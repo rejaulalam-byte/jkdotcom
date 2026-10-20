@@ -46,7 +46,7 @@ $feedbackToken = Security::csrfToken();
         <nav class="footer__links" aria-label="ফুটার মেনু">
             <ul>
                 <li><a class="footer__links-head" href="/">হোম</a></li>
-                <li><a href="/services">আমাদের সেবা সমুহ</a></li>
+                <li><a href="/services">আমাদের সেবা সমূহ</a></li>
                 <li><a href="/registration">রেজিস্ট্রেশন</a></li>
                 <li><a href="/#faq">আপনার জিজ্ঞাসা আমাদের উত্তর</a></li>
             </ul>

@@ -19,7 +19,7 @@ return [
 
     // Designed in Figma, to be built page by page (see PROGRESS.md)
     ['GET',  '/about',           [PageController::class, 'soon', ['title' => 'আমাদের সম্পর্কে']]],
-    ['GET',  '/services',        [PageController::class, 'soon', ['title' => 'সেবা সমুহ']]],
+    ['GET',  '/services',        [PageController::class, 'soon', ['title' => 'সেবা সমূহ']]],
     ['GET',  '/today',           [PageController::class, 'soon', ['title' => 'আজকের প্রকাশিত কাজ']]],
     ['GET',  '/today/post',      [PageController::class, 'soon', ['title' => 'কাজ সম্পর্কে জানান']]],
     ['GET',  '/registration',    [PageController::class, 'soon', ['title' => 'রেজিস্ট্রেশন']]],

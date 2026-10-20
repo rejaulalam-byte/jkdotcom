@@ -41,7 +41,7 @@ $faqKeys = [1, 2, 3, 4, 5];
                         <?php endforeach; ?>
                     </ol>
                 <?php endif; ?>
-                <p class="today__note"><?= rich(content('home.today.note')) ?></p>
+                <p class="today__note"><span><?= rich(content('home.today.note')) ?></span></p>
             </div>
         </aside>
     </div>

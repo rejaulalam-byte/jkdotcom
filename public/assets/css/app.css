@@ -1696,3 +1696,27 @@ textarea {
         overflow-y: auto;
     }
 }
+
+/* ---- Fine-tuning after first visual check ------------------------------- */
+.topbar__contact a span {
+    white-space: nowrap;
+}
+.faq-item[open] {
+    min-height: 12.8rem;
+}
+.hero__title {
+    text-wrap: balance;
+}
+@media (max-width: 1199px) {
+    .faq-item[open] {
+        min-height: 0;
+    }
+}
+@media (max-width: 480px) {
+    :root {
+        --fs-h1: 1.9rem;
+    }
+    .hero__title-1 {
+        white-space: normal;
+    }
+}
