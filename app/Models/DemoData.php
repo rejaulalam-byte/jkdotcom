@@ -33,14 +33,24 @@ final class DemoData
         ];
     }
 
-    /** @return list<array{name:string,icon:?string}> */
+    /**
+     * All services of the old site (database/seeds/services.php).
+     * The icon is the default file public/assets/img/service-icons/<slug>.svg when it exists.
+     *
+     * @return list<array{name:string,slug:string,icon:?string}>
+     */
     public static function services(): array
     {
-        $names = [
-            'আর্কিটেক্ট', 'আই,পি,এস ঠিক করা', 'আলোক সজ্জা করা', 'ইন্টেরিয়র ডিজাইনার',
-            'ইভেন্ট ম্যানেজমেন্ট', 'ইন্টারনেট লাইন সংযোগ', 'ইলেকট্রিক মিস্ত্রি', 'এম্বুলেন্স সেবা',
-        ];
+        /** @var list<array{0:int,1:string,2:string}> $rows */
+        $rows = require BASE_PATH . '/database/seeds/services.php';
 
-        return array_map(static fn (string $n): array => ['name' => $n, 'icon' => null], $names);
+        return array_map(
+            static fn (array $r): array => [
+                'name' => $r[1],
+                'slug' => $r[2],
+                'icon' => ServiceRepository::iconUrl('/assets/img/service-icons/' . $r[2] . '.svg'),
+            ],
+            $rows
+        );
     }
 }

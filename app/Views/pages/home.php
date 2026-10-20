@@ -84,21 +84,32 @@ $faqKeys = [1, 2, 3, 4, 5];
         <p class="section__text"><?= e(content('home.services.text_1')) ?><br class="br-desktop"> <?= e(content('home.services.text_2')) ?></p>
     </div>
 
+    <?php
+    // ALL services in two rows that scroll right -> left on their own (app.js);
+    // without JS / with "reduce motion" they are normal sideways-scrollable rows.
+    $serviceRows = $services === [] ? [] : array_chunk($services, (int) ceil(count($services) / 2));
+    ?>
+    <div class="service-rows">
+        <?php foreach ($serviceRows as $r => $rowServices): ?>
+            <div class="service-row" data-service-row="<?= e($r + 1) ?>">
+                <ul class="service-row__track">
+                    <?php foreach ($rowServices as $service): ?>
+                        <li class="service-card">
+                            <a href="/services/<?= e(rawurlencode($service['slug'])) ?>">
+                                <span class="service-card__icon">
+                                    <?php if ($service['icon'] !== null): ?>
+                                        <img src="<?= e($service['icon']) ?>" alt="" width="44" height="44">
+                                    <?php endif; ?>
+                                </span>
+                                <span class="service-card__name"><?= e($service['name']) ?></span>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endforeach; ?>
+    </div>
     <div class="container">
-        <ul class="service-grid">
-            <?php foreach ($services as $service): ?>
-                <li class="service-card">
-                    <a href="/services">
-                        <span class="service-card__icon">
-                            <?php if ($service['icon'] !== null): ?>
-                                <img src="<?= e($service['icon']) ?>" alt="" width="113" height="95" loading="lazy">
-                            <?php endif; ?>
-                        </span>
-                        <span class="service-card__name"><?= e($service['name']) ?></span>
-                    </a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
         <p class="center"><a class="btn btn--teal-soft" href="/services"><?= e(content('home.services.button')) ?></a></p>
     </div>
 </section>

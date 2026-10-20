@@ -23,7 +23,7 @@ final class HomeController
             'description' => content('site.description'),
             'jobs' => JobPostRepository::recent($days),
             'ads' => AdRepository::active(),
-            'services' => ServiceRepository::featured(8),
+            'services' => ServiceRepository::all(),
             'feedbackOk' => Session::pull('feedback_ok'),
             'feedbackErrors' => Session::pull('feedback_errors', []),
             'old' => Session::pull('feedback_old', []),

@@ -1,6 +1,9 @@
 <?php
-/** @var string $heading */
-$crumbs = [['/', 'হোম'], [null, $heading]];
+/**
+ * @var string $heading
+ * @var list<array{0:?string,1:string}>|null $crumbs
+ */
+$crumbs ??= [['/', 'হোম'], [null, $heading]];
 require BASE_PATH . '/app/Views/partials/page-banner.php';
 ?>
 <section class="section section--plain">

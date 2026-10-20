@@ -36,13 +36,14 @@ final class Router
 
         $pathExists = false;
         foreach ($routes as $route) {
-            if ($route[1] !== $path) {
+            $params = self::match($route[1], $path);
+            if ($params === null) {
                 continue;
             }
             $pathExists = true;
             if ($route[0] === $method) {
                 [$class, $action] = $route[2];
-                (new $class())->$action($route[3] ?? []);
+                (new $class())->$action(($route[3] ?? []) + $params);
                 return;
             }
         }
@@ -55,6 +56,22 @@ final class Router
         }
 
         self::notFound();
+    }
+
+    /**
+     * Does a route path match the URL? A route may hold {slug}: one part made of
+     * a-z, 0-9 and "-" only (e.g. /services/{slug} matches /services/electrician).
+     *
+     * @return array<string,string>|null  the {slug} values, or null when it does not match
+     */
+    private static function match(string $routePath, string $path): ?array
+    {
+        if (!str_contains($routePath, '{slug}')) {
+            return $routePath === $path ? [] : null;
+        }
+        $regex = '#^' . str_replace('\{slug\}', '([a-z0-9-]{1,80})', preg_quote($routePath, '#')) . '$#';
+
+        return preg_match($regex, $path, $m) === 1 ? ['slug' => $m[1]] : null;
     }
 
     private static function notFound(): void

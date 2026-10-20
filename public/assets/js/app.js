@@ -121,6 +121,43 @@
         window.addEventListener("resize", setSpeed);
     });
 
+    /* ---- Services: two rows running right -> left, each on its own -------
+       The cards of a row are repeated so the loop has no gap. Row 2 runs at a
+       different speed and starts at a different point, so the rows never move
+       in step. Hover / keyboard focus pauses (CSS). */
+    document.querySelectorAll("[data-service-row]").forEach(function (row) {
+        var track = row.querySelector(".service-row__track");
+        if (!track || reduceMotion) {
+            return;
+        }
+        var items = Array.prototype.slice.call(track.children);
+        if (items.length < 2) {
+            return;
+        }
+        var second = row.getAttribute("data-service-row") === "2";
+        var gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+        var setWidth = items.reduce(function (sum, li) {
+            return sum + li.getBoundingClientRect().width + gap;
+        }, 0);
+        var copies = Math.max(1, Math.ceil(row.clientWidth / setWidth));
+        for (var c = 0; c < copies; c++) {
+            items.forEach(function (li) {
+                var clone = li.cloneNode(true);
+                clone.setAttribute("aria-hidden", "true");
+                clone.querySelectorAll("a").forEach(function (a) {
+                    a.setAttribute("tabindex", "-1");
+                });
+                track.appendChild(clone);
+            });
+        }
+        var pxPerSecond = (window.innerWidth < 768 ? 28 : 45) * (second ? 0.8 : 1);
+        var seconds = setWidth / pxPerSecond;
+        row.style.setProperty("--row-shift", setWidth + "px");
+        row.style.setProperty("--row-duration", seconds.toFixed(1) + "s");
+        row.style.setProperty("--row-delay", (second ? -seconds * 0.37 : 0).toFixed(1) + "s");
+        row.classList.add("is-moving");
+    });
+
     /* ---- Advertisement strip: endless sideways scroll -------------------- */
     document.querySelectorAll("[data-ad-strip]").forEach(function (strip) {
         var track = strip.querySelector(".ad-strip__track");
