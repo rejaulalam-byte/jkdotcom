@@ -76,10 +76,9 @@ $feedbackToken = Security::csrfToken();
                 </button>
             </form>
 
-            <?php if (social_links() !== []): // no address for any icon = the whole box (heading too) is left out ?>
-                <p class="pill pill--social"><?= e(content('footer.social_title')) ?></p>
-                <?php $socialClass = 'social--footer'; require BASE_PATH . '/app/Views/partials/social.php'; ?>
-            <?php endif; ?>
+            <?php // the heading always stays; below it only the icons that have an address (social.php prints none when no link is set) ?>
+            <p class="pill pill--social"><?= e(content('footer.social_title')) ?></p>
+            <?php $socialClass = 'social--footer'; require BASE_PATH . '/app/Views/partials/social.php'; ?>
         </div>
     </div>
 

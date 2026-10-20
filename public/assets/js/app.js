@@ -56,8 +56,9 @@
        Shows N rows. Each page of rows rises SLOWLY from the bottom (data-rise,
        default 4s, so the rows can be read while rising), rests for a few
        seconds (data-hold, default 5.5s), then quickly moves up and away; the
-       next page rises in the same slow way. Without JS or with "reduce motion" the plain list
-       (first N rows) is shown. */
+       next page rises at the same moment and speed (one belt, no gap). The rows run
+       in a circle, so every page is full. Without JS or with "reduce motion" the plain
+       list (first N rows) is shown. */
     var ticker = document.querySelector(".ticker[data-page-size]");
     if (ticker && !reduceMotion && ticker.animate) {
         var size = parseInt(ticker.getAttribute("data-page-size"), 10) || 8;
@@ -66,16 +67,20 @@
         var rows = Array.prototype.slice.call(ticker.children);
 
         if (rows.length > size) {
-            var pages = [];
-            for (var i = 0; i < rows.length; i += size) {
+            // The rows form a circle (…11, 12, 1, 2…): every page is a window of `size`
+            // rows, so a page is never short and the list never shows an empty gap.
+            rows.forEach(function (row) {
+                ticker.removeChild(row);
+            });
+            var makePage = function (from) {
                 var page = document.createElement("ol");
-                page.className = "ticker__page";
-                rows.slice(i, i + size).forEach(function (row) {
-                    page.appendChild(row);
-                });
+                page.className = "ticker__page is-shown";
+                for (var j = 0; j < size; j++) {
+                    page.appendChild(rows[(from + j) % rows.length].cloneNode(true));
+                }
                 ticker.appendChild(page);
-                pages.push(page);
-            }
+                return page;
+            };
             ticker.classList.add("is-live");
 
             var sleep = function (ms) {
@@ -83,9 +88,10 @@
                     setTimeout(resolve, ms);
                 });
             };
-            var play = function (el, from, to, ms, easing) {
+            var easing = "cubic-bezier(.25,.1,.25,1)";
+            var slide = function (el, from, to) {
                 return el.animate([{ transform: from }, { transform: to }], {
-                    duration: ms,
+                    duration: rise,
                     easing: easing,
                     fill: "forwards"
                 }).finished;
@@ -106,17 +112,23 @@
             };
 
             (async function loop() {
-                var index = 0;
+                var from = 0;
+                var current = makePage(from);
+                await whenVisible();
+                await slide(current, "translateY(100%)", "translateY(0)");
                 for (;;) {
-                    var current = pages[index];
-                    await whenVisible();
-                    current.classList.add("is-shown");
-                    await play(current, "translateY(100%)", "translateY(0)", rise, "cubic-bezier(.25,.1,.25,1)");
                     await sleep(hold);
                     await whenVisible();
-                    await play(current, "translateY(0)", "translateY(-100%)", rise, "cubic-bezier(.25,.1,.25,1)");
-                    current.classList.remove("is-shown");
-                    index = (index + 1) % pages.length;
+                    // the full page leaves at the top while the next one rises at the bottom,
+                    // both at the same speed, so the list moves like one belt
+                    from = (from + size) % rows.length;
+                    var next = makePage(from);
+                    await Promise.all([
+                        slide(current, "translateY(0)", "translateY(-100%)"),
+                        slide(next, "translateY(100%)", "translateY(0)")
+                    ]);
+                    ticker.removeChild(current);
+                    current = next;
                 }
             })();
         }
@@ -211,9 +223,9 @@
             }
 
             // Step by step (owner 2026-10-20): the first banner slides out to the left in ~0.9 s,
-            // the rest stay still for 2.5 s (data-hold), then the next one leaves. A visitor can
+            // the rest stay still for 5.5 s (data-hold; was 2.5 s, +3 s asked by the owner), then the next one leaves. A visitor can
             // read every ad; hovering or focusing the strip holds it still.
-            var hold = parseInt(strip.getAttribute("data-hold"), 10) || 2500;
+            var hold = parseInt(strip.getAttribute("data-hold"), 10) || 5500;
             var held = false;
             strip.addEventListener("mouseenter", function () { held = true; });
             strip.addEventListener("mouseleave", function () { held = false; });
