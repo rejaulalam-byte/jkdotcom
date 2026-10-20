@@ -24,6 +24,23 @@ Reference images: docs/references/service-card-reference.png (wanted service-car
 
 Also record in CLAUDE.md after finishing: these decisions (marquee text colouring, footer link editing, services scrolling rows) so the admin panel plan includes them.
 
+## State at end of 2026-10-20 (after Home tweaks round 1 + 2 and later polish) — all pushed to main
+Done after "Home tweaks round 1" (commits 925da04 … 7decece):
+- Menu logo: new one-picture logo `public/assets/img/site/logo-header.png` (original kept in `assets/brand/logo-header-original.png`); header sits a little lower.
+- Today's-jobs list (hero right box): the next page rises the moment the last row of the previous page has left (one endless belt, no gaps); a short last page leaves sooner.
+- Ad strip: moves one banner at a time with 5.5 s rests. Teal marquee bar below it is lower.
+- Footer rebuilt from the owner's new Figma: logo with the name beside it, e-mail box centred on the logo, 4 link columns on one line; footer logo links to the page top.
+- Social icons: all six shown again (top bar + footer). Switch `settings.social_hide_empty` is OFF ('0') — turn it ON only when the owner says so.
+- Hero: every letter flies in from a random direction (`[data-fly]` + js/app.js).
+- Floating back-to-top button: travels like a scroll thumb from the middle of the screen to the bottom, glides up slowly.
+- Menu: "রেজিস্ট্রেশন" has 4 sub-menu items (`/registration/professional`, `/registration/agent`, `/login`, `/dashboard`) — they still show the coming-soon page.
+
+NOT done / NOT tested:
+- Real MySQL: run `database/migrations/002_services.sql` after 001 (only demo mode has been used so far).
+- Real phone test (only the desktop browser / mobile-size emulation was checked).
+- The animations (hero fly-in, list belt, ad strip, back-to-top) were only measured with numbers, because the preview pane draws no frames — the owner must watch them in a real browser.
+- Registration, login and dashboard pages are not built (coming-soon).
+
 ## State at end of session 1 (2026-10-20)
 - GitHub repo https://github.com/rejaulalam-byte/jkdotcom , branch main, all work pushed. Git identity set locally (Kazi Rejaul Alam / rejaulalam@gmail.com).
 - Plain-PHP skeleton + HOME page DONE and visually checked (desktop 1920 + mobile 390). See README.md for folder map and security rules.
