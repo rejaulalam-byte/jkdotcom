@@ -22,6 +22,28 @@ International-standard, mobile-first, fast (low-bandwidth) redesign. Bangla-firs
 - Hosting: cPanel. Never ask for/accept passwords in chat; prefer cPanel Git Version Control (.cpanel.yml) or SFTP key.
 - Contact data in design: hotline +880 1761 441 911, info@jorurikaj.com, H-100 New Airport Road, Kakoli Bonani, Dhaka 1213. Footer credit: "Developed by Do Something".
 
+## Figma page map (fileKey TzuvEKEzb297MFROjbO9UF; use node-id in get_design_context/get_screenshot)
+All pages share: top bar (phone, email, tagline, social icons), white nav (logo, হোম / আমাদের সম্পর্কে / সেবা সমূহ / আজকের প্রকাশিত / রেজিস্ট্রেশন / যোগাযোগ, search icon), teal page-title banner with breadcrumb, teal footer (logo, address, hotline, newsletter email box, link columns, social, copyright "Developed by Do Something").
+| Page | node-id | Notes |
+|---|---|---|
+| Home | 2584-12 | hero + today's job list box, 3 photos, agent-wanted bar, 8 service cards, about+BD map, 4 steps, FAQ + feedback form, Google map, footer |
+| About (আমাদের সম্পর্কে) | 2621-103 | long text + BD map |
+| Services (সেবা সমূহ) | 2642-54 | notice box, search (service/area/name/mobile), alphabetical Bangla list in 3 columns |
+| Today's published – post a job (কাজ সম্পর্কে জানান) | 2674-7 | form: job type (or add new), name, mobile, email, address, upazila/thana, district, division, ad start/end date, description; helpline 01919293483 for help; * = required |
+| Today's published list (কাজ সম্পর্কে জানুন) | 2675-148 | accordion list: title, date/time, details, contact (phone masked, click to reveal), email masked |
+| Registration rules overview | 2631-395 | who can register: professional / job-seeker / agent; 2 buttons |
+| Registration guideline – professional | 2683-148 | rules, eligibility, 2 cards |
+| Registration guideline – agent | 2683-305 | rules, duties, 2 cards |
+| Professional registration form | 2658-504 | name, profession, experience, mobile, address, upazila, district, division, password x2 (min 12 chars), bio, photo (JPG/PNG/WebP, max 150KB) |
+| Professional login | 2660-816 | login id = registered mobile + password |
+| Professional logged-in welcome | 2663-981 | header shows avatar; dashboard page not designed yet |
+| Agent registration form | 2682-2 | name, NID number, mobile, address, upazila, district, division, password x2, photo |
+| Agent login | 2686-619 | same as professional login |
+| Agent logged-in welcome | 2686-740 | |
+| Registration rules (separate frame) | 2684-437 | not yet reviewed |
+| Contact (যোগাযোগ) | pending | owner is finishing; will send link |
+Not designed yet (discuss with owner): profile dashboard/edit, search results, stats ("এক নজরে পরিসংখ্যান"), FAQ page, privacy/terms, admin panel, 404, mobile layouts.
+
 ## Branding
 - Follow the FIGMA palette (dark teal hero/footer + orange accent + light teal-grey cards), not the logo's maroon/gold. Logo files (assets/brand/logo.png, logo.jpg) are the "JK" maroon/gold monogram, used as-is. Extract exact tokens from Figma via get_design_context.
 - Light theme. Bangla-first fonts.
