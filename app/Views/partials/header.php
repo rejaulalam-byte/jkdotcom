@@ -8,7 +8,12 @@ $menu = [
         ['/today/post', 'কাজ সম্পর্কে জানান'],
         ['/today',      'কাজ সম্পর্কে জানুন'],
     ]],
-    ['/registration', 'রেজিস্ট্রেশন',        []],
+    ['/registration', 'রেজিস্ট্রেশন',        [
+        ['/registration/professional', 'আগ্রহী পেশাদার কর্মী রেজিস্ট্রেশন'],
+        ['/registration/agent',        'প্রতিনিধি রেজিস্ট্রেশন'],
+        ['/login',                     'লগইন'],
+        ['/dashboard',                 'ড্যাশবোর্ড'],
+    ]],
     ['/contact',      'যোগাযোগ',           []],
 ];
 $current = \App\Core\Router::currentPath();
