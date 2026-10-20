@@ -358,7 +358,7 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 9.25rem;
+    min-height: 7.75rem; /* owner 2026-10-20: a little lower; the logo keeps ~14px free above and below */
     gap: 2rem;
 }
 .brand {
@@ -369,7 +369,7 @@ textarea {
 .brand__logo {
     display: block;
     width: auto;
-    height: 6.75rem;
+    height: 5.75rem;
 }
 .emblem {
     position: relative;
@@ -652,21 +652,10 @@ textarea {
 .ad-strip__item a {
     display: block;
 }
+/* app.js moves the first banner out to the left, one at a time (see "Advertisement strip") */
 .ad-strip.is-marquee .ad-strip__track {
     justify-content: flex-start;
     width: max-content;
-    animation: ad-scroll var(--ad-duration, 40s) linear infinite;
-}
-.ad-strip.is-marquee:hover .ad-strip__track {
-    animation-play-state: paused;
-}
-@keyframes ad-scroll {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(calc(-1 * var(--ad-shift, 50%)));
-    }
 }
 
 .rep-bar {

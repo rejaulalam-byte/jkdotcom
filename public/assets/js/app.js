@@ -114,7 +114,7 @@
                     await play(current, "translateY(100%)", "translateY(0)", rise, "cubic-bezier(.25,.1,.25,1)");
                     await sleep(hold);
                     await whenVisible();
-                    await play(current, "translateY(0)", "translateY(-100%)", 900, "ease-in-out");
+                    await play(current, "translateY(0)", "translateY(-100%)", rise, "cubic-bezier(.25,.1,.25,1)");
                     current.classList.remove("is-shown");
                     index = (index + 1) % pages.length;
                 }
@@ -174,7 +174,7 @@
         row.classList.add("is-moving");
     });
 
-    /* ---- Advertisement strip: endless sideways scroll -------------------- */
+    /* ---- Advertisement strip: one banner leaves, the others rest ----------- */
     document.querySelectorAll("[data-ad-strip]").forEach(function (strip) {
         var track = strip.querySelector(".ad-strip__track");
         if (!track || reduceMotion) {
@@ -205,9 +205,38 @@
                     track.appendChild(clone);
                 });
             }
-            strip.style.setProperty("--ad-shift", setWidth + "px");
-            strip.style.setProperty("--ad-duration", Math.max(15, setWidth / 55) + "s");
             strip.classList.add("is-marquee");
+            if (!track.animate) {
+                return;
+            }
+
+            // Step by step (owner 2026-10-20): the first banner slides out to the left in ~0.9 s,
+            // the rest stay still for 2.5 s (data-hold), then the next one leaves. A visitor can
+            // read every ad; hovering or focusing the strip holds it still.
+            var hold = parseInt(strip.getAttribute("data-hold"), 10) || 2500;
+            var held = false;
+            strip.addEventListener("mouseenter", function () { held = true; });
+            strip.addEventListener("mouseleave", function () { held = false; });
+            strip.addEventListener("focusin", function () { held = true; });
+            strip.addEventListener("focusout", function () { held = false; });
+
+            function step() {
+                if (held || document.hidden) {
+                    setTimeout(step, 500);
+                    return;
+                }
+                var first = track.firstElementChild;
+                var distance = first.getBoundingClientRect().width + (parseFloat(getComputedStyle(track).columnGap) || 0);
+                var move = track.animate(
+                    [{ transform: "translateX(0)" }, { transform: "translateX(-" + distance + "px)" }],
+                    { duration: 900, easing: "ease-in-out" }
+                );
+                move.onfinish = function () {
+                    track.appendChild(first); // the banner that left joins the end of the line
+                    setTimeout(step, hold);
+                };
+            }
+            setTimeout(step, hold);
         }
 
         // wait for the images so the widths are real

@@ -57,10 +57,10 @@ $faqKeys = [1, 2, 3, 4, 5];
                         <li class="ad-strip__item">
                             <?php if ($ad['link'] !== null): ?>
                                 <a href="<?= e($ad['link']) ?>" target="_blank" rel="noopener noreferrer nofollow sponsored">
-                                    <img src="<?= e($ad['image']) ?>" alt="<?= e($ad['title']) ?>" width="<?= e($ad['width']) ?>" height="<?= e($ad['height']) ?>" loading="lazy">
+                                    <img src="<?= e($ad['image']) ?>" alt="<?= e($ad['title']) ?>" width="<?= e($ad['width']) ?>" height="<?= e($ad['height']) ?>">
                                 </a>
                             <?php else: ?>
-                                <img src="<?= e($ad['image']) ?>" alt="<?= e($ad['title']) ?>" width="<?= e($ad['width']) ?>" height="<?= e($ad['height']) ?>" loading="lazy">
+                                <img src="<?= e($ad['image']) ?>" alt="<?= e($ad['title']) ?>" width="<?= e($ad['width']) ?>" height="<?= e($ad['height']) ?>">
                             <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
