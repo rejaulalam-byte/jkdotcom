@@ -35,7 +35,7 @@ $faqKeys = [1, 2, 3, 4, 5];
                 <?php if ($jobs === []): ?>
                     <p class="today__empty"><?= e(content('home.today.empty')) ?></p>
                 <?php else: ?>
-                    <ol class="ticker" data-page-size="8" data-hold="5500">
+                    <ol class="ticker" data-page-size="8" data-rise="4000" data-hold="5500">
                         <?php foreach ($jobs as $i => $job): ?>
                             <li><a href="/today#job-<?= e($job['id']) ?>"><span class="ticker__no"><?= e(bn($i + 1)) ?>.</span> <?= e($job['title']) ?></a></li>
                         <?php endforeach; ?>

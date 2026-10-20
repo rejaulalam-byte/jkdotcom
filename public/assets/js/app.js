@@ -37,14 +37,16 @@
     });
 
     /* ---- "আজকের কাজের তালিকা" scroller ------------------------------------
-       Shows N rows. Each page of rows rises from the bottom, rests for a few
+       Shows N rows. Each page of rows rises SLOWLY from the bottom (data-rise,
+       default 4s, so the rows can be read while rising), rests for a few
        seconds (data-hold, default 5.5s), then quickly moves up and away; the
-       next page rises in. Without JS or with "reduce motion" the plain list
+       next page rises in the same slow way. Without JS or with "reduce motion" the plain list
        (first N rows) is shown. */
     var ticker = document.querySelector(".ticker[data-page-size]");
     if (ticker && !reduceMotion && ticker.animate) {
         var size = parseInt(ticker.getAttribute("data-page-size"), 10) || 8;
         var hold = parseInt(ticker.getAttribute("data-hold"), 10) || 5500;
+        var rise = parseInt(ticker.getAttribute("data-rise"), 10) || 4000;
         var rows = Array.prototype.slice.call(ticker.children);
 
         if (rows.length > size) {
@@ -93,7 +95,7 @@
                     var current = pages[index];
                     await whenVisible();
                     current.classList.add("is-shown");
-                    await play(current, "translateY(100%)", "translateY(0)", 900, "cubic-bezier(.2,.7,.2,1)");
+                    await play(current, "translateY(100%)", "translateY(0)", rise, "cubic-bezier(.25,.1,.25,1)");
                     await sleep(hold);
                     await whenVisible();
                     await play(current, "translateY(0)", "translateY(-100%)", 450, "ease-in");
