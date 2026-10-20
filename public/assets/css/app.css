@@ -997,6 +997,20 @@ textarea {
     color: rgba(34, 34, 34, 0.5);
     opacity: 1;
 }
+/* required-field star, stays visible while typing */
+.field {
+    position: relative;
+}
+.field__req {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.9rem;
+    color: var(--red);
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1;
+    pointer-events: none;
+}
 .feedback .btn {
     display: flex;
     margin: 1.25rem auto 0;

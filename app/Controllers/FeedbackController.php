@@ -41,18 +41,23 @@ final class FeedbackController
             'message' => $this->clean($_POST['message'] ?? '', 2000, true),
         ];
 
+        // All five fields are required (owner 2026-10-20)
         $errors = [];
         if ($data['name'] === '') {
             $errors[] = 'আপনার নাম লিখুন।';
         }
-        if ($data['email'] !== '' && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        if ($data['email'] === '') {
+            $errors[] = 'ইমেইল ঠিকানা লিখুন।';
+        } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'ইমেইল ঠিকানাটি সঠিক নয়।';
         }
-        if ($data['phone'] !== '' && !preg_match('/^[0-9+\-\s()০-৯]{6,20}$/u', $data['phone'])) {
+        if ($data['phone'] === '') {
+            $errors[] = 'ফোন নাম্বার লিখুন।';
+        } elseif (!preg_match('/^[0-9+\-\s()০-৯]{6,20}$/u', $data['phone'])) {
             $errors[] = 'ফোন নাম্বারটি সঠিক নয়।';
         }
-        if ($data['email'] === '' && $data['phone'] === '') {
-            $errors[] = 'ইমেইল অথবা ফোন নাম্বার দিন, যাতে আমরা যোগাযোগ করতে পারি।';
+        if ($data['subject'] === '') {
+            $errors[] = 'বিষয় বস্তু লিখুন।';
         }
         if (mb_strlen($data['message']) < 5) {
             $errors[] = 'আপনার পরামর্শ / মতামত লিখুন।';

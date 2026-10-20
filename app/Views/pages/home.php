@@ -198,25 +198,41 @@ $faqKeys = [1, 2, 3, 4, 5];
             <?= csrf_field() ?>
             <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
 
-            <label class="sr-only" for="fb-name"><?= e(content('home.feedback.name')) ?></label>
-            <input id="fb-name" type="text" name="name" maxlength="100" required autocomplete="name"
-                   placeholder="<?= e(content('home.feedback.name')) ?>" value="<?= e($old['name'] ?? '') ?>">
+            <?php // every field is required: "*" in the placeholder + a red * that stays visible while typing ?>
+            <div class="field">
+                <label class="sr-only" for="fb-name"><?= e(content('home.feedback.name')) ?></label>
+                <input id="fb-name" type="text" name="name" maxlength="100" required autocomplete="name"
+                       placeholder="<?= e(content('home.feedback.name')) ?> *" value="<?= e($old['name'] ?? '') ?>">
+                <span class="field__req" aria-hidden="true">*</span>
+            </div>
 
-            <label class="sr-only" for="fb-email"><?= e(content('home.feedback.email')) ?></label>
-            <input id="fb-email" type="email" name="email" maxlength="150" autocomplete="email"
-                   placeholder="<?= e(content('home.feedback.email')) ?>" value="<?= e($old['email'] ?? '') ?>">
+            <div class="field">
+                <label class="sr-only" for="fb-email"><?= e(content('home.feedback.email')) ?></label>
+                <input id="fb-email" type="email" name="email" maxlength="150" required autocomplete="email"
+                       placeholder="<?= e(content('home.feedback.email')) ?> *" value="<?= e($old['email'] ?? '') ?>">
+                <span class="field__req" aria-hidden="true">*</span>
+            </div>
 
-            <label class="sr-only" for="fb-phone"><?= e(content('home.feedback.phone')) ?></label>
-            <input id="fb-phone" type="tel" name="phone" maxlength="20" autocomplete="tel"
-                   placeholder="<?= e(content('home.feedback.phone')) ?>" value="<?= e($old['phone'] ?? '') ?>">
+            <div class="field">
+                <label class="sr-only" for="fb-phone"><?= e(content('home.feedback.phone')) ?></label>
+                <input id="fb-phone" type="tel" name="phone" maxlength="20" required autocomplete="tel"
+                       placeholder="<?= e(content('home.feedback.phone')) ?> *" value="<?= e($old['phone'] ?? '') ?>">
+                <span class="field__req" aria-hidden="true">*</span>
+            </div>
 
-            <label class="sr-only" for="fb-subject"><?= e(content('home.feedback.subject')) ?></label>
-            <input id="fb-subject" type="text" name="subject" maxlength="150"
-                   placeholder="<?= e(content('home.feedback.subject')) ?>" value="<?= e($old['subject'] ?? '') ?>">
+            <div class="field">
+                <label class="sr-only" for="fb-subject"><?= e(content('home.feedback.subject')) ?></label>
+                <input id="fb-subject" type="text" name="subject" maxlength="150" required
+                       placeholder="<?= e(content('home.feedback.subject')) ?> *" value="<?= e($old['subject'] ?? '') ?>">
+                <span class="field__req" aria-hidden="true">*</span>
+            </div>
 
-            <label class="sr-only" for="fb-message"><?= e(content('home.feedback.message')) ?></label>
-            <textarea id="fb-message" name="message" rows="5" maxlength="2000" required
-                      placeholder="<?= e(content('home.feedback.message')) ?>"><?= e($old['message'] ?? '') ?></textarea>
+            <div class="field">
+                <label class="sr-only" for="fb-message"><?= e(content('home.feedback.message')) ?></label>
+                <textarea id="fb-message" name="message" rows="5" maxlength="2000" required
+                          placeholder="<?= e(content('home.feedback.message')) ?> *"><?= e($old['message'] ?? '') ?></textarea>
+                <span class="field__req" aria-hidden="true">*</span>
+            </div>
 
             <button class="btn btn--white" type="submit">
                 <span><?= e(content('home.feedback.submit')) ?></span>
