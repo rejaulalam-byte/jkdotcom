@@ -9,8 +9,10 @@ $feedbackToken = Security::csrfToken();
         <div class="footer__brand">
             <div class="footer__brand-head">
             <span class="emblem emblem--footer"><img src="<?= e(asset('img/site/logo-figma.png')) ?>" alt="" width="596" height="541" loading="lazy"></span>
-            <p class="footer__name"><span><?= e(content('site.brand')) ?></span><?= e(content('site.brand_suffix')) ?></p>
-            <p class="footer__tagline"><?= e(content('site.tagline')) ?></p>
+            <div class="footer__brand-text">
+                <p class="footer__name"><span><?= e(content('site.brand')) ?></span><?= e(content('site.brand_suffix')) ?></p>
+                <p class="footer__tagline"><?= e(content('site.tagline')) ?></p>
+            </div>
             </div>
 
             <div class="footer__brand-body">

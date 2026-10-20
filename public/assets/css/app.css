@@ -1050,7 +1050,7 @@ textarea {
 
 /* ---- Footer ------------------------------------------------------------- */
 .site-footer {
-    padding-top: 4.3rem;
+    padding-top: 8rem; /* Figma 2026-10-20: logo row starts 128px under the footer's top edge */
     background: var(--teal);
     color: var(--white);
     font-size: var(--fs-small);
@@ -1065,15 +1065,18 @@ textarea {
     display: grid;
     grid-template-columns: 34rem 22.875rem 20.75rem 21.875rem;
     column-gap: 0;
-    row-gap: 2.7rem;
+    row-gap: 3.3rem;
     align-items: start;
 }
-/* Row 1: logo/name (left) + newsletter. Row 2: address list (left) + the link
-   columns + social box, so all of row 2 starts on the address line (owner 2026-10-20). */
+/* Row 1: logo (emblem + name beside it) on the left, the e-mail box centred on the logo's height on the right.
+   Row 2: address list + the link columns + social box, all starting on the same line (owner 2026-10-20). */
 .footer__brand {
     display: contents;
 }
 .footer__brand-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     grid-column: 1;
     grid-row: 1;
 }
@@ -1082,12 +1085,13 @@ textarea {
     grid-row: 2;
 }
 .footer__brand-head > .emblem--footer {
+    flex: none;
     width: 8.875rem;
-    margin-left: 2.5rem;
+    margin-left: -1.0625rem;
 }
 .footer__name {
     width: 13.875rem;
-    margin-top: 0.7rem;
+    margin-top: 0;
     font-size: 1.7284rem;
     font-weight: 600;
     line-height: 1.2;
@@ -1162,7 +1166,7 @@ textarea {
     grid-column: 3 / span 2;
     grid-row: 1;
     position: relative;
-    margin-top: 5.75rem;
+    align-self: center;
     height: 4.795rem;
     border-radius: 3.33rem;
     background: var(--white);
@@ -1653,8 +1657,11 @@ textarea {
         grid-column: 1;
         grid-row: auto;
     }
+    .footer__brand-head {
+        gap: 0.75rem;
+    }
     .footer__brand-head > .emblem--footer {
-        width: 6.5rem;
+        width: 5.5rem;
         margin-left: 0;
     }
     .footer__name {
