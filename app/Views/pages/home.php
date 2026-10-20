@@ -169,7 +169,8 @@ $faqKeys = [1, 2, 3, 4, 5];
     <div class="container faq__grid">
         <div class="faq__list">
             <?php foreach ($faqKeys as $n): ?>
-                <details class="faq-item" open>
+                <?php // all closed on load; name="faq" = only one open at a time (app.js does the same for older browsers) ?>
+                <details class="faq-item" name="faq">
                     <summary>
                         <img src="<?= e(asset('img/icons/dot.svg')) ?>" alt="" width="14" height="14">
                         <span><?= e(content('home.faq.' . $n . '.q')) ?></span>

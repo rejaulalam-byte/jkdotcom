@@ -941,6 +941,19 @@ textarea {
 .faq-item:not([open]) summary {
     padding-bottom: 2.5rem;
 }
+/* the open question: whole box teal, white text, "−" */
+.faq-item[open] {
+    background: var(--teal);
+    color: var(--white);
+}
+.faq-item[open] summary img {
+    filter: brightness(0) invert(1);
+}
+.faq-item summary:focus-visible {
+    outline: 3px solid var(--amber);
+    outline-offset: 3px;
+    border-radius: 0.625rem;
+}
 
 .feedback {
     padding: 3.4375rem 5.8rem 5.3rem;

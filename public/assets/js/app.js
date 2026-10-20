@@ -36,6 +36,22 @@
         });
     });
 
+    /* ---- FAQ: opening one question closes the others ---------------------
+       (browsers that know <details name="..."> already do this themselves) */
+    var faqItems = document.querySelectorAll(".faq-item");
+    faqItems.forEach(function (item) {
+        item.addEventListener("toggle", function () {
+            if (!item.open) {
+                return;
+            }
+            faqItems.forEach(function (other) {
+                if (other !== item && other.open) {
+                    other.open = false;
+                }
+            });
+        });
+    });
+
     /* ---- "আজকের কাজের তালিকা" scroller ------------------------------------
        Shows N rows. Each page of rows rises SLOWLY from the bottom (data-rise,
        default 4s, so the rows can be read while rising), rests for a few
