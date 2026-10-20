@@ -1,6 +1,9 @@
 # Progress (read CLAUDE.md first)
 
-## >>> NEXT TASK: Home page tweaks, owner round 1 (2026-10-20) <<<
+## Home page tweaks, owner round 1 (2026-10-20) — DONE, all 9 items pushed
+Decisions recorded in CLAUDE.md ("Home tweaks round 1"). Service names now follow the owner's
+Figma style (no "... করার লোক"). Waiting for the owner's review of the result; next = "Next steps" below.
+
 Owner reviewed Home. Do these in order, test desktop 1920 + mobile 390, commit + push after each group.
 Reference images: docs/references/service-card-reference.png (wanted service-card look), docs/references/steps-number-bug.png (bug).
 

@@ -96,3 +96,12 @@ Not designed yet (discuss with owner): profile dashboard/edit, search results, s
 - Footer link columns in Figma were placeholders (duplicates); I used real pages. Footer "এক নজরে আমাদের পরিসংখ্যান" page not designed — omitted.
 - Footer e-mail box ("আপনার ইমেইল - আমাদের সাথে সেতুবন্ধন") = subscribers list (POST /subscribe) — confirm purpose with owner.
 - Dev tooling: portable PHP goes in `tools/php` (git-ignored). Fonts self-hosted in public/assets/fonts (Poppins 400/500/600 + Hind Siliguri 400/500/600).
+
+## Owner decisions (2026-10-20, Home tweaks round 1) — the admin panel must include these
+- Teal representative bar = endless right->left marquee. Its text (`home.rep.text`) is shown with `colored()` (app/helpers.php): `[[color:NAME|words]]` colours words, allowed NAMEs only (`TEXT_COLORS`: gold, amber, white, red -> CSS `.tc-*`), `{words}` = bold; text is escaped first. Admin editor: a colour picker limited to that list that writes this markup.
+- Services on Home = ALL active services in two rows scrolling right->left independently (app.js `[data-service-row]`). Each card links to `/services/<slug>` (coming-soon until the page is built); button -> `/services`. Data: `database/seeds/services.php` (94 services of the old site, names in the owner's Figma style = no "... করার লোক / এর লোক" endings; owner: each provider may rename theirs) + migration `002_services.sql` (adds `slug`, `legacy_sl`, seeds rows with `icon_path`). Never change a live slug.
+- Service icons: Tabler Icons 3.24.0 (MIT, licence file beside them), white SVGs in `public/assets/img/service-icons/<slug>.svg`, mapping `database/seeds/service-icons.php` + `docs/service-icons.md` (27 marked "near" = closest match). `services.icon_path` holds `/assets/img/service-icons/x.svg` (default) or an uploaded file name (admin upload, `/uploads/services/`).
+- Footer "হোম" and "আমাদের সম্পর্কে" link columns must become admin-editable (add/remove/reorder, label + URL): planned table `footer_links (id, column_key, label, url, sort_order, is_active)`; until then they are hard-coded in app/Views/partials/footer.php.
+- FAQ: all closed on load, one open at a time (`<details name="faq">` + app.js fallback), open box teal/white.
+- Feedback form: all five fields required (server + red *).
+- Step-card numbers use the device's Bangla font (Hind Siliguri's "১" looks like a blob).

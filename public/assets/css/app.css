@@ -1086,14 +1086,23 @@ textarea {
     display: grid;
     grid-template-columns: 34rem 22.875rem 20.75rem 21.875rem;
     column-gap: 0;
-    row-gap: 5.25rem;
+    row-gap: 2.7rem;
     align-items: start;
 }
+/* Row 1: logo/name (left) + newsletter. Row 2: address list (left) + the link
+   columns + social box, so all of row 2 starts on the address line (owner 2026-10-20). */
 .footer__brand {
-    grid-column: 1;
-    grid-row: 1 / span 2;
+    display: contents;
 }
-.footer__brand > .emblem--footer {
+.footer__brand-head {
+    grid-column: 1;
+    grid-row: 1;
+}
+.footer__brand-body {
+    grid-column: 1;
+    grid-row: 2;
+}
+.footer__brand-head > .emblem--footer {
     width: 8.875rem;
     margin-left: 2.5rem;
 }
@@ -1117,7 +1126,6 @@ textarea {
     text-align: center;
 }
 .footer__contact {
-    margin-top: 2.7rem;
     display: grid;
     gap: 1.1rem;
 }
@@ -1676,10 +1684,11 @@ textarea {
         row-gap: 2rem;
     }
     .footer__brand {
+        display: block;
         grid-column: 1;
         grid-row: auto;
     }
-    .footer__brand > .emblem--footer {
+    .footer__brand-head > .emblem--footer {
         width: 6.5rem;
         margin-left: 0;
     }

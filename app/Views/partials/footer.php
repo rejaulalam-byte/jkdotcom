@@ -5,11 +5,15 @@ $feedbackToken = Security::csrfToken();
 ?>
 <footer class="site-footer">
     <div class="container footer__grid">
+        <?php // head = grid row 1, body = grid row 2: the link columns and the social box (also row 2) start on the address line ?>
         <div class="footer__brand">
+            <div class="footer__brand-head">
             <span class="emblem emblem--footer"><img src="<?= e(asset('img/site/logo-figma.png')) ?>" alt="" width="596" height="541" loading="lazy"></span>
             <p class="footer__name"><span><?= e(content('site.brand')) ?></span><?= e(content('site.brand_suffix')) ?></p>
             <p class="footer__tagline"><?= e(content('site.tagline')) ?></p>
+            </div>
 
+            <div class="footer__brand-body">
             <ul class="footer__contact">
                 <li>
                     <img src="<?= e(asset('img/icons/home-footer.svg')) ?>" alt="" width="21" height="18">
@@ -41,6 +45,7 @@ $feedbackToken = Security::csrfToken();
                 <span><?= e(content('footer.hotline')) ?></span>
                 <a href="<?= e(tel(content('site.hotline'))) ?>"><?= e(content('site.hotline')) ?></a>
             </p>
+            </div>
         </div>
 
         <nav class="footer__links" aria-label="ফুটার মেনু">
