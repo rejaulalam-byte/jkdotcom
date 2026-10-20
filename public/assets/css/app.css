@@ -675,13 +675,45 @@ textarea {
     background: var(--teal);
     color: var(--white);
 }
-.rep-bar p {
-    width: min(108.9rem, 100% - 2rem);
+/* Marquee: the text enters at the far right of the page and runs to the left,
+   endless. app.js sets --marquee-duration from the text length (constant speed).
+   Hover pauses it; "reduce motion" shows the plain centred text. */
+.rep-bar__text {
+    width: 100%;
+    overflow: hidden;
     font-size: 2.1875rem;
     font-weight: 500;
     line-height: 1.5;
-    text-align: center;
-    text-wrap: balance;
+    white-space: nowrap;
+}
+.rep-bar__move {
+    display: inline-block;
+    padding-left: 100%;
+    animation: rep-marquee var(--marquee-duration, 30s) linear infinite;
+}
+.rep-bar:hover .rep-bar__move {
+    animation-play-state: paused;
+}
+@keyframes rep-marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+/* colours the admin may use in texts: [[color:gold|words]] (helpers.php TEXT_COLORS) */
+.tc-gold {
+    color: var(--gold);
+}
+.tc-amber {
+    color: #ffb11f;
+}
+.tc-white {
+    color: var(--white);
+}
+.tc-red {
+    color: #ff8a8a;
 }
 
 /* ---- Services ----------------------------------------------------------- */
@@ -1417,7 +1449,7 @@ textarea {
         min-height: 0;
         padding: 1.75rem 0;
     }
-    .rep-bar p {
+    .rep-bar__text {
         font-size: 1.15rem;
         line-height: 1.6;
     }
@@ -1691,6 +1723,17 @@ textarea {
     }
     .ad-strip {
         overflow-x: auto;
+    }
+    .rep-bar__text {
+        width: min(108.9rem, 100% - 2rem);
+        white-space: normal;
+        text-align: center;
+        text-wrap: balance;
+    }
+    .rep-bar__move {
+        display: inline;
+        padding-left: 0;
+        animation: none;
     }
     .ticker {
         overflow-y: auto;

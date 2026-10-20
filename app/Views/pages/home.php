@@ -68,8 +68,8 @@ $faqKeys = [1, 2, 3, 4, 5];
             </div>
         <?php endif; ?>
     </div>
-    <div class="rep-bar">
-        <p class="container"><?= e(content('home.rep.text')) ?></p>
+    <div class="rep-bar" data-marquee>
+        <p class="rep-bar__text"><span class="rep-bar__move"><?= colored(content('home.rep.text')) ?></span></p>
     </div>
 </section>
 

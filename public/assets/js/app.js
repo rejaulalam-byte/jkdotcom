@@ -106,6 +106,21 @@
         }
     }
 
+    /* ---- Teal text bar marquee: same speed whatever the text length ------- */
+    document.querySelectorAll("[data-marquee]").forEach(function (bar) {
+        var move = bar.querySelector(".rep-bar__move");
+        if (!move || reduceMotion) {
+            return;
+        }
+        var setSpeed = function () {
+            var pxPerSecond = window.innerWidth < 768 ? 70 : 140;
+            var seconds = Math.max(8, move.getBoundingClientRect().width / pxPerSecond);
+            bar.style.setProperty("--marquee-duration", seconds.toFixed(1) + "s");
+        };
+        setSpeed();
+        window.addEventListener("resize", setSpeed);
+    });
+
     /* ---- Advertisement strip: endless sideways scroll -------------------- */
     document.querySelectorAll("[data-ad-strip]").forEach(function (strip) {
         var track = strip.querySelector(".ad-strip__track");

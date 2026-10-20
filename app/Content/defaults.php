@@ -6,6 +6,8 @@ declare(strict_types=1);
  * Default wording of the website (taken from the Figma design).
  * The admin panel can override any of these keys; overrides are stored in the
  * "content_blocks" table. {Words in braces} are shown in bold.
+ * Texts shown with colored() (e.g. home.rep.text) may also use
+ * [[color:gold|words]] — allowed colours: gold, amber, white, red (TEXT_COLORS in helpers.php).
  */
 return [
     // ---- Site-wide -------------------------------------------------------

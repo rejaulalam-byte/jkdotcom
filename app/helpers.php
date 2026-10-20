@@ -43,6 +43,37 @@ function rich(string $text): string
     return (string) preg_replace('/\{(.+?)\}/u', '<strong>$1</strong>', e($text));
 }
 
+/**
+ * Colours the admin may use inside a text with [[color:NAME|words]].
+ * NAME => CSS class (defined in app.css). Anything not listed is shown as plain text.
+ */
+const TEXT_COLORS = [
+    'gold'  => 'tc-gold',
+    'amber' => 'tc-amber',
+    'white' => 'tc-white',
+    'red'   => 'tc-red',
+];
+
+/**
+ * Escaped text with simple, safe markup:
+ *   [[color:gold|words]]  -> words in an allowed colour (see TEXT_COLORS)
+ *   {words}               -> bold
+ * The text is escaped FIRST, so no HTML from the admin can ever get through.
+ */
+function colored(string $text): string
+{
+    $html = (string) preg_replace_callback(
+        '/\[\[color:([a-z]+)\|(.+?)\]\]/u',
+        static function (array $m): string {
+            $class = TEXT_COLORS[$m[1]] ?? null;
+            return $class === null ? $m[2] : '<span class="' . $class . '">' . $m[2] . '</span>';
+        },
+        e($text)
+    );
+
+    return (string) preg_replace('/\{(.+?)\}/u', '<strong>$1</strong>', $html);
+}
+
 /** Hidden CSRF field for every POST form. */
 function csrf_field(): string
 {
