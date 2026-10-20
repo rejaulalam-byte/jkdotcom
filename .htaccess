@@ -1,0 +1,16 @@
+# Safety net for hosts where the domain points at the PROJECT folder instead of /public.
+# Best practice is to point the (sub)domain document root at the "public" folder —
+# see README.md. Even if that is forgotten, nothing outside /public can be reached:
+# every request is mapped inside /public, so .env, app/, config/, database/ stay private.
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+<FilesMatch "^\.(?!htaccess$)">
+    Require all denied
+</FilesMatch>

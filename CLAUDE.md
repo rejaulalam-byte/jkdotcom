@@ -88,3 +88,11 @@ Not designed yet (discuss with owner): profile dashboard/edit, search results, s
 - Passwords: owner will rotate cPanel/FTP/email passwords. New site needs very strict security (see Architecture & security).
 - Geo data: use public dataset (nuhil/bangladesh-geocode on GitHub: divisions, districts, upazilas, unions with bn names; verified reachable) merged with old DB tables. Villages not in public sets — admin-editable / free-text.
 - Migrate only worker (কর্মী) data from old DB; do NOT migrate old plaintext passwords.
+
+## Owner decisions (2026-10-20, later)
+- "আজকের কাজ" visibility window: 3 days for now (setting `settings.jobs_visible_days`, owner will confirm later).
+- Ad strip: images only, with an OPTIONAL link per ad (advertiser's own site) — implemented (`advertisements.link_url`).
+- Typos to confirm with owner (kept as in Figma): "সমুহ" (সমূহ), "ম্যানেজম্যান্ট" (ম্যানেজমেন্ট), "যোগাযেগ" (যোগাযোগ).
+- Footer link columns in Figma were placeholders (duplicates); I used real pages. Footer "এক নজরে আমাদের পরিসংখ্যান" page not designed — omitted.
+- Footer e-mail box ("আপনার ইমেইল - আমাদের সাথে সেতুবন্ধন") = subscribers list (POST /subscribe) — confirm purpose with owner.
+- Dev tooling: portable PHP goes in `tools/php` (git-ignored). Fonts self-hosted in public/assets/fonts (Poppins 400/500/600 + Hind Siliguri 400/500/600).

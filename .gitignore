@@ -1,12 +1,28 @@
+# Secrets and private data — NEVER commit these
 .env
 .env.*
 !.env.example
+
+# Database dumps / backups (contain people's phone numbers and addresses)
 *.sql
+!database/migrations/*.sql
+*.sql.gz
 *.zip
+*.tar.gz
+*.bak
+
+# Runtime files created on the server
+storage/*
+!storage/.gitkeep
+public/uploads/*
+!public/uploads/.htaccess
+
+# Tools / OS / editor
 vendor/
 node_modules/
-storage/
-uploads/
+tools/
 .DS_Store
 Thumbs.db
 .claude/
+.idea/
+.vscode/
