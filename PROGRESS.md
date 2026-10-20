@@ -1,5 +1,26 @@
 # Progress (read CLAUDE.md first)
 
+## >>> NEXT TASK: Home page tweaks, owner round 1 (2026-10-20) <<<
+Owner reviewed Home. Do these in order, test desktop 1920 + mobile 390, commit + push after each group.
+Reference images: docs/references/service-card-reference.png (wanted service-card look), docs/references/steps-number-bug.png (bug).
+
+1. **Today's-jobs list (hero right box):** a batch of 8 rows currently pops in too fast. Make each new batch rise from the bottom SLOWLY (about 4 s, smooth, so rows can be read while rising). Keep the rest time (~5.5 s). The next batch also rises slowly the same way. (js/app.js ticker; currently 900 ms enter, 450 ms exit.)
+2. **Ad strip (under hero):** reduce the white space above and below the pictures to ONE THIRD (currently 47px top/46px bottom -> ~16px). Halve the gap between pictures (54px -> 27px). The section's TOP must stay exactly where it starts now (overlapping the hero by 71px, no vertical jumping); only its bottom edge moves up, so the teal bar below moves up too. Picture height stays 278px.
+3. **Teal text bar under the ads ("বাংলাদেশ জুড়ে আমাদের নিজস্ব প্রতিনিধি…") becomes a MARQUEE:** text moves continuously from the far right of the page to the left (endless loop; pause on hover; respect reduced-motion). FUTURE (admin panel): admin must be able to colour some words of this text — design the text storage with simple markup now (e.g. [[color:gold|word]] or {braces}) and render it safely (escaped, only allowed colours).
+4. **"সহজ সেবা, সহজ জীবন" services section — bigger change (see reference image):**
+   - card corner radius 40px -> 20px; card look like the reference (light card, thin teal border, name in teal bold under the icon);
+   - the white rounded-square icon box becomes a CIRCLE (reference: ~80px, solid teal-blue circle) with a subject-related white icon inside;
+   - TWO rows of cards, BOTH rows scroll continuously right -> left, but independently (different speed/start offset, not in sync); pause on hover/focus; reduced-motion = normal scrollable rows;
+   - show ALL services (not just 8) so a visitor who waits sees every service slowly pass by;
+   - every card is a link to that service's detail/list page (e.g. /services/<slug>; page to be built later — until then a coming-soon page); the button "সেবাসমূহ দেখুন" goes to /services (all services page).
+5. **Service icons (owner asked Claude to find them):** owner cannot find suitable icons. Find/download a matching icon for EVERY service name (the 8 on the home page + all 93 in the old DB `services` table, backup in E:\0000 Claude-All JK- BACKUP Old Site - Rokib Bhai\jorurika_jk.sql.gz; extract into the scratchpad, never commit it). Use a permissively licensed set (e.g. Tabler Icons MIT / Lucide ISC / Phosphor MIT / Material Symbols Apache-2.0), self-hosted SVGs in public/assets/img/service-icons/, a mapping table service -> icon file, and tell the owner which services had no good match. ASK the owner's permission before downloading (rule: downloads need explicit yes) and show the license. Store icon in services.icon_path (admin can change later).
+6. **Bug – "আপনার জন্য, আপনার প্রয়োজনেই" step cards:** the number inside the teal circle is hidden/clipped (see steps-number-bug.png). Debug (.step-card__no: font, line-height, glyph clipping with Bangla digit) and fix; the number must be big and clear.
+7. **FAQ ("আপনার জিজ্ঞাসা"):** on page load ALL answers are hidden — only the question + "+" is visible. Click "+" (or the question) to open: the answer shows and the WHOLE box turns colour (teal background, white text, "−" sign). Opening another one closes the previous (exclusive accordion). After refresh everything is closed again. Keyboard accessible.
+8. **Feedback form:** the owner forgot to make the fields required: make ALL five fields (name, email, phone, subject, message) required, show a red/gold * on each label/placeholder, and update server-side validation (FeedbackController) + the Bangla error messages to match.
+9. **Footer layout:** on the right side, the link columns ("হোম" column, "আমাদের সম্পর্কে" column) and the "সামাজিক যোগাযোগ মাধ্যম" box must start at the SAME top line as the address block on the left (the "H-100, New Airport Road…" line), i.e. move up. FUTURE (admin panel): the items of the "হোম" and "আমাদের সম্পর্কে" footer columns must be admin-editable (add/remove items, each with a link) — prepare data structure (e.g. footer_links table: column, label, url, sort_order) when the admin is built.
+
+Also record in CLAUDE.md after finishing: these decisions (marquee text colouring, footer link editing, services scrolling rows) so the admin panel plan includes them.
+
 ## State at end of session 1 (2026-10-20)
 - GitHub repo https://github.com/rejaulalam-byte/jkdotcom , branch main, all work pushed. Git identity set locally (Kazi Rejaul Alam / rejaulalam@gmail.com).
 - Plain-PHP skeleton + HOME page DONE and visually checked (desktop 1920 + mobile 390). See README.md for folder map and security rules.
