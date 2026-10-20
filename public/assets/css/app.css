@@ -508,7 +508,7 @@ textarea {
     background: var(--teal);
     color: var(--white);
     padding: 10.375rem 0 10rem;
-    overflow-x: clip; /* the flying-in texts must never widen the page */
+    overflow: clip; /* the flying-in letters must never leave the hero */
 }
 .hero__inner {
     display: grid;
@@ -610,58 +610,41 @@ textarea {
 }
 
 /* ---- Hero entrance (owner 2026-10-20) -----------------------------------
-   On every visit the small heading, the big heading (two lines), the text and the
-   button fly in slowly from different sides and settle in place; the job list on the
-   right floats up out of the background. Only transform + opacity move, so nothing
-   jumps. "Reduce motion" shows everything at once. */
-.hero .pill,
-.hero__title-1,
-.hero__title-2,
-.hero__text,
+   app.js cuts the small heading, the two heading lines and the text into letters
+   ([data-fly]); every letter flies in from its own random direction (--dx, --dy, --rot)
+   and settles, one continuous stream of about 2.5 s. The button follows, the job list
+   on the right floats up. Only transform + opacity move. Until app.js has split a text it
+   is hidden (opacity 0) - with a 3.5 s safety net so it can never stay hidden. */
+.fly-word {
+    display: inline-block;
+    white-space: nowrap;
+}
+.fly-letter {
+    display: inline-block;
+    animation: fly-letter 1.5s cubic-bezier(.2, .7, .2, 1) backwards;
+}
+@keyframes fly-letter {
+    from {
+        opacity: 0;
+        transform: translate(var(--dx, 0), var(--dy, 0)) rotate(var(--rot, 0deg)) scale(0.35);
+    }
+}
+@media (scripting: enabled) {
+    [data-fly]:not(.is-split) {
+        opacity: 0;
+        animation: fly-fallback 0.01s 3.5s forwards;
+    }
+}
+@keyframes fly-fallback {
+    to {
+        opacity: 1;
+    }
+}
 .hero__copy .btn {
-    animation-duration: 1.6s;
-    animation-timing-function: cubic-bezier(.2, .7, .2, 1);
-    animation-fill-mode: backwards;
-}
-.hero .pill {
-    animation-name: fly-from-left;
-}
-.hero__title-1 {
-    animation-name: fly-from-right;
-    animation-delay: 0.25s;
-}
-.hero__title-2 {
-    animation-name: fly-from-left;
-    animation-delay: 0.5s;
-}
-.hero__text {
-    animation-name: fly-from-bottom;
-    animation-delay: 0.8s;
-}
-.hero__copy .btn {
-    animation-name: fly-from-top;
-    animation-delay: 1.1s;
+    animation: fly-from-top 1.4s cubic-bezier(.2, .7, .2, 1) var(--btn-delay, 2.6s) backwards;
 }
 .hero .today {
     animation: float-up 2.4s ease-out 0.7s backwards;
-}
-@keyframes fly-from-left {
-    from {
-        opacity: 0;
-        transform: translateX(-9rem);
-    }
-}
-@keyframes fly-from-right {
-    from {
-        opacity: 0;
-        transform: translateX(9rem);
-    }
-}
-@keyframes fly-from-bottom {
-    from {
-        opacity: 0;
-        transform: translateY(5rem);
-    }
 }
 @keyframes fly-from-top {
     from {
@@ -1853,12 +1836,13 @@ textarea {
     .ad-strip {
         overflow-x: auto;
     }
-    .hero .pill,
-    .hero__title-1,
-    .hero__title-2,
-    .hero__text,
+    .fly-letter,
     .hero__copy .btn,
     .hero .today {
+        animation: none;
+    }
+    [data-fly]:not(.is-split) {
+        opacity: 1;
         animation: none;
     }
     .rep-bar__text {
@@ -1902,11 +1886,14 @@ textarea {
 }
 
 /* ---- Button "back to top" (owner 2026-10-20) ------------------------------
-   Fixed at the right edge; fades in once the visitor is past the middle of the page. */
+   Fixed at the right edge. app.js places it like a scroll thumb: past the middle of the
+   page it appears (fades in) at the middle of the screen and slides down the screen as
+   the visitor scrolls on; at the very end of the page it sits at the bottom. Scrolling
+   back up it rises to the middle of the screen and fades out. */
 .to-top {
     position: fixed;
     right: 1.5rem;
-    bottom: 1.5rem;
+    top: 50%;
     z-index: 50;
     display: flex;
     align-items: center;
@@ -1922,13 +1909,7 @@ textarea {
     cursor: pointer;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(1rem);
-    transition: opacity 0.35s, transform 0.35s, visibility 0.35s, background-color 0.2s;
-}
-.to-top.is-visible {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
+    transition: background-color 0.2s;
 }
 .to-top:hover {
     background: var(--red);
@@ -1944,7 +1925,6 @@ textarea {
 @media (max-width: 860px) {
     .to-top {
         right: 1rem;
-        bottom: 1rem;
         width: 3rem;
         height: 3rem;
     }

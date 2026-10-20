@@ -19,13 +19,13 @@ $faqKeys = [1, 2, 3, 4, 5];
         <div class="hero__copy">
             <p class="pill pill--amber">
                 <img src="<?= e(asset('img/icons/badge-hero.svg')) ?>" alt="" width="50" height="32">
-                <span><?= e(content('home.hero.badge')) ?></span>
+                <span data-fly><?= e(content('home.hero.badge')) ?></span>
             </p>
             <h1 id="hero-title" class="hero__title">
-                <span class="hero__title-1"><?= e(content('home.hero.title_1')) ?></span>
-                <span class="hero__title-2"><?= e(content('home.hero.title_2')) ?></span>
+                <span class="hero__title-1" data-fly><?= e(content('home.hero.title_1')) ?></span>
+                <span class="hero__title-2" data-fly><?= e(content('home.hero.title_2')) ?></span>
             </h1>
-            <p class="hero__text"><?= e(content('home.hero.text')) ?></p>
+            <p class="hero__text" data-fly><?= e(content('home.hero.text')) ?></p>
             <a class="btn btn--light" href="/services"><?= e(content('home.hero.button')) ?></a>
         </div>
 

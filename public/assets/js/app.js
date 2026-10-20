@@ -36,21 +36,120 @@
         });
     });
 
-    /* ---- Button "back to top": appears past the middle of the page ---------- */
-    var toTop = document.querySelector("[data-to-top]");
-    if (toTop) {
-        var toggleToTop = function () {
-            var scrollable = document.documentElement.scrollHeight - window.innerHeight;
-            toTop.classList.toggle("is-visible", scrollable > 0 && window.scrollY > scrollable / 2);
-        };
-        window.addEventListener("scroll", toggleToTop, { passive: true });
-        window.addEventListener("resize", toggleToTop);
-        toggleToTop();
-        toTop.addEventListener("click", function () {
-            window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    /* ---- Hero: every letter flies in from its own direction ---------------- */
+    var heroEl = document.querySelector(".hero");
+    if (heroEl && !reduceMotion) {
+        var segmenter = window.Intl && Intl.Segmenter ? new Intl.Segmenter("bn", { granularity: "grapheme" }) : null;
+        var flyLetters = [];
+        Array.prototype.forEach.call(heroEl.querySelectorAll("[data-fly]"), function (el) {
+            var text = el.textContent;
+            var frag = document.createDocumentFragment();
+            text.split(/(\s+)/).forEach(function (part) {
+                if (part === "") {
+                    return;
+                }
+                if (/^\s+$/.test(part)) {
+                    frag.appendChild(document.createTextNode(" "));
+                    return;
+                }
+                var word = document.createElement("span");
+                word.className = "fly-word";
+                // grapheme clusters keep Bangla conjuncts and vowel signs together;
+                // an old browser without Intl.Segmenter lets the whole word fly as one piece
+                var pieces = segmenter
+                    ? Array.from(segmenter.segment(part), function (s) { return s.segment; })
+                    : [part];
+                pieces.forEach(function (piece) {
+                    var letter = document.createElement("span");
+                    letter.className = "fly-letter";
+                    letter.textContent = piece;
+                    word.appendChild(letter);
+                    flyLetters.push(letter);
+                });
+                frag.appendChild(word);
+            });
+            var visual = document.createElement("span");
+            visual.setAttribute("aria-hidden", "true");
+            visual.appendChild(frag);
+            var plain = document.createElement("span");
+            plain.className = "sr-only";
+            plain.textContent = text; // screen readers get the plain text
+            el.textContent = "";
+            el.appendChild(plain);
+            el.appendChild(visual);
+            el.classList.add("is-split");
         });
+        var reach = Math.max(window.innerWidth, 600);
+        var step = Math.min(0.03, 2.4 / Math.max(1, flyLetters.length)); // the whole stream takes about 2.4 s
+        flyLetters.forEach(function (letter, i) {
+            var angle = Math.random() * Math.PI * 2;
+            var dist = reach * (0.25 + Math.random() * 0.5);
+            letter.style.setProperty("--dx", Math.round(Math.cos(angle) * dist) + "px");
+            letter.style.setProperty("--dy", Math.round(Math.sin(angle) * dist * 0.7) + "px");
+            letter.style.setProperty("--rot", Math.round((Math.random() - 0.5) * 540) + "deg");
+            letter.style.animationDelay = (i * step + Math.random() * 0.15).toFixed(3) + "s";
+        });
+        heroEl.style.setProperty("--btn-delay", (flyLetters.length * step + 0.9).toFixed(2) + "s");
     }
 
+    /* ---- Button "back to top" -------------------------------------------------
+       Works like a scroll thumb: hidden in the first half of the page; past the middle it
+       fades in at the middle of the screen and slides down the screen with the scrolling,
+       reaching the bottom when the page ends; scrolling up reverses it. A click glides to
+       the top slowly (about 3 px per ms, 0.9 - 3.5 s) and stops if the visitor takes over. */
+    var toTop = document.querySelector("[data-to-top]");
+    if (toTop) {
+        var placeToTop = function () {
+            var scrollable = document.documentElement.scrollHeight - window.innerHeight;
+            var progress = scrollable > 0 ? window.scrollY / scrollable : 0;
+            if (progress <= 0.5) {
+                toTop.style.opacity = "0";
+                toTop.style.visibility = "hidden";
+                return;
+            }
+            var size = toTop.offsetHeight;
+            var margin = 24;
+            var along = Math.min(1, (progress - 0.5) * 2);
+            var startTop = window.innerHeight / 2 - size / 2;
+            var endTop = window.innerHeight - margin - size;
+            toTop.style.top = (startTop + along * (endTop - startTop)) + "px";
+            toTop.style.opacity = String(Math.min(1, (progress - 0.5) / 0.06));
+            toTop.style.visibility = "visible";
+        };
+        window.addEventListener("scroll", placeToTop, { passive: true });
+        window.addEventListener("resize", placeToTop);
+        placeToTop();
+
+        var gliding = false;
+        ["wheel", "touchstart", "keydown"].forEach(function (name) {
+            window.addEventListener(name, function () { gliding = false; }, { passive: true });
+        });
+        toTop.addEventListener("click", function () {
+            var from = window.scrollY;
+            if (reduceMotion || from < 1) {
+                window.scrollTo({ top: 0, behavior: "instant" });
+                return;
+            }
+            var duration = Math.min(3500, Math.max(900, from / 3));
+            var started = null;
+            gliding = true;
+            var frame = function (now) {
+                if (!gliding) {
+                    return;
+                }
+                started = started === null ? now : started;
+                var k = Math.min(1, (now - started) / duration);
+                var eased = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+                window.scrollTo({ top: from * (1 - eased), behavior: "instant" });
+                if (k < 1) {
+                    requestAnimationFrame(frame);
+                } else {
+                    gliding = false;
+                }
+            };
+            requestAnimationFrame(frame);
+        });
+    }
     /* ---- FAQ: opening one question closes the others ---------------------
        (browsers that know <details name="..."> already do this themselves) */
     var faqItems = document.querySelectorAll(".faq-item");
