@@ -36,6 +36,21 @@
         });
     });
 
+    /* ---- Button "back to top": appears past the middle of the page ---------- */
+    var toTop = document.querySelector("[data-to-top]");
+    if (toTop) {
+        var toggleToTop = function () {
+            var scrollable = document.documentElement.scrollHeight - window.innerHeight;
+            toTop.classList.toggle("is-visible", scrollable > 0 && window.scrollY > scrollable / 2);
+        };
+        window.addEventListener("scroll", toggleToTop, { passive: true });
+        window.addEventListener("resize", toggleToTop);
+        toggleToTop();
+        toTop.addEventListener("click", function () {
+            window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+        });
+    }
+
     /* ---- FAQ: opening one question closes the others ---------------------
        (browsers that know <details name="..."> already do this themselves) */
     var faqItems = document.querySelectorAll(".faq-item");
@@ -56,9 +71,8 @@
        Shows N rows. Each page of rows rises SLOWLY from the bottom (data-rise,
        default 4s, so the rows can be read while rising), rests for a few
        seconds (data-hold, default 5.5s), then quickly moves up and away; the
-       next page rises at the same moment and speed (one belt, no gap). The rows run
-       in a circle, so every page is full. Without JS or with "reduce motion" the plain
-       list (first N rows) is shown. */
+       next page rises the moment the last row of the previous one has left. Without JS or
+       with "reduce motion" the plain list (first N rows) is shown. */
     var ticker = document.querySelector(".ticker[data-page-size]");
     if (ticker && !reduceMotion && ticker.animate) {
         var size = parseInt(ticker.getAttribute("data-page-size"), 10) || 8;
@@ -67,20 +81,17 @@
         var rows = Array.prototype.slice.call(ticker.children);
 
         if (rows.length > size) {
-            // The rows form a circle (…11, 12, 1, 2…): every page is a window of `size`
-            // rows, so a page is never short and the list never shows an empty gap.
-            rows.forEach(function (row) {
-                ticker.removeChild(row);
-            });
-            var makePage = function (from) {
+            // pages of `size` rows (the last page may be shorter)
+            var pages = [];
+            for (var i = 0; i < rows.length; i += size) {
                 var page = document.createElement("ol");
-                page.className = "ticker__page is-shown";
-                for (var j = 0; j < size; j++) {
-                    page.appendChild(rows[(from + j) % rows.length].cloneNode(true));
-                }
+                page.className = "ticker__page";
+                rows.slice(i, i + size).forEach(function (row) {
+                    page.appendChild(row);
+                });
                 ticker.appendChild(page);
-                return page;
-            };
+                pages.push(page);
+            }
             ticker.classList.add("is-live");
 
             var sleep = function (ms) {
@@ -89,9 +100,9 @@
                 });
             };
             var easing = "cubic-bezier(.25,.1,.25,1)";
-            var slide = function (el, from, to) {
+            var play = function (el, from, to, ms) {
                 return el.animate([{ transform: from }, { transform: to }], {
-                    duration: rise,
+                    duration: ms,
                     easing: easing,
                     fill: "forwards"
                 }).finished;
@@ -111,24 +122,22 @@
                 });
             };
 
+            // Owner 2026-10-20: the next page starts to rise at the very moment the LAST row of the
+            // page before has left the top. A short last page (e.g. 4 of 8 rows) only has to travel
+            // as far as its rows are long, so it leaves sooner and nothing waits for empty space.
             (async function loop() {
-                var from = 0;
-                var current = makePage(from);
-                await whenVisible();
-                await slide(current, "translateY(100%)", "translateY(0)");
+                var index = 0;
                 for (;;) {
+                    var current = pages[index];
+                    var count = current.children.length;
+                    await whenVisible();
+                    current.classList.add("is-shown");
+                    await play(current, "translateY(100%)", "translateY(0)", rise);
                     await sleep(hold);
                     await whenVisible();
-                    // the full page leaves at the top while the next one rises at the bottom,
-                    // both at the same speed, so the list moves like one belt
-                    from = (from + size) % rows.length;
-                    var next = makePage(from);
-                    await Promise.all([
-                        slide(current, "translateY(0)", "translateY(-100%)"),
-                        slide(next, "translateY(100%)", "translateY(0)")
-                    ]);
-                    ticker.removeChild(current);
-                    current = next;
+                    await play(current, "translateY(0)", "translateY(-" + (count * 100 / size) + "%)", rise * count / size);
+                    current.classList.remove("is-shown");
+                    index = (index + 1) % pages.length;
                 }
             })();
         }

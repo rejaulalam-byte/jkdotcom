@@ -26,7 +26,7 @@ $pageDescription = $description ?? content('site.description');
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
     <script src="<?= e(asset('js/app.js')) ?>" defer></script>
 </head>
-<body>
+<body id="top">
 <a class="skip-link" href="#main">মূল অংশে যান</a>
 
 <?php require BASE_PATH . '/app/Views/partials/topbar.php'; ?>
@@ -37,5 +37,10 @@ $pageDescription = $description ?? content('site.description');
 </main>
 
 <?php require BASE_PATH . '/app/Views/partials/footer.php'; ?>
+
+<?php // "back to top": app.js shows it once the visitor is past the middle of the page ?>
+<button class="to-top" type="button" aria-label="পেজের উপরে যান" data-to-top>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+</button>
 </body>
 </html>

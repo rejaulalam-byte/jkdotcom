@@ -7,13 +7,13 @@ $feedbackToken = Security::csrfToken();
     <div class="container footer__grid">
         <?php // head = grid row 1, body = grid row 2: the link columns and the social box (also row 2) start on the address line ?>
         <div class="footer__brand">
-            <div class="footer__brand-head">
+            <a class="footer__brand-head" href="#top" aria-label="পেজের উপরে যান">
             <span class="emblem emblem--footer"><img src="<?= e(asset('img/site/logo-figma.png')) ?>" alt="" width="596" height="541" loading="lazy"></span>
             <div class="footer__brand-text">
                 <p class="footer__name"><span><?= e(content('site.brand')) ?></span><?= e(content('site.brand_suffix')) ?></p>
                 <p class="footer__tagline"><?= e(content('site.tagline')) ?></p>
             </div>
-            </div>
+            </a>
 
             <div class="footer__brand-body">
             <ul class="footer__contact">
