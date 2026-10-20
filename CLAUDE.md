@@ -105,3 +105,4 @@ Not designed yet (discuss with owner): profile dashboard/edit, search results, s
 - FAQ: all closed on load, one open at a time (`<details name="faq">` + app.js fallback), open box teal/white.
 - Feedback form: all five fields required (server + red *).
 - Step-card numbers use the device's Bangla font (Hind Siliguri's "১" looks like a blob).
+- Social icons (top bar + footer): ALL six are shown for now (empty ones link to "#"). The "hide icons without a link" behaviour is built but OFF: setting `settings.social_hide_empty` = '0' (app/Content/defaults.php). Switch it to '1' ONLY when the owner says so (then, in the admin, only icons with a link show). Admin panel must offer: per-icon address + this switch. Footer heading "সামাজিক যোগাযোগ মাধ্যম" always stays.

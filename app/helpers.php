@@ -75,8 +75,10 @@ function colored(string $text): string
 }
 
 /**
- * Social media links that have a real address in the editable keys "site.social.*".
- * An icon with no address (empty, "#" or not http/https) is simply left out of the site.
+ * Social media icons with their addresses from the editable keys "site.social.*".
+ * Setting "settings.social_hide_empty" = 1 (switched on only when the owner says so):
+ * an icon with no address (empty, "#" or not http/https) is left out of the site.
+ * While it is 0 (default) every icon is shown; one without an address links to "#".
  *
  * @return list<array{key:string,label:string,href:string}>
  */
@@ -90,12 +92,14 @@ function social_links(): array
         'twitter'   => 'টুইটার',
         'linkedin'  => 'লিংকডইন',
     ];
+    $hideEmpty = content('settings.social_hide_empty', '0') === '1';
     $links = [];
     foreach ($labels as $key => $label) {
         $href = Security::safeUrl(content('site.social.' . $key));
-        if ($href !== null) {
-            $links[] = ['key' => $key, 'label' => $label, 'href' => $href];
+        if ($href === null && $hideEmpty) {
+            continue;
         }
+        $links[] = ['key' => $key, 'label' => $label, 'href' => $href ?? '#'];
     }
 
     return $links;

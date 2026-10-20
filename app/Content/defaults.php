@@ -35,6 +35,9 @@ return [
     'site.social.linkedin'  => '#',
 
     'settings.jobs_visible_days' => '3',
+    // 0 = show every social icon (empty ones link to "#"); 1 = hide icons that have no address.
+    // Owner: keep 0 for now, switch to 1 only when he says so.
+    'settings.social_hide_empty' => '0',
 
     // ---- Home: hero ------------------------------------------------------
     'home.hero.badge'     => 'আপনার প্রয়োজন, আমাদের অগ্রাধিকার',
