@@ -114,7 +114,7 @@
                     await play(current, "translateY(100%)", "translateY(0)", rise, "cubic-bezier(.25,.1,.25,1)");
                     await sleep(hold);
                     await whenVisible();
-                    await play(current, "translateY(0)", "translateY(-100%)", 450, "ease-in");
+                    await play(current, "translateY(0)", "translateY(-100%)", 900, "ease-in-out");
                     current.classList.remove("is-shown");
                     index = (index + 1) % pages.length;
                 }

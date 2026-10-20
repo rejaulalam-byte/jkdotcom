@@ -514,7 +514,7 @@ textarea {
 .hero__title {
     margin-top: 3.75rem;
     font-size: var(--fs-h1);
-    font-weight: 400;
+    font-weight: 600; /* owner 2026-10-20: bolder heading (Hind Siliguri 600 is the boldest we load) */
     line-height: 1.5;
 }
 .hero__title-1,
@@ -850,16 +850,16 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 6.125rem;
+    width: 5.5625rem;
     height: 5.5625rem;
-    border-radius: 50px;
+    border-radius: 50%;
     background: var(--teal);
     color: var(--white);
     /* Hind Siliguri draws "১" as a short half-height curl that reads as a blob in the
        circle (owner bug 2026-10-20), so the numbers use the device's own Bangla font
        (Windows Nirmala UI, Android Noto Sans Bengali, Apple Kohinoor Bangla): tall, clear digits. */
     font-family: "Nirmala UI", "Noto Sans Bengali", "Kohinoor Bangla", "Hind Siliguri", sans-serif;
-    font-size: 3.75rem;
+    font-size: 2.5rem; /* owner 2026-10-20: one third smaller than 3.75rem */
     font-weight: 700;
     line-height: 1;
 }
@@ -996,20 +996,6 @@ textarea {
 .feedback ::placeholder {
     color: rgba(34, 34, 34, 0.5);
     opacity: 1;
-}
-/* required-field star, stays visible while typing */
-.field {
-    position: relative;
-}
-.field__req {
-    position: absolute;
-    top: 0.35rem;
-    right: 0.9rem;
-    color: var(--red);
-    font-size: 1.5rem;
-    font-weight: 600;
-    line-height: 1;
-    pointer-events: none;
 }
 .feedback .btn {
     display: flex;
@@ -1598,8 +1584,8 @@ textarea {
     }
     .step-card__no {
         width: 3.75rem;
-        height: 3.5rem;
-        font-size: 2.25rem;
+        height: 3.75rem;
+        font-size: 1.5rem;
     }
     .step-card h3 {
         margin-top: 1.25rem;

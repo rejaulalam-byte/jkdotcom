@@ -74,8 +74,10 @@ $feedbackToken = Security::csrfToken();
                 </button>
             </form>
 
-            <p class="pill pill--social"><?= e(content('footer.social_title')) ?></p>
-            <?php $socialClass = 'social--footer'; require BASE_PATH . '/app/Views/partials/social.php'; ?>
+            <?php if (social_links() !== []): // no address for any icon = the whole box (heading too) is left out ?>
+                <p class="pill pill--social"><?= e(content('footer.social_title')) ?></p>
+                <?php $socialClass = 'social--footer'; require BASE_PATH . '/app/Views/partials/social.php'; ?>
+            <?php endif; ?>
         </div>
     </div>
 

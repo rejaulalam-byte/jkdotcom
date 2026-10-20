@@ -74,6 +74,33 @@ function colored(string $text): string
     return (string) preg_replace('/\{(.+?)\}/u', '<strong>$1</strong>', $html);
 }
 
+/**
+ * Social media links that have a real address in the editable keys "site.social.*".
+ * An icon with no address (empty, "#" or not http/https) is simply left out of the site.
+ *
+ * @return list<array{key:string,label:string,href:string}>
+ */
+function social_links(): array
+{
+    $labels = [
+        'facebook'  => 'ফেসবুক',
+        'whatsapp'  => 'হোয়াটসঅ্যাপ',
+        'instagram' => 'ইনস্টাগ্রাম',
+        'telegram'  => 'টেলিগ্রাম',
+        'twitter'   => 'টুইটার',
+        'linkedin'  => 'লিংকডইন',
+    ];
+    $links = [];
+    foreach ($labels as $key => $label) {
+        $href = Security::safeUrl(content('site.social.' . $key));
+        if ($href !== null) {
+            $links[] = ['key' => $key, 'label' => $label, 'href' => $href];
+        }
+    }
+
+    return $links;
+}
+
 /** Hidden CSRF field for every POST form. */
 function csrf_field(): string
 {
