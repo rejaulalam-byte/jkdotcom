@@ -16,9 +16,8 @@ $current = \App\Core\Router::currentPath();
 <header class="site-header">
     <div class="container header__inner">
         <a class="brand" href="/" aria-label="Jorurikaj.com — হোম পেজ">
-            <span class="emblem"><img src="<?= e(asset('img/site/logo-figma.png')) ?>" alt="" width="596" height="541"></span>
-            <span class="brand__name"><span><?= e(content('site.brand')) ?></span><?= e(content('site.brand_suffix')) ?></span>
-            <span class="brand__tag"><?= e(content('site.tagline')) ?></span>
+            <?php // menu logo = one picture with the name and tagline in it (owner 2026-10-20); the footer keeps its own logo ?>
+            <img class="brand__logo" src="<?= e(asset('img/site/logo-header.png')) ?>" alt="Jorurikaj.com — <?= e(content('site.tagline')) ?>" width="760" height="272">
         </a>
 
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">

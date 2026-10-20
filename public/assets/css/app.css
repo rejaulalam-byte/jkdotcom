@@ -362,10 +362,14 @@ textarea {
     gap: 2rem;
 }
 .brand {
-    display: grid;
-    justify-items: center;
-    width: 8.5rem;
+    display: block;
+    flex: none;
     text-decoration: none;
+}
+.brand__logo {
+    display: block;
+    width: auto;
+    height: 6.75rem;
 }
 .emblem {
     position: relative;
@@ -1315,24 +1319,10 @@ textarea {
         gap: 1rem;
     }
     .brand {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        width: auto;
         padding: 0.4rem 0;
     }
-    .brand .emblem {
-        width: 3.5rem;
-    }
-    .brand__name {
-        margin: 0;
-        font-size: 1.15rem;
-    }
-    .brand__name span {
-        font-size: 1.15rem;
-    }
-    .brand__tag {
-        display: none;
+    .brand__logo {
+        height: 3.75rem;
     }
     .nav-toggle {
         display: block;
