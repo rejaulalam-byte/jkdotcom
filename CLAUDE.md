@@ -75,3 +75,16 @@ Not designed yet (discuss with owner): profile dashboard/edit, search results, s
 5. Commit small steps to git. On any push request, state clearly whether the push succeeded/is live, or give exact commands for the user to run.
 6. Server deploy: staging first, backup old site, user approves final switch. Never handle passwords/keys in chat. Never delete the old site without explicit user OK.
 7. Suggest the cheapest suitable model at the start of each task (Haiku/Sonnet for routine, bigger only for hard problems).
+
+## Owner decisions (2026-10-20)
+- EVERYTHING editable by admin: all text, images, logo, colors, animations. Editors (limited role): edit sections/text only; exact permissions TBD.
+- Owner builds, hands over, trains the client; Claude assists long-term.
+- Home hero right box "আজকের কাজের তালিকা": real data from "কাজ সম্পর্কে জানুন" entries (last N days, N TBD). Animation: rows scroll up from bottom, pause ~4-7s, then move up quickly out, next batch scrolls in, loop.
+- Hero: starts as in Figma; later admin can add multiple images + animations.
+- Strip below hero (3 photos): becomes AD banner slider for paid advertisers. Fixed height, width flexible; wide images auto-expand width. Scrolling.
+- Feedback form: email to admin AND stored in admin panel (admin can read/delete/keep).
+- Language: Bangla only for now; English maybe later (build i18n-ready).
+- Mobile: adapt the desktop Figma design to all phone sizes (Claude decides).
+- Passwords: owner will rotate cPanel/FTP/email passwords. New site needs very strict security (see Architecture & security).
+- Geo data: use public dataset (nuhil/bangladesh-geocode on GitHub: divisions, districts, upazilas, unions with bn names; verified reachable) merged with old DB tables. Villages not in public sets — admin-editable / free-text.
+- Migrate only worker (কর্মী) data from old DB; do NOT migrate old plaintext passwords.
