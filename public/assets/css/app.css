@@ -2244,12 +2244,12 @@ textarea {
     margin: 0;
 }
 .post-job__tel {
-    color: var(--amber);
+    color: var(--gold);
     font-weight: 600;
     text-decoration: none;
 }
 .post-job__note strong {
-    color: var(--amber);
+    color: var(--gold);
     font-weight: 600;
 }
 .post-form {
