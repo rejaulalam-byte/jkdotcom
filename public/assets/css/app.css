@@ -47,11 +47,11 @@
 
 /* ---- Design tokens ------------------------------------------------------ */
 :root {
-    --teal: #651a2c;
-    --teal-05: rgba(101, 26, 44, 0.05);
-    --teal-10: rgba(101, 26, 44, 0.1);
-    --teal-20: rgba(101, 26, 44, 0.2);
-    --teal-35: rgba(101, 26, 44, 0.35);
+    --teal: #173a5e;
+    --teal-05: rgba(23, 58, 94, 0.05);
+    --teal-10: rgba(23, 58, 94, 0.1);
+    --teal-20: rgba(23, 58, 94, 0.2);
+    --teal-35: rgba(23, 58, 94, 0.35);
     --gold: #f0d772;
     --amber: #d08a00;
     --ink: #222;
@@ -238,7 +238,7 @@ textarea {
     color: var(--teal);
 }
 .btn--teal-soft:hover {
-    background: rgba(101, 26, 44, 0.5);
+    background: rgba(23, 58, 94, 0.5);
 }
 .btn--white {
     background: var(--white);
@@ -819,7 +819,7 @@ textarea {
 .service-card a:hover,
 .service-card a:focus-visible {
     background: var(--white);
-    box-shadow: 0 0.5rem 1.25rem rgba(101, 26, 44, 0.18);
+    box-shadow: 0 0.5rem 1.25rem rgba(23, 58, 94, 0.18);
 }
 .service-card__icon {
     display: flex;
