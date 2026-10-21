@@ -156,19 +156,39 @@ function bn_time(string $datetime): string
     return bn(date('h:i:s', $time)) . ' ' . date('A', $time) . ' বি.এস.টি.';
 }
 
-/** Hides the middle of a Bangladeshi mobile number: "01774123443" -> "+880 1774 *** *43". */
-function mask_phone(string $phone): string
+/** Any typed form of a Bangladeshi mobile number -> the 11 digits "01XXXXXXXXX" (unchanged when it does not fit). */
+function normalize_phone(string $phone): string
 {
-    $digits = (string) preg_replace('/\D/', '', $phone);
-    if (str_starts_with($digits, '880')) {
-        $digits = substr($digits, 3);
-    }
-    $digits = ltrim($digits, '0');
-    if (strlen($digits) !== 10) {
-        return str_repeat('*', max(0, strlen($digits) - 2)) . substr($digits, -2);
+    $digits = strtr($phone, ['০' => '0', '১' => '1', '২' => '2', '৩' => '3', '৪' => '4', '৫' => '5', '৬' => '6', '৭' => '7', '৮' => '8', '৯' => '9']);
+    $digits = (string) preg_replace('/\D/', '', $digits);
+    if (strlen($digits) === 13 && str_starts_with($digits, '880')) {
+        $digits = '0' . substr($digits, 3);
+    } elseif (strlen($digits) === 12 && str_starts_with($digits, '88')) {
+        $digits = substr($digits, 2);
+    } elseif (strlen($digits) === 10 && $digits[0] === '1') {
+        $digits = '0' . $digits;
     }
 
-    return '+880 ' . substr($digits, 0, 4) . ' *** *' . substr($digits, 8, 2);
+    return $digits;
+}
+
+/** Hides the middle of a mobile number: "01774123443" -> "+88 01774 *** *43". */
+function mask_phone(string $phone): string
+{
+    $n = normalize_phone($phone);
+    if (strlen($n) !== 11) {
+        return str_repeat('*', max(0, strlen($n) - 2)) . substr($n, -2);
+    }
+
+    return '+88 ' . substr($n, 0, 5) . ' *** *' . substr($n, 9, 2);
+}
+
+/** Full number as shown after the visitor asked for it: "01774123443" -> "+88 01774 123 443". */
+function format_phone(string $phone): string
+{
+    $n = normalize_phone($phone);
+
+    return strlen($n) === 11 ? '+88 ' . substr($n, 0, 5) . ' ' . substr($n, 5, 3) . ' ' . substr($n, 8, 3) : $phone;
 }
 
 /** "mr.azizsarkar@gmail.com" -> "mr*********@gmail.com". */
@@ -183,14 +203,3 @@ function mask_email(string $email): string
     return substr($name, 0, 2) . str_repeat('*', max(3, strlen($name) - 2)) . substr($email, $at);
 }
 
-/** Full number for display after the visitor asked for it: "01774123443" -> "+880 1774 123443". */
-function format_phone(string $phone): string
-{
-    $digits = (string) preg_replace('/\D/', '', $phone);
-    if (str_starts_with($digits, '880')) {
-        $digits = substr($digits, 3);
-    }
-    $digits = ltrim($digits, '0');
-
-    return strlen($digits) === 10 ? '+880 ' . substr($digits, 0, 4) . ' ' . substr($digits, 4) : $phone;
-}

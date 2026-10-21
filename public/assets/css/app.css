@@ -3024,3 +3024,36 @@ textarea {
         font-size: 1rem;
     }
 }
+
+/* mobile number fields: "+88" is fixed in front, the visitor types the 11 digits (01XXXXXXXXX) */
+.pf--phone {
+    position: relative;
+}
+.pf__code {
+    position: absolute;
+    top: 50%;
+    left: 4.5rem;
+    transform: translateY(-50%);
+    font-size: var(--fs-body);
+    font-weight: 500;
+    color: var(--ink);
+    pointer-events: none;
+}
+.pf--phone input {
+    padding-left: 8.2rem;
+}
+.lead .pf__code {
+    left: 1.5rem;
+}
+.lead .pf--phone input {
+    padding-left: 4.6rem;
+}
+@media (max-width: 1199px) {
+    .pf__code {
+        left: 1.2rem;
+        font-size: 1rem;
+    }
+    .pf--phone input {
+        padding-left: 3.9rem;
+    }
+}

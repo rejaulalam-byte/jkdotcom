@@ -90,7 +90,7 @@ final class TodayController
         }
 
         $show = static fn (): array => $kind === 'phone'
-            ? ['kind' => 'phone', 'value' => format_phone($value), 'href' => 'tel:+88' . ltrim((string) preg_replace('/\D/', '', $value), '0')]
+            ? ['kind' => 'phone', 'value' => format_phone($value), 'href' => 'tel:+88' . normalize_phone($value)]
             : ['kind' => 'email', 'value' => $value, 'href' => 'mailto:' . $value];
 
         if ($step === 'click') {
@@ -111,14 +111,14 @@ final class TodayController
             return;
         }
         $name = $this->clean($_POST['name'] ?? '', 100);
-        $phone = $this->digits($this->clean($_POST['phone'] ?? '', 20));
+        $phone = normalize_phone($this->clean($_POST['phone'] ?? '', 20));
         if ($name === '' || mb_strlen($name) < 2) {
             $reply(['error' => 'invalid', 'message' => 'আপনার নাম লিখুন।'], 422);
 
             return;
         }
-        if (!preg_match('/^(?:\+?88)?01[3-9][0-9]{8}$/', $phone)) {
-            $reply(['error' => 'invalid', 'message' => 'মোবাইল নাম্বারটি সঠিক নয়। ১১ সংখ্যার নাম্বার দিন, যেমন 017XXXXXXXX।'], 422);
+        if (!preg_match('/^01[3-9][0-9]{8}$/', $phone)) {
+            $reply(['error' => 'invalid', 'message' => 'মোবাইল নাম্বারটি সঠিক নয়। ১১ সংখ্যার নাম্বার দিন, যেমন 01712345678।'], 422);
 
             return;
         }
@@ -186,7 +186,7 @@ final class TodayController
         $data = [
             'title' => $this->clean($_POST['title'] ?? '', 120),
             'contact_name' => $this->clean($_POST['contact_name'] ?? '', 100),
-            'phone' => $this->digits($this->clean($_POST['phone'] ?? '', 20)),
+            'phone' => normalize_phone($this->clean($_POST['phone'] ?? '', 20)),
             'email' => $this->clean($_POST['email'] ?? '', 150),
             'address' => $this->clean($_POST['address'] ?? '', 250),
             'upazila_id' => (int) ($_POST['upazila_id'] ?? 0),
@@ -241,8 +241,8 @@ final class TodayController
         }
         if ($d['phone'] === '') {
             $errors[] = 'মোবাইল নাম্বার লিখুন।';
-        } elseif (!preg_match('/^(?:\+?88)?01[3-9][0-9]{8}$/', $d['phone'])) {
-            $errors[] = 'মোবাইল নাম্বারটি সঠিক নয়। ১১ সংখ্যার নাম্বার দিন, যেমন ০১৭XXXXXXXX।';
+        } elseif (!preg_match('/^01[3-9][0-9]{8}$/', $d['phone'])) {
+            $errors[] = 'মোবাইল নাম্বারটি সঠিক নয়। ১১ সংখ্যার নাম্বার দিন, যেমন 01712345678।';
         }
         if ($d['email'] !== '' && !filter_var($d['email'], FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'ইমেইল ঠিকানাটি সঠিক নয়।';
@@ -286,14 +286,6 @@ final class TodayController
         $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
 
         return $date !== false && $date->format('Y-m-d') === $value ? $value : null;
-    }
-
-    /** Bangla digits -> English digits, spaces/dashes removed (for phone numbers). */
-    private function digits(string $value): string
-    {
-        $value = strtr($value, ['০' => '0', '১' => '1', '২' => '2', '৩' => '3', '৪' => '4', '৫' => '5', '৬' => '6', '৭' => '7', '৮' => '8', '৯' => '9']);
-
-        return (string) preg_replace('/[\s\-()]/', '', $value);
     }
 
     private function clean(mixed $value, int $max, bool $multiline = false): string

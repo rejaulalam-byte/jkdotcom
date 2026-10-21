@@ -77,9 +77,10 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
             <label class="sr-only" for="lead-name"><?= e(content('today.lead.name')) ?></label>
             <input id="lead-name" data-bn type="text" name="name" maxlength="100" required autocomplete="name" placeholder="<?= e(content('today.lead.name')) ?> *">
         </div>
-        <div class="pf">
+        <div class="pf pf--phone">
             <label class="sr-only" for="lead-phone"><?= e(content('today.lead.phone')) ?></label>
-            <input id="lead-phone" type="tel" name="phone" maxlength="20" required autocomplete="tel" inputmode="tel" placeholder="<?= e(content('today.lead.phone')) ?> *">
+            <span class="pf__code" aria-hidden="true">+88</span>
+            <input id="lead-phone" type="tel" name="phone" maxlength="11" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}" placeholder="<?= e(content('today.lead.phone')) ?> *">
         </div>
         <p class="lead__error" role="alert" hidden></p>
         <p class="lead__actions">

@@ -75,9 +75,10 @@ $helpTel = content('today.post.helpline_tel');
                             <input id="pj-name" data-bn type="text" name="contact_name" maxlength="100" required autocomplete="name"
                                    placeholder="<?= $ph('name') ?>" value="<?= $val('contact_name') ?>">
                         </div>
-                        <div class="pf">
+                        <div class="pf pf--phone">
                             <label class="sr-only" for="pj-phone"><?= e(content('today.post.f.phone')) ?></label>
-                            <input id="pj-phone" type="tel" name="phone" maxlength="20" required autocomplete="tel" inputmode="tel"
+                            <span class="pf__code" aria-hidden="true">+88</span>
+                            <input id="pj-phone" type="tel" name="phone" maxlength="11" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
                                    placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                         </div>
                         <div class="pf">
