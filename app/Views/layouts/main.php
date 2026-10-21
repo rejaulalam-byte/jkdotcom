@@ -16,7 +16,7 @@ $pageDescription = $description ?? content('site.description');
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($pageTitle) ?></title>
     <meta name="description" content="<?= e($pageDescription) ?>">
-    <meta name="theme-color" content="#125a6c">
+    <meta name="theme-color" content="#651a2c">
     <meta property="og:type" content="website">
     <meta property="og:title" content="<?= e($pageTitle) ?>">
     <meta property="og:description" content="<?= e($pageDescription) ?>">
