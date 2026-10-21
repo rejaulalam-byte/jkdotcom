@@ -10,15 +10,14 @@
 /* ---- Fonts (self-hosted; files live in /assets/fonts) ------------------- */
 
 
-/* Bangla font: Kalpurush by Md. Tanbin Islam Siyam (Bangladesh), SIL Open Font License 1.0 - free to embed.
-   Only a regular weight exists; bold text is the browser's own bold of it. Latin letters and
-   English digits are taken from the device's normal sans-serif font (see unicode-range). */
+/* Bangla font: Siyam Rupali by Md. Tanbin Islam Siyam (Bangladesh), GNU GPL v2+ WITH the font-embedding exception
+   (a website that uses the font is not itself covered by the GPL). Its Latin letters are Droid Sans (Apache 2.0),
+   so English text looks clean too. Only a regular weight exists; bold text is the browser's own bold of it. */
 @font-face {
-    font-family: "Kalpurush";
+    font-family: "Siyam Rupali";
     font-weight: 400;
-    unicode-range: U+0980-09FF, U+0964-0965, U+200C-200D, U+25CC; /* Bangla only: its Latin letters are serif-style */
     font-display: swap;
-    src: url("../fonts/kalpurush.woff") format("woff");
+    src: url("../fonts/siyam-rupali.woff") format("woff");
 }
 
 /* ---- Design tokens ------------------------------------------------------ */
@@ -37,7 +36,7 @@
     --olive-10: rgba(106, 93, 16, 0.1);
     --white: #fff;
 
-    --font: "Kalpurush", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font: "Siyam Rupali", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 
     /* type scale (desktop) */
     --fs-body: 1.375rem;   /* 22px */
