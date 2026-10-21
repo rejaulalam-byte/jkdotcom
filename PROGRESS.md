@@ -1,3 +1,11 @@
+## START HERE (written 2026-10-21 night, for a fresh chat)
+Read CLAUDE.md first (all rules and owner decisions), then this section. Owner Reja works in Bangla; reply in Bangla; he reviews every change himself.
+- Run locally: double-click `start-server.bat` (portable PHP in tools/php) -> http://127.0.0.1:8000 . No database yet: demo mode (jobs posted in the form are saved in storage/demo-jobs.json and appear at once; clicks/leads in storage/demo-contact-log.json).
+- DONE and approved/under review: Home `/`, About `/about`, Services `/services`, Post-a-job `/today/post`, Job list `/today` (accordion, hidden phone/e-mail + "interested?" pop-up + click/lead tracking), sticky main menu, Banglish typing (data-bn), Bangladeshi phone format (+88 fixed, 11 digits), geo dropdowns nationwide.
+- STANDING RULES: new pages = body text 24px, other sizes Figma +2px (desktop; body class page-*); fonts stay Poppins + Hind Siliguri (do NOT swap); fix Bangla typos silently; push to main after finished work and say it succeeded; verify on desktop (1920/1440) AND mobile (390) with measurements; keep Bangla texts in app/Content/defaults.php; every new text field gets `data-bn` and the switch partial.
+- NEXT: registration pages (Figma 2631-395 overview, 2683-148 professional guideline, 2683-305 agent guideline, 2658-504 professional form, 2682-2 agent form, 2660-816 / 2686-619 logins) -> contact page (owner will send the link) -> admin panel (big; decisions are all in CLAUDE.md; start it in a fresh chat) -> real MySQL (run migrations 001-004 in order), e-mail, cPanel deploy.
+- NOT TESTED yet: real MySQL, e-mail sending, real phone keyboards (Banglish), the animations in a real browser (preview pane draws no frames).
+- Git tags: home-final-figma-colors (home with Figma colours), before-bangla-font-change. Colour experiments are on branches experiment/logo-colors and experiment/colors-navy-gold (not merged).
 # Progress (read CLAUDE.md first)
 
 ## Home page tweaks, owner round 1 (2026-10-20) — DONE, all 9 items pushed
