@@ -2079,7 +2079,7 @@ textarea {
     color: var(--ink);
 }
 .svc-search input::placeholder {
-    color: rgba(34, 34, 34, 0.58);
+    color: rgba(34, 34, 34, 0.45);
 }
 .svc-search input:focus-visible {
     outline: 3px solid var(--amber);
