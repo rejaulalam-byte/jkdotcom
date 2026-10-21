@@ -3298,7 +3298,7 @@ textarea {
 }
 .post-toast__icon {
     display: block;
-    width: 4rem;
+    width: 7.5rem;
     height: auto;
     margin: 0 auto;
 }
@@ -3341,5 +3341,10 @@ textarea {
     .post-toast {
         animation-duration: 0.01s;
         animation-delay: 10s;
+    }
+}
+@media (max-width: 1199px) {
+    .post-toast__icon {
+        width: 5rem;
     }
 }
