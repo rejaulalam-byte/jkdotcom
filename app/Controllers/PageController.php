@@ -41,6 +41,18 @@ final class PageController
         ]);
     }
 
+    /** Registration guideline for agents (/registration/agent); the form is at .../form. */
+    public function registrationAgent(): void
+    {
+        View::render('pages/registration-agent', [
+            'bodyClass' => 'page-regrules page-regguide',
+            'title' => 'প্রতিনিধি রেজিস্ট্রেশনের নিয়মাবলী — Jorurikaj.com',
+            'description' => 'এলাকার প্রতিনিধি (এজেন্ট) হিসেবে Jorurikaj.com-এর সঙ্গে কাজ করার যোগ্যতা, দায়িত্ব ও শর্তাবলি।',
+            'heading' => Content::get('reg.rules.title'),
+            'bodyHtml' => Content::get('page.registration-agent.html', (string) file_get_contents(BASE_PATH . '/app/Content/pages/registration-agent.html')),
+        ]);
+    }
+
     /** About page (/about). */
     public function about(): void
     {
