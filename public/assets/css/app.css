@@ -104,6 +104,7 @@ html {
     font-size: clamp(10.5px, 0.8333vw, 16px);
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    scroll-padding-top: 9rem; /* anchor links (#faq, #feedback) must not hide under the sticky menu */
 }
 body {
     margin: 0;
@@ -366,9 +367,12 @@ textarea {
 
 /* ---- Header + menu ------------------------------------------------------ */
 .site-header {
-    position: relative;
-    z-index: 20;
+    /* the main menu stays at the top while the page scrolls; the thin top bar above it scrolls away (owner 2026-10-21) */
+    position: sticky;
+    top: 0;
+    z-index: 60;
     background: var(--white);
+    box-shadow: 0 0.2rem 0.9rem rgba(0, 0, 0, 0.08);
 }
 .header__inner {
     display: flex;
@@ -3055,5 +3059,11 @@ textarea {
     }
     .pf--phone input {
         padding-left: 3.9rem;
+    }
+}
+
+@media (max-width: 1199px) {
+    html {
+        scroll-padding-top: 6rem; /* phone menu bar is about 80px high */
     }
 }
