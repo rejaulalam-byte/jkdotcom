@@ -2630,3 +2630,44 @@ textarea {
         font-size: 1.6364rem;
     }
 }
+
+/* Home tweaks round 3 (owner 2026-10-21) --------------------------------- */
+/* feedback form: the "type English letters" bar sits straight on the teal box: white text, white button on the right */
+.feedback .bn-switch {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--white);
+}
+.feedback .bn-switch__text {
+    flex: 1;
+}
+.feedback .bn-switch__btn {
+    border-color: var(--white);
+    background: var(--white);
+    color: var(--teal);
+}
+.feedback .bn-switch__btn.is-off {
+    background: transparent;
+    color: var(--white);
+}
+/* FAQ: the open answer sits lower, a little to the right of its question, in a wider area; the open question turns gold */
+.faq-item[open] summary {
+    padding-bottom: 1.5rem;
+    color: var(--gold);
+}
+.faq-item p {
+    max-width: none;
+    padding: 0.5rem 3rem 3rem 7.6rem;
+}
+@media (max-width: 1199px) {
+    .feedback .bn-switch {
+        flex-wrap: wrap;
+    }
+    .faq-item p {
+        padding: 0.25rem 1.25rem 1.75rem 3.2rem;
+    }
+}

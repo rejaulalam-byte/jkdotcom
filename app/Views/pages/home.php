@@ -81,7 +81,7 @@ $faqKeys = [1, 2, 3, 4, 5];
             <span><?= e(content('home.services.badge')) ?></span>
         </p>
         <h2 id="services-title" class="section__title"><?= e(content('home.services.title')) ?></h2>
-        <p class="section__text"><?= e(content('home.services.text_1')) ?><br class="br-desktop"> <?= e(content('home.services.text_2')) ?></p>
+        <p class="section__text"><?= e(content('home.services.text_1')) ?> <?= e(content('home.services.text_2')) ?></p>
     </div>
 
     <?php
