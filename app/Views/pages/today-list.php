@@ -75,7 +75,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
         </div>
         <div class="pf pf--phone">
             <label class="sr-only" for="lead-phone"><?= e(content('today.lead.phone')) ?></label>
-            <span class="pf__code" aria-hidden="true">+88</span>
+            <span class="pf__code" aria-hidden="true">+৮৮</span>
             <input id="lead-phone" type="tel" name="phone" maxlength="11" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}" placeholder="<?= e(content('today.lead.phone')) ?> *">
         </div>
         <p class="lead__error" role="alert" hidden></p>

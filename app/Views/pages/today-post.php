@@ -65,7 +65,7 @@ $helpTel = content('today.post.helpline_tel');
                         </div>
                         <div class="pf pf--phone">
                             <label class="sr-only" for="pj-phone"><?= e(content('today.post.f.phone')) ?></label>
-                            <span class="pf__code" aria-hidden="true">+88</span>
+                            <span class="pf__code" aria-hidden="true">+৮৮</span>
                             <input id="pj-phone" type="tel" name="phone" maxlength="11" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
                                    placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                         </div>
