@@ -48,6 +48,15 @@
             }
         });
     });
+    /* Date fields: the browser's own format (mm/dd/yyyy) is shown pale until a date is chosen. */
+    document.querySelectorAll(".pf--date input[type=date]").forEach(function (d) {
+        var mark = function () {
+            d.classList.toggle("is-empty", d.value === "");
+        };
+        mark();
+        d.addEventListener("input", mark);
+        d.addEventListener("change", mark);
+    });
     document.addEventListener("keydown", function (e) {
         if (e.key !== "Escape") {
             return;

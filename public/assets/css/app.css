@@ -3195,6 +3195,42 @@ textarea {
     }
 }
 
+/* Post-a-job form (owner 2026-10-22): all hint texts are paler (about half colour): placeholders, the unchosen
+   drop-downs, "+88", the date captions and the empty date format. Only the hint "(না পেলে যোগ করুন)" at the
+   right end of the first field is darker, because it works like a button. */
+.post-form .pf ::placeholder,
+.post-form .pf select:invalid,
+.post-form .pf--date label,
+.post-form .pf__code {
+    color: rgba(34, 34, 34, 0.4);
+}
+.post-form .pf--date input.is-empty {
+    color: rgba(34, 34, 34, 0.4);
+}
+.post-form .pf--date input.is-empty::-webkit-datetime-edit {
+    color: rgba(34, 34, 34, 0.4);
+}
+.pf__aside {
+    position: absolute;
+    top: 50%;
+    right: 4rem;
+    transform: translateY(-50%);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: rgba(34, 34, 34, 0.85);
+    pointer-events: none;
+}
+.pf--combo input:not(:placeholder-shown) ~ .pf__aside,
+.pf--combo input:focus ~ .pf__aside {
+    display: none;
+}
+@media (max-width: 1199px) {
+    .pf__aside {
+        right: 3rem;
+        font-size: 0.875rem;
+    }
+}
+
 /* mobile number fields: "+88" is fixed in front, the visitor types the 11 digits (01XXXXXXXXX) */
 .pf--phone {
     position: relative;

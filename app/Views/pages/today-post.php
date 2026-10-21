@@ -63,7 +63,9 @@ $helpTel = content('today.post.helpline_tel');
                         <div class="pf pf--combo" data-combo data-none="<?= e(content('today.post.combo.none')) ?>" data-use="<?= e(content('today.post.combo.use')) ?>" data-hint="<?= e(content('today.post.combo.hint')) ?>">
                             <label class="sr-only" for="pj-title"><?= e(content('today.post.f.title')) ?></label>
                             <input id="pj-title" data-bn type="text" name="title" list="pj-types" maxlength="120" required autocomplete="off"
-                                   placeholder="<?= $ph('title') ?>   <?= e(content('today.post.f.title_hint')) ?>" value="<?= $val('title') ?>">
+                                   placeholder="<?= $ph('title') ?>" value="<?= $val('title') ?>">
+                            <?php // the hint sits at the right end of the empty field, darker than the pale placeholder (works like a button) ?>
+                            <span class="pf__aside" aria-hidden="true"><?= e(content('today.post.f.title_hint')) ?></span>
                             <datalist id="pj-types">
                                 <?php foreach ($services as $service): ?>
                                     <option value="<?= e($service['name']) ?>"></option>
