@@ -154,5 +154,10 @@ return [
     'today.post.done.list'    => 'প্রকাশিত কাজগুলো দেখুন',
     'today.post.done.again'   => 'আরেকটি কাজ জানান',
 
+    // ---- Typing Bangla with English letters (Avro phonetic) ---------------------
+    'input.bn.label'      => 'বাংলায় লিখুন: ইংরেজি অক্ষরে লিখলেই বাংলা হবে (যেমন: ami = আমি, tumi = তুমি, bhalO = ভালো, tOmake = তোমাকে; বড় হাতের O = ো)',
+    'input.bn.on'         => 'চালু',
+    'input.bn.off'        => 'বন্ধ',
+
     'services.search.note'        => 'এলাকা (থানা/উপজেলা, জেলা, বিভাগ), নাম বা মোবাইল দিয়ে কর্মী খোঁজার সুবিধা কর্মীদের তথ্য যুক্ত হলে চালু হবে।',
 ];

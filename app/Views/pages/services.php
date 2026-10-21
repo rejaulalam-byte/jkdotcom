@@ -24,13 +24,15 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
 
         <form class="svc-search" action="/services" method="get" role="search">
             <label class="sr-only" for="svc-q"><?= e(content('services.search.placeholder')) ?></label>
-            <input id="svc-q" type="search" name="q" value="<?= e($query) ?>" maxlength="100"
+            <input id="svc-q" data-bn type="search" name="q" value="<?= e($query) ?>" maxlength="100"
                    placeholder="<?= e(content('services.search.placeholder')) ?>" autocomplete="off">
             <button class="svc-search__btn" type="submit">
                 <span><?= e(content('services.search.button')) ?></span>
                 <img src="<?= e(asset('img/icons/search-white.svg')) ?>" alt="" width="32" height="32">
             </button>
         </form>
+
+        <?php require BASE_PATH . '/app/Views/partials/bn-switch.php'; ?>
 
         <?php if ($query !== ''): ?>
             <p class="svc-result" role="status">

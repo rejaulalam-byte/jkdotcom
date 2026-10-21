@@ -55,12 +55,14 @@ $helpTel = content('today.post.helpline_tel');
                 <?= csrf_field() ?>
                 <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
 
+                <?php require BASE_PATH . '/app/Views/partials/bn-switch.php'; ?>
+
                 <div class="post-form__grid">
                     <div class="post-form__col">
                         <?php // without JavaScript this is a plain text box with suggestions (datalist); app.js makes it a searchable drop-down ?>
                         <div class="pf pf--combo" data-combo data-none="<?= e(content('today.post.combo.none')) ?>" data-use="<?= e(content('today.post.combo.use')) ?>" data-hint="<?= e(content('today.post.combo.hint')) ?>">
                             <label class="sr-only" for="pj-title"><?= e(content('today.post.f.title')) ?></label>
-                            <input id="pj-title" type="text" name="title" list="pj-types" maxlength="120" required autocomplete="off"
+                            <input id="pj-title" data-bn type="text" name="title" list="pj-types" maxlength="120" required autocomplete="off"
                                    placeholder="<?= $ph('title') ?>   <?= e(content('today.post.f.title_hint')) ?>" value="<?= $val('title') ?>">
                             <datalist id="pj-types">
                                 <?php foreach ($services as $service): ?>
@@ -70,7 +72,7 @@ $helpTel = content('today.post.helpline_tel');
                         </div>
                         <div class="pf">
                             <label class="sr-only" for="pj-name"><?= e(content('today.post.f.name')) ?></label>
-                            <input id="pj-name" type="text" name="contact_name" maxlength="100" required autocomplete="name"
+                            <input id="pj-name" data-bn type="text" name="contact_name" maxlength="100" required autocomplete="name"
                                    placeholder="<?= $ph('name') ?>" value="<?= $val('contact_name') ?>">
                         </div>
                         <div class="pf">
@@ -92,7 +94,7 @@ $helpTel = content('today.post.helpline_tel');
                     <div class="post-form__col">
                         <div class="pf">
                             <label class="sr-only" for="pj-address"><?= e(content('today.post.f.address')) ?></label>
-                            <input id="pj-address" type="text" name="address" maxlength="250" required autocomplete="street-address"
+                            <input id="pj-address" data-bn type="text" name="address" maxlength="250" required autocomplete="street-address"
                                    placeholder="<?= $ph('address') ?>" value="<?= $val('address') ?>">
                         </div>
                         <?php // Figma order: upazila, district, division. app.js lets any of the three be picked first. ?>
@@ -132,7 +134,7 @@ $helpTel = content('today.post.helpline_tel');
 
                 <div class="pf pf--wide">
                     <label class="sr-only" for="pj-details"><?= e(content('today.post.f.details')) ?></label>
-                    <textarea id="pj-details" name="details" maxlength="3000" required
+                    <textarea id="pj-details" data-bn name="details" maxlength="3000" required
                               placeholder="<?= $ph('details') ?>"><?= $val('details') ?></textarea>
                 </div>
 

@@ -696,3 +696,162 @@
     settle();
     render();
 })();
+
+/* Typing Bangla with English letters ("Banglish", Avro phonetic): ami = আমি, tomake = তোমাকে.
+   Fields opt in with data-bn. The converter is vendor/avro/avro-lib.js (MPL 1.1), loaded only on pages
+   that have such fields. The small switch (data-bn-switch) turns it on/off; the choice is remembered. */
+(function () {
+    var fields = document.querySelectorAll("[data-bn]");
+    if (!fields.length) {
+        return;
+    }
+
+    var enabled = true;
+    try {
+        enabled = window.localStorage.getItem("bnPhonetic") !== "off";
+    } catch (err) {
+        enabled = true;
+    }
+
+    // do not let phones "correct" the English letters before we turn them into Bangla
+    Array.prototype.forEach.call(fields, function (el) {
+        el.setAttribute("autocapitalize", "none");
+        el.setAttribute("autocorrect", "off");
+        el.setAttribute("spellcheck", "false");
+    });
+
+    var loading = false;
+    function load() {
+        if (window.OmicronLab || loading) {
+            return;
+        }
+        loading = true;
+        var s = document.createElement("script");
+        s.src = "/assets/vendor/avro/avro-lib.js";
+        s.async = true;
+        document.head.appendChild(s);
+    }
+
+    var buttons = document.querySelectorAll("[data-bn-switch] button");
+    function paint() {
+        Array.prototype.forEach.call(buttons, function (b) {
+            b.setAttribute("aria-pressed", enabled ? "true" : "false");
+            b.textContent = b.getAttribute(enabled ? "data-on" : "data-off");
+            b.classList.toggle("is-off", !enabled);
+        });
+    }
+    Array.prototype.forEach.call(buttons, function (b) {
+        b.addEventListener("click", function () {
+            enabled = !enabled;
+            try {
+                window.localStorage.setItem("bnPhonetic", enabled ? "on" : "off");
+            } catch (err) {
+                /* private mode: the choice just lasts for this page */
+            }
+            if (enabled) {
+                load();
+            }
+            paint();
+        });
+    });
+    paint();
+    if (enabled) {
+        load();
+    }
+
+    // letters, digits and the Avro signs ( . , : ^ $ ` ) belong to the word being typed
+    var typed = /[A-Za-z0-9.,:^$`]+$/;
+    var onlyTyped = /^[A-Za-z0-9.,:^$`]+$/;
+    var states = typeof WeakMap === "function" ? new WeakMap() : null;
+    var plain = {};
+
+    function getState(el) {
+        return states ? states.get(el) : plain[el.id];
+    }
+    function setState(el, st) {
+        if (states) {
+            if (st) { states.set(el, st); } else { states.delete(el); }
+        } else {
+            plain[el.id] = st;
+        }
+    }
+
+    // capture phase: runs before the field's own listeners (e.g. the "কাজের ধরন" list)
+    document.addEventListener("input", function (e) {
+        var el = e.target;
+        if (!enabled || !window.OmicronLab || !el.hasAttribute || !el.hasAttribute("data-bn")) {
+            return;
+        }
+        var type = e.inputType || "insertText";
+        if (type.indexOf("insert") !== 0 || type === "insertFromPaste" || type === "insertFromDrop" || type === "insertLineBreak") {
+            setState(el, null);
+            return;
+        }
+        var caret = el.selectionStart;
+        if (typeof caret !== "number") {
+            return;
+        }
+        var value = el.value;
+        var left = value.slice(0, caret);
+        var st = getState(el);
+        var raw;
+        var start;
+
+        // several characters arrive at once (voice typing, a keyboard's word suggestion): convert every English word in them
+        var chunk = typeof e.data === "string" ? e.data : "";
+        if (chunk.length > 1 && left.slice(-chunk.length) === chunk) {
+            var chunkStart = caret - chunk.length;
+            var lastRaw = "";
+            var lastOut = "";
+            var converted = chunk.replace(/[A-Za-z0-9.,:^$`]+/g, function (word) {
+                lastRaw = word;
+                lastOut = window.OmicronLab.Avro.Phonetic.parse(word);
+                return lastOut;
+            });
+            el.value = value.slice(0, chunkStart) + converted + value.slice(caret);
+            var end = chunkStart + converted.length;
+            el.setSelectionRange(end, end);
+            var endsWithWord = lastOut !== "" && converted.slice(-lastOut.length) === lastOut && typed.test(chunk);
+            setState(el, endsWithWord ? { start: end - lastOut.length, out: lastOut, raw: lastRaw } : null);
+            return;
+        }
+
+        if (st && left.length >= st.start + st.out.length && left.substr(st.start, st.out.length) === st.out) {
+            var added = left.slice(st.start + st.out.length);
+            if (added === "" || !onlyTyped.test(added)) {
+                setState(el, null);
+                return;
+            }
+            raw = st.raw + added;
+            start = st.start;
+        } else {
+            var m = typed.exec(left);
+            if (!m) {
+                setState(el, null);
+                return;
+            }
+            raw = m[0];
+            start = caret - raw.length;
+        }
+
+        var out = window.OmicronLab.Avro.Phonetic.parse(raw);
+        el.value = value.slice(0, start) + out + value.slice(caret);
+        var pos = start + out.length;
+        el.setSelectionRange(pos, pos);
+        setState(el, { start: start, out: out, raw: raw });
+    }, true);
+
+    // moving the cursor or leaving the field ends the word
+    ["blur", "mouseup", "keyup"].forEach(function (name) {
+        document.addEventListener(name, function (e) {
+            var el = e.target;
+            if (!el.hasAttribute || !el.hasAttribute("data-bn")) {
+                return;
+            }
+            if (name === "keyup" && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].indexOf(e.key) === -1) {
+                return;
+            }
+            setState(el, null);
+        }, true);
+    });
+})();
