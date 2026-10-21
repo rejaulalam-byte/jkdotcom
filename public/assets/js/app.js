@@ -23,6 +23,31 @@
             btn.setAttribute("aria-expanded", String(open));
         });
     });
+    /* A menu name that has a sub-menu does not open a page: it only shows its sub-menu.
+       With a mouse on a wide screen the sub-menu already opens on hover, so a click does nothing;
+       on phones/tablets a tap opens and closes it. (Without JavaScript the name still links to its page.) */
+    var hoverMenu = window.matchMedia("(hover: hover) and (min-width: 1200px)");
+    document.querySelectorAll(".has-sub > .nav__link").forEach(function (link) {
+        link.addEventListener("click", function (e) {
+            e.preventDefault();
+            if (hoverMenu.matches) {
+                return;
+            }
+            var item = link.closest(".has-sub");
+            var open = item.classList.toggle("is-open");
+            var b = item.querySelector(".sub-toggle");
+            if (b) {
+                b.setAttribute("aria-expanded", String(open));
+            }
+        });
+    });
+    document.addEventListener("click", function (e) {
+        document.querySelectorAll(".has-sub.is-open").forEach(function (item) {
+            if (!item.contains(e.target) && !hoverMenu.matches) {
+                item.classList.remove("is-open");
+            }
+        });
+    });
     document.addEventListener("keydown", function (e) {
         if (e.key !== "Escape") {
             return;
