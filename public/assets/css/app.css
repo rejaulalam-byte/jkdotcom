@@ -2135,7 +2135,7 @@ textarea {
     margin-top: 1.4rem;
 }
 .svc-group__head {
-    padding: 0.35rem 2.75rem;
+    padding: 0.35rem 2rem;
     background: var(--teal-20);
     font-size: var(--fs-lead);
     font-weight: 600;
@@ -2144,7 +2144,7 @@ textarea {
 }
 .svc-group li a {
     display: block;
-    padding: 0.4rem 2.75rem;
+    padding: 0.4rem 2rem;
     border-bottom: 1px solid var(--teal-10);
     font-size: 1.375rem;
     line-height: 1.5;

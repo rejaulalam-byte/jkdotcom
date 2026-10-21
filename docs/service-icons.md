@@ -63,9 +63,9 @@ Default icon of every service. Source: [Tabler Icons](https://tabler.io/icons) 3
 | 55 | ফটোগ্রাফার | photographer.svg | camera | good |
 | 56 | ফটোকপি মেশিন ঠিক করা | photocopier-repair.svg | copy | **near** |
 | 57 | ফ্রিজ ঠিক করা | fridge-repair.svg | fridge | good |
-| 58 | বাসায় গিয়ে রক্ত ও অন্যান্ন পরীক্ষা | home-blood-test.svg | test-pipe | good |
-| 59 | বাসায় গিয়ে পড়ানোর শিক্ষক | home-tutor.svg | school | good |
-| 60 | বাসায় গিয়ে আরবী পড়ানোর শিক্ষক | arabic-tutor.svg | book-2 | **near** |
+| 58 | রক্ত ও অন্যান্য উপাদান (বাসা থেকে সংগ্রহ করা) | home-blood-test.svg | test-pipe | good |
+| 59 | শিক্ষক (বাসায় এসে পড়ানো) | home-tutor.svg | school | good |
+| 60 | শিক্ষক - আরবী পড়ানো (বাসায় গিয়ে) | arabic-tutor.svg | book-2 | **near** |
 | 61 | বাসা পরিবর্তন | house-shifting.svg | home-move | good |
 | 62 | বাবুর্চি | cook.svg | chef-hat | good |
 | 63 | ভিডিও এডিটিং করা | video-editor.svg | movie | good |
