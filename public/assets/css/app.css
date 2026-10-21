@@ -2081,9 +2081,9 @@ textarea {
 .svc-search input::placeholder {
     color: rgba(34, 34, 34, 0.45);
 }
+.svc-search input:focus,
 .svc-search input:focus-visible {
-    outline: 3px solid var(--amber);
-    outline-offset: -3px;
+    outline: none; /* the pill keeps its normal border: no second coloured frame */
 }
 .svc-search__btn {
     display: flex;
