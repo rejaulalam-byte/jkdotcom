@@ -26,7 +26,7 @@ $pageDescription = $description ?? content('site.description');
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
     <script src="<?= e(asset('js/app.js')) ?>" defer></script>
 </head>
-<body id="top">
+<body id="top"<?= !empty($bodyClass) ? ' class="' . e($bodyClass) . '"' : '' ?>>
 <a class="skip-link" href="#main">মূল অংশে যান</a>
 
 <?php require BASE_PATH . '/app/Views/partials/topbar.php'; ?>

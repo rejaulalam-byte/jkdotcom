@@ -19,6 +19,7 @@ final class HomeController
         $days = max(1, min(30, (int) Content::get('settings.jobs_visible_days', '3')));
 
         View::render('pages/home', [
+            'bodyClass' => 'page-home',
             'title' => content('site.title'),
             'description' => content('site.description'),
             'jobs' => JobPostRepository::recent($days),

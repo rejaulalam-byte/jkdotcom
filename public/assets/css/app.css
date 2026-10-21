@@ -2618,3 +2618,15 @@ textarea {
 .feedback .bn-switch {
     background: var(--white);
 }
+
+/* Home page (desktop): all 22px text becomes 24px, and the buttons under that text grow by the same ratio
+   (24px -> 26.2px). Owner request 2026-10-21. Phones/tablets keep their own sizes. */
+@media (min-width: 1200px) {
+    body.page-home {
+        --fs-body: 1.5rem;
+    }
+    .page-home .btn--teal-soft,
+    .page-home .feedback .btn {
+        font-size: 1.6364rem;
+    }
+}
