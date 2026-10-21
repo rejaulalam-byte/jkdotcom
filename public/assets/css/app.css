@@ -45,6 +45,22 @@
     src: url("../fonts/hind-siliguri-600.woff2") format("woff2");
 }
 
+/* Bangla digits (০-৯): Hind Siliguri draws "১" as a short curl that looks like a blob (owner 2026-10-21).
+   Only the digits are taken from the device's own Bangla font (Windows Nirmala UI, Android Noto Sans Bengali,
+   Apple Bangla Sangam MN); where none exists the normal font is used. */
+@font-face {
+    font-family: "Bangla Digits";
+    font-weight: 100 500;
+    unicode-range: U+09E6-09EF;
+    src: local("Nirmala UI"), local("Noto Sans Bengali"), local("Bangla Sangam MN"), local("Kohinoor Bangla"), local("Siyam Rupali");
+}
+@font-face {
+    font-family: "Bangla Digits";
+    font-weight: 600 900;
+    unicode-range: U+09E6-09EF;
+    src: local("Nirmala UI Bold"), local("NirmalaUI-Bold"), local("Noto Sans Bengali Bold"), local("NotoSansBengali-Bold"), local("Bangla Sangam MN Bold"), local("Kohinoor Bangla Bold"), local("Nirmala UI"), local("Noto Sans Bengali");
+}
+
 /* ---- Design tokens ------------------------------------------------------ */
 :root {
     --teal: #125a6c;
@@ -61,7 +77,7 @@
     --olive-10: rgba(106, 93, 16, 0.1);
     --white: #fff;
 
-    --font: "Poppins", "Hind Siliguri", "Noto Sans Bengali", "Nirmala UI", "Siyam Rupali", system-ui, sans-serif;
+    --font: "Bangla Digits", "Poppins", "Hind Siliguri", "Noto Sans Bengali", "Nirmala UI", "Siyam Rupali", system-ui, sans-serif;
 
     /* type scale (desktop) */
     --fs-body: 1.375rem;   /* 22px */
