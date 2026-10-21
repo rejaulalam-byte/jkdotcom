@@ -1,10 +1,5 @@
-Siyam Rupali (siyam-rupali.woff)
-  Designer: Md. Tanbin Islam Siyam (Bangladesh); font programming M. M. Rifat-Un-Nabi; modified "Rupali Bangla";
-            developed under the Avro Font Development Project (OmicronLab). Latin letters: Droid Sans (Apache License 2.0).
-  Source:   https://omicronlab.com/bangla-fonts.html  (Siyamrupali.ttf, repacked here as WOFF; glyphs unchanged)
-  Licence:  GNU General Public License v2 or later, with this special exception (written in the font file itself):
-            "if you create a document which uses this font, and embed this font or unaltered portions of this font
-            into the document, this font does not by itself cause the resulting document to be covered by the GPL."
-            The font file stays unmodified and may be copied freely (GPL: https://www.gnu.org/licenses/gpl-2.0.html).
-  Owner decision 2026-10-21: no fonts from Indian foundries (Hind Siliguri / Poppins removed). Kalpurush (OFL) was tried
-  first and rejected by the owner as too light/old-looking. Old design = git tag before-bangla-font-change.
+Poppins (Latin) and Hind Siliguri (Bangla) - self-hosted WOFF2 files, SIL Open Font License 1.1.
+  Both were designed by Indian Type Foundry (India). The owner first asked for no Indian fonts (2026-10-21), tried
+  Kalpurush and Siyam Rupali (Bangladeshi), found they broke the design in many places, and decided to go back
+  to these two. Bangla digits (০-৯) are drawn by the device's own Bangla font (see @font-face "Bangla Digits" in
+  app.css) because Hind Siliguri's "১" looks like a blob. Phone numbers are shown with English digits.

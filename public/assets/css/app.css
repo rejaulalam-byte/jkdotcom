@@ -8,16 +8,57 @@
    ========================================================================== */
 
 /* ---- Fonts (self-hosted; files live in /assets/fonts) ------------------- */
-
-
-/* Bangla font: Siyam Rupali by Md. Tanbin Islam Siyam (Bangladesh), GNU GPL v2+ WITH the font-embedding exception
-   (a website that uses the font is not itself covered by the GPL). Its Latin letters are Droid Sans (Apache 2.0),
-   so English text looks clean too. Only a regular weight exists; bold text is the browser's own bold of it. */
 @font-face {
-    font-family: "Siyam Rupali";
+    font-family: "Poppins";
     font-weight: 400;
     font-display: swap;
-    src: url("../fonts/siyam-rupali.woff") format("woff");
+    src: url("../fonts/poppins-400.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Poppins";
+    font-weight: 500;
+    font-display: swap;
+    src: url("../fonts/poppins-500.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Poppins";
+    font-weight: 600;
+    font-display: swap;
+    src: url("../fonts/poppins-600.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Hind Siliguri";
+    font-weight: 400;
+    font-display: swap;
+    src: url("../fonts/hind-siliguri-400.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Hind Siliguri";
+    font-weight: 500;
+    font-display: swap;
+    src: url("../fonts/hind-siliguri-500.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Hind Siliguri";
+    font-weight: 600;
+    font-display: swap;
+    src: url("../fonts/hind-siliguri-600.woff2") format("woff2");
+}
+
+/* Bangla digits (০-৯): Hind Siliguri draws "১" as a short curl that looks like a blob (owner 2026-10-21).
+   Only the digits are taken from the device's own Bangla font (Windows Nirmala UI, Android Noto Sans Bengali,
+   Apple Bangla Sangam MN); where none exists the normal font is used. */
+@font-face {
+    font-family: "Bangla Digits";
+    font-weight: 100 500;
+    unicode-range: U+09E6-09EF;
+    src: local("Nirmala UI"), local("Noto Sans Bengali"), local("Bangla Sangam MN"), local("Kohinoor Bangla"), local("Siyam Rupali");
+}
+@font-face {
+    font-family: "Bangla Digits";
+    font-weight: 600 900;
+    unicode-range: U+09E6-09EF;
+    src: local("Nirmala UI Bold"), local("NirmalaUI-Bold"), local("Noto Sans Bengali Bold"), local("NotoSansBengali-Bold"), local("Bangla Sangam MN Bold"), local("Kohinoor Bangla Bold"), local("Nirmala UI"), local("Noto Sans Bengali");
 }
 
 /* ---- Design tokens ------------------------------------------------------ */
@@ -36,7 +77,7 @@
     --olive-10: rgba(106, 93, 16, 0.1);
     --white: #fff;
 
-    --font: "Siyam Rupali", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --font: "Bangla Digits", "Poppins", "Hind Siliguri", "Noto Sans Bengali", "Nirmala UI", "Siyam Rupali", system-ui, sans-serif;
 
     /* type scale (desktop) */
     --fs-body: 1.375rem;   /* 22px */
@@ -494,7 +535,7 @@ textarea {
 .hero__title {
     margin-top: 3.75rem;
     font-size: var(--fs-h1);
-    font-weight: 600; /* owner 2026-10-20: bolder heading (Kalpurush bold) */
+    font-weight: 600; /* owner 2026-10-20: bolder heading (Hind Siliguri 600 is the boldest we load) */
     line-height: 1.5;
 }
 .hero__title-1,
@@ -874,6 +915,10 @@ textarea {
     border-radius: 50%;
     background: var(--teal);
     color: var(--white);
+    /* Hind Siliguri draws "১" as a short half-height curl that reads as a blob in the
+       circle (owner bug 2026-10-20), so the numbers use the device's own Bangla font
+       (Windows Nirmala UI, Android Noto Sans Bengali, Apple Kohinoor Bangla): tall, clear digits. */
+    font-family: "Nirmala UI", "Noto Sans Bengali", "Kohinoor Bangla", "Hind Siliguri", sans-serif;
     font-size: 2.5rem; /* owner 2026-10-20: one third smaller than 3.75rem */
     font-weight: 700;
     line-height: 1;
