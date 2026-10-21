@@ -2205,3 +2205,16 @@ textarea {
         font-size: 1.25rem;
     }
 }
+
+/* ---- Site name "Jorurikaj.com" inside page text (added by View::boldBrand) ---- */
+.brandname {
+    font-weight: 600;
+    color: var(--teal);
+}
+.hero .brandname,
+.svc-notice .brandname,
+.faq-item[open] .brandname,
+.rep-bar .brandname,
+.page-banner .brandname {
+    color: var(--gold);
+}

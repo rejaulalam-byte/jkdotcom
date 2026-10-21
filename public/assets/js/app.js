@@ -59,9 +59,15 @@
                 var pieces = segmenter
                     ? Array.from(segmenter.segment(part), function (s) { return s.segment; })
                     : [part];
+                // the site name at the start of a word ("Jorurikaj.com-এ") stays bold + coloured
+                var brandLeft = /^jorurikaj\.com/i.test(part) ? "jorurikaj.com".length : 0;
                 pieces.forEach(function (piece) {
                     var letter = document.createElement("span");
                     letter.className = "fly-letter";
+                    if (brandLeft > 0) {
+                        letter.className += " brandname";
+                        brandLeft -= piece.length;
+                    }
                     letter.textContent = piece;
                     word.appendChild(letter);
                     flyLetters.push(letter);

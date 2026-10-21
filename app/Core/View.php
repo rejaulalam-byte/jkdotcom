@@ -10,7 +10,7 @@ final class View
     /** @param array<string,mixed> $data variables made available to the view */
     public static function render(string $view, array $data = [], string $layout = 'layouts/main'): void
     {
-        $content = self::capture($view, $data);
+        $content = self::boldBrand(self::capture($view, $data));
         echo self::capture($layout, $data + ['content' => $content]);
     }
 
@@ -30,5 +30,30 @@ final class View
 
             return (string) ob_get_clean();
         })($file, $data);
+    }
+
+    /**
+     * Shows the site name "Jorurikaj.com" bold + coloured wherever it appears in page text
+     * (not in tags/attributes, scripts, e-mail or web addresses such as info@jorurikaj.com).
+     */
+    private static function boldBrand(string $html): string
+    {
+        $parts = preg_split('/(<[^>]*>)/u', $html, -1, PREG_SPLIT_DELIM_CAPTURE) ?: [$html];
+        $skip = 0;
+        foreach ($parts as $i => $part) {
+            if ($part !== '' && $part[0] === '<') {
+                if (preg_match('#^<(script|style|textarea|option|title)\b#i', $part)) {
+                    $skip++;
+                } elseif (preg_match('#^</(script|style|textarea|option|title)\b#i', $part)) {
+                    $skip = max(0, $skip - 1);
+                }
+                continue;
+            }
+            if ($skip === 0) {
+                $parts[$i] = (string) preg_replace('/(?<![\w@.\/-])jorurikaj\.com(?![A-Za-z0-9_])/iu', '<strong class="brandname">$0</strong>', $part);
+            }
+        }
+
+        return implode('', $parts);
     }
 }
