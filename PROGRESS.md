@@ -24,6 +24,13 @@ Reference images: docs/references/service-card-reference.png (wanted service-car
 
 Also record in CLAUDE.md after finishing: these decisions (marquee text colouring, footer link editing, services scrolling rows) so the admin panel plan includes them.
 
+## 2026-10-21 (later) — Services page `/services` basic work DONE (owner: "প্রাথমিক কাজ হয়ে গেছে")
+- Built from Figma 2642-54: banner, intro, teal notice box, search pill, all services A-Z under letter headings in 3 balanced columns (`app/Models/ServiceDirectory.php`, view `app/Views/pages/services.php`). Letter groups never split; each service links to `/services/<slug>`.
+- Search now matches service NAMES only (`/services?q=`). Area (গ্রাম/থানা-উপজেলা/জেলা/বিভাগ), name, mobile search needs workers + geo tables (not built).
+- 3 services renamed (blood sample, 2 tutors; slugs unchanged). Bangla typos fixed silently (owner's permission). Site name "Jorurikaj.com" bold+coloured in page text (teal / gold on dark).
+- Open: very long service names may wrap on small laptops; search focus frame removed on purpose; admin editing of letter headings/services not built.
+- Local commits not pushed yet (push when owner says). Next: pick the next Figma page (Registration overview/guidelines 2631-395, 2683-148, 2683-305 / Contact when ready).
+
 ## 2026-10-21 — Home final + About page DONE (owner: "আপাতত শেষ")
 - Home approved by owner. Safe copy of it with the Figma colours: git tag `home-final-figma-colors` + branch `backup/home-figma-colors` (pushed). Colour experiments (not merged, owner kept Figma colours): branches `experiment/logo-colors` (maroon), `experiment/colors-navy-gold`.
 - About page `/about` built from Figma 2621-103: banner + ONE open writing area (`.rich`, body in `app/Content/pages/about.html`, key `page.about.html`); small badge removed; map 350x446, 10px lower (`img-down-10`). Home button now "বিস্তারিত জানতে ক্লিক করুন" -> /about.
