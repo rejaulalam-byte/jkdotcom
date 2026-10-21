@@ -1,9 +1,9 @@
--- 001: tables used by the Home page. Run once in phpMyAdmin (cPanel) on the NEW database.
--- Character set utf8mb4 is required for Bangla text.
+-- 001: হোম পেইজের টেবিল। নতুন ডাটাবেসে phpMyAdmin (cPanel) থেকে একবার চালান।
+-- বাংলা লেখার জন্য utf8mb4 ক্যারেক্টার সেট আবশ্যক।
 
 SET NAMES utf8mb4;
 
--- Admin-editable website text (key = e.g. "home.hero.title_1")
+-- অ্যাডমিনের সম্পাদনাযোগ্য ওয়েবসাইটের লেখা (key = যেমন "home.hero.title_1")
 CREATE TABLE IF NOT EXISTS content_blocks (
     content_key   VARCHAR(120) NOT NULL,
     content_value TEXT         NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS content_blocks (
     PRIMARY KEY (content_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Service categories (electrician, plumber ...)
+-- সেবার বিভাগ (ইলেকট্রিশিয়ান, প্লাম্বার ইত্যাদি)
 CREATE TABLE IF NOT EXISTS services (
     id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     name        VARCHAR(120) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS services (
     KEY idx_services_listing (is_active, is_featured, sort_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- "আজকের প্রকাশিত" job notices (new rows start as 'pending' until the admin approves)
+-- "আজকের প্রকাশিত" কাজের বিজ্ঞপ্তি (ফর্ম থেকে এলে সঙ্গে সঙ্গে 'approved' হয়ে প্রকাশিত; অ্যাডমিন চাইলে 'pending'-এ নামিয়ে লুকাতে পারেন)
 CREATE TABLE IF NOT EXISTS job_posts (
     id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
     title         VARCHAR(190) NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS job_posts (
     KEY idx_job_posts_recent (status, published_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Advertisement banners in the strip under the home hero
+-- হোম hero-র নিচের স্ট্রিপের বিজ্ঞাপন-ব্যানার
 CREATE TABLE IF NOT EXISTS advertisements (
     id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
     title      VARCHAR(150) NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS advertisements (
     KEY idx_ads_active (is_active, sort_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Visitor feedback (admin can read / delete / keep)
+-- দর্শকের মতামত (অ্যাডমিন পড়তে / মুছতে / রাখতে পারেন)
 CREATE TABLE IF NOT EXISTS feedback (
     id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
     name       VARCHAR(100) NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS feedback (
     KEY idx_feedback_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Footer e-mail box
+-- ফুটারের ইমেইল-বাক্স
 CREATE TABLE IF NOT EXISTS subscribers (
     id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
     email      VARCHAR(150) NOT NULL,

@@ -1,11 +1,11 @@
 <?php
 /**
- * "সেবা সমূহ" page (Figma node 2642-54): notice, search, all services A-Z in 3 columns.
+ * "সেবা সমূহ" পেইজ (Figma node 2642-54): নোটিস, খোঁজার ঘর, সব সেবা বর্ণানুক্রমে ৩ কলামে।
  *
  * @var string $heading
- * @var string $query    what the visitor searched for ('' = no search)
+ * @var string $query    দর্শক কী খুঁজেছেন ('' = খোঁজেননি)
  * @var list<list<array{letter:string,items:list<array{name:string,slug:string}>}>> $columns
- * @var int $found       number of services shown
+ * @var int $found       দেখানো সেবার সংখ্যা
  */
 $crumbs = [['/', 'হোম'], [null, 'সেবাসমূহ']];
 require BASE_PATH . '/app/Views/partials/page-banner.php';

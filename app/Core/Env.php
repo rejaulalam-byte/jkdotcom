@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/** Reads settings (database password, mail address ...) from the private .env file. */
+/** গোপন .env ফাইল থেকে সেটিং (ডাটাবেস পাসওয়ার্ড, মেইল ঠিকানা ইত্যাদি) পড়ে। */
 final class Env
 {
     /** @var array<string,string> */

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/** Renders app/Views/<name>.php inside the shared layout. */
+/** app/Views/<নাম>.php ভিউকে সবার সাধারণ কাঠামো (layout)-এর ভেতরে সাজিয়ে দেখায়। */
 final class View
 {
-    /** @param array<string,mixed> $data variables made available to the view */
+    /** @param array<string,mixed> $data ভিউয়ের ভেতরে যে ভেরিয়েবলগুলো পাওয়া যাবে */
     public static function render(string $view, array $data = [], string $layout = 'layouts/main'): void
     {
         $content = self::boldBrand(self::capture($view, $data));
@@ -22,7 +22,7 @@ final class View
             throw new \RuntimeException('View not found: ' . $view);
         }
 
-        // Isolated scope: the view only sees $data, never controller internals
+        // আলাদা স্কোপ: ভিউ শুধু $data-র জিনিস দেখতে পায়, কন্ট্রোলারের ভেতরের কিছু নয়
         return (static function (string $__file, array $__data): string {
             extract($__data, EXTR_SKIP);
             ob_start();
@@ -33,8 +33,8 @@ final class View
     }
 
     /**
-     * Shows the site name "Jorurikaj.com" bold + coloured wherever it appears in page text
-     * (not in tags/attributes, scripts, e-mail or web addresses such as info@jorurikaj.com).
+     * পেইজের লেখার যেখানেই সাইটের নাম "Jorurikaj.com" আছে, সেখানে মোটা ও রঙিন করে।
+     * (ট্যাগ/অ্যাট্রিবিউট, স্ক্রিপ্ট, ইমেইল বা ওয়েব ঠিকানা, যেমন info@jorurikaj.com, বাদ থাকে।)
      */
     private static function boldBrand(string $html): string
     {

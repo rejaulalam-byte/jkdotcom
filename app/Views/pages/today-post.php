@@ -1,11 +1,11 @@
 <?php
 /**
- * "কাজ সম্পর্কে জানান" (Figma node 2674-7): a visitor posts the work they need done.
- * Fields use the placeholder as their label (as in the Figma design); the three area
- * selects work together in app.js and are checked again on the server.
+ * "কাজ সম্পর্কে জানান" (Figma node 2674-7): দর্শক যে কাজ করাতে চান তা জানান।
+ * ঘরের ইঙ্গিত-লেখাই তার লেবেল (Figma নকশার মতো); এলাকার তিনটি ড্রপডাউন app.js-এ একসঙ্গে
+ * কাজ করে এবং সার্ভারে আবার যাচাই হয়।
  *
  * @var string $heading
- * @var bool $done        true right after a successful submit (shows the pop-up message for 5 seconds)
+ * @var bool $done        সফলভাবে জমা দেওয়ার ঠিক পরে true (১০ সেকেন্ডের জন্য বার্তা-বক্স দেখায়)
  * @var list<string> $errors
  * @var array<string,mixed> $old
  * @var array{divisions:list<array{id:int,name:string}>,districts:list<array{id:int,parent:int,name:string}>,upazilas:list<array{id:int,parent:int,name:string}>} $geo
@@ -45,12 +45,12 @@ $helpTel = content('today.post.helpline_tel');
 
                 <div class="post-form__grid">
                     <div class="post-form__col">
-                        <?php // without JavaScript this is a plain text box with suggestions (datalist); app.js makes it a searchable drop-down ?>
+                        <?php // JavaScript ছাড়া এটা পরামর্শসহ সাধারণ লেখার ঘর (datalist); app.js একে খোঁজা-যায় এমন ড্রপডাউন বানায় ?>
                         <div class="pf pf--combo" data-combo data-none="<?= e(content('today.post.combo.none')) ?>" data-use="<?= e(content('today.post.combo.use')) ?>" data-hint="<?= e(content('today.post.combo.hint')) ?>">
                             <label class="sr-only" for="pj-title"><?= e(content('today.post.f.title')) ?></label>
                             <input id="pj-title" data-bn type="text" name="title" list="pj-types" maxlength="120" required autocomplete="off"
                                    placeholder="<?= $ph('title') ?>" value="<?= $val('title') ?>">
-                            <?php // the hint sits at the right end of the empty field, darker than the pale placeholder (works like a button) ?>
+                            <?php // ইঙ্গিতটা খালি ঘরের ডান প্রান্তে, ফ্যাকাশে ইঙ্গিত-লেখার চেয়ে গাঢ় (বাটনের মতো কাজ করে) ?>
                             <span class="pf__aside" aria-hidden="true"><?= e(content('today.post.f.title_hint')) ?></span>
                             <datalist id="pj-types">
                                 <?php foreach ($services as $service): ?>
@@ -86,7 +86,7 @@ $helpTel = content('today.post.helpline_tel');
                             <input id="pj-address" data-bn type="text" name="address" maxlength="250" required autocomplete="street-address"
                                    placeholder="<?= $ph('address') ?>" value="<?= $val('address') ?>">
                         </div>
-                        <?php // Figma order: upazila, district, division. app.js lets any of the three be picked first. ?>
+                        <?php // Figma-র ক্রম: উপজেলা, জেলা, বিভাগ। app.js-এ তিনটির যেকোনোটা আগে বাছা যায়। ?>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-upazila"><?= e(content('today.post.f.upazila')) ?></label>
                             <select id="pj-upazila" name="upazila_id" required>

@@ -9,8 +9,8 @@ use App\Core\Session;
 use App\Core\View;
 
 /*
- * Application bootstrap: autoloading, configuration, error handling,
- * security headers and the session. Runs once per request.
+ * অ্যাপ চালু করা (bootstrap): অটোলোড, কনফিগারেশন, ত্রুটি-সামলানো, নিরাপত্তা-হেডার ও সেশন।
+ * প্রতিটি অনুরোধে একবার চলে।
  */
 
 if (PHP_VERSION_ID < 80100) {
@@ -18,7 +18,7 @@ if (PHP_VERSION_ID < 80100) {
     exit('PHP 8.1 or newer is required.');
 }
 
-// PSR-4 style autoloader: App\Core\Router  ->  app/Core/Router.php
+// PSR-4 ধাঁচের অটোলোডার: App\Core\Router  ->  app/Core/Router.php
 spl_autoload_register(static function (string $class): void {
     $prefix = 'App\\';
     if (strncmp($class, $prefix, strlen($prefix)) !== 0) {
@@ -36,7 +36,7 @@ Env::load(BASE_PATH . '/.env');
 date_default_timezone_set('Asia/Dhaka');
 mb_internal_encoding('UTF-8');
 
-// Errors: never shown to visitors in production, always written to the log
+// ত্রুটি: আসল সাইটে দর্শককে কখনও দেখানো হয় না, সবসময় লগে লেখা হয়
 $isLocal = Env::get('APP_ENV', 'production') === 'local';
 ini_set('display_errors', $isLocal ? '1' : '0');
 ini_set('log_errors', '1');

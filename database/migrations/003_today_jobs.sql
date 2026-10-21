@@ -1,6 +1,6 @@
--- Migration 003 — "আজকের প্রকাশিত" post-a-job form + areas (run after 001 and 002)
--- Areas (বিভাগ -> জেলা -> উপজেলা/থানা): nuhil/bangladesh-geocode (MIT) + Dhaka city thanas from the old site (database/seeds/geo.php).
--- The admin can add or rename areas later.
+-- মাইগ্রেশন 003 — "আজকের প্রকাশিত" কাজ-জানানোর ফর্ম + এলাকা (001 ও 002-এর পরে চালান)
+-- এলাকা (বিভাগ → জেলা → উপজেলা/থানা): nuhil/bangladesh-geocode (MIT) + পুরনো সাইটের ঢাকা শহরের থানা (database/seeds/geo.php)।
+-- অ্যাডমিন পরে এলাকা যোগ বা নাম বদলাতে পারবেন।
 
 CREATE TABLE IF NOT EXISTS divisions (
     id      SMALLINT UNSIGNED NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS upazilas (
     KEY idx_upazilas_district (district_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Extra columns of a posted job (job_posts.title = the kind of work, job_posts.details = the description)
+-- পোস্ট-করা কাজের বাড়তি কলাম (job_posts.title = কাজের ধরন, job_posts.details = বিবরণ)
 ALTER TABLE job_posts
     ADD COLUMN title_custom TINYINT(1) NOT NULL DEFAULT 0 AFTER title,
     ADD COLUMN upazila_id  SMALLINT UNSIGNED NULL AFTER address,

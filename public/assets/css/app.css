@@ -1,13 +1,25 @@
 /* ==========================================================================
-   jorurikaj.com — stylesheet
-   Built from the Figma design (1920px canvas).
-   HOW SIZES WORK: on desktop 1rem = 1/120 of the screen width (16px at 1920px),
-   so the page scales exactly like the design. Below 1200px the layout switches
-   to the mobile/tablet version with a normal 16px base.
-   Design px -> rem: divide by 16 (e.g. 28px = 1.75rem).
+   jorurikaj.com — মূল স্টাইলশিট (একটাই ফাইল, কোনো বিল্ড-টুল লাগে না)
+
+   মাপ কীভাবে কাজ করে: ডেস্কটপে 1rem = পর্দার প্রস্থের ১/১২০ (১৯২০px-এ ১৬px),
+   ফলে পেইজ Figma নকশার মতোই আনুপাতিকভাবে ছোট-বড় হয়। ১২০০px-এর নিচে
+   ট্যাবলেট/ফোনের আলাদা বিন্যাস চলে, সেখানে 1rem = ১৬px।
+   Figma px থেকে rem: ১৬ দিয়ে ভাগ করুন (যেমন ২৮px = 1.75rem)।
+
+   সূচিপত্র (ফাইলের ভেতরে এই নামে খুঁজুন):
+     ১. Fonts · Design tokens · Reset / base · Shared components
+     ২. Top bar · Header + menu · Footer · Inner page banner
+     ৩. হোম পেইজ: Hero · Advertisements · Services · About · Steps · FAQ + feedback
+     ৪. Tablet + phone (১২০০px-এর নিচে): হোম ও সাধারণ অংশের মোবাইল নিয়ম
+     ৫. Open page (খোলা লেখার পেইজ, .rich) · Services page · Site name
+     ৬. Post a job · Today's published list · Registration rules
+     ৭. পেইজ-ভিত্তিক ডেস্কটপ ফন্ট-সাইজ (body.page-* ক্লাস): ২৪px নিয়ম
+
+   নতুন পেইজের স্টাইল: ফাইলের নিচের দিকে নিজের নামে একটা সেকশন খুলুন এবং
+   ডেস্কটপ ফন্ট-সাইজ body.page-<নাম> ক্লাসে রাখুন (docs/CODING-STANDARD.md দেখুন)।
    ========================================================================== */
 
-/* ---- Fonts (self-hosted; files live in /assets/fonts) ------------------- */
+/* ---- Fonts: সাইটেই রাখা ফন্ট (ফাইল public/assets/fonts-এ) ------------------ */
 @font-face {
     font-family: "Poppins";
     font-weight: 400;
@@ -45,9 +57,10 @@
     src: url("../fonts/hind-siliguri-600.woff2") format("woff2");
 }
 
-/* Bangla digits (০-৯): Hind Siliguri draws "১" as a short curl that looks like a blob (owner 2026-10-21).
-   Only the digits are taken from the device's own Bangla font (Windows Nirmala UI, Android Noto Sans Bengali,
-   Apple Bangla Sangam MN); where none exists the normal font is used. */
+/* বাংলা অঙ্ক (০-৯): Hind Siliguri-তে "১" ছোট একটা বাঁকা দাগের মতো আঁকা হয়, দেখতে ফোঁটার মতো লাগে।
+   তাই শুধু অঙ্কগুলো ব্যবহারকারীর ডিভাইসের নিজের বাংলা ফন্ট থেকে নেওয়া হয়
+   (Windows: Nirmala UI, Android: Noto Sans Bengali, Apple: Bangla Sangam MN)।
+   ডিভাইসে না থাকলে সাধারণ ফন্টই চলে। */
 @font-face {
     font-family: "Bangla Digits";
     font-weight: 100 500;
@@ -61,7 +74,7 @@
     src: local("Nirmala UI Bold"), local("NirmalaUI-Bold"), local("Noto Sans Bengali Bold"), local("NotoSansBengali-Bold"), local("Bangla Sangam MN Bold"), local("Kohinoor Bangla Bold"), local("Nirmala UI"), local("Noto Sans Bengali");
 }
 
-/* ---- Design tokens ------------------------------------------------------ */
+/* ---- Design tokens: রং, ফন্ট-সাইজ, মাপ (পুরো সাইটে একই মান) ------------------ */
 :root {
     --teal: #125a6c;
     --teal-05: rgba(18, 90, 108, 0.05);
@@ -79,22 +92,22 @@
 
     --font: "Bangla Digits", "Poppins", "Hind Siliguri", "Noto Sans Bengali", "Nirmala UI", "Siyam Rupali", system-ui, sans-serif;
 
-    /* type scale (desktop) */
+    /* ডেস্কটপের ফন্ট-সাইজ; ফোনে নিচের Tablet + phone অংশে বদলায় */
     --fs-body: 1.375rem;   /* 22px */
     --fs-lead: 1.75rem;    /* 28px */
     --fs-h1: 5rem;         /* 80px */
     --fs-h2: 3.125rem;     /* 50px */
-    --fs-pill: 1.625rem;   /* 26px trial (owner 2026-10-22); before: 1.75rem = 28px (Figma) */
-    --fs-nav: 1.625rem;    /* 26px (owner 2026-10-22; Figma 28px) */
+    --fs-pill: 1.625rem;   /* ২৬px — সেকশনের ওপরের ছোট ক্যাপসুল-শিরোনাম (Figma-তে ২৮px, মালিকের সিদ্ধান্তে কমানো) */
+    --fs-nav: 1.625rem;    /* ২৬px — প্রধান মেনু (Figma-তে ২৮px, মালিকের সিদ্ধান্তে কমানো) */
     --fs-btn: 1.5rem;
     --fs-card: 1.75rem;
     --fs-small: 1.125rem;  /* 18px */
     --fs-foot: 1.25rem;    /* 20px */
 
-    --ad-h: 17.375rem;     /* advertisement strip height (278px) */
+    --ad-h: 17.375rem;     /* বিজ্ঞাপন-স্ট্রিপের উচ্চতা (২৭৮px) */
 }
 
-/* ---- Reset / base ------------------------------------------------------- */
+/* ---- Reset / base: ব্রাউজারের ডিফল্ট মুছে সাধারণ নিয়ম ------------------------ */
 *,
 *::before,
 *::after {
@@ -104,7 +117,7 @@ html {
     font-size: clamp(10.5px, 0.8333vw, 16px);
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
-    scroll-padding-top: 9rem; /* anchor links (#faq, #feedback) must not hide under the sticky menu */
+    scroll-padding-top: 9rem; /* #faq, #feedback-এর মতো লিংকে গেলে লেখা যেন আটকে-থাকা মেনুর নিচে ঢাকা না পড়ে */
 }
 body {
     margin: 0;
@@ -187,7 +200,7 @@ textarea {
     top: 1rem;
 }
 
-/* ---- Shared components -------------------------------------------------- */
+/* ---- Shared components: বাটন, ক্যাপসুল-শিরোনাম, সেকশনের সাধারণ কাঠামো ------------ */
 .pill {
     display: inline-flex;
     align-items: center;
@@ -315,7 +328,7 @@ textarea {
     list-style: disc inside;
 }
 
-/* ---- Top bar ------------------------------------------------------------ */
+/* ---- Top bar: ওপরের সরু পট্টি (ফোন, ইমেইল, ট্যাগলাইন, সোশ্যাল আইকন) ------------- */
 .topbar {
     background: var(--teal);
     color: var(--white);
@@ -366,9 +379,9 @@ textarea {
     justify-content: flex-end;
 }
 
-/* ---- Header + menu ------------------------------------------------------ */
+/* ---- Header + menu: লোগো ও প্রধান মেনু (সাব-মেনুসহ) -------------------------- */
 .site-header {
-    /* the main menu stays at the top while the page scrolls; the thin top bar above it scrolls away (owner 2026-10-21) */
+    /* স্ক্রল করলে প্রধান মেনু ওপরে আটকে থাকে; তার ওপরের সরু পট্টি স্ক্রলের সঙ্গে সরে যায় */
     position: sticky;
     top: 0;
     z-index: 60;
@@ -379,7 +392,7 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 7.75rem; /* owner 2026-10-20: a little lower; the logo keeps ~14px free above and below */
+    min-height: 7.75rem; /* লোগোর ওপরে-নিচে প্রায় ১৪px ফাঁকা থাকে */
     gap: 2rem;
 }
 .brand {
@@ -406,23 +419,6 @@ textarea {
     width: 154.29%;
     height: 140.43%;
     max-width: none;
-}
-.brand__name {
-    margin-top: 0.25rem;
-    font-size: 1.0125rem;
-    font-weight: 600;
-    color: var(--maroon);
-    line-height: 1.2;
-}
-.brand__name span {
-    font-size: 1.0125rem;
-}
-.brand__tag {
-    font-size: 0.6rem;
-    font-weight: 600;
-    line-height: 1.3;
-    white-space: nowrap;
-    color: var(--ink);
 }
 
 .nav {
@@ -524,12 +520,12 @@ textarea {
     display: none;
 }
 
-/* ---- Hero --------------------------------------------------------------- */
+/* ---- Hero: হোমের প্রথম অংশ (শিরোনাম, বাটন, ডানে আজকের কাজের তালিকা) ------------- */
 .hero {
     background: var(--teal);
     color: var(--white);
     padding: 10.375rem 0 10rem;
-    overflow: clip; /* the flying-in letters must never leave the hero */
+    overflow: clip; /* উড়ে-আসা অক্ষরগুলো যেন কখনও hero-র বাইরে না যায় */
 }
 .hero__inner {
     display: grid;
@@ -540,7 +536,7 @@ textarea {
 .hero__title {
     margin-top: 3.75rem;
     font-size: var(--fs-h1);
-    font-weight: 600; /* owner 2026-10-20: bolder heading (Hind Siliguri 600 is the boldest we load) */
+    font-weight: 600; /* শিরোনাম মোটা; আমরা Hind Siliguri-র সবচেয়ে মোটা যে ওজন লোড করি সেটাই ৬০০ */
     line-height: 1.5;
 }
 .hero__title-1,
@@ -630,12 +626,12 @@ textarea {
     text-align: center;
 }
 
-/* ---- Hero entrance (owner 2026-10-20) -----------------------------------
-   app.js cuts the small heading, the two heading lines and the text into letters
-   ([data-fly]); every letter flies in from its own random direction (--dx, --dy, --rot)
-   and settles, one continuous stream of about 2.5 s. The button follows, the job list
-   on the right floats up. Only transform + opacity move. Until app.js has split a text it
-   is hidden (opacity 0) - with a 3.5 s safety net so it can never stay hidden. */
+/* ---- Hero entrance: শুরুর অ্যানিমেশন ----------------------------------------
+   app.js ছোট শিরোনাম, দুই লাইনের শিরোনাম ও লেখাকে অক্ষরে ভাঙে ([data-fly]);
+   প্রতিটি অক্ষর নিজের এলোমেলো দিক (--dx, --dy, --rot) থেকে উড়ে এসে বসে,
+   পুরোটা মিলিয়ে প্রায় ২.৫ সেকেন্ড। তারপর বাটন আসে, ডানের তালিকা ভেসে ওঠে।
+   শুধু transform ও opacity বদলায় (পেইজ ধীর হয় না)। app.js লেখা না ভাঙা পর্যন্ত
+   তা লুকানো (opacity 0); ৩.৫ সেকেন্ডের নিরাপত্তা-সময় আছে, যাতে কখনও লুকিয়ে না থাকে। */
 .fly-word {
     display: inline-block;
     white-space: nowrap;
@@ -680,7 +676,7 @@ textarea {
     }
 }
 
-/* ---- Advertisements ----------------------------------------------------- */
+/* ---- Advertisements: ছবির বিজ্ঞাপন-স্ট্রিপ ও তার নিচের সরু লেখার পট্টি --------------- */
 .ads {
     position: relative;
     z-index: 2;
@@ -695,7 +691,7 @@ textarea {
 .ads__card {
     position: relative;
     width: min(101.5rem, 100% - 2rem);
-    padding: 1rem 4rem; /* owner 2026-10-20: white space above/below the pictures = 1/3 of Figma's 47px */
+    padding: 1rem 4rem; /* ছবির ওপরে-নিচের ফাঁকা Figma-র ৪৭px-এর এক-তৃতীয়াংশ */
     background: var(--white);
     border: 1px solid #d3d3d3;
     border-bottom: 0;
@@ -709,7 +705,7 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 1.6875rem; /* 27px = half of Figma's 54px */
+    gap: 1.6875rem; /* ২৭px = Figma-র ৫৪px-এর অর্ধেক */
 }
 .ad-strip__item {
     flex: none;
@@ -724,7 +720,7 @@ textarea {
 .ad-strip__item a {
     display: block;
 }
-/* app.js moves the first banner out to the left, one at a time (see "Advertisement strip") */
+/* app.js ("Advertisement strip" অংশ) প্রথম ব্যানারটা একবারে একটা করে বাঁ দিকে সরিয়ে দেয় */
 .ad-strip.is-marquee .ad-strip__track {
     justify-content: flex-start;
     width: max-content;
@@ -735,14 +731,14 @@ textarea {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 7rem; /* owner 2026-10-20: lower bar (was 10.5rem = 168px) */
+    min-height: 7rem; /* পট্টি আগের চেয়ে নিচু (আগে ১০.৫rem = ১৬৮px) */
     padding: 1rem 0;
     background: var(--teal);
     color: var(--white);
 }
-/* Marquee: the text enters at the far right of the page and runs to the left,
-   endless. app.js sets --marquee-duration from the text length (constant speed).
-   Hover pauses it; "reduce motion" shows the plain centred text. */
+/* Marquee: লেখা পেইজের একেবারে ডান প্রান্ত থেকে ঢুকে বাঁ দিকে চলতেই থাকে।
+   app.js লেখার দৈর্ঘ্য থেকে --marquee-duration ঠিক করে (গতি সবসময় সমান)।
+   মাউস নিলে থামে; "reduce motion" চালু থাকলে লেখা স্থির মাঝখানে দেখায়। */
 .rep-bar__text {
     width: 100%;
     overflow: hidden;
@@ -767,7 +763,7 @@ textarea {
         transform: translateX(-100%);
     }
 }
-/* colours the admin may use in texts: [[color:gold|words]] (helpers.php TEXT_COLORS) */
+/* লেখার ভেতরে অ্যাডমিন যে রংগুলো ব্যবহার করতে পারবেন: [[color:gold|শব্দ]] (helpers.php-র TEXT_COLORS) */
 .tc-gold {
     color: var(--gold);
 }
@@ -781,10 +777,10 @@ textarea {
     color: #ff8a8a;
 }
 
-/* ---- Services ----------------------------------------------------------- */
-/* Two full-width rows of service cards. app.js adds .is-moving: the cards are
-   repeated and the track runs right -> left forever (each row its own speed);
-   hover or keyboard focus pauses the row. Without it: normal sideways scroll. */
+/* ---- Services (হোম): সেবার কার্ডের দুই সারি --------------------------------- */
+/* পুরো-চওড়ার দুই সারি সেবার কার্ড। app.js .is-moving ক্লাস যোগ করলে কার্ডগুলো
+   পুনরাবৃত্তি হয়ে ডান থেকে বাঁয়ে অনন্তকাল চলে (প্রতি সারির নিজস্ব গতি);
+   মাউস বা কীবোর্ড-ফোকাসে সারি থামে। JavaScript ছাড়া সাধারণ পাশে-স্ক্রল হয়। */
 .service-rows {
     display: grid;
     gap: 1.875rem;
@@ -872,7 +868,7 @@ textarea {
     margin-top: 4.3rem;
 }
 
-/* ---- About -------------------------------------------------------------- */
+/* ---- About (হোম): পরিচয়-অংশ ও বাংলাদেশের মানচিত্র --------------------------- */
 .about {
     background: var(--teal-05);
 }
@@ -898,7 +894,7 @@ textarea {
     object-fit: cover;
 }
 
-/* ---- Steps -------------------------------------------------------------- */
+/* ---- Steps (হোম): "আপনার জন্য, আপনার প্রয়োজনেই"-র ধাপের কার্ড ------------------- */
 .step-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -920,11 +916,11 @@ textarea {
     border-radius: 50%;
     background: var(--teal);
     color: var(--white);
-    /* Hind Siliguri draws "১" as a short half-height curl that reads as a blob in the
-       circle (owner bug 2026-10-20), so the numbers use the device's own Bangla font
-       (Windows Nirmala UI, Android Noto Sans Bengali, Apple Kohinoor Bangla): tall, clear digits. */
+    /* Hind Siliguri-তে "১" অর্ধেক-উচ্চতার বাঁকা দাগ, বৃত্তের ভেতরে ফোঁটার মতো দেখায়।
+       তাই এখানে ডিভাইসের নিজের বাংলা ফন্ট (Windows: Nirmala UI, Android: Noto Sans Bengali,
+       Apple: Kohinoor Bangla) — লম্বা, পরিষ্কার অঙ্ক। */
     font-family: "Nirmala UI", "Noto Sans Bengali", "Kohinoor Bangla", "Hind Siliguri", sans-serif;
-    font-size: 2.5rem; /* owner 2026-10-20: one third smaller than 3.75rem */
+    font-size: 2.5rem; /* প্রথম নকশার ৩.৭৫rem-এর চেয়ে এক-তৃতীয়াংশ ছোট */
     font-weight: 700;
     line-height: 1;
 }
@@ -942,7 +938,7 @@ textarea {
     line-height: 1.5;
 }
 
-/* ---- FAQ + feedback ----------------------------------------------------- */
+/* ---- FAQ + feedback (হোম): প্রশ্ন-উত্তর ও মতামতের ফর্ম ---------------------- */
 .faq {
     padding-top: 11.25rem;
     background: var(--teal-10);
@@ -1006,7 +1002,7 @@ textarea {
 .faq-item:not([open]) summary {
     padding-bottom: 2.5rem;
 }
-/* the open question: whole box teal, white text, "−" */
+/* খোলা প্রশ্ন: পুরো বাক্স টিল রঙের, লেখা সাদা, চিহ্ন "−" */
 .faq-item[open] {
     background: var(--teal);
     color: var(--white);
@@ -1078,7 +1074,7 @@ textarea {
     object-fit: cover;
 }
 
-/* ---- Inner page banner -------------------------------------------------- */
+/* ---- Inner page banner: ভেতরের পেইজের টিল শিরোনাম-ব্যানার ও ব্রেডক্রাম্ব -------- */
 .page-banner {
     padding: 10.75rem 0;
     background: var(--teal);
@@ -1122,7 +1118,7 @@ textarea {
 
 /* ---- Footer ------------------------------------------------------------- */
 .site-footer {
-    padding-top: 8rem; /* Figma 2026-10-20: logo row starts 128px under the footer's top edge */
+    padding-top: 8rem; /* Figma: লোগোর সারি ফুটারের ওপরের কিনারা থেকে ১২৮px নিচে শুরু */
     background: var(--teal);
     color: var(--white);
     font-size: var(--fs-small);
@@ -1140,8 +1136,8 @@ textarea {
     row-gap: 3.3rem;
     align-items: start;
 }
-/* Row 1: logo (emblem + name beside it) on the left, the e-mail box centred on the logo's height on the right.
-   Row 2: address list + the link columns + social box, all starting on the same line (owner 2026-10-20). */
+/* সারি ১: বাঁয়ে লোগো (প্রতীক + পাশে নাম), ডানে ইমেইল-বাক্স লোগোর উচ্চতার ঠিক মাঝখানে।
+   সারি ২: ঠিকানার তালিকা, লিংকের কলাম ও সোশ্যাল বাক্স — সবগুলো একই লাইন থেকে শুরু। */
 .footer__brand {
     display: contents;
 }
@@ -1233,8 +1229,8 @@ textarea {
 .footer__links-head {
     font-weight: 500;
 }
-/* Footer columns 1-3 (contact list, two link columns) 22px on desktop: trial (owner 2026-10-22); before: 18px / 20px.
-   The hotline line keeps its own size; phones keep theirs. */
+/* ফুটারের ১ম–৩য় কলাম (যোগাযোগের তালিকা ও দুই লিংক-কলাম) ডেস্কটপে ২২px (আগে ১৮px / ২০px)।
+   হটলাইন লাইনের নিজের সাইজ আছে; ফোনে আলাদা নিয়ম। */
 @media (min-width: 1200px) {
     .footer__contact,
     .footer__links ul {
@@ -1318,7 +1314,9 @@ textarea {
 }
 
 /* ==========================================================================
-   Tablet + phone  (below 1200px) — separate layout, normal 16px base
+   Tablet + phone (১২০০px-এর নিচে) — আলাদা বিন্যাস, সাধারণ ১৬px ভিত্তি
+   এই বড় অংশে হোম ও সাধারণ অংশের (মেনু, ফুটার, কার্ড) মোবাইল নিয়ম। পরের
+   পেইজগুলোর মোবাইল নিয়ম নিজ নিজ সেকশনের ভেতরেই আছে।
    ========================================================================== */
 @media (max-width: 1199px) {
     :root {
@@ -1619,9 +1617,6 @@ textarea {
     .services .center {
         margin-top: 2rem;
     }
-    .br-desktop {
-        display: none;
-    }
 
     .about__grid {
         grid-template-columns: 1fr;
@@ -1890,7 +1885,7 @@ textarea {
     }
 }
 
-/* ---- Fine-tuning after first visual check ------------------------------- */
+/* ---- Fine-tuning: প্রথম চাক্ষুষ পরীক্ষার পরের ছোট সংশোধন ---------------------- */
 .topbar__contact a span {
     white-space: nowrap;
 }
@@ -1914,11 +1909,10 @@ textarea {
     }
 }
 
-/* ---- Button "back to top" (owner 2026-10-20) ------------------------------
-   Fixed at the right edge. app.js places it like a scroll thumb: past the middle of the
-   page it appears (fades in) at the middle of the screen and slides down the screen as
-   the visitor scrolls on; at the very end of the page it sits at the bottom. Scrolling
-   back up it rises to the middle of the screen and fades out. */
+/* ---- Button "back to top": পেইজের ওপরে যাওয়ার ভাসমান বাটন ---------------------
+   ডান কিনারায় আটকানো। app.js একে স্ক্রল-থাম্বের মতো বসায়: পেইজের মাঝামাঝি পেরোলে
+   পর্দার মাঝখানে ধীরে ফুটে ওঠে এবং স্ক্রলের সঙ্গে নিচে নামে; পেইজের একেবারে শেষে
+   পর্দার নিচে থাকে। ওপরে ফিরলে আবার মাঝখানে উঠে মিলিয়ে যায়। */
 .to-top {
     position: fixed;
     right: 1.5rem;
@@ -1959,11 +1953,11 @@ textarea {
     }
 }
 
-/* ---- Open page (About and similar): one free writing area ---------------
-   The body is rich HTML written in the admin editor. Images may float left or
-   right (text wraps around them), sit centred, or be resized by the editor
-   (inline width/height). Spacing from the Figma About frame: heading block
-   156px under the banner, 70px to the first text, headings 45px apart. */
+/* ---- Open page (About ও অনুরূপ পেইজ): একটাই খোলা লেখার জায়গা (.rich) -----------
+   ভেতরের লেখা অ্যাডমিন-এডিটরে লেখা rich HTML। ছবি বাঁয়ে বা ডানে ভাসতে পারে (লেখা
+   ঘিরে যায়), মাঝে বসতে পারে, বা এডিটরে মাপ বদলানো যায় (width/height)।
+   মাপ Figma About-ফ্রেম থেকে: ব্যানারের ১৫৬px নিচে শিরোনাম, ৭০px পরে প্রথম লেখা,
+   শিরোনামগুলোর মাঝে ৪৫px। */
 .section--open-page {
     padding: 9.75rem 0 10rem;
 }
@@ -1971,7 +1965,7 @@ textarea {
     font-size: var(--fs-body);
     line-height: 2.05;
     color: #000;
-    display: flow-root; /* contains floated images */
+    display: flow-root; /* ভাসমান ছবি যেন বাক্সের ভেতরেই থাকে */
 }
 .rich > :first-child {
     margin-top: 0;
@@ -2056,12 +2050,12 @@ textarea {
     }
 }
 
-/* Image nudged 10px lower than the text's first line (owner request, About). */
+/* About পেইজে ছবিটা লেখার প্রথম লাইনের চেয়ে ১০px নিচে বসে। */
 .rich img.img-down-10 {
     margin-top: 10px;
 }
 
-/* ---- Services page (Figma 2642-54) -------------------------------------- */
+/* ---- Services page (Figma 2642-54): বর্ণানুক্রমে সব সেবা, তিন কলামে ------------- */
 .section--services-page {
     padding: 9.75rem 0 8rem;
 }
@@ -2112,7 +2106,7 @@ textarea {
 }
 .svc-search input:focus,
 .svc-search input:focus-visible {
-    outline: none; /* the pill keeps its normal border: no second coloured frame */
+    outline: none; /* ক্যাপসুল তার নিজের বর্ডারই রাখে; আলাদা রঙিন ফোকাস-ফ্রেম নেই */
 }
 .svc-search__btn {
     display: flex;
@@ -2228,14 +2222,14 @@ textarea {
     }
     .svc-group li a {
         font-size: 1.0625rem;
-        padding-block: 0.6rem; /* comfortable tap target */
+        padding-block: 0.6rem; /* আঙুলে চাপার জন্য আরামদায়ক উচ্চতা */
     }
     .svc-group__head {
         font-size: 1.25rem;
     }
 }
 
-/* ---- Site name "Jorurikaj.com" inside page text (added by View::boldBrand) ---- */
+/* ---- Site name: পেইজের লেখার ভেতরে "Jorurikaj.com" নাম (View::boldBrand .brandname ক্লাস বসায়) ---- */
 .brandname {
     font-weight: 600;
     color: var(--teal);
@@ -2248,7 +2242,7 @@ textarea {
     color: var(--gold);
 }
 
-/* ---- Post a job (Figma 2674-7) ------------------------------------------- */
+/* ---- Post a job (Figma 2674-7): "কাজ সম্পর্কে জানান" ফর্ম ------------------------ */
 .section--post-job {
     padding: 9.4rem 0 10rem;
 }
@@ -2394,49 +2388,6 @@ textarea {
     color: var(--white);
 }
 
-/* thank-you card after a successful submit */
-.post-done {
-    max-width: 62rem;
-    margin: 3.7rem auto 0;
-    padding: 3.5rem 3rem;
-    border: 1px solid var(--teal-35);
-    border-radius: 1.25rem;
-    background: var(--teal-05);
-    text-align: center;
-}
-.post-done h3 {
-    margin-top: 1.2rem;
-    font-size: 2.5rem;
-    font-weight: 600;
-    line-height: 1.4;
-    color: var(--teal);
-}
-.post-done p {
-    margin-top: 1.1rem;
-    font-size: var(--fs-body);
-    line-height: 1.9;
-}
-.post-done__tel {
-    color: var(--teal);
-    font-weight: 600;
-    white-space: nowrap;
-}
-.post-done__actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1.25rem;
-    margin-top: 2.2rem !important;
-}
-.btn--outline {
-    border: 2px solid var(--teal-35);
-    background: transparent;
-    color: var(--teal);
-}
-.btn--outline:hover {
-    background: var(--teal-10);
-}
-
 @media (max-width: 1199px) {
     .section--post-job {
         padding: 3rem 0 4rem;
@@ -2485,22 +2436,9 @@ textarea {
     .post-form__submit {
         margin-top: 2rem;
     }
-    .post-done {
-        padding: 2rem 1.25rem;
-    }
-    .post-done h3 {
-        font-size: 1.5rem;
-    }
-    .post-done p {
-        font-size: 1.0625rem;
-    }
-}
-.post-done__icon {
-    display: block;
-    margin: 0 auto;
 }
 
-/* post-a-job: searchable "কাজের ধরন" list + layout tweaks (owner 2026-10-21) */
+/* "কাজের ধরন": খোঁজা-যায় এমন ড্রপডাউন (.combo, app.js বানায়) ও ফর্মের বিন্যাস-সংশোধন */
 .pf--combo input {
     padding-right: 4rem;
 }
@@ -2567,7 +2505,7 @@ textarea {
     line-height: 1.4;
     color: var(--teal);
 }
-/* the two field groups sit 25px closer to the middle; the details box spans exactly the same width */
+/* দুই ঘরের গুচ্ছ মাঝের দিকে ২৫px সরানো; বিস্তারিত-বাক্স ঠিক ততটাই চওড়া */
 .post-form__grid {
     padding-inline: 1.5625rem;
 }
@@ -2593,7 +2531,7 @@ textarea {
     }
 }
 
-/* switch "type English letters, get Bangla" */
+/* "ইংরেজি অক্ষরে লিখলে বাংলা হবে" সুইচ (partials/bn-switch.php) */
 .bn-switch {
     display: flex;
     flex-wrap: wrap;
@@ -2632,8 +2570,8 @@ textarea {
     background: var(--white);
 }
 
-/* Home page (desktop): all 22px text becomes 24px, and the buttons under that text grow by the same ratio
-   (24px -> 26.2px). Owner request 2026-10-21. Phones/tablets keep their own sizes. */
+/* হোম পেইজ (ডেস্কটপ): ২২px লেখা সব ২৪px, লেখার নিচের বাটন একই অনুপাতে বড় (২৪px → ২৬.২px)।
+   ফোন/ট্যাবলেটের সাইজ আলাদা, বদলায়নি। */
 @media (min-width: 1200px) {
     body.page-home {
         --fs-body: 1.5rem;
@@ -2644,8 +2582,8 @@ textarea {
     }
 }
 
-/* Home tweaks round 3 (owner 2026-10-21) --------------------------------- */
-/* feedback form: the "type English letters" bar sits straight on the teal box: white text, white button on the right */
+/* ---- হোমের কয়েকটি সংশোধন (ফিডব্যাক, FAQ) -------------------------------------- */
+/* মতামতের ফর্ম: "ইংরেজি অক্ষরে লিখুন" লাইনটা সরাসরি টিল বাক্সের ওপর; সাদা লেখা, ডানে সাদা বাটন */
 .feedback .bn-switch {
     flex-wrap: nowrap;
     justify-content: space-between;
@@ -2667,7 +2605,7 @@ textarea {
     background: transparent;
     color: var(--white);
 }
-/* FAQ: the open answer sits lower, a little to the right of its question, in a wider area; the open question turns gold */
+/* FAQ: খোলা উত্তর প্রশ্নের একটু নিচে ও ডানে, চওড়া জায়গায় বসে; খোলা প্রশ্ন সোনালি রঙের হয় */
 .faq-item[open] summary {
     padding-bottom: 1.5rem;
     color: var(--gold);
@@ -2685,15 +2623,17 @@ textarea {
     }
 }
 
-/* About page (desktop): body text 22px -> 24px (owner 2026-10-21) */
+/* ---- About পেইজ (ডেস্কটপ): লেখা ২২px → ২৪px ------------------------------------- */
 @media (min-width: 1200px) {
     body.page-about {
         --fs-body: 1.5rem;
     }
 }
 
-/* Registration rules overview (Figma 2631-395): text 24px, other sizes Figma +2px (standing rule), two buttons */
-/* The three rules buttons above the text; the open page's button is inactive */
+/* ---- Registration rules (Figma 2631-395, 2683-148, 2683-305) -------------------
+   তিনটা নিয়মাবলীর পেইজ (/registration, /registration/professional, /registration/agent)।
+   ডেস্কটপে লেখা ২৪px, বাকি সাইজ Figma + ২px (body.page-regrules)। */
+/* লেখার ওপরের তিনটা নিয়মাবলী-বাটন (partials/reg-tabs.php); খোলা পেইজের বাটনটা নিষ্ক্রিয় */
 .reg-tabs {
     display: flex;
     flex-wrap: wrap;
@@ -2744,7 +2684,7 @@ textarea {
     }
 }
 
-/* Registration guideline (Figma 2683-148): text, then a tinted band with two photo cards */
+/* গাইডলাইন পেইজের নিচের অংশ (partials/reg-join.php): হালকা টিল ব্যান্ডে দুটো ছবির কার্ড */
 .section--guide {
     padding-bottom: 9.75rem;
 }
@@ -2849,9 +2789,9 @@ textarea {
     }
 }
 
-/* Services page tweaks (owner 2026-10-21, desktop): intro 24px, letter headings +2px, service names 24px,
-   the "type English letters" line under the search is one centred line (no box) with its button at the right end.
-   Columns sit a little closer so the longest names stay on one line at 24px. The teal box text stays as it was. */
+/* ---- Services page (ডেস্কটপ): ভূমিকা ২৪px, বর্ণ-শিরোনাম +২px, সেবার নাম ২৪px ------
+   সার্চের নিচের "ইংরেজি অক্ষরে লিখুন" লাইন বাক্স ছাড়া একটাই মাঝের লাইন, বাটন ডান প্রান্তে।
+   কলামগুলো একটু কাছে, যাতে সবচেয়ে লম্বা নামও ২৪px-এ এক লাইনে ধরে। টিল বাক্সের লেখা আগের মতো। */
 @media (min-width: 1200px) {
     .services-intro {
         font-size: 1.5rem;
@@ -2881,9 +2821,9 @@ textarea {
     }
 }
 
-/* Post-a-job page tweaks (owner 2026-10-21, desktop): text under the main heading and the text inside the fields
-   (what is typed, the placeholders, the drop-down items) are 24px; the "type English letters" line is one centred
-   line without a box, its button at the right end. The teal note box keeps its size. */
+/* ---- Post a job (ডেস্কটপ): শিরোনামের নিচের লেখা এবং ঘরের ভেতরের লেখা (টাইপ করা অংশ,
+   ইঙ্গিত-লেখা, ড্রপডাউনের তালিকা) ২৪px। "ইংরেজি অক্ষরে লিখুন" লাইন বাক্স ছাড়া একটাই মাঝের লাইন,
+   বাটন ডান প্রান্তে। টিল নোট-বাক্সের সাইজ আগের মতো। */
 @media (min-width: 1200px) {
     body.page-post {
         --fs-body: 1.5rem;
@@ -2911,7 +2851,7 @@ textarea {
     }
 }
 
-/* ---- Today's published list (Figma 2675-148) ---------------------------- */
+/* ---- Today's published list (Figma 2675-148): "কাজ সম্পর্কে জানুন" তালিকা ---------- */
 .section--today {
     padding: 9.4rem 0 10rem;
 }
@@ -2954,7 +2894,7 @@ textarea {
     font-size: 1.875rem;
     font-weight: 600;
     line-height: 1.4;
-    color: var(--teal); /* the heading of a notice is coloured, the rest is normal text */
+    color: var(--teal); /* বিজ্ঞপ্তির শিরোনাম রঙিন, বাকি লেখা সাধারণ রঙের */
 }
 .job__meta {
     display: flex;
@@ -3025,24 +2965,7 @@ textarea {
     text-align: center;
     font-size: var(--fs-body);
 }
-.today-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2.2rem;
-    margin-top: 4.4rem;
-}
-.today-actions .pf-submit {
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-}
-.today-actions .pf-submit[aria-current="page"] {
-    background: var(--teal);
-    color: var(--white);
-}
-
-/* desktop: normal text 24px, other sizes Figma + 2px (owner rule 2026-10-21) */
+/* ডেস্কটপ: সাধারণ লেখা ২৪px, বাকি সাইজ Figma + ২px */
 @media (min-width: 1200px) {
     body.page-today {
         --fs-body: 1.5rem;
@@ -3054,9 +2977,6 @@ textarea {
     }
     .page-today .job__toggle {
         font-size: 3.25rem;
-    }
-    .page-today .today-actions .pf-submit {
-        font-size: 1.875rem;
     }
 }
 @media (max-width: 1199px) {
@@ -3094,16 +3014,9 @@ textarea {
         margin: 0.2rem 0 0;
         font-size: 0.9375rem;
     }
-    .today-actions {
-        margin-top: 2.5rem;
-    }
-    .today-actions .pf-submit {
-        width: 100%;
-        justify-content: center;
-    }
 }
 
-/* pop-up: "are you interested?" -> name + mobile (list page) */
+/* পপ-আপ "আপনি কি আগ্রহী?" → নাম + মোবাইল (তালিকা-পেইজ; ফোন/ইমেইল দেখার আগে) */
 .lead {
     width: min(92vw, 44rem);
     max-width: none;
@@ -3172,7 +3085,7 @@ textarea {
 }
 @media (min-width: 1200px) {
     body.page-today .lead h3 {
-        font-size: 2rem; /* 30px + 2 */
+        font-size: 2rem; /* ৩০px + ২px */
     }
 }
 @media (max-width: 1199px) {
@@ -3195,9 +3108,9 @@ textarea {
     }
 }
 
-/* Post-a-job form (owner 2026-10-22): all hint texts are paler (about half colour): placeholders, the unchosen
-   drop-downs, "+88", the date captions and the empty date format. Only the hint "(না পেলে যোগ করুন)" at the
-   right end of the first field is darker, because it works like a button. */
+/* Post a job — ইঙ্গিত-লেখাগুলো ফ্যাকাশে (প্রায় অর্ধেক রং): ইঙ্গিত, বাছাই-না-করা ড্রপডাউন,
+   "+৮৮", তারিখের ক্যাপশন ও খালি তারিখ-ফরম্যাট। শুধু প্রথম ঘরের ডান প্রান্তের
+   "(না পেলে যোগ করুন)" গাঢ়, কারণ ওটা বাটনের মতো কাজ করে। */
 .post-form .pf ::placeholder,
 .post-form .pf select:invalid,
 .post-form .pf--date label,
@@ -3231,7 +3144,7 @@ textarea {
     }
 }
 
-/* mobile number fields: "+88" is fixed in front, the visitor types the 11 digits (01XXXXXXXXX) */
+/* মোবাইল নাম্বারের ঘর: সামনে "+৮৮" স্থির, ব্যবহারকারী ১১ সংখ্যা (01XXXXXXXXX) লেখেন */
 .pf--phone {
     position: relative;
 }
@@ -3266,12 +3179,12 @@ textarea {
 
 @media (max-width: 1199px) {
     html {
-        scroll-padding-top: 6rem; /* phone menu bar is about 80px high */
+        scroll-padding-top: 6rem; /* ফোনে মেনু-পট্টি প্রায় ৮০px উঁচু */
     }
 }
 
-/* Pop-up message after a job was posted (owner 2026-10-22): fixed in the middle, gone after 10 seconds
-   (app.js; the CSS animation does the same when JavaScript is off), closed at once by the x button. */
+/* কাজ জমা দেওয়ার পরের বার্তা-বক্স (.post-toast): পর্দার মাঝখানে বসানো, ১০ সেকেন্ড পর মিলিয়ে যায়
+   (app.js বন্ধ করে; JavaScript বন্ধ থাকলে CSS অ্যানিমেশনই একই কাজ করে), ✕ বাটনে সঙ্গে সঙ্গে বন্ধ। */
 .post-toast {
     position: fixed;
     top: 50%;
@@ -3315,7 +3228,7 @@ textarea {
 }
 @media (min-width: 1200px) {
     .post-toast p {
-        font-size: 1.5rem; /* 24px, owner 2026-10-22 */
+        font-size: 1.5rem; /* ২৪px */
         line-height: 1.85;
     }
 }

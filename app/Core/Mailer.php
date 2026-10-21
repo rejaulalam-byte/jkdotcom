@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/** Sends plain-text e-mail through the server's mail system (cPanel). */
+/** সার্ভারের মেইল-ব্যবস্থা (cPanel) দিয়ে সাধারণ লেখার ইমেইল পাঠায়। */
 final class Mailer
 {
     public static function send(string $to, string $subject, string $body, ?string $replyTo = null): bool
     {
         $from = Env::get('MAIL_FROM', 'no-reply@jorurikaj.com') ?? 'no-reply@jorurikaj.com';
 
-        // filter_var rejects line breaks, which blocks e-mail header injection
+        // filter_var লাইন-ব্রেক বাতিল করে; এতে ইমেইল হেডার ইনজেকশন আটকায়
         foreach ([$to, $from, $replyTo] as $address) {
             if ($address !== null && !filter_var($address, FILTER_VALIDATE_EMAIL)) {
                 return false;

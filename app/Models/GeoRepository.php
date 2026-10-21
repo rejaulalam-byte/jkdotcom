@@ -8,15 +8,15 @@ use App\Core\Database;
 use App\Core\Logger;
 use Throwable;
 
-/** Areas: বিভাগ (division) -> জেলা (district) -> উপজেলা/থানা (upazila). */
+/** এলাকা: বিভাগ → জেলা → উপজেলা/থানা। */
 final class GeoRepository
 {
     /** @var array{divisions:list<array{id:int,name:string}>,districts:list<array{id:int,parent:int,name:string}>,upazilas:list<array{id:int,parent:int,name:string,short?:string}>}|null */
     private static ?array $cache = null;
 
     /**
-     * Every area, names in Bangla. An upazila name that exists in several districts
-     * (e.g. "সদর") is shown with its district: "সদর (বগুড়া জেলা)".
+     * সব এলাকা, নাম বাংলায়। যে উপজেলার নাম একাধিক জেলায় আছে (যেমন "সদর") তাকে
+     * জেলাসহ দেখানো হয়: "সদর (বগুড়া জেলা)"।
      *
      * @return array{divisions:list<array{id:int,name:string}>,districts:list<array{id:int,parent:int,name:string}>,upazilas:list<array{id:int,parent:int,name:string}>}
      */
@@ -51,7 +51,7 @@ final class GeoRepository
     }
 
     /**
-     * Area names of one place for display: upazila/thana, district, division (without the word "বিভাগ").
+     * একটা জায়গার এলাকার নাম দেখানোর জন্য: উপজেলা/থানা, জেলা, বিভাগ ("বিভাগ" শব্দ ছাড়া)।
      *
      * @return array{upazila:string,district:string,division:string}
      */
@@ -78,7 +78,7 @@ final class GeoRepository
         return $out;
     }
 
-    /** True when the upazila belongs to the district and the district to the division. */
+    /** উপজেলা জেলার অন্তর্গত এবং জেলা বিভাগের অন্তর্গত হলে true। */
     public static function isConsistent(int $divisionId, int $districtId, int $upazilaId): bool
     {
         $geo = self::all();
@@ -101,8 +101,8 @@ final class GeoRepository
     }
 
     /**
-     * Rows as [id, name_bn] / [id, parent, name_bn]: from the database, or from
-     * database/seeds/geo.php when no database is connected (local demo).
+     * [id, name_bn] / [id, parent, name_bn] আকারে সারি: ডাটাবেস থেকে, না থাকলে
+     * database/seeds/geo.php থেকে (লোকাল ডেমো)।
      *
      * @return array{divisions:list<list<mixed>>,districts:list<list<mixed>>,upazilas:list<list<mixed>>}
      */

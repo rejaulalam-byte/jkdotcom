@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 /*
- * The 94 services of the old site (old DB table `services`). Names follow the owner's
- * Figma style (2026-10-20): the repeated "... করার লোক / এর লোক" endings are cut
- * ("আই,পি,এস ঠিক করা"); other wording kept as it was. The admin can rename any of them.
- * [old `sl` number, Bangla name, URL slug]
- * Used by DemoData (site without a database) and by 002_services.sql (the same list).
- * The slug is the page address: /services/<slug>. Never change a slug once live.
+ * পুরনো সাইটের ৯৪টি সেবা (পুরনো ডাটাবেসের `services` টেবিল)। নাম মালিকের Figma-ধাঁচে:
+ * বারবার-আসা "... করার লোক / এর লোক" শেষাংশ কেটে ফেলা ("আই,পি,এস ঠিক করা"); বাকি শব্দ আগের মতোই।
+ * অ্যাডমিন যেকোনোটার নাম বদলাতে পারবেন।
+ * [পুরনো `sl` নাম্বার, বাংলা নাম, URL slug]
+ * DemoData (ডাটাবেস-ছাড়া সাইট) ও 002_services.sql (একই তালিকা) ব্যবহার করে।
+ * slug-ই পেইজের ঠিকানা: /services/<slug>। সাইট চালু হওয়ার পর কোনো slug কখনও বদলাবেন না।
  */
 return [
     [1, 'অনুবাদক', 'translator'],

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/** Maps a URL + method (GET/POST) to a controller method, using config/routes.php. */
+/** URL ও মেথড (GET/POST) থেকে config/routes.php দেখে কন্ট্রোলারের মেথড খুঁজে চালায়। */
 final class Router
 {
     private static string $path = '/';
@@ -25,7 +25,7 @@ final class Router
         $path = '/' . trim(rawurldecode($raw), '/');
         self::$path = $path;
 
-        // Only normal characters are allowed in a path; anything odd is simply "not found"
+        // পাথে শুধু সাধারণ অক্ষর চলবে; অদ্ভুত কিছু থাকলে সোজা "পাওয়া যায়নি"
         if (strlen($path) > 200 || !preg_match('#^/[\p{L}\p{N}/_\-.]*$#u', $path) || str_contains($path, '..')) {
             self::notFound();
             return;
@@ -59,10 +59,10 @@ final class Router
     }
 
     /**
-     * Does a route path match the URL? A route may hold {slug}: one part made of
-     * a-z, 0-9 and "-" only (e.g. /services/{slug} matches /services/electrician).
+     * রুটের পাথ কি URL-এর সঙ্গে মেলে? রুটে {slug} থাকতে পারে: শুধু a-z, 0-9 ও "-" দিয়ে
+     * গড়া একটা অংশ (যেমন /services/{slug} মেলে /services/electrician-এর সঙ্গে)।
      *
-     * @return array<string,string>|null  the {slug} values, or null when it does not match
+     * @return array<string,string>|null  {slug}-এর মান, না মিললে null
      */
     private static function match(string $routePath, string $path): ?array
     {

@@ -1,5 +1,5 @@
--- 002: services get a URL slug + the old site's number, and the 94 old services are added.
--- Run once in phpMyAdmin after 001_home.sql. Names: database/seeds/services.php (owner's Figma style).
+-- 002: সেবায় URL-slug ও পুরনো সাইটের নাম্বার যোগ হয়, এবং পুরনো ৯৪টি সেবা বসে।
+-- 001_home.sql-এর পরে phpMyAdmin-এ একবার চালান। নাম: database/seeds/services.php (মালিকের Figma-ধাঁচে)।
 
 ALTER TABLE services
     ADD COLUMN slug      VARCHAR(80)  NULL AFTER name,

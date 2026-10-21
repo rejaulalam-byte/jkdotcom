@@ -7,7 +7,7 @@ namespace App\Controllers;
 use App\Core\Content;
 use App\Core\View;
 
-/** Pages that are designed but not built yet show a friendly "coming soon" page. */
+/** নকশা-করা কিন্তু এখনও না-বানানো পেইজে একটা ভদ্র "coming soon" পেইজ দেখায়; সঙ্গে সাধারণ লেখার পেইজ। */
 final class PageController
 {
     /** @param array<string,mixed> $meta */
@@ -17,7 +17,7 @@ final class PageController
         View::render('pages/coming-soon', ['title' => $title, 'heading' => $title]);
     }
 
-    /** Registration rules overview (/registration): who can register + buttons to the two guidelines. */
+    /** রেজিস্ট্রেশন নিয়মাবলীর ওভারভিউ (/registration): কারা রেজিস্ট্রেশন করতে পারবেন। */
     public function registrationRules(): void
     {
         View::render('pages/registration-rules', [
@@ -29,7 +29,7 @@ final class PageController
         ]);
     }
 
-    /** Registration guideline for professionals (/registration/professional); the form is at .../form. */
+    /** পেশাজীবীদের রেজিস্ট্রেশন-নির্দেশিকা (/registration/professional); ফর্ম থাকবে .../form-এ। */
     public function registrationProfessional(): void
     {
         View::render('pages/registration-professional', [
@@ -41,7 +41,7 @@ final class PageController
         ]);
     }
 
-    /** Registration guideline for agents (/registration/agent); the form is at .../form. */
+    /** প্রতিনিধির রেজিস্ট্রেশন-নির্দেশিকা (/registration/agent); ফর্ম থাকবে .../form-এ। */
     public function registrationAgent(): void
     {
         View::render('pages/registration-agent', [
@@ -53,7 +53,7 @@ final class PageController
         ]);
     }
 
-    /** About page (/about). */
+    /** আমাদের সম্পর্কে পেইজ (/about)। */
     public function about(): void
     {
         View::render('pages/about', [

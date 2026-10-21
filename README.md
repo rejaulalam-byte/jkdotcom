@@ -3,13 +3,14 @@
 Bangladeshi service-provider website (জরুরীকাজ.কম). Plain **PHP 8.1+** and **MySQL**, no framework,
 built so any PHP developer can pick it up quickly. Design source: Figma file `RTM-AKTU-Sylhet`
 (frames named `JoruriKaj.Com-*`). Project notes and decisions: [CLAUDE.md](CLAUDE.md), progress: [PROGRESS.md](PROGRESS.md).
+**Coding rules (comments in Bangla, CSS/JS/PHP conventions): [docs/CODING-STANDARD.md](docs/CODING-STANDARD.md) — read this first.**
 
 ## Folder map
 
 ```
 public/            <- the ONLY folder the web server serves (document root)
   index.php        front controller: every URL enters here
-  assets/          css, js, fonts, images (site design)
+  assets/          css/app.css (one stylesheet), js/app.js, fonts, img, vendor (third-party, unchanged)
   uploads/         files uploaded through the admin (PHP can never run here)
 app/
   bootstrap.php    start-up: autoload, .env, error handling, security headers, session
@@ -19,17 +20,22 @@ app/
   Models/          database access (repositories); DemoData = sample data when no DB is set
   Views/           layouts/, partials/ (header, footer...), pages/
   Content/defaults.php   default wording of every editable text
+  Content/pages/   long "open page" texts as HTML (About, registration rules ...)
 config/routes.php  list of all URLs
-database/migrations/     SQL to create tables (run in order in phpMyAdmin)
+database/migrations/     SQL to create tables (run 001, 002, 003, 004 in order in phpMyAdmin)
+database/seeds/          data lists (services, areas, icons) used by the migrations and by demo mode
+docs/                    CODING-STANDARD.md and design references
+tools/php/               portable PHP for Windows (git-ignored); start-server.bat starts the site with it
 storage/           logs, sessions, rate-limit files (private, not in git)
 .env.example       copy to .env and fill in (never commit .env)
 ```
 
 ## Run locally
 
-1. Install PHP 8.1+ and run from this folder: `php -S localhost:8000 -t public`
+1. Windows: double-click `start-server.bat`. Elsewhere install PHP 8.1+ and run `php -S localhost:8000 -t public`
 2. Open <http://localhost:8000>. With no `.env` the site runs in **demo mode** (sample jobs, ads, services).
-3. To use a real database: copy `.env.example` to `.env`, set `DB_*`, and run `database/migrations/001_home.sql`.
+   In demo mode posts made in the form are kept in `storage/demo-jobs.json` (not in git).
+3. To use a real database: copy `.env.example` to `.env`, set `DB_*`, and run all files in `database/migrations/` in order.
 
 ## Deploy on cPanel (summary)
 

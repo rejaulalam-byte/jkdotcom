@@ -1,9 +1,9 @@
 <?php
 /**
- * Social media icons. All icons are shown while settings.social_hide_empty = 0; with 1 only the ones that have an address (admin: "site.social.*") are
- * shown; with no address at all nothing is printed.
+ * সোশ্যাল মিডিয়ার আইকন। settings.social_hide_empty = 0 থাকলে সব আইকন দেখায়; ১ হলে শুধু
+ * ঠিকানা-আছে এমনগুলো (অ্যাডমিন: "site.social.*"); কোনো ঠিকানাই না থাকলে কিছুই ছাপে না।
  *
- * @var string $socialClass  extra CSS class for the list
+ * @var string $socialClass  তালিকার জন্য বাড়তি CSS ক্লাস
  */
 $socialLinks = social_links();
 ?>

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/** Writes problems to storage/logs (never shown to visitors). */
+/** সমস্যা storage/logs-এ লেখে (দর্শককে কখনও দেখানো হয় না)। */
 final class Logger
 {
     public static function error(string $message): void

@@ -10,17 +10,17 @@ use App\Core\Security;
 use Throwable;
 
 /**
- * Who looks at hidden phone numbers / e-mails (owner decision 2026-10-21):
- *  - every click on a hidden number or e-mail is COUNTED as a "call" (contact_clicks);
- *  - a visitor who wants to see it first says they are interested and leaves name + mobile (contact_leads).
- * Used for job notices ($type = 'job') and, later, for the workers list ($type = 'worker').
- * The admin panel will show the counts per day/notice and the list of leads.
+ * কে লুকানো ফোন নাম্বার / ইমেইল দেখতে চাইছে তার হিসাব:
+ *  - লুকানো নাম্বার বা ইমেইলে প্রতিটি ক্লিক একটা "কল" হিসেবে গোনা হয় (contact_clicks);
+ *  - যিনি দেখতে চান তিনি আগে আগ্রহের কথা জানিয়ে নাম + মোবাইল দেন (contact_leads)।
+ * কাজের বিজ্ঞপ্তির জন্য ব্যবহার হয় ($type = 'job'), পরে কর্মীর তালিকার জন্যও ($type = 'worker')।
+ * অ্যাডমিন প্যানেলে দিন/বিজ্ঞপ্তি-ভিত্তিক গণনা ও আগ্রহীদের তালিকা দেখানো হবে।
  */
 final class ContactTrackingRepository
 {
     private const DEMO_FILE = '/storage/demo-contact-log.json';
 
-    /** One click on a hidden phone/e-mail. $kind = 'phone' | 'email'. */
+    /** লুকানো ফোন/ইমেইলে একটা ক্লিক। $kind = 'phone' | 'email'। */
     public static function click(string $type, int $targetId, string $kind): void
     {
         $pdo = Database::connection();
@@ -38,7 +38,7 @@ final class ContactTrackingRepository
         }
     }
 
-    /** A visitor said "I am interested" and left their name and mobile number. */
+    /** একজন দর্শক "আমি আগ্রহী" বলে নিজের নাম ও মোবাইল নাম্বার দিয়েছেন। */
     public static function lead(string $type, int $targetId, string $kind, string $name, string $phone): bool
     {
         $pdo = Database::connection();

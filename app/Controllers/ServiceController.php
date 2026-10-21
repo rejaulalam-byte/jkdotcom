@@ -8,10 +8,10 @@ use App\Core\View;
 use App\Models\ServiceDirectory;
 use App\Models\ServiceRepository;
 
-/** One service's page: /services/<slug> (list of its providers — to be built; "coming soon" for now). */
+/** একটা সেবার পেইজ: /services/<slug> (সেবাদাতাদের তালিকা — এখনও বানানো হয়নি; আপাতত "coming soon")। */
 final class ServiceController
 {
-    /** All services A-Z in three balanced columns, with search: /services */
+    /** সব সেবা বর্ণানুক্রমে তিনটি সমান কলামে, খোঁজার সুবিধাসহ: /services */
     public function index(): void
     {
         $query = trim((string) ($_GET['q'] ?? ''));

@@ -7,10 +7,10 @@ namespace App\Core;
 use Throwable;
 
 /**
- * Editable website text.
- * Every piece of text on the site has a key (e.g. "home.hero.title_1").
- * The default wording lives in app/Content/defaults.php; when the admin edits a
- * text in the admin panel it is saved in the "content_blocks" table and wins.
+ * সম্পাদনাযোগ্য ওয়েবসাইটের লেখা।
+ * সাইটের প্রতিটি লেখার একটা কী (key) আছে (যেমন "home.hero.title_1")।
+ * ডিফল্ট লেখা app/Content/defaults.php-তে; অ্যাডমিন প্যানেলে বদলালে "content_blocks"
+ * টেবিলে জমা হয় এবং সেটাই প্রাধান্য পায়।
  */
 final class Content
 {

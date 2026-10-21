@@ -1,10 +1,10 @@
 <?php
 /**
- * Registration guideline for professionals (Figma node 2683-148): banner, one open
- * writing area (.rich), two buttons, then a tinted band with two photo cards.
+ * পেশাজীবীদের রেজিস্ট্রেশন-নির্দেশিকা (Figma node 2683-148): ব্যানার, তিনটি নিয়মাবলী-বাটন,
+ * একটা খোলা লেখার জায়গা (.rich), তারপর দুটো ছবির কার্ডসহ হালকা ব্যান্ড।
  *
  * @var string $heading
- * @var string $bodyHtml  trusted HTML (admin-editor output, sanitised on save)
+ * @var string $bodyHtml  বিশ্বস্ত HTML (অ্যাডমিন-এডিটরের লেখা, সংরক্ষণের সময় sanitise করা)
  */
 $crumbs = [['/', 'হোম'], ['/registration', 'রেজিস্ট্রেশন'], [null, 'পেশাজীবী রেজিস্ট্রেশনের নিয়মাবলী']];
 $regActive = 'pro';

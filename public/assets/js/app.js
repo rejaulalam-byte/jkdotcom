@@ -1,12 +1,20 @@
-/* jorurikaj.com — small enhancements. The site works without JavaScript;
-   this file only adds: mobile menu, sub-menus, the "today's jobs" scroller
-   and the scrolling advertisement strip. */
+/* ==========================================================================
+   jorurikaj.com — ছোট ছোট উন্নতি (JavaScript ছাড়াও সাইট চলে; এটা শুধু বাড়তি আরাম দেয়)
+
+   সূচিপত্র (এই নামে খুঁজুন):
+     মেনু (মোবাইল মেনু, সাব-মেনু) · বার্তা-বক্স · তারিখ ঘর · Hero অক্ষরের অ্যানিমেশন
+     ওপরে-যাওয়ার বাটন · FAQ · আজকের কাজের তালিকা · Marquee · Services সারি
+     Advertisement strip · কাজের ধরন ড্রপডাউন · এলাকার তিন ড্রপডাউন
+     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ
+
+   প্রতিটি অংশ নিজের মতো স্বাধীন: ওই অংশের উপাদান পেইজে না থাকলে সে চুপচাপ বাদ পড়ে।
+   ========================================================================== */
 (function () {
     "use strict";
 
     var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    /* ---- Mobile menu + sub-menus ---------------------------------------- */
+    /* ---- মোবাইল মেনু ও সাব-মেনু -------------------------------------------- */
     var toggle = document.querySelector(".nav-toggle");
     var nav = document.getElementById("site-nav");
     if (toggle && nav) {
@@ -23,9 +31,9 @@
             btn.setAttribute("aria-expanded", String(open));
         });
     });
-    /* A menu name that has a sub-menu does not open a page: it only shows its sub-menu.
-       With a mouse on a wide screen the sub-menu already opens on hover, so a click does nothing;
-       on phones/tablets a tap opens and closes it. (Without JavaScript the name still links to its page.) */
+    /* সাব-মেনু আছে এমন মেনুর নামে ক্লিক করলে কোনো পেইজ খোলে না; শুধু সাব-মেনু দেখায়।
+       চওড়া পর্দায় মাউস নিলেই সাব-মেনু খোলে, তাই সেখানে ক্লিকে কিছু হয় না;
+       ফোন/ট্যাবলেটে ট্যাপ করলে খোলে-বন্ধ হয়। (JavaScript বন্ধ থাকলে নামটা নিজের পেইজের লিংকই থাকে।) */
     var hoverMenu = window.matchMedia("(hover: hover) and (min-width: 1200px)");
     document.querySelectorAll(".has-sub > .nav__link").forEach(function (link) {
         link.addEventListener("click", function (e) {
@@ -48,7 +56,7 @@
             }
         });
     });
-    /* "Your post was published" pop-up: leaves by itself after 10 seconds, or at once with the x button. */
+    /* ---- "আপনার পোস্ট প্রকাশিত" বার্তা-বক্স: ১০ সেকেন্ড পরে নিজে সরে যায়, ✕ বাটনে সঙ্গে সঙ্গে ---- */
     var toast = document.getElementById("post-toast");
     if (toast) {
         var closeToast = function () {
@@ -62,7 +70,7 @@
         window.setTimeout(closeToast, 10000);
     }
 
-    /* Date fields: the browser's own format (mm/dd/yyyy) is shown pale until a date is chosen. */
+    /* ---- তারিখের ঘর: তারিখ বাছার আগে ব্রাউজারের নিজের ফরম্যাট (mm/dd/yyyy) ফ্যাকাশে দেখায় ---- */
     document.querySelectorAll(".pf--date input[type=date]").forEach(function (d) {
         var mark = function () {
             d.classList.toggle("is-empty", d.value === "");
@@ -84,7 +92,7 @@
         });
     });
 
-    /* ---- Hero: every letter flies in from its own direction ---------------- */
+    /* ---- Hero: প্রতিটি অক্ষর নিজের দিক থেকে উড়ে আসে (স্টাইল: CSS-এর "Hero entrance") ---- */
     var heroEl = document.querySelector(".hero");
     if (heroEl && !reduceMotion) {
         var segmenter = window.Intl && Intl.Segmenter ? new Intl.Segmenter("bn", { granularity: "grapheme" }) : null;
@@ -102,12 +110,12 @@
                 }
                 var word = document.createElement("span");
                 word.className = "fly-word";
-                // grapheme clusters keep Bangla conjuncts and vowel signs together;
-                // an old browser without Intl.Segmenter lets the whole word fly as one piece
+                // গ্রাফিম-ক্লাস্টার ধরে ভাঙলে বাংলা যুক্তাক্ষর ও কার-চিহ্ন একসঙ্গে থাকে;
+                // Intl.Segmenter নেই এমন পুরনো ব্রাউজারে গোটা শব্দ একটুকরো হয়ে ওড়ে
                 var pieces = segmenter
                     ? Array.from(segmenter.segment(part), function (s) { return s.segment; })
                     : [part];
-                // the site name at the start of a word ("Jorurikaj.com-এ") stays bold + coloured
+                // শব্দের শুরুতে সাইটের নাম ("Jorurikaj.com-এ") মোটা ও রঙিন থাকে
                 var brandLeft = /^jorurikaj\.com/i.test(part) ? "jorurikaj.com".length : 0;
                 pieces.forEach(function (piece) {
                     var letter = document.createElement("span");
@@ -146,11 +154,11 @@
         heroEl.style.setProperty("--btn-delay", (flyLetters.length * step + 0.9).toFixed(2) + "s");
     }
 
-    /* ---- Button "back to top" -------------------------------------------------
-       Works like a scroll thumb: hidden in the first half of the page; past the middle it
-       fades in at the middle of the screen and slides down the screen with the scrolling,
-       reaching the bottom when the page ends; scrolling up reverses it. A click glides to
-       the top slowly (about 3 px per ms, 0.9 - 3.5 s) and stops if the visitor takes over. */
+    /* ---- ওপরে-যাওয়ার বাটন ("back to top") --------------------------------------
+       স্ক্রল-থাম্বের মতো কাজ করে: পেইজের প্রথম অর্ধেকে লুকানো; মাঝামাঝি পেরোলে পর্দার মাঝখানে
+       ফুটে ওঠে এবং স্ক্রলের সঙ্গে নিচে নেমে পেইজ শেষে পর্দার তলায় পৌঁছায়; ওপরে স্ক্রলে উল্টোটা হয়।
+       ক্লিক করলে ধীরে ওপরে গড়িয়ে যায় (প্রতি মিলিসেকেন্ডে প্রায় ৩px, মোট ০.৯–৩.৫ সেকেন্ড)
+       এবং ব্যবহারকারী নিজে স্ক্রল করলে থেমে যায়। */
     var toTop = document.querySelector("[data-to-top]");
     if (toTop) {
         var placeToTop = function () {
@@ -204,8 +212,8 @@
             requestAnimationFrame(frame);
         });
     }
-    /* ---- FAQ: opening one question closes the others ---------------------
-       (browsers that know <details name="..."> already do this themselves) */
+    /* ---- FAQ: একটা প্রশ্ন খুললে বাকিগুলো বন্ধ হয় ---------------------------------
+       (যে ব্রাউজার <details name="..."> বোঝে, সে নিজেই এটা করে; এটা অন্যদের জন্য) */
     var faqItems = document.querySelectorAll(".faq-item");
     faqItems.forEach(function (item) {
         item.addEventListener("toggle", function () {
@@ -220,12 +228,11 @@
         });
     });
 
-    /* ---- "আজকের কাজের তালিকা" scroller ------------------------------------
-       Shows N rows. Each page of rows rises SLOWLY from the bottom (data-rise,
-       default 4s, so the rows can be read while rising), rests for a few
-       seconds (data-hold, default 5.5s), then quickly moves up and away; the
-       next page rises the moment the last row of the previous one has left. Without JS or
-       with "reduce motion" the plain list (first N rows) is shown. */
+    /* ---- "আজকের কাজের তালিকা" (hero-র ডানের বাক্স) -------------------------------
+       একসঙ্গে N সারি দেখায়। প্রতিটি পাতা নিচ থেকে ধীরে ওঠে (data-rise, ডিফল্ট ৪s, যাতে
+       ওঠার সময়ই পড়া যায়), কয়েক সেকেন্ড থামে (data-hold, ডিফল্ট ৫.৫s), তারপর দ্রুত ওপরে সরে
+       যায়; আগের পাতার শেষ সারি বেরিয়ে যাওয়ার মুহূর্তেই পরের পাতা উঠতে শুরু করে।
+       JavaScript না থাকলে বা "reduce motion" চালু থাকলে সাধারণ তালিকা (প্রথম N সারি) দেখায়। */
     var ticker = document.querySelector(".ticker[data-page-size]");
     if (ticker && !reduceMotion && ticker.animate) {
         var size = parseInt(ticker.getAttribute("data-page-size"), 10) || 8;
@@ -234,7 +241,7 @@
         var rows = Array.prototype.slice.call(ticker.children);
 
         if (rows.length > size) {
-            // pages of `size` rows (the last page may be shorter)
+            // `size` সারির পাতা (শেষ পাতা ছোট হতে পারে)
             var pages = [];
             for (var i = 0; i < rows.length; i += size) {
                 var page = document.createElement("ol");
@@ -275,9 +282,9 @@
                 });
             };
 
-            // Owner 2026-10-20: the next page starts to rise at the very moment the LAST row of the
-            // page before has left the top. A short last page (e.g. 4 of 8 rows) only has to travel
-            // as far as its rows are long, so it leaves sooner and nothing waits for empty space.
+            // পরের পাতা ওঠা শুরু করে ঠিক তখন, যখন আগের পাতার শেষ সারিটা ওপর দিয়ে বেরিয়ে যায়।
+            // ছোট শেষ পাতা (যেমন ৮-এর মধ্যে ৪ সারি) শুধু নিজের সারির দৈর্ঘ্যটুকু পথ চলে,
+            // তাই আগে বেরিয়ে যায় — খালি জায়গার জন্য কেউ অপেক্ষা করে না।
             (async function loop() {
                 var index = 0;
                 for (;;) {
@@ -296,7 +303,7 @@
         }
     }
 
-    /* ---- Teal text bar marquee: same speed whatever the text length ------- */
+    /* ---- টিল লেখার পট্টির marquee: লেখা ছোট-বড় যা-ই হোক, গতি সমান ------------------- */
     document.querySelectorAll("[data-marquee]").forEach(function (bar) {
         var move = bar.querySelector(".rep-bar__move");
         if (!move || reduceMotion) {
@@ -311,10 +318,10 @@
         window.addEventListener("resize", setSpeed);
     });
 
-    /* ---- Services: two rows running right -> left, each on its own -------
-       The cards of a row are repeated so the loop has no gap. Row 2 runs at a
-       different speed and starts at a different point, so the rows never move
-       in step. Hover / keyboard focus pauses (CSS). */
+    /* ---- Services (হোম): দুই সারি ডান থেকে বাঁয়ে, প্রতিটি নিজের গতিতে ---------------
+       সারির কার্ড পুনরাবৃত্তি করা হয়, যাতে ঘুরে আসার সময় ফাঁক না থাকে। ২য় সারির গতি ও শুরুর
+       বিন্দু আলাদা, তাই দুই সারি কখনও তালে তাল মিলিয়ে চলে না।
+       মাউস/কীবোর্ড-ফোকাসে থামে (এটা CSS করে)। */
     document.querySelectorAll("[data-service-row]").forEach(function (row) {
         var track = row.querySelector(".service-row__track");
         if (!track || reduceMotion) {
@@ -348,7 +355,7 @@
         row.classList.add("is-moving");
     });
 
-    /* ---- Advertisement strip: one banner leaves, the others rest ----------- */
+    /* ---- Advertisement strip: একটা ব্যানার বেরিয়ে যায়, বাকিরা স্থির থাকে ------------------ */
     document.querySelectorAll("[data-ad-strip]").forEach(function (strip) {
         var track = strip.querySelector(".ad-strip__track");
         if (!track || reduceMotion) {
@@ -367,7 +374,7 @@
             if (setWidth <= 0) {
                 return;
             }
-            // repeat the banners until two full sets fill the strip, so the loop has no gap
+            // ব্যানারগুলো এতবার নকল করা হয় যাতে দুই সেট স্ট্রিপ ভরে ফেলে; তাহলে ঘুরে আসার সময় ফাঁক থাকে না
             var copies = Math.max(1, Math.ceil(strip.clientWidth / setWidth));
             for (var c = 0; c < copies + 1; c++) {
                 items.forEach(function (li) {
@@ -384,9 +391,9 @@
                 return;
             }
 
-            // Step by step (owner 2026-10-20): the first banner slides out to the left in ~0.9 s,
-            // the rest stay still for 5.5 s (data-hold; was 2.5 s, +3 s asked by the owner), then the next one leaves. A visitor can
-            // read every ad; hovering or focusing the strip holds it still.
+            // ধাপে ধাপে: প্রথম ব্যানার প্রায় ০.৯ সেকেন্ডে বাঁ দিকে সরে যায়, বাকিরা ৫.৫ সেকেন্ড
+            // (data-hold) স্থির থাকে, তারপর পরেরটা বেরোয়। ফলে প্রতিটি বিজ্ঞাপন পড়া যায়;
+            // স্ট্রিপের ওপর মাউস বা ফোকাস থাকলে সব স্থির।
             var hold = parseInt(strip.getAttribute("data-hold"), 10) || 5500;
             var held = false;
             strip.addEventListener("mouseenter", function () { held = true; });
@@ -413,7 +420,7 @@
             setTimeout(step, hold);
         }
 
-        // wait for the images so the widths are real
+        // ছবি লোড হওয়ার জন্য অপেক্ষা: তখনই প্রস্থগুলো আসল মাপের হয়
         var imgs = Array.prototype.slice.call(track.querySelectorAll("img"));
         var pending = imgs.filter(function (img) {
             return !img.complete;
@@ -437,10 +444,10 @@
     });
 })();
 
-/* Post-a-job form, part 1: "কাজের ধরন" becomes a searchable drop-down.
-   The services list (the <datalist> of the page) is shown while typing; the list gets shorter with every letter.
-   When nothing matches, a button lets the visitor use their own words (the admin corrects the spelling later).
-   Without JavaScript the field stays a plain text box with suggestions. */
+/* ---- কাজের ধরন ড্রপডাউন ("কাজ সম্পর্কে জানান" ফর্ম, অংশ ১) -----------------------
+   "কাজের ধরন" ঘরটা খোঁজা-যায় এমন তালিকা হয়ে যায়: টাইপ করার সময় পেইজের <datalist>-এর সেবাগুলো দেখায়,
+   প্রতিটি অক্ষরে তালিকা ছোট হয়। কিছু না মিললে একটা বাটন ব্যবহারকারীকে নিজের শব্দ ব্যবহার করতে দেয়
+   (বানান অ্যাডমিন পরে ঠিক করবেন)। JavaScript ছাড়া ঘরটা পরামর্শসহ সাধারণ লেখার ঘরই থাকে। */
 (function () {
     var box = document.querySelector("[data-combo]");
     if (!box) {
@@ -610,12 +617,12 @@
     showHint();
 })();
 
-/* Post-a-job form, part 2: উপজেলা / থানা, জেলা and বিভাগ work together, in any order.
-   Every name is listed once. Pick an upazila: the district list shows only the districts that have
-   an upazila with that name (several, if the name repeats, e.g. "সদর"). Pick a district: its division
-   fills in (or the divisions that have it). Auto-fill happens when only one answer is possible.
-   Three hidden fields carry the real ids to the server, which checks they belong together.
-   Without JavaScript the three lists stay complete and keep their own names. */
+/* ---- এলাকার তিন ড্রপডাউন ("কাজ সম্পর্কে জানান" ফর্ম, অংশ ২) ------------------------
+   উপজেলা/থানা, জেলা ও বিভাগ একসঙ্গে কাজ করে, যেকোনো ক্রমে বাছা যায়। প্রতিটি নাম একবারই থাকে।
+   উপজেলা বাছলে জেলার তালিকায় শুধু সেই নামের উপজেলা আছে এমন জেলাগুলো থাকে (নাম এক হলে একাধিক,
+   যেমন "সদর")। জেলা বাছলে তার বিভাগ নিজে বসে (বা সেই জেলা আছে এমন বিভাগগুলো থাকে)।
+   উত্তর একটাই হলে নিজে ভরে যায়। আসল আইডি সার্ভারে যায় তিনটি লুকানো ঘরে; সার্ভার যাচাই করে
+   তারা পরস্পরের সঙ্গে মেলে কি না। JavaScript ছাড়া তিনটি তালিকা পূর্ণ থাকে, নিজের নামেই যায়। */
 (function () {
     var upz = document.getElementById("pj-upazila");
     var dis = document.getElementById("pj-district");
@@ -641,7 +648,7 @@
         d: div.options[0].textContent
     };
 
-    // start values (after a failed submit the server selects the earlier choice)
+    // শুরুর মান (জমা ব্যর্থ হলে সার্ভার আগের বাছাইটা ফিরিয়ে দেয়)
     var U = "";
     var S = "";
     var D = div.value;
@@ -658,7 +665,7 @@
         D = dists[dis.value].div;
     }
 
-    // the selects no longer send values themselves; hidden fields do
+    // ড্রপডাউনগুলো নিজে আর মান পাঠায় না; লুকানো ঘরগুলো পাঠায়
     var hidden = {};
     [["upazila_id", upz], ["district_id", dis], ["division_id", div]].forEach(function (pair) {
         var h = document.createElement("input");
@@ -745,9 +752,9 @@
     render();
 })();
 
-/* Typing Bangla with English letters ("Banglish", Avro phonetic): ami = আমি, tomake = তোমাকে.
-   Fields opt in with data-bn. The converter is vendor/avro/avro-lib.js (MPL 1.1), loaded only on pages
-   that have such fields. The small switch (data-bn-switch) turns it on/off; the choice is remembered. */
+/* ---- Banglish টাইপিং: ইংরেজি অক্ষরে লিখলে বাংলা (Avro ফোনেটিক): ami = আমি, tomake = তোমাকে ------
+   যে ঘরে data-bn আছে সেটা এই সুবিধা পায়। রূপান্তরকারী vendor/avro/avro-lib.js (MPL 1.1, অপরিবর্তিত),
+   শুধু এমন ঘর আছে এমন পেইজেই লোড হয়। ছোট সুইচ (data-bn-switch) চালু/বন্ধ করে; পছন্দ মনে রাখা হয়। */
 (function () {
     var fields = document.querySelectorAll("[data-bn]");
     if (!fields.length) {
@@ -761,7 +768,7 @@
         enabled = true;
     }
 
-    // do not let phones "correct" the English letters before we turn them into Bangla
+    // বাংলায় বদলানোর আগে ফোন যেন ইংরেজি অক্ষর "শুধরে" না দেয়
     Array.prototype.forEach.call(fields, function (el) {
         el.setAttribute("autocapitalize", "none");
         el.setAttribute("autocorrect", "off");
@@ -794,7 +801,7 @@
             try {
                 window.localStorage.setItem("bnPhonetic", enabled ? "on" : "off");
             } catch (err) {
-                /* private mode: the choice just lasts for this page */
+                /* ব্রাউজারের প্রাইভেট মোডে পছন্দ সংরক্ষণ হয় না; শুধু এই পেইজের জন্য থাকে */
             }
             if (enabled) {
                 load();
@@ -807,7 +814,7 @@
         load();
     }
 
-    // letters, digits and the Avro signs ( . , : ^ $ ` ) belong to the word being typed
+    // অক্ষর, অঙ্ক ও Avro-র চিহ্ন ( . , : ^ $ ` ) যে শব্দ টাইপ হচ্ছে তারই অংশ
     var typed = /[A-Za-z0-9.,:^$`]+$/;
     var onlyTyped = /^[A-Za-z0-9.,:^$`]+$/;
     var states = typeof WeakMap === "function" ? new WeakMap() : null;
@@ -824,7 +831,7 @@
         }
     }
 
-    // capture phase: runs before the field's own listeners (e.g. the "কাজের ধরন" list)
+    // capture ধাপ: ঘরের নিজের শ্রোতাদের (যেমন "কাজের ধরন" তালিকা) আগে চলে
     document.addEventListener("input", function (e) {
         var el = e.target;
         if (!enabled || !window.OmicronLab || !el.hasAttribute || !el.hasAttribute("data-bn")) {
@@ -845,7 +852,7 @@
         var raw;
         var start;
 
-        // several characters arrive at once (voice typing, a keyboard's word suggestion): convert every English word in them
+        // একসঙ্গে কয়েকটা অক্ষর এলে (ভয়েস টাইপিং, কীবোর্ডের শব্দ-পরামর্শ) তার প্রতিটি ইংরেজি শব্দ বদলানো হয়
         var chunk = typeof e.data === "string" ? e.data : "";
         if (chunk.length > 1 && left.slice(-chunk.length) === chunk) {
             var chunkStart = caret - chunk.length;
@@ -889,7 +896,7 @@
         setState(el, { start: start, out: out, raw: raw });
     }, true);
 
-    // moving the cursor or leaving the field ends the word
+    // কার্সর সরালে বা ঘর ছাড়লে শব্দ শেষ ধরা হয়
     ["blur", "mouseup", "keyup"].forEach(function (name) {
         document.addEventListener(name, function (e) {
             var el = e.target;
@@ -904,10 +911,10 @@
     });
 })();
 
-/* "আজকের প্রকাশিত" list: hidden phone numbers / e-mails.
-   A click on one is COUNTED by the server as a "call". If this visitor has not yet said who they are, a pop-up asks
-   "are you interested?"; on "yes" they leave name + mobile, and only then the phone number or e-mail
-   (only the one they clicked) is shown as a call / mail link. Nothing real is in the page source. */
+/* ---- "আজকের প্রকাশিত" তালিকা: লুকানো ফোন নাম্বার / ইমেইল --------------------------
+   একটাতে ক্লিক করলে সার্ভার সেটাকে একটা "কল" হিসেবে গোনে। এই দর্শক আগে পরিচয় না দিয়ে থাকলে পপ-আপ
+   জিজ্ঞেস করে "আপনি কি আগ্রহী?"; "হ্যাঁ" বললে নাম + মোবাইল দিতে হয়, তারপরই (শুধু যেটাতে ক্লিক
+   করেছিলেন সেই) ফোন নাম্বার বা ইমেইল কল/মেইল লিংক হয়ে দেখায়। পেইজের সোর্সে আসল তথ্য থাকে না। */
 (function () {
     var list = document.querySelector(".job-list");
     var dialog = document.getElementById("lead-dialog");

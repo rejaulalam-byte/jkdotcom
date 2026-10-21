@@ -1,11 +1,11 @@
 <?php
 /**
- * About page (Figma node 2621-103): title banner + ONE open writing area.
- * The whole body is a single piece of rich HTML (headings, text, images that
- * text wraps around) so the admin's editor can lay it out freely.
+ * আমাদের সম্পর্কে পেইজ (Figma node 2621-103): শিরোনাম-ব্যানার + একটাই খোলা লেখার জায়গা।
+ * পুরো বিষয়বস্তু একটাই rich HTML (শিরোনাম, লেখা, লেখা-ঘেরা ছবি), যাতে অ্যাডমিনের
+ * এডিটরে খুশিমতো সাজানো যায়।
  *
  * @var string $heading
- * @var string $bodyHtml  trusted HTML (admin-editor output, sanitised on save)
+ * @var string $bodyHtml  বিশ্বস্ত HTML (অ্যাডমিন-এডিটরের লেখা, সংরক্ষণের সময় sanitise করা)
  */
 $crumbs = [['/', 'হোম'], [null, 'আমাদের সম্পর্কে']];
 require BASE_PATH . '/app/Views/partials/page-banner.php';

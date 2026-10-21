@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/** Security headers, CSRF protection and small safety helpers. */
+/** নিরাপত্তা-হেডার, CSRF সুরক্ষা ও ছোট ছোট নিরাপত্তা-সহায়ক। */
 final class Security
 {
     public static function isHttps(): bool
@@ -24,7 +24,7 @@ final class Security
         header('Referrer-Policy: strict-origin-when-cross-origin');
         header('Cross-Origin-Opener-Policy: same-origin');
         header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()');
-        // Everything (scripts, styles, fonts, images) must come from our own domain.
+        // সবকিছু (স্ক্রিপ্ট, স্টাইল, ফন্ট, ছবি) আমাদের নিজের ডোমেইন থেকেই আসতে হবে।
         header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; "
             . "img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; "
             . "base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
@@ -49,19 +49,19 @@ final class Security
             && hash_equals($_SESSION['_csrf'], $token);
     }
 
-    /** Visitor address. We trust only REMOTE_ADDR (headers like X-Forwarded-For can be faked). */
+    /** দর্শকের ঠিকানা। শুধু REMOTE_ADDR বিশ্বাস করা হয় (X-Forwarded-For-এর মতো হেডার জাল করা যায়)। */
     public static function clientIp(): string
     {
         return (string) ($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
     }
 
-    /** One-way hash of the IP so we can rate-limit/log without storing the address itself. */
+    /** আইপির একমুখী হ্যাশ: ঠিকানা না রেখেই সীমা-নিয়ন্ত্রণ ও লগ করা যায়। */
     public static function ipHash(): string
     {
         return hash_hmac('sha256', self::clientIp(), Env::get('APP_KEY', 'change-me') ?? 'change-me');
     }
 
-    /** Returns the URL only if it is a plain http/https link; otherwise null. */
+    /** URL শুধু সাধারণ http/https লিংক হলে ফেরত দেয়; নইলে null। */
     public static function safeUrl(?string $url): ?string
     {
         if ($url === null) {

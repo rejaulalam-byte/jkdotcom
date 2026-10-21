@@ -1,7 +1,8 @@
 <?php
 /**
- * Small switch for "type in English letters, get Bangla" (Avro phonetic, app.js).
- * Fields opt in with the data-bn attribute. The choice is remembered in the browser.
+ * "ইংরেজি অক্ষরে লিখলে বাংলা হবে" ছোট সুইচ (Avro ফোনেটিক, app.js)।
+ * যে ঘরে data-bn অ্যাট্রিবিউট আছে সেটাই এই সুবিধা পায়। ব্রাউজারে পছন্দ মনে রাখা হয়।
+ * নতুন ফর্মে প্রতিটি লেখার ঘরে data-bn দিন এবং ফর্মে এই partial একবার বসান।
  */
 ?>
 <div class="bn-switch" data-bn-switch>

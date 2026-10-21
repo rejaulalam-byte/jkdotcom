@@ -1,7 +1,7 @@
--- Migration 004 — who looks at hidden phone numbers / e-mails (run after 003)
--- Used by the job list (/today) now and by the workers list later (target_type = 'worker').
+-- মাইগ্রেশন 004 — কে লুকানো ফোন নাম্বার / ইমেইল দেখছে (003-এর পরে চালান)
+-- এখন কাজের তালিকায় (/today) ব্যবহার হয়, পরে কর্মীর তালিকায় (target_type = 'worker')।
 
--- every click on a hidden number or e-mail (counted as a "call" for the admin's report)
+-- লুকানো নাম্বার বা ইমেইলে প্রতিটি ক্লিক (অ্যাডমিনের রিপোর্টে একটা "কল" হিসেবে গোনা হয়)
 CREATE TABLE IF NOT EXISTS contact_clicks (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     target_type ENUM('job','worker') NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS contact_clicks (
     KEY idx_clicks_day (clicked_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- a visitor said "I am interested" and left their name + mobile before seeing the contact
+-- যোগাযোগ দেখার আগে দর্শক "আমি আগ্রহী" বলে নিজের নাম + মোবাইল রেখে গেছেন
 CREATE TABLE IF NOT EXISTS contact_leads (
     id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     target_type   ENUM('job','worker') NOT NULL,

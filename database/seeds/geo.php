@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 /*
- * Bangladesh administrative areas (Bangla + English names).
- * Base: nuhil/bangladesh-geocode (MIT licence, https://github.com/nuhil/bangladesh-geocode):
- * 8 divisions, 64 districts, all upazilas. Added from the old jorurikaj.com database:
- * Dhaka city thanas and other local areas that the public list does not have.
- * Ids are stable once the site is live. [id, name_bn, name_en] / [id, parent_id, name_bn, name_en]
+ * বাংলাদেশের প্রশাসনিক এলাকা (বাংলা + ইংরেজি নাম)।
+ * ভিত্তি: nuhil/bangladesh-geocode (MIT লাইসেন্স, https://github.com/nuhil/bangladesh-geocode):
+ * ৮ বিভাগ, ৬৪ জেলা, সব উপজেলা। পুরনো jorurikaj.com ডাটাবেস থেকে যোগ করা:
+ * ঢাকা শহরের থানা ও অন্য স্থানীয় এলাকা, যা সর্বজনীন তালিকায় নেই।
+ * সাইট চালু হওয়ার পর id বদলানো যাবে না। [id, name_bn, name_en] / [id, parent_id, name_bn, name_en]
  */
 return [
     'divisions' => [

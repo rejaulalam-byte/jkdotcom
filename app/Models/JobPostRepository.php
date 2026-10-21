@@ -10,11 +10,11 @@ use App\Core\Logger;
 use App\Core\Security;
 use Throwable;
 
-/** "আজকের প্রকাশিত" job notices. */
+/** "আজকের প্রকাশিত" কাজের বিজ্ঞপ্তি। */
 final class JobPostRepository
 {
     /**
-     * Saves a job posted from the public form. It is published at once (status 'approved'); the admin can still edit or hide it later.
+     * সর্বজনীন ফর্ম থেকে জানানো কাজ সংরক্ষণ করে। সঙ্গে সঙ্গে প্রকাশিত হয় (status 'approved'); অ্যাডমিন পরে সম্পাদনা বা লুকাতে পারবেন।
      *
      * @param array{title:string,title_custom:int,details:string,contact_name:string,phone:string,email:string,address:string,upazila_id:int,district_id:int,division_id:int,start_date:string,end_date:string} $data
      */
@@ -22,8 +22,8 @@ final class JobPostRepository
     {
         $pdo = Database::connection();
         if ($pdo === null) {
-            // No database (local preview): keep the post in storage/demo-jobs.json and show it at once,
-            // so the whole flow (post -> list) can be tried. Same on the real site: job notices need no approval (owner 2026-10-22).
+            // ডাটাবেস নেই (লোকাল প্রিভিউ): পোস্ট storage/demo-jobs.json-এ রেখে সঙ্গে সঙ্গে দেখানো হয়,
+            // যাতে পুরো প্রক্রিয়া (জানান → তালিকা) পরীক্ষা করা যায়। আসল সাইটেও কাজের বিজ্ঞপ্তিতে অনুমোদন লাগে না।
             return self::demoAdd($data);
         }
 
@@ -61,7 +61,7 @@ final class JobPostRepository
     }
 
     /**
-     * Approved notices published within the last $days days, newest first.
+     * গত $days দিনে প্রকাশিত অনুমোদিত বিজ্ঞপ্তি, নতুনটা আগে।
      *
      * @return list<array{id:int,title:string}>
      */
@@ -69,7 +69,7 @@ final class JobPostRepository
     {
         $pdo = Database::connection();
         if ($pdo === null) {
-            // posts made during the local preview come first
+            // লোকাল প্রিভিউতে করা পোস্ট আগে আসে
             $mine = array_map(
                 static fn (array $r): array => ['id' => (int) $r['id'], 'title' => (string) $r['title']],
                 array_reverse(self::demoRead())
@@ -101,9 +101,9 @@ final class JobPostRepository
     }
 
     /**
-     * Notices to show on the list page: approved, started, and not yet finished
-     * (without an end date a notice stays for `settings.jobs_visible_days` days). Newest first.
-     * Phone and e-mail are NOT included, only hidden versions (the full ones come from contactOf()).
+     * তালিকা-পেইজে দেখানোর বিজ্ঞপ্তি: অনুমোদিত, শুরু হয়ে গেছে, এখনও শেষ হয়নি
+     * (শেষের তারিখ না থাকলে `settings.jobs_visible_days` দিন থাকে)। নতুনটা আগে।
+     * ফোন ও ইমেইল আসল রূপে নেই, শুধু লুকানো রূপ আছে (পূর্ণরূপ আসে contactOf() থেকে)।
      *
      * @return list<array<string,string|int>>
      */
@@ -132,7 +132,7 @@ final class JobPostRepository
     }
 
     /**
-     * Full phone and e-mail of one shown notice (asked for by a click on the hidden number).
+     * দেখানো একটা বিজ্ঞপ্তির পূর্ণ ফোন ও ইমেইল (লুকানো নাম্বারে ক্লিকের পর চাওয়া হয়)।
      *
      * @return array{phone:string,email:string}|null
      */

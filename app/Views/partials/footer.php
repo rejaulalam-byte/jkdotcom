@@ -5,7 +5,7 @@ $feedbackToken = Security::csrfToken();
 ?>
 <footer class="site-footer">
     <div class="container footer__grid">
-        <?php // head = grid row 1, body = grid row 2: the link columns and the social box (also row 2) start on the address line ?>
+        <?php // head = গ্রিডের সারি ১, body = সারি ২: লিংকের কলাম ও সোশ্যাল বাক্স (এরাও সারি ২) ঠিকানার লাইন থেকে শুরু ?>
         <div class="footer__brand">
             <a class="footer__brand-head" href="#top" aria-label="পেজের উপরে যান">
             <span class="emblem emblem--footer"><img src="<?= e(asset('img/site/logo-figma.png')) ?>" alt="" width="596" height="541" loading="lazy"></span>
@@ -76,7 +76,7 @@ $feedbackToken = Security::csrfToken();
                 </button>
             </form>
 
-            <?php // the heading always stays; below it only the icons that have an address (social.php prints none when no link is set) ?>
+            <?php // শিরোনাম সবসময় থাকে; তার নিচে শুধু ঠিকানা-আছে এমন আইকন (কোনো লিংক না থাকলে social.php কিছুই ছাপে না) ?>
             <p class="pill pill--social"><?= e(content('footer.social_title')) ?></p>
             <?php $socialClass = 'social--footer'; require BASE_PATH . '/app/Views/partials/social.php'; ?>
         </div>

@@ -9,7 +9,7 @@ use App\Core\Logger;
 use App\Core\Security;
 use Throwable;
 
-/** Advertisement banners shown in the scrolling strip under the home hero. */
+/** হোম hero-র নিচের চলমান স্ট্রিপে দেখানো বিজ্ঞাপন-ব্যানার। */
 final class AdRepository
 {
     /** @return list<array{title:string,image:string,width:int,height:int,link:?string}> */

@@ -1,11 +1,11 @@
 <?php
 /**
- * "কাজ সম্পর্কে জানুন" (Figma node 2675-148): today's published notices as rows; a click opens one.
- * The phone number and e-mail are hidden until the visitor clicks the number (app.js asks /today/contact).
+ * "কাজ সম্পর্কে জানুন" (Figma node 2675-148): আজকের প্রকাশিত বিজ্ঞপ্তি সারি আকারে; ক্লিক করলে একটা খোলে।
+ * ফোন নাম্বার ও ইমেইল দর্শক নাম্বারে ক্লিক না করা পর্যন্ত লুকানো (app.js /today/contact-এ জিজ্ঞেস করে)।
  *
  * @var string $heading
  * @var list<array<string,string|int>> $jobs
- * @var string $token  CSRF token for the "show number" request
+ * @var string $token  "নাম্বার দেখান" অনুরোধের CSRF টোকেন
  */
 $crumbs = [['/', 'হোম'], ['/today', 'আজকের প্রকাশিত'], [null, 'কাজ সম্পর্কে জানুন']];
 require BASE_PATH . '/app/Views/partials/page-banner.php';
@@ -20,7 +20,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
             <?php endif; ?>
 
             <?php foreach ($jobs as $i => $job): ?>
-                <?php // exclusive accordion like the FAQ; every notice is closed on load (owner 2026-10-21) ?>
+                <?php // FAQ-র মতো accordion: একসঙ্গে একটাই খোলা; লোডের সময় সব বিজ্ঞপ্তি বন্ধ ?>
                 <details class="job" name="job">
                     <summary>
                         <span class="job__head">
@@ -55,7 +55,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
     </div>
 </section>
 
-<?php // pop-up shown when a hidden number / e-mail is clicked: "are you interested?" -> name + mobile -> contact shown ?>
+<?php // লুকানো নাম্বার/ইমেইলে ক্লিক করলে পপ-আপ: "আপনি কি আগ্রহী?" → নাম + মোবাইল → যোগাযোগ দেখানো ?>
 <dialog class="lead" id="lead-dialog" aria-labelledby="lead-title">
     <div class="lead__step" data-step="ask">
         <h3 id="lead-title"><?= e(content('today.lead.title')) ?></h3>

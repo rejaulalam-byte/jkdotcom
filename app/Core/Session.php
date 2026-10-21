@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/** Secure session handling + one-time "flash" messages. */
+/** নিরাপদ সেশন সামলানো + একবার-দেখানোর "flash" বার্তা। */
 final class Session
 {
     public static function start(): void
@@ -41,7 +41,7 @@ final class Session
         $_SESSION['_flash'][$key] = $value;
     }
 
-    /** Reads a flash message once, then removes it. */
+    /** flash বার্তা একবার পড়ে, তারপর মুছে ফেলে। */
     public static function pull(string $key, mixed $default = null): mixed
     {
         $value = $_SESSION['_flash'][$key] ?? $default;

@@ -1,5 +1,5 @@
 <?php
-/** "আপনার অংশগ্রহণ" band with two photo cards, shared by the guideline pages (Figma 2683-148 / 2683-305). */
+/** "আপনার অংশগ্রহণ" ব্যান্ড ও দুটো ছবির কার্ড; দুই নির্দেশিকা-পেইজেই ব্যবহার হয় (Figma 2683-148 / 2683-305)। */
 ?>
 <section class="section reg-join" aria-labelledby="reg-join-title">
     <div class="container">

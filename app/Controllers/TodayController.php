@@ -16,10 +16,10 @@ use App\Models\GeoRepository;
 use App\Models\JobPostRepository;
 use App\Models\ServiceRepository;
 
-/** "আজকের প্রকাশিত": the form where a visitor posts the work they need done (/today/post). */
+/** "আজকের প্রকাশিত": কাজের তালিকা (/today), লুকানো ফোন/ইমেইল দেখানো এবং কাজ জানানোর ফর্ম (/today/post)। */
 final class TodayController
 {
-    /** The list of today's published notices (/today). @param array<string,mixed> $meta */
+    /** আজকের প্রকাশিত বিজ্ঞপ্তির তালিকা (/today). @param array<string,mixed> $meta */
     public function index(array $meta = []): void
     {
         $jobs = [];
@@ -48,12 +48,12 @@ final class TodayController
     }
 
     /**
-     * The hidden phone number OR e-mail of one notice (JSON), in two steps:
-     *  step=click  every click is counted as a "call"; answers with the contact at once when this visitor
-     *              already left name + mobile for this notice, otherwise {need_lead: true} (the pop-up opens);
-     *  step=lead   the visitor said "interested" and sent name + mobile: stored, the admin gets an e-mail,
-     *              the contact is shown.
-     * Asking is limited per visitor, so lists of numbers cannot be collected in bulk.
+     * একটা বিজ্ঞপ্তির লুকানো ফোন নাম্বার অথবা ইমেইল (JSON), দুই ধাপে:
+     *  step=click  প্রতিটি ক্লিক একটা "কল" হিসেবে গোনা হয়; এই দর্শক এই বিজ্ঞপ্তির জন্য আগেই নাম + মোবাইল
+     *              দিয়ে থাকলে সঙ্গে সঙ্গে যোগাযোগ দেখায়, নইলে {need_lead: true} (পপ-আপ খোলে);
+     *  step=lead   দর্শক "আগ্রহী" বলে নাম + মোবাইল পাঠালেন: সংরক্ষণ হয়, অ্যাডমিন ইমেইল পান,
+     *              যোগাযোগ দেখানো হয়।
+     * চাওয়ার সংখ্যা দর্শক-প্রতি সীমিত, তাই একসঙ্গে অনেক নাম্বার সংগ্রহ করা যায় না।
      *
      * @param array<string,mixed> $meta
      */
@@ -104,7 +104,7 @@ final class TodayController
             return;
         }
 
-        // step = lead
+        // ধাপ = lead
         if (RateLimiter::tooMany('job_lead', 10, 3600)) {
             $reply(['error' => 'limit'], 429);
 
@@ -129,7 +129,7 @@ final class TodayController
         }
         $_SESSION['contact_ok']['job'][$id] = true;
 
-        // the admin hears about it at once (the same data is stored for the admin panel)
+        // অ্যাডমিন সঙ্গে সঙ্গে জানতে পান (একই তথ্য অ্যাডমিন প্যানেলের জন্যও জমা থাকে)
         $notice = null;
         foreach (JobPostRepository::listActive(500) as $job) {
             if ((int) $job['id'] === $id) {
@@ -174,7 +174,7 @@ final class TodayController
             $this->fail(['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
         }
 
-        // Hidden "website" field: real people leave it empty, spam bots fill it in
+        // লুকানো "website" ঘর: আসল মানুষ ফাঁকা রাখে, স্প্যাম-বট ভরে ফেলে
         if (trim((string) ($_POST['website'] ?? '')) !== '') {
             redirect('/today/post');
         }
@@ -197,7 +197,7 @@ final class TodayController
             'details' => $this->clean($_POST['details'] ?? '', 3000, true),
         ];
 
-        // a kind of work that is not in the services list is marked, so the admin can check its spelling
+        // সেবার তালিকায় নেই এমন কাজের ধরনে চিহ্ন দেওয়া হয়, যাতে অ্যাডমিন বানান যাচাই করতে পারেন
         $known = array_column(ServiceRepository::all(), 'name');
         $data['title_custom'] = in_array($data['title'], $known, true) ? 0 : 1;
 
@@ -218,7 +218,7 @@ final class TodayController
             . "{$data['details']}\n";
         $replyTo = filter_var($data['email'], FILTER_VALIDATE_EMAIL) ? $data['email'] : null;
         if (!Mailer::send($to, 'নতুন কাজের তথ্য: ' . $data['title'], $body, $replyTo)) {
-            // Already saved (admin panel), so nothing is lost
+            // আগেই সংরক্ষিত (অ্যাডমিন প্যানেলের জন্য), তাই কিছু হারাবে না
             Logger::error('Job post e-mail could not be sent');
         }
 
@@ -280,7 +280,7 @@ final class TodayController
         return $errors;
     }
 
-    /** Returns "Y-m-d" when $value is a real calendar date, otherwise null. */
+    /** $value সত্যিকারের তারিখ হলে "Y-m-d" ফেরত দেয়, নইলে null। */
     private function validDate(string $value): ?string
     {
         $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);

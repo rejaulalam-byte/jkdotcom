@@ -11,7 +11,7 @@ use App\Core\Security;
 use App\Core\Session;
 use Throwable;
 
-/** Footer box "আপনার ইমেইল - আমাদের সাথে সেতুবন্ধন": stores the visitor's e-mail address. */
+/** ফুটারের "আপনার ইমেইল - আমাদের সাথে সেতুবন্ধন" বাক্স: দর্শকের ইমেইল জমা রাখে। */
 final class SubscribeController
 {
     /** @param array<string,mixed> $meta */

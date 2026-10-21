@@ -1,5 +1,9 @@
 <?php
-/** Logo + main menu. The active page is highlighted. */
+/**
+ * লোগো + প্রধান মেনু। খোলা পেইজ হাইলাইট থাকে।
+ * মেনুতে নতুন আইটেম: নিচের $menu তালিকায় [পাথ, নাম, [সাব-মেনু]] বসান।
+ * সাব-মেনু আছে এমন আইটেমের নামে ক্লিকে পেইজ খোলে না, শুধু সাব-মেনু দেখায় (app.js)।
+ */
 $menu = [
     ['/',             'হোম',               []],
     ['/about',        'আমাদের সম্পর্কে',     []],
@@ -22,7 +26,7 @@ $current = \App\Core\Router::currentPath();
 <header class="site-header">
     <div class="container header__inner">
         <a class="brand" href="/" aria-label="Jorurikaj.com — হোম পেজ">
-            <?php // menu logo = one picture with the name and tagline in it (owner 2026-10-20); the footer keeps its own logo ?>
+            <?php // মেনুর লোগো = নাম ও ট্যাগলাইনসহ একটাই ছবি; ফুটারের নিজের লোগো আছে ?>
             <img class="brand__logo" src="<?= e(asset('img/site/logo-header.png')) ?>" alt="Jorurikaj.com — <?= e(content('site.tagline')) ?>" width="760" height="272">
         </a>
 

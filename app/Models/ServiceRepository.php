@@ -8,14 +8,14 @@ use App\Core\Database;
 use App\Core\Logger;
 use Throwable;
 
-/** Service categories (electrician, plumber ...). */
+/** সেবার বিভাগ (ইলেকট্রিশিয়ান, প্লাম্বার ইত্যাদি)। */
 final class ServiceRepository
 {
-    /** Default icons shipped with the site live here; admin uploads live in /uploads/services/. */
+    /** সাইটের সঙ্গে আসা ডিফল্ট আইকন এখানে; অ্যাডমিনের আপলোড করা আইকন /uploads/services/-এ। */
     private const DEFAULT_ICON_DIR = '/assets/img/service-icons/';
 
     /**
-     * Every active service, in the admin's order (Home page scrolling rows).
+     * প্রতিটি সক্রিয় সেবা, অ্যাডমিনের ক্রমে (হোম পেইজের চলমান সারি)।
      *
      * @return list<array{name:string,slug:string,icon:?string}>
      */
@@ -69,9 +69,9 @@ final class ServiceRepository
     }
 
     /**
-     * Web address of an icon stored in services.icon_path:
-     * "/assets/img/service-icons/x.svg" (default set) or an uploaded file name (admin).
-     * Returns null when the file does not exist, so the card shows an empty circle.
+     * services.icon_path-এ রাখা আইকনের ওয়েব ঠিকানা:
+     * "/assets/img/service-icons/x.svg" (ডিফল্ট সেট) বা আপলোড-করা ফাইলের নাম (অ্যাডমিন)।
+     * ফাইল না থাকলে null দেয়, তখন কার্ডে ফাঁকা বৃত্ত দেখায়।
      */
     public static function iconUrl(?string $iconPath): ?string
     {
@@ -98,7 +98,7 @@ final class ServiceRepository
     {
         return [
             'name' => (string) $r['name'],
-            // rows without a slug (added before 002_services.sql) use their id
+            // slug-হীন সারি (002_services.sql-এর আগে যোগ হওয়া) নিজের id ব্যবহার করে
             'slug' => (string) ($r['slug'] ?? '') !== '' ? (string) $r['slug'] : (string) $r['id'],
             'icon' => self::iconUrl($r['icon_path'] !== null ? (string) $r['icon_path'] : null),
         ];

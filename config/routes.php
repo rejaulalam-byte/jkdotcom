@@ -10,16 +10,16 @@ use App\Controllers\SubscribeController;
 use App\Controllers\TodayController;
 
 /*
- * Every public URL of the website.
- * Format: [HTTP method, path, [Controller::class, 'method'], optional extra data]
- * To add a page: create the controller method + view, then add one line here.
+ * ওয়েবসাইটের প্রতিটি সর্বজনীন URL।
+ * ধরন: [HTTP মেথড, পাথ, [Controller::class, 'মেথড'], ঐচ্ছিক বাড়তি তথ্য]
+ * নতুন পেইজ যোগ করতে: কন্ট্রোলারের মেথড + ভিউ বানান, তারপর এখানে এক লাইন যোগ করুন।
  */
 return [
     ['GET',  '/',                [HomeController::class, 'index']],
     ['POST', '/feedback',        [FeedbackController::class, 'store']],
     ['POST', '/subscribe',       [SubscribeController::class, 'store']],
 
-    // Designed in Figma, to be built page by page (see PROGRESS.md)
+    // Figma-তে নকশা করা পেইজ; একটা একটা করে বানানো হচ্ছে (PROGRESS.md দেখুন)
     ['GET',  '/about',           [PageController::class, 'about']],
     ['GET',  '/services',        [ServiceController::class, 'index']],
     ['GET',  '/services/{slug}', [ServiceController::class, 'show']],

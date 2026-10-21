@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/** Simple per-visitor limit (e.g. max 5 feedback messages per hour) to stop spam and brute force. */
+/** দর্শক-প্রতি সহজ সীমা (যেমন ঘণ্টায় সর্বোচ্চ ৫টি মতামত): স্প্যাম ও জোর-খাটানো চেষ্টা ঠেকায়। */
 final class RateLimiter
 {
-    /** Returns true when the visitor already used up the allowed attempts (and records this attempt otherwise). */
+    /** দর্শক অনুমোদিত চেষ্টা শেষ করে ফেললে true দেয় (নইলে এই চেষ্টাটা গুনে রাখে)। */
     public static function tooMany(string $bucket, int $maxAttempts, int $windowSeconds): bool
     {
         $dir = BASE_PATH . '/storage/ratelimit';

@@ -8,16 +8,16 @@ use PDO;
 use Throwable;
 
 /**
- * One shared MySQL connection (PDO).
- * RULE FOR EVERY DEVELOPER: all SQL must use prepared statements with bound
- * parameters — never put user input directly into an SQL string.
+ * সবার জন্য একটাই MySQL সংযোগ (PDO)।
+ * প্রতিটি ডেভেলপারের জন্য নিয়ম: সব SQL-এ prepared statement ও bound parameter ব্যবহার করতে হবে —
+ * ব্যবহারকারীর দেওয়া কিছু কখনও সরাসরি SQL লেখার ভেতরে বসানো যাবে না।
  */
 final class Database
 {
     private static ?PDO $pdo = null;
     private static bool $tried = false;
 
-    /** Returns null when no database is configured (demo mode) or it is unreachable. */
+    /** ডাটাবেস সেট করা না থাকলে (ডেমো মোড) বা না-পাওয়া গেলে null দেয়। */
     public static function connection(): ?PDO
     {
         if (self::$tried) {
@@ -44,7 +44,7 @@ final class Database
             ]);
             self::$pdo->exec("SET time_zone = '+06:00'");
         } catch (Throwable $e) {
-            // Log the reason, but never show connection details to visitors
+            // কারণ লগে লেখা হয়, কিন্তু সংযোগের তথ্য দর্শককে কখনও দেখানো হয় না
             Logger::error('Database connection failed: ' . $e->getMessage());
             self::$pdo = null;
         }

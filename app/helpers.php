@@ -6,13 +6,13 @@ use App\Core\Content;
 use App\Core\Router;
 use App\Core\Security;
 
-/** Escape text for safe output inside HTML. Use it for EVERY dynamic value. */
+/** HTML-এ নিরাপদে দেখানোর জন্য লেখা escape করে। প্রতিটি পরিবর্তনশীল মানের জন্য এটা ব্যবহার করুন। */
 function e(mixed $value): string
 {
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-/** Latin digits -> Bangla digits (1234 -> ১২৩৪). */
+/** ইংরেজি অঙ্ক → বাংলা অঙ্ক (1234 → ১২৩৪)। */
 function bn(int|string $number): string
 {
     return strtr((string) $number, [
@@ -21,7 +21,7 @@ function bn(int|string $number): string
     ]);
 }
 
-/** URL of a file inside public/assets, with a cache-busting version. */
+/** public/assets-এর ভেতরের ফাইলের URL; ফাইল বদলালে ব্রাউজার যেন নতুনটা নেয় সেজন্য ভার্সন-সহ। */
 function asset(string $path): string
 {
     $path = ltrim($path, '/');
@@ -31,21 +31,21 @@ function asset(string $path): string
     return '/assets/' . $path . '?v=' . $version;
 }
 
-/** Editable site text: database value if the admin changed it, otherwise the default. */
+/** সম্পাদনাযোগ্য সাইটের লেখা: অ্যাডমিন বদলালে ডাটাবেসের মান, নইলে ডিফল্ট। */
 function content(string $key, string $fallback = ''): string
 {
     return Content::get($key, $fallback);
 }
 
-/** Escaped text where {braced words} become <strong>bold</strong>. */
+/** escape-করা লেখা, যেখানে {বন্ধনীর শব্দ} <strong>মোটা</strong> হয়। */
 function rich(string $text): string
 {
     return (string) preg_replace('/\{(.+?)\}/u', '<strong>$1</strong>', e($text));
 }
 
 /**
- * Colours the admin may use inside a text with [[color:NAME|words]].
- * NAME => CSS class (defined in app.css). Anything not listed is shown as plain text.
+ * লেখার ভেতরে [[color:NAME|শব্দ]] দিয়ে অ্যাডমিন যে রংগুলো ব্যবহার করতে পারবেন।
+ * NAME => CSS ক্লাস (app.css-এ আছে)। তালিকায় নেই এমন কিছু সাধারণ লেখা হিসেবে দেখায়।
  */
 const TEXT_COLORS = [
     'gold'  => 'tc-gold',
@@ -55,10 +55,10 @@ const TEXT_COLORS = [
 ];
 
 /**
- * Escaped text with simple, safe markup:
- *   [[color:gold|words]]  -> words in an allowed colour (see TEXT_COLORS)
- *   {words}               -> bold
- * The text is escaped FIRST, so no HTML from the admin can ever get through.
+ * সহজ ও নিরাপদ মার্কআপসহ escape-করা লেখা:
+ *   [[color:gold|শব্দ]]  -> অনুমোদিত রঙে শব্দ (TEXT_COLORS দেখুন)
+ *   {শব্দ}               -> মোটা
+ * লেখা আগে escape হয়, তাই অ্যাডমিনের দেওয়া কোনো HTML কখনও ঢুকতে পারে না।
  */
 function colored(string $text): string
 {
@@ -75,10 +75,10 @@ function colored(string $text): string
 }
 
 /**
- * Social media icons with their addresses from the editable keys "site.social.*".
- * Setting "settings.social_hide_empty" = 1 (switched on only when the owner says so):
- * an icon with no address (empty, "#" or not http/https) is left out of the site.
- * While it is 0 (default) every icon is shown; one without an address links to "#".
+ * সোশ্যাল মিডিয়ার আইকন ও তাদের ঠিকানা (সম্পাদনাযোগ্য "site.social.*" কী থেকে)।
+ * "settings.social_hide_empty" = 1 হলে (মালিক বললেই চালু হবে): ঠিকানাহীন (ফাঁকা, "#"
+ * বা http/https নয়) আইকন সাইটে দেখানো হয় না।
+ * ০ থাকলে (ডিফল্ট) সব আইকন দেখায়; ঠিকানাহীনটা "#"-এ যায়।
  *
  * @return list<array{key:string,label:string,href:string}>
  */
@@ -105,25 +105,25 @@ function social_links(): array
     return $links;
 }
 
-/** Hidden CSRF field for every POST form. */
+/** প্রতিটি POST ফর্মের জন্য লুকানো CSRF ঘর। */
 function csrf_field(): string
 {
     return '<input type="hidden" name="_token" value="' . e(Security::csrfToken()) . '">';
 }
 
-/** True when $path is the page being shown (used for the active menu item). */
+/** $path যে পেইজ এখন দেখানো হচ্ছে সেটা হলে true (মেনুর সক্রিয় আইটেমের জন্য)। */
 function is_current(string $path): bool
 {
     return Router::currentPath() === $path;
 }
 
-/** "tel:" link from a display phone number such as "(+88) 01761441911". */
+/** দেখানোর ফোন নাম্বার (যেমন "(+88) 01761441911") থেকে "tel:" লিংক। */
 function tel(string $display): string
 {
     return 'tel:' . preg_replace('/[^0-9+]/', '', $display);
 }
 
-/** Redirect to an internal path only (never to a URL taken from user input). */
+/** শুধু সাইটের ভেতরের পাথে পাঠায় (ব্যবহারকারীর দেওয়া URL-এ কখনও নয়)। */
 function redirect(string $path, int $status = 303): never
 {
     if ($path === '' || $path[0] !== '/' || str_starts_with($path, '//')) {
@@ -133,7 +133,7 @@ function redirect(string $path, int $status = 303): never
     exit;
 }
 
-/** "2026-10-19" -> "১৯ অক্টোবর ২০২৬". */
+/** "2026-10-19" → "১৯ অক্টোবর ২০২৬"। */
 function bn_date(string $ymd): string
 {
     $months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
@@ -145,7 +145,7 @@ function bn_date(string $ymd): string
     return bn(date('j', $time)) . ' ' . $months[(int) date('n', $time) - 1] . ' ' . bn(date('Y', $time));
 }
 
-/** "2026-10-19 10:55:17" -> "১০:৫৫:১৭ AM বি.এস.টি." (server time, Asia/Dhaka). */
+/** "2026-10-19 10:55:17" → "১০:৫৫:১৭ AM বি.এস.টি." (সার্ভারের সময়, Asia/Dhaka)। */
 function bn_time(string $datetime): string
 {
     $time = strtotime($datetime);
@@ -156,7 +156,7 @@ function bn_time(string $datetime): string
     return bn(date('h:i:s', $time)) . ' ' . date('A', $time) . ' বি.এস.টি.';
 }
 
-/** Any typed form of a Bangladeshi mobile number -> the 11 digits "01XXXXXXXXX" (unchanged when it does not fit). */
+/** বাংলাদেশি মোবাইল নাম্বারের যেকোনো লেখা-রূপ → ১১ সংখ্যা "01XXXXXXXXX" (না মিললে যেমন ছিল তেমনই)। */
 function normalize_phone(string $phone): string
 {
     $digits = strtr($phone, ['০' => '0', '১' => '1', '২' => '2', '৩' => '3', '৪' => '4', '৫' => '5', '৬' => '6', '৭' => '7', '৮' => '8', '৯' => '9']);
@@ -172,7 +172,7 @@ function normalize_phone(string $phone): string
     return $digits;
 }
 
-/** Hides the middle of a mobile number: "01774123443" -> "+88 01774 *** *43". */
+/** মোবাইল নাম্বারের মাঝখান লুকায়: "01774123443" → "+88 01774 *** *43"। */
 function mask_phone(string $phone): string
 {
     $n = normalize_phone($phone);
@@ -183,7 +183,7 @@ function mask_phone(string $phone): string
     return '+88 ' . substr($n, 0, 5) . ' *** *' . substr($n, 9, 2);
 }
 
-/** Full number as shown after the visitor asked for it: "01774123443" -> "+88 01774 123 443". */
+/** দর্শক চাইলে যে পূর্ণ রূপে দেখানো হয়: "01774123443" → "+88 01774 123 443"। */
 function format_phone(string $phone): string
 {
     $n = normalize_phone($phone);
@@ -191,7 +191,7 @@ function format_phone(string $phone): string
     return strlen($n) === 11 ? '+88 ' . substr($n, 0, 5) . ' ' . substr($n, 5, 3) . ' ' . substr($n, 8, 3) : $phone;
 }
 
-/** "mr.azizsarkar@gmail.com" -> "mr*********@gmail.com". */
+/** "mr.azizsarkar@gmail.com" → "mr*********@gmail.com"। */
 function mask_email(string $email): string
 {
     $at = strrpos($email, '@');

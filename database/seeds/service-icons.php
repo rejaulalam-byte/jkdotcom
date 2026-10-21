@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 /*
- * Default icon of every service: slug => [Tabler icon name, match].
- * Source: Tabler Icons 3.24.0 (outline), MIT licence — see
- * public/assets/img/service-icons/LICENSE-tabler.txt.
- * The file is saved as public/assets/img/service-icons/<slug>.svg (white lines, for the
- * teal circle) and stored in services.icon_path; the admin can replace it later.
- * match: 'good' = clearly that service, 'near' = closest icon that exists (better one welcome).
+ * প্রতিটি সেবার ডিফল্ট আইকন: slug => [Tabler আইকনের নাম, মিল]।
+ * উৎস: Tabler Icons 3.24.0 (outline), MIT লাইসেন্স — দেখুন
+ * public/assets/img/service-icons/LICENSE-tabler.txt।
+ * ফাইল public/assets/img/service-icons/<slug>.svg হিসেবে রাখা (সাদা রেখা, টিল বৃত্তের জন্য)
+ * এবং services.icon_path-এ জমা; অ্যাডমিন পরে বদলাতে পারবেন।
+ * match: 'good' = পরিষ্কারভাবে সেই সেবার আইকন, 'near' = যা আছে তার মধ্যে সবচেয়ে কাছের (ভালো পেলে বদলানো হবে)।
  */
 return [
     'translator'                => ['language', 'good'],

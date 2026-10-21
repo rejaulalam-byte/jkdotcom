@@ -1,9 +1,9 @@
 <?php
 /**
- * Teal title banner used at the top of every inner page.
+ * প্রতিটি ভেতরের পেইজের ওপরের টিল শিরোনাম-ব্যানার।
  *
- * @var string $heading                     big white title
- * @var list<array{0:?string,1:string}> $crumbs  breadcrumb: [url|null, label]
+ * @var string $heading                     বড় সাদা শিরোনাম
+ * @var list<array{0:?string,1:string}> $crumbs  ব্রেডক্রাম্ব: [url|null, নাম]
  */
 ?>
 <section class="page-banner" aria-labelledby="page-title">

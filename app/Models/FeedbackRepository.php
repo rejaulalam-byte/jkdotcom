@@ -9,7 +9,7 @@ use App\Core\Logger;
 use App\Core\Security;
 use Throwable;
 
-/** Visitor feedback ("মতামত") — kept in the database so the admin can read, keep or delete it. */
+/** দর্শকের মতামত — ডাটাবেসে রাখা হয়, যাতে অ্যাডমিন পড়তে, রাখতে বা মুছতে পারেন। */
 final class FeedbackRepository
 {
     /** @param array{name:string,email:string,phone:string,subject:string,message:string} $data */

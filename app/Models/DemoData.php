@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-/** Sample data used ONLY when no database is configured (local preview). */
+/** নমুনা তথ্য — শুধু ডাটাবেস সেট করা না থাকলে (লোকাল প্রিভিউ) ব্যবহার হয়। */
 final class DemoData
 {
     /** @return list<array{id:int,title:string}> */
@@ -24,7 +24,7 @@ final class DemoData
     }
 
     /**
-     * Two sample notices for the list page (only when no database is connected).
+     * তালিকা-পেইজের জন্য দুটো নমুনা বিজ্ঞপ্তি (শুধু ডাটাবেস সংযুক্ত না থাকলে)।
      *
      * @return list<array<string,mixed>>
      */
@@ -63,8 +63,8 @@ final class DemoData
     }
 
     /**
-     * All services of the old site (database/seeds/services.php).
-     * The icon is the default file public/assets/img/service-icons/<slug>.svg when it exists.
+     * পুরনো সাইটের সব সেবা (database/seeds/services.php)।
+     * আইকন হলো ডিফল্ট ফাইল public/assets/img/service-icons/<slug>.svg, যদি থাকে।
      *
      * @return list<array{name:string,slug:string,icon:?string}>
      */

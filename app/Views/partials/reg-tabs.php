@@ -1,7 +1,7 @@
 <?php
 /**
- * The three registration-rules buttons (overview / professional / agent) above the text.
- * The button of the open page is shown inactive; the other two are links.
+ * লেখার ওপরের তিনটি রেজিস্ট্রেশন-নিয়মাবলী বাটন (ওভারভিউ / পেশাজীবী / প্রতিনিধি)।
+ * খোলা পেইজের বাটন নিষ্ক্রিয় দেখায়; বাকি দুটো লিংক।
  *
  * @var string $regActive  'rules' | 'pro' | 'agent'
  */

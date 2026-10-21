@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\Models;
 
 /**
- * Arranges services for the "সেবা সমূহ" page: grouped under the first letter of
- * their name (Bangla alphabet order, vowels first, then consonants) and split into
- * columns of about the same height. A letter group is never split across columns.
+ * "সেবা সমূহ" পেইজের জন্য সেবা সাজায়: নামের প্রথম অক্ষরের নিচে জড়ো করে (বাংলা বর্ণক্রমে,
+ * আগে স্বরবর্ণ, তারপর ব্যঞ্জনবর্ণ) এবং প্রায় সমান উচ্চতার কলামে ভাগ করে।
+ * একটা বর্ণের দল কখনও দুই কলামে ভাঙে না।
  */
 final class ServiceDirectory
 {
-    /** Heading letters in order. The admin will be able to edit this list later (setting `services.letters`). */
+    /** ক্রমানুসারে শিরোনাম-বর্ণ। অ্যাডমিন পরে এই তালিকা বদলাতে পারবেন (সেটিং `services.letters`)। */
     public const LETTERS = [
         'অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ',
         'ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ', 'ট', 'ঠ', 'ড', 'ঢ', 'ণ',
         'ত', 'থ', 'দ', 'ধ', 'ন', 'প', 'ফ', 'ব', 'ভ', 'ম', 'য', 'র', 'ল', 'শ', 'ষ', 'স', 'হ',
     ];
 
-    /** A group's heading + gap count about this many service rows of height. */
+    /** একটা দলের শিরোনাম + ফাঁক প্রায় এতগুলো সেবা-সারির উচ্চতার সমান ধরা হয়। */
     private const HEADING_WEIGHT = 1.8;
 
     /**
@@ -51,8 +51,8 @@ final class ServiceDirectory
     }
 
     /**
-     * Splits the groups, in order, into 3 columns so the tallest column is as
-     * short as possible (the columns end up about equally long).
+     * দলগুলোকে ক্রম ঠিক রেখে ৩ কলামে ভাগ করে, যাতে সবচেয়ে উঁচু কলামটা যতটা সম্ভব
+     * ছোট হয় (কলামগুলো প্রায় সমান লম্বা হয়)।
      *
      * @param list<array{letter:string,items:list<mixed>}> $groups
      * @return list<list<array{letter:string,items:list<mixed>}>>
@@ -69,7 +69,7 @@ final class ServiceDirectory
             $prefix[] = end($prefix) + count($g['items']) + self::HEADING_WEIGHT;
         }
 
-        // cut positions a <= b (0..n): column 1 = [0,a), column 2 = [a,b), column 3 = [b,n)
+        // কাটার অবস্থান a <= b (0..n): কলাম ১ = [0,a), কলাম ২ = [a,b), কলাম ৩ = [b,n)
         $best = [0, 0];
         $bestScore = [INF, INF];
         for ($a = 0; $a <= $n; $a++) {
@@ -91,7 +91,7 @@ final class ServiceDirectory
     }
 
     /**
-     * Services whose name contains every word of the search text.
+     * যে সেবার নামে খোঁজার লেখার প্রতিটি শব্দ আছে।
      *
      * @param list<array{name:string,slug:string,icon:?string}> $services
      * @return list<array{name:string,slug:string,icon:?string}>

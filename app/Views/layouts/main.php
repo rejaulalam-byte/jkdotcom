@@ -1,8 +1,8 @@
 <?php
 /**
- * Shared page frame: <head>, top bar, menu, page content, footer.
+ * সব পেইজের সাধারণ কাঠামো: <head>, ওপরের পট্টি, মেনু, পেইজের বিষয়বস্তু, ফুটার।
  *
- * @var string $content   page HTML (already escaped by its own view)
+ * @var string $content   পেইজের HTML (নিজের ভিউ-তেই escape করা)
  * @var string|null $title
  * @var string|null $description
  */
@@ -38,7 +38,7 @@ $pageDescription = $description ?? content('site.description');
 
 <?php require BASE_PATH . '/app/Views/partials/footer.php'; ?>
 
-<?php // "back to top": app.js shows it once the visitor is past the middle of the page ?>
+<?php // "back to top": দর্শক পেইজের মাঝামাঝি পেরোলে app.js এটা দেখায় ?>
 <button class="to-top" type="button" aria-label="পেজের উপরে যান" data-to-top>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
 </button>

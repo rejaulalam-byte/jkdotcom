@@ -1,6 +1,6 @@
 <?php
 /**
- * Home page — follows the Figma frame "JoruriKaj.Com-Home".
+ * হোম পেইজ — Figma ফ্রেম "JoruriKaj.Com-Home" অনুসরণ করে।
  *
  * @var list<array{id:int,title:string}> $jobs
  * @var list<array{title:string,image:string,width:int,height:int,link:?string}> $ads
@@ -85,8 +85,8 @@ $faqKeys = [1, 2, 3, 4, 5];
     </div>
 
     <?php
-    // ALL services in two rows that scroll right -> left on their own (app.js);
-    // without JS / with "reduce motion" they are normal sideways-scrollable rows.
+    // সব সেবা দুই সারিতে, নিজে নিজে ডান থেকে বাঁয়ে চলে (app.js);
+    // JavaScript ছাড়া বা "reduce motion"-এ সাধারণ পাশে-স্ক্রল করা সারি।
     $serviceRows = $services === [] ? [] : array_chunk($services, (int) ceil(count($services) / 2));
     ?>
     <div class="service-rows">
@@ -169,7 +169,7 @@ $faqKeys = [1, 2, 3, 4, 5];
     <div class="container faq__grid">
         <div class="faq__list">
             <?php foreach ($faqKeys as $n): ?>
-                <?php // all closed on load; name="faq" = only one open at a time (app.js does the same for older browsers) ?>
+                <?php // লোডের সময় সব বন্ধ; name="faq" = একসঙ্গে একটাই খোলা (পুরনো ব্রাউজারের জন্য app.js একই কাজ করে) ?>
                 <details class="faq-item" name="faq">
                     <summary>
                         <img src="<?= e(asset('img/icons/dot.svg')) ?>" alt="" width="14" height="14">
@@ -199,7 +199,7 @@ $faqKeys = [1, 2, 3, 4, 5];
             <?= csrf_field() ?>
             <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
 
-            <?php // every field is required: "*" at the end of each placeholder ?>
+            <?php // প্রতিটি ঘর আবশ্যক: প্রতিটি ইঙ্গিত-লেখার শেষে "*" ?>
             <div class="field">
                 <label class="sr-only" for="fb-name"><?= e(content('home.feedback.name')) ?></label>
                 <input id="fb-name" data-bn type="text" name="name" maxlength="100" required autocomplete="name"

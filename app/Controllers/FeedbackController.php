@@ -12,7 +12,7 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Models\FeedbackRepository;
 
-/** Handles the "মতামত জমা দিন" form on the home page. */
+/** হোম পেইজের "মতামত জমা দিন" ফর্ম সামলায়। */
 final class FeedbackController
 {
     /** @param array<string,mixed> $meta */
@@ -23,7 +23,7 @@ final class FeedbackController
             redirect('/#feedback');
         }
 
-        // Hidden "website" field: real people leave it empty, spam bots fill it in
+        // লুকানো "website" ঘর: আসল মানুষ ফাঁকা রাখে, স্প্যাম-বট ভরে ফেলে
         if (trim((string) ($_POST['website'] ?? '')) !== '') {
             redirect('/#feedback');
         }
@@ -41,7 +41,7 @@ final class FeedbackController
             'message' => $this->clean($_POST['message'] ?? '', 2000, true),
         ];
 
-        // All five fields are required (owner 2026-10-20)
+        // পাঁচটি ঘরই আবশ্যক
         $errors = [];
         if ($data['name'] === '') {
             $errors[] = 'আপনার নাম লিখুন।';
@@ -81,7 +81,7 @@ final class FeedbackController
             . "বিষয়: {$data['subject']}\n\n{$data['message']}\n";
         $replyTo = filter_var($data['email'], FILTER_VALIDATE_EMAIL) ? $data['email'] : null;
         if (!Mailer::send($to, 'নতুন মতামত: ' . ($data['subject'] !== '' ? $data['subject'] : $data['name']), $body, $replyTo)) {
-            // Already saved in the admin panel, so nothing is lost
+            // অ্যাডমিন প্যানেলের জন্য আগেই সংরক্ষিত, তাই কিছু হারাবে না
             Logger::error('Feedback e-mail could not be sent');
         }
 
@@ -90,9 +90,9 @@ final class FeedbackController
     }
 
     /**
-     * Trim, strip control characters and limit the length.
-     * Only "Cc" (control) characters are removed — the invisible joiners (ZWJ/ZWNJ)
-     * that Bangla conjunct letters need are kept.
+     * ফাঁকা অংশ ছাঁটে, নিয়ন্ত্রণ-অক্ষর সরায় ও দৈর্ঘ্য সীমিত করে।
+     * শুধু "Cc" (নিয়ন্ত্রণ) অক্ষর বাদ যায় — বাংলা যুক্তাক্ষরের জন্য দরকারি
+     * অদৃশ্য সংযোগকারী (ZWJ/ZWNJ) রেখে দেওয়া হয়।
      */
     private function clean(mixed $value, int $max, bool $multiline = false): string
     {
