@@ -2684,16 +2684,28 @@ textarea {
 }
 
 /* Registration rules overview (Figma 2631-395): text 24px, other sizes Figma +2px (standing rule), two buttons */
-.reg-actions {
+/* The three rules buttons above the text; the open page's button is inactive */
+.reg-tabs {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 1.5rem 2rem;
-    margin-top: 4rem;
+    gap: 1rem 1.5rem;
+    margin-bottom: 4.5rem;
 }
-.reg-actions .btn {
+.reg-tabs .btn {
+    min-height: 3.75rem;
+    padding: 0.4rem 2rem;
     border: 2px solid rgba(18, 90, 108, 0.5);
-    letter-spacing: 0.1em;
+    font-size: 1.25rem;
+}
+.reg-tabs .btn.is-current {
+    background: transparent;
+    border-color: rgba(18, 90, 108, 0.25);
+    color: rgba(18, 90, 108, 0.45);
+    cursor: default;
+}
+.reg-tabs .btn.is-current:hover {
+    transform: none;
 }
 @media (min-width: 1200px) {
     body.page-regrules {
@@ -2710,19 +2722,16 @@ textarea {
     .page-regrules .rich {
         line-height: 1.875;
     }
-    .page-regrules .reg-actions .btn {
-        min-width: 28rem;
-        font-size: 1.875rem;
-    }
 }
 @media (max-width: 1199px) {
-    .reg-actions {
+    .reg-tabs {
         flex-direction: column;
         align-items: stretch;
-        margin-top: 2.5rem;
+        margin-bottom: 2rem;
     }
-    .reg-actions .btn {
-        padding-inline: 1.5rem;
+    .reg-tabs .btn {
+        padding-inline: 1rem;
+        font-size: 1rem;
     }
 }
 

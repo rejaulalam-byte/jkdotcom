@@ -6,17 +6,15 @@
  * @var string $heading
  * @var string $bodyHtml  trusted HTML (admin-editor output, sanitised on save)
  */
-$crumbs = [['/', 'হোম'], ['/registration', 'রেজিস্ট্রেশন'], [null, content('reg.pro.title')]];
+$crumbs = [['/', 'হোম'], ['/registration', 'রেজিস্ট্রেশন'], [null, 'পেশাজীবী রেজিস্ট্রেশনের নিয়মাবলী']];
+$regActive = 'pro';
 require BASE_PATH . '/app/Views/partials/page-banner.php';
 ?>
-<section class="section section--open-page section--guide">
+<section class="section section--open-page section--guide section--regtabs">
     <div class="container">
+        <?php require BASE_PATH . '/app/Views/partials/reg-tabs.php'; ?>
         <div class="rich">
             <?= $bodyHtml ?>
-        </div>
-        <div class="reg-actions">
-            <a class="btn btn--teal-soft" href="/registration/professional/form"><?= e(content('reg.rules.pro')) ?></a>
-            <a class="btn btn--teal-soft" href="/registration/agent"><?= e(content('reg.rules.agent')) ?></a>
         </div>
     </div>
 </section>

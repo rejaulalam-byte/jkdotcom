@@ -69,8 +69,9 @@ return [
 
     // ---- Registration rules (overview, Figma 2631-395) ---------------------
     'reg.rules.title'     => 'আপনার যাত্রা শুরু হোক এখান থেকেই',
-    'reg.rules.pro'       => 'পেশাজীবীদের রেজিস্ট্রেশন',
-    'reg.rules.agent'     => 'প্রতিনিধি রেজিস্ট্রেশন',
+    'reg.tab.rules'       => '১. রেজিস্ট্রেশনের নিয়মাবলী',
+    'reg.tab.pro'         => '২. পেশাজীবীদের রেজিস্ট্রেশনের নিয়মাবলী',
+    'reg.tab.agent'       => '৩. প্রতিনিধি রেজিস্ট্রেশনের নিয়মাবলী',
 
     // ---- Registration guideline: professional (Figma 2683-148) --------------
     'reg.pro.title'       => 'নির্দেশিকা',
