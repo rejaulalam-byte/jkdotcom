@@ -21,6 +21,7 @@ final class PageController
     public function about(): void
     {
         View::render('pages/about', [
+            'bodyClass' => 'page-about',
             'title' => 'আমাদের সম্পর্কে — Jorurikaj.com',
             'description' => 'মানুষের প্রয়োজনে, মানুষের পাশে — Jorurikaj.com-এর পরিচয় ও লক্ষ্য।',
             'heading' => 'আমাদের পরিচয়, আমাদের লক্ষ্য',

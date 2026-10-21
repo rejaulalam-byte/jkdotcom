@@ -2671,3 +2671,10 @@ textarea {
         padding: 0.25rem 1.25rem 1.75rem 3.2rem;
     }
 }
+
+/* About page (desktop): body text 22px -> 24px (owner 2026-10-21) */
+@media (min-width: 1200px) {
+    body.page-about {
+        --fs-body: 1.5rem;
+    }
+}
