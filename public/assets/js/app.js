@@ -856,58 +856,141 @@
     });
 })();
 
-/* "আজকের প্রকাশিত" list: a click on the hidden phone number asks the server for the real number and e-mail
-   (limited per visitor) and shows them as call / mail links. */
+/* "আজকের প্রকাশিত" list: hidden phone numbers / e-mails.
+   A click on one is COUNTED by the server as a "call". If this visitor has not yet said who they are, a pop-up asks
+   "are you interested?"; on "yes" they leave name + mobile, and only then the phone number or e-mail
+   (only the one they clicked) is shown as a call / mail link. Nothing real is in the page source. */
 (function () {
     var list = document.querySelector(".job-list");
+    var dialog = document.getElementById("lead-dialog");
     if (!list) {
         return;
     }
+    var token = list.getAttribute("data-token");
+    var current = null; // { btn, id, kind } of the click that opened the pop-up
+
+    function post(fields) {
+        var body = new FormData();
+        Object.keys(fields).forEach(function (k) { body.append(k, fields[k]); });
+        body.append("_token", token);
+        return fetch("/today/contact", { method: "POST", body: body, credentials: "same-origin" })
+            .then(function (r) {
+                return r.json().then(function (j) { return { ok: r.ok, status: r.status, data: j }; });
+            });
+    }
+
+    function hintOf(btn) {
+        return btn.closest(".job__row") ? btn.closest(".job__row").querySelector(".job__hint") : null;
+    }
+
+    function show(btn, info) {
+        var link = document.createElement("a");
+        link.className = "job-reveal";
+        link.href = info.href;
+        link.textContent = info.value;
+        var hint = hintOf(btn);
+        btn.parentNode.replaceChild(link, btn);
+        if (hint) {
+            hint.parentNode.removeChild(hint);
+        }
+    }
+
+    function message(btn, text) {
+        var hint = hintOf(btn);
+        if (hint) {
+            hint.textContent = text;
+        } else {
+            btn.title = text;
+        }
+    }
+
+    function step(name) {
+        Array.prototype.forEach.call(dialog.querySelectorAll(".lead__step"), function (el) {
+            el.hidden = el.getAttribute("data-step") !== name;
+        });
+    }
+
+    function closeDialog() {
+        if (dialog && dialog.open) {
+            dialog.close();
+        }
+        current = null;
+    }
+
     list.addEventListener("click", function (e) {
         var btn = e.target.closest ? e.target.closest(".job-reveal") : null;
-        if (!btn || btn.getAttribute("data-busy")) {
+        if (!btn || btn.tagName !== "BUTTON" || btn.getAttribute("data-busy")) {
             return;
         }
         e.preventDefault();
         btn.setAttribute("data-busy", "1");
-        var body = new FormData();
-        body.append("id", btn.getAttribute("data-id"));
-        body.append("_token", list.getAttribute("data-token"));
-        var row = btn.parentNode;
-        var jobBody = btn.closest(".job__body");
-        var hint = row.querySelector(".job__hint");
-
-        fetch("/today/contact", { method: "POST", body: body, credentials: "same-origin" })
-            .then(function (r) {
-                return r.json().then(function (j) { return { ok: r.ok, data: j }; });
-            })
+        post({ step: "click", id: btn.getAttribute("data-id"), kind: btn.getAttribute("data-kind") })
             .then(function (res) {
-                if (!res.ok) {
-                    throw new Error(res.data && res.data.error);
-                }
-                var call = document.createElement("a");
-                call.className = "job-reveal";
-                call.href = "tel:+88" + String(res.data.tel).replace(/^88/, "");
-                call.textContent = res.data.phone;
-                btn.parentNode.replaceChild(call, btn);
-                if (hint) {
-                    hint.parentNode.removeChild(hint);
-                }
-                var mail = jobBody.querySelector(".job__email");
-                if (mail && res.data.email) {
-                    var link = document.createElement("a");
-                    link.className = "job-reveal";
-                    link.href = "mailto:" + res.data.email;
-                    link.textContent = res.data.email;
-                    mail.textContent = "";
-                    mail.appendChild(link);
+                btn.removeAttribute("data-busy");
+                if (res.ok && res.data.value) {
+                    show(btn, res.data);
+                } else if (res.ok && res.data.need_lead && dialog && dialog.showModal) {
+                    current = { btn: btn, id: btn.getAttribute("data-id"), kind: btn.getAttribute("data-kind") };
+                    var err = dialog.querySelector(".lead__error");
+                    err.hidden = true;
+                    step("ask");
+                    dialog.showModal();
+                } else {
+                    message(btn, list.getAttribute("data-limit") || "");
                 }
             })
             .catch(function () {
                 btn.removeAttribute("data-busy");
-                if (hint) {
-                    hint.textContent = list.getAttribute("data-limit") || "";
+                message(btn, list.getAttribute("data-limit") || "");
+            });
+    });
+
+    if (!dialog) {
+        return;
+    }
+
+    dialog.addEventListener("click", function (e) {
+        var act = e.target.getAttribute ? e.target.getAttribute("data-act") : null;
+        if (act === "yes") {
+            step("form");
+            var first = dialog.querySelector("#lead-name");
+            if (first) { first.focus(); }
+        } else if (act === "no" || e.target === dialog) {
+            closeDialog(); // "no" or a click on the dark background
+        }
+    });
+
+    dialog.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (!current) {
+            return;
+        }
+        var form = e.target;
+        var err = form.querySelector(".lead__error");
+        var submit = form.querySelector("[type=submit]");
+        submit.disabled = true;
+        err.hidden = true;
+        var target = current;
+        post({
+            step: "lead", id: target.id, kind: target.kind,
+            name: form.elements.name.value, phone: form.elements.phone.value
+        })
+            .then(function (res) {
+                submit.disabled = false;
+                if (res.ok && res.data.value) {
+                    closeDialog();
+                    if (target.btn.parentNode) {
+                        show(target.btn, res.data);
+                    }
+                } else {
+                    err.textContent = (res.data && res.data.message) || (list.getAttribute("data-limit") || "");
+                    err.hidden = false;
                 }
+            })
+            .catch(function () {
+                submit.disabled = false;
+                err.textContent = list.getAttribute("data-limit") || "";
+                err.hidden = false;
             });
     });
 })();

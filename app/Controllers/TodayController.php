@@ -11,6 +11,7 @@ use App\Core\RateLimiter;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
+use App\Models\ContactTrackingRepository;
 use App\Models\GeoRepository;
 use App\Models\JobPostRepository;
 use App\Models\ServiceRepository;
@@ -47,7 +48,11 @@ final class TodayController
     }
 
     /**
-     * The hidden phone number and e-mail of one notice, shown after a click (JSON).
+     * The hidden phone number OR e-mail of one notice (JSON), in two steps:
+     *  step=click  every click is counted as a "call"; answers with the contact at once when this visitor
+     *              already left name + mobile for this notice, otherwise {need_lead: true} (the pop-up opens);
+     *  step=lead   the visitor said "interested" and sent name + mobile: stored, the admin gets an e-mail,
+     *              the contact is shown.
      * Asking is limited per visitor, so lists of numbers cannot be collected in bulk.
      *
      * @param array<string,mixed> $meta
@@ -57,32 +62,91 @@ final class TodayController
         header('Content-Type: application/json; charset=utf-8');
         header('Cache-Control: no-store');
 
+        $reply = static function (array $body, int $status = 200): void {
+            http_response_code($status);
+            echo json_encode($body, JSON_UNESCAPED_UNICODE);
+        };
+
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
-            http_response_code(403);
-            echo json_encode(['error' => 'csrf']);
+            $reply(['error' => 'csrf'], 403);
 
             return;
         }
-        if (RateLimiter::tooMany('job_contact', 40, 3600)) {
-            http_response_code(429);
-            echo json_encode(['error' => 'limit']);
-
-            return;
-        }
-
-        $contact = JobPostRepository::contactOf((int) ($_POST['id'] ?? 0));
-        if ($contact === null) {
-            http_response_code(404);
-            echo json_encode(['error' => 'none']);
+        if (RateLimiter::tooMany('job_contact', 60, 3600)) {
+            $reply(['error' => 'limit'], 429);
 
             return;
         }
 
-        echo json_encode([
-            'phone' => format_phone($contact['phone']),
-            'tel' => preg_replace('/\D/', '', $contact['phone']),
-            'email' => $contact['email'],
-        ], JSON_UNESCAPED_UNICODE);
+        $id = (int) ($_POST['id'] ?? 0);
+        $kind = (string) ($_POST['kind'] ?? '');
+        $step = (string) ($_POST['step'] ?? 'click');
+        $contact = in_array($kind, ['phone', 'email'], true) ? JobPostRepository::contactOf($id) : null;
+        $value = $contact === null ? '' : ($kind === 'phone' ? $contact['phone'] : $contact['email']);
+        if ($contact === null || $value === '') {
+            $reply(['error' => 'none'], 404);
+
+            return;
+        }
+
+        $show = static fn (): array => $kind === 'phone'
+            ? ['kind' => 'phone', 'value' => format_phone($value), 'href' => 'tel:+88' . ltrim((string) preg_replace('/\D/', '', $value), '0')]
+            : ['kind' => 'email', 'value' => $value, 'href' => 'mailto:' . $value];
+
+        if ($step === 'click') {
+            ContactTrackingRepository::click('job', $id, $kind);
+            if (!empty($_SESSION['contact_ok']['job'][$id])) {
+                $reply($show());
+            } else {
+                $reply(['need_lead' => true]);
+            }
+
+            return;
+        }
+
+        // step = lead
+        if (RateLimiter::tooMany('job_lead', 10, 3600)) {
+            $reply(['error' => 'limit'], 429);
+
+            return;
+        }
+        $name = $this->clean($_POST['name'] ?? '', 100);
+        $phone = $this->digits($this->clean($_POST['phone'] ?? '', 20));
+        if ($name === '' || mb_strlen($name) < 2) {
+            $reply(['error' => 'invalid', 'message' => 'আপনার নাম লিখুন।'], 422);
+
+            return;
+        }
+        if (!preg_match('/^(?:\+?88)?01[3-9][0-9]{8}$/', $phone)) {
+            $reply(['error' => 'invalid', 'message' => 'মোবাইল নাম্বারটি সঠিক নয়। ১১ সংখ্যার নাম্বার দিন, যেমন 017XXXXXXXX।'], 422);
+
+            return;
+        }
+        if (!ContactTrackingRepository::lead('job', $id, $kind, $name, $phone)) {
+            $reply(['error' => 'save', 'message' => 'দুঃখিত, এখন সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।'], 500);
+
+            return;
+        }
+        $_SESSION['contact_ok']['job'][$id] = true;
+
+        // the admin hears about it at once (the same data is stored for the admin panel)
+        $notice = null;
+        foreach (JobPostRepository::listActive(500) as $job) {
+            if ((int) $job['id'] === $id) {
+                $notice = $job;
+            }
+        }
+        $to = Env::get('MAIL_TO', 'info@jorurikaj.com') ?? 'info@jorurikaj.com';
+        $body = "কেউ একটি কাজের " . ($kind === 'phone' ? 'ফোন নাম্বার' : 'ইমেইল') . " দেখতে চেয়েছেন — jorurikaj.com\n\n"
+            . 'কাজ: ' . ($notice['title'] ?? ('#' . $id)) . "\n"
+            . 'কাজের মালিক: ' . ($notice['contact_name'] ?? '') . "\n\n"
+            . "যিনি আগ্রহ দেখিয়েছেন:\nনাম: {$name}\nমোবাইল: {$phone}\n\n"
+            . "(প্রয়োজনে কাজের মালিককে ফোন করে জেনে নিন এই নামে কেউ খোঁজ নিয়েছেন কিনা।)\n";
+        if (!Mailer::send($to, 'কাজের যোগাযোগ দেখতে চেয়েছেন: ' . ($notice['title'] ?? ('#' . $id)), $body)) {
+            Logger::error('Contact-lead e-mail could not be sent');
+        }
+
+        $reply($show());
     }
 
     /** @param array<string,mixed> $meta */

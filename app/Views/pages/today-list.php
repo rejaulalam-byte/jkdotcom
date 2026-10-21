@@ -20,8 +20,8 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
             <?php endif; ?>
 
             <?php foreach ($jobs as $i => $job): ?>
-                <?php // exclusive accordion like the FAQ; the newest notice is open on load ?>
-                <details class="job" name="job"<?= $i === 0 ? ' open' : '' ?>>
+                <?php // exclusive accordion like the FAQ; every notice is closed on load (owner 2026-10-21) ?>
+                <details class="job" name="job">
                     <summary>
                         <span class="job__head">
                             <span class="job__title"><?= e($job['title']) ?></span>
@@ -41,11 +41,11 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
 
                         <p class="job__row">
                             <?= e(content('today.list.phone')) ?>
-                            <button class="job-reveal" type="button" data-id="<?= (int) $job['id'] ?>"><?= e($job['phone_masked']) ?></button>
+                            <button class="job-reveal" type="button" data-id="<?= (int) $job['id'] ?>" data-kind="phone"><?= e($job['phone_masked']) ?></button>
                             <span class="job__hint"><?= e(content('today.list.phone_hint')) ?></span>
                         </p>
                         <?php if ($job['email_masked'] !== ''): ?>
-                            <p class="job__row"><?= e(content('today.list.email')) ?> <span class="job__email"><?= e($job['email_masked']) ?></span></p>
+                            <p class="job__row"><?= e(content('today.list.email')) ?> <button class="job-reveal" type="button" data-id="<?= (int) $job['id'] ?>" data-kind="email"><?= e($job['email_masked']) ?></button></p>
                         <?php endif; ?>
                     </div>
                 </details>
@@ -58,3 +58,33 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
         </p>
     </div>
 </section>
+
+<?php // pop-up shown when a hidden number / e-mail is clicked: "are you interested?" -> name + mobile -> contact shown ?>
+<dialog class="lead" id="lead-dialog" aria-labelledby="lead-title">
+    <div class="lead__step" data-step="ask">
+        <h3 id="lead-title"><?= e(content('today.lead.title')) ?></h3>
+        <p><?= e(content('today.lead.ask')) ?></p>
+        <p class="lead__actions">
+            <button class="pf-submit" type="button" data-act="yes"><?= e(content('today.lead.yes')) ?></button>
+            <button class="lead__no" type="button" data-act="no"><?= e(content('today.lead.no')) ?></button>
+        </p>
+    </div>
+    <form class="lead__step" data-step="form" hidden novalidate>
+        <h3><?= e(content('today.lead.form_title')) ?></h3>
+        <p><?= e(content('today.lead.form_text')) ?></p>
+        <?php require BASE_PATH . '/app/Views/partials/bn-switch.php'; ?>
+        <div class="pf">
+            <label class="sr-only" for="lead-name"><?= e(content('today.lead.name')) ?></label>
+            <input id="lead-name" data-bn type="text" name="name" maxlength="100" required autocomplete="name" placeholder="<?= e(content('today.lead.name')) ?> *">
+        </div>
+        <div class="pf">
+            <label class="sr-only" for="lead-phone"><?= e(content('today.lead.phone')) ?></label>
+            <input id="lead-phone" type="tel" name="phone" maxlength="20" required autocomplete="tel" inputmode="tel" placeholder="<?= e(content('today.lead.phone')) ?> *">
+        </div>
+        <p class="lead__error" role="alert" hidden></p>
+        <p class="lead__actions">
+            <button class="pf-submit" type="submit"><?= e(content('today.lead.submit')) ?></button>
+            <button class="lead__no" type="button" data-act="no"><?= e(content('today.lead.cancel')) ?></button>
+        </p>
+    </form>
+</dialog>
