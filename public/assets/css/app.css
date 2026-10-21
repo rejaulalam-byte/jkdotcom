@@ -2487,7 +2487,7 @@ textarea {
 }
 .combo__list {
     position: absolute;
-    top: calc(100% - 1.75rem);
+    top: calc(100% + 0.25rem);
     left: 0;
     right: 0;
     z-index: 30;
