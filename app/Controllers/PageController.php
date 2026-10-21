@@ -29,6 +29,18 @@ final class PageController
         ]);
     }
 
+    /** Registration guideline for professionals (/registration/professional); the form is at .../form. */
+    public function registrationProfessional(): void
+    {
+        View::render('pages/registration-professional', [
+            'bodyClass' => 'page-regrules page-regguide',
+            'title' => 'পেশাজীবীদের রেজিস্ট্রেশন নির্দেশিকা — Jorurikaj.com',
+            'description' => 'পেশাজীবী হিসেবে Jorurikaj.com-এ রেজিস্ট্রেশনের যোগ্যতা, শর্তাবলি ও নিয়মাবলী।',
+            'heading' => Content::get('reg.rules.title'),
+            'bodyHtml' => Content::get('page.registration-professional.html', (string) file_get_contents(BASE_PATH . '/app/Content/pages/registration-professional.html')),
+        ]);
+    }
+
     /** About page (/about). */
     public function about(): void
     {

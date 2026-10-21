@@ -2726,6 +2726,111 @@ textarea {
     }
 }
 
+/* Registration guideline (Figma 2683-148): text, then a tinted band with two photo cards */
+.section--guide {
+    padding-bottom: 9.75rem;
+}
+.reg-join {
+    padding: 10rem 0 10rem;
+    background: var(--teal-10);
+    text-align: center;
+}
+.reg-join__title {
+    margin: 1.9rem 0 1.1rem;
+    font-size: var(--fs-h2);
+    font-weight: 500;
+    line-height: 1.35;
+}
+.reg-join__text {
+    text-align: justify;
+    font-size: var(--fs-body);
+    line-height: 2.05;
+}
+.reg-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7rem;
+    margin-top: 2.5rem;
+    text-align: left;
+}
+.reg-card {
+    padding: 1.5rem 1.7rem 2.6rem;
+    border: 1px solid #eaeaea;
+    border-radius: 1.25rem;
+    background: var(--teal);
+    color: var(--white);
+}
+.reg-card > img {
+    width: 100%;
+    aspect-ratio: 686 / 432;
+    object-fit: cover;
+    border-radius: 1.25rem;
+}
+.reg-card h3 {
+    margin: 2.6rem 0 0.4rem;
+    font-size: 2.5rem;
+    font-weight: 500;
+    line-height: 1.3;
+}
+.reg-card p {
+    margin: 0;
+    font-size: var(--fs-body);
+    line-height: 1.9;
+}
+.reg-card a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 2.2rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--white);
+}
+.reg-card a img {
+    width: 1.125rem;
+    height: auto;
+}
+.reg-card a:hover {
+    text-decoration: underline;
+}
+@media (min-width: 1200px) {
+    .page-regguide .reg-join__title {
+        font-size: 3.25rem;
+    }
+    .page-regguide .reg-card h3 {
+        font-size: 2.625rem;
+    }
+    .page-regguide .reg-card a {
+        font-size: 1.625rem;
+    }
+}
+@media (max-width: 1199px) {
+    .section--guide {
+        padding-bottom: 3rem;
+    }
+    .reg-join {
+        padding: 3rem 0 3.5rem;
+    }
+    .reg-join__title {
+        font-size: 1.5rem;
+    }
+    .reg-join__text {
+        text-align: left;
+        line-height: 1.85;
+    }
+    .reg-cards {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    .reg-card h3 {
+        margin-top: 1.5rem;
+        font-size: 1.5rem;
+    }
+    .reg-card a {
+        margin-top: 1.25rem;
+    }
+}
+
 /* Services page tweaks (owner 2026-10-21, desktop): intro 24px, letter headings +2px, service names 24px,
    the "type English letters" line under the search is one centred line (no box) with its button at the right end.
    Columns sit a little closer so the longest names stay on one line at 24px. The teal box text stays as it was. */
