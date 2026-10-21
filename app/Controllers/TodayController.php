@@ -211,7 +211,7 @@ final class TodayController
         }
 
         $to = Env::get('MAIL_TO', 'info@jorurikaj.com') ?? 'info@jorurikaj.com';
-        $body = "নতুন কাজের তথ্য জমা পড়েছে (অনুমোদনের অপেক্ষায়) — jorurikaj.com\n\n"
+        $body = "নতুন কাজের তথ্য প্রকাশিত হয়েছে — jorurikaj.com\n\n"
             . "কাজের ধরন: {$data['title']}\nনাম: {$data['contact_name']}\nমোবাইল: {$data['phone']}\n"
             . "ইমেইল: {$data['email']}\nঠিকানা: {$data['address']}\n"
             . "প্রচারের তারিখ: {$data['start_date']}" . ($data['end_date'] !== '' ? " থেকে {$data['end_date']}" : '') . "\n\n"

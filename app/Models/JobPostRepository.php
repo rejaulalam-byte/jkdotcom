@@ -14,7 +14,7 @@ use Throwable;
 final class JobPostRepository
 {
     /**
-     * Saves a job posted from the public form. It waits as 'pending' until the admin approves it.
+     * Saves a job posted from the public form. It is published at once (status 'approved'); the admin can still edit or hide it later.
      *
      * @param array{title:string,title_custom:int,details:string,contact_name:string,phone:string,email:string,address:string,upazila_id:int,district_id:int,division_id:int,start_date:string,end_date:string} $data
      */
@@ -23,7 +23,7 @@ final class JobPostRepository
         $pdo = Database::connection();
         if ($pdo === null) {
             // No database (local preview): keep the post in storage/demo-jobs.json and show it at once,
-            // so the whole flow (post -> list) can be tried. On the real site posts wait for the admin.
+            // so the whole flow (post -> list) can be tried. Same on the real site: job notices need no approval (owner 2026-10-22).
             return self::demoAdd($data);
         }
 
@@ -31,10 +31,10 @@ final class JobPostRepository
             $stmt = $pdo->prepare(
                 "INSERT INTO job_posts
                     (title, title_custom, details, contact_name, phone, email, address, upazila_id, district_id, division_id,
-                     start_date, end_date, ip_hash, status, created_at)
+                     start_date, end_date, ip_hash, status, published_at, created_at)
                  VALUES
                     (:title, :title_custom, :details, :name, :phone, :email, :address, :upazila, :district, :division,
-                     :start_date, :end_date, :ip_hash, 'pending', NOW())"
+                     :start_date, :end_date, :ip_hash, 'approved', NOW(), NOW())"
             );
             $stmt->execute([
                 ':title' => $data['title'],

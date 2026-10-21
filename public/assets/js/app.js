@@ -48,6 +48,20 @@
             }
         });
     });
+    /* "Your post was published" pop-up: leaves by itself after 5 seconds, or at once with the x button. */
+    var toast = document.getElementById("post-toast");
+    if (toast) {
+        var closeToast = function () {
+            toast.classList.add("is-closed");
+        };
+        var toastClose = toast.querySelector(".post-toast__close");
+        if (toastClose) {
+            toastClose.addEventListener("click", closeToast);
+            toastClose.focus();
+        }
+        window.setTimeout(closeToast, 5000);
+    }
+
     /* Date fields: the browser's own format (mm/dd/yyyy) is shown pale until a date is chosen. */
     document.querySelectorAll(".pf--date input[type=date]").forEach(function (d) {
         var mark = function () {

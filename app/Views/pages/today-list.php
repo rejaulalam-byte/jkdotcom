@@ -52,10 +52,6 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
             <?php endforeach; ?>
         </div>
 
-        <p class="today-actions">
-            <a class="pf-submit" href="/today/post"><?= e(content('today.list.btn_post')) ?></a>
-            <a class="pf-submit" href="/today" aria-current="page"><?= e(content('today.list.btn_list')) ?></a>
-        </p>
     </div>
 </section>
 

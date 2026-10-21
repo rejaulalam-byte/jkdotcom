@@ -5,7 +5,7 @@
  * selects work together in app.js and are checked again on the server.
  *
  * @var string $heading
- * @var bool $done        true right after a successful submit (shows the thank-you card)
+ * @var bool $done        true right after a successful submit (shows the pop-up message for 5 seconds)
  * @var list<string> $errors
  * @var array<string,mixed> $old
  * @var array{divisions:list<array{id:int,name:string}>,districts:list<array{id:int,parent:int,name:string}>,upazilas:list<array{id:int,parent:int,name:string}>} $geo
@@ -24,20 +24,6 @@ $helpTel = content('today.post.helpline_tel');
         <h2 id="post-title" class="section__title post-job__title"><?= e(content('today.post.heading')) ?></h2>
         <p class="post-job__intro"><?= e(content('today.post.intro')) ?></p>
 
-        <?php if ($done): ?>
-            <div class="post-done" role="status">
-                <img class="post-done__icon" src="<?= e(asset('img/icons/check-circle.svg')) ?>" alt="" width="96" height="96">
-                <h3><?= e(content('today.post.done.title')) ?></h3>
-                <p><?= e(content('today.post.done.text_1')) ?></p>
-                <p><?= e(content('today.post.done.text_2')) ?></p>
-                <p><?= e(content('today.post.done.text_3')) ?>
-                    <a class="post-done__tel" href="tel:<?= e($helpTel) ?>"><?= e(content('today.post.helpline')) ?></a></p>
-                <p class="post-done__actions">
-                    <a class="btn btn--teal-soft" href="/today"><?= e(content('today.post.done.list')) ?></a>
-                    <a class="btn btn--outline" href="/today/post"><?= e(content('today.post.done.again')) ?></a>
-                </p>
-            </div>
-        <?php else: ?>
             <div class="svc-notice post-job__note">
                 <p><?= e(content('today.post.help_1')) ?><a class="post-job__tel" href="tel:<?= e($helpTel) ?>"><?= e(content('today.post.helpline')) ?></a><?= e(content('today.post.help_2')) ?></p>
                 <p><?= rich(content('today.post.required')) ?></p>
@@ -145,6 +131,16 @@ $helpTel = content('today.post.helpline_tel');
                     <button class="pf-submit" type="submit"><?= e(content('today.post.submit')) ?></button>
                 </p>
             </form>
-        <?php endif; ?>
     </div>
 </section>
+
+<?php if ($done): ?>
+<div class="post-toast" id="post-toast" role="status" aria-live="polite">
+    <button class="post-toast__close" type="button" aria-label="বন্ধ করুন"><span aria-hidden="true">&times;</span></button>
+    <img class="post-toast__icon" src="<?= e(asset('img/icons/check-circle.svg')) ?>" alt="" width="64" height="64">
+    <h3><?= e(content('today.post.done.title')) ?></h3>
+    <p><?= e(content('today.post.done.text_1')) ?></p>
+    <p><?= e(content('today.post.done.text_2')) ?></p>
+    <p><?= e(content('today.post.done.text_3')) ?></p>
+</div>
+<?php endif; ?>
