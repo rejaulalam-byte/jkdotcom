@@ -132,3 +132,65 @@ function redirect(string $path, int $status = 303): never
     header('Location: ' . $path, true, $status);
     exit;
 }
+
+/** "2026-10-19" -> "১৯ অক্টোবর ২০২৬". */
+function bn_date(string $ymd): string
+{
+    $months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+    $time = strtotime($ymd);
+    if ($time === false) {
+        return '';
+    }
+
+    return bn(date('j', $time)) . ' ' . $months[(int) date('n', $time) - 1] . ' ' . bn(date('Y', $time));
+}
+
+/** "2026-10-19 10:55:17" -> "১০:৫৫:১৭ AM বি.এস.টি." (server time, Asia/Dhaka). */
+function bn_time(string $datetime): string
+{
+    $time = strtotime($datetime);
+    if ($time === false) {
+        return '';
+    }
+
+    return bn(date('h:i:s', $time)) . ' ' . date('A', $time) . ' বি.এস.টি.';
+}
+
+/** Hides the middle of a Bangladeshi mobile number: "01774123443" -> "+880 1774 *** *43". */
+function mask_phone(string $phone): string
+{
+    $digits = (string) preg_replace('/\D/', '', $phone);
+    if (str_starts_with($digits, '880')) {
+        $digits = substr($digits, 3);
+    }
+    $digits = ltrim($digits, '0');
+    if (strlen($digits) !== 10) {
+        return str_repeat('*', max(0, strlen($digits) - 2)) . substr($digits, -2);
+    }
+
+    return '+880 ' . substr($digits, 0, 4) . ' *** *' . substr($digits, 8, 2);
+}
+
+/** "mr.azizsarkar@gmail.com" -> "mr*********@gmail.com". */
+function mask_email(string $email): string
+{
+    $at = strrpos($email, '@');
+    if ($at === false || $at < 1) {
+        return '';
+    }
+    $name = substr($email, 0, $at);
+
+    return substr($name, 0, 2) . str_repeat('*', max(3, strlen($name) - 2)) . substr($email, $at);
+}
+
+/** Full number for display after the visitor asked for it: "01774123443" -> "+880 1774 123443". */
+function format_phone(string $phone): string
+{
+    $digits = (string) preg_replace('/\D/', '', $phone);
+    if (str_starts_with($digits, '880')) {
+        $digits = substr($digits, 3);
+    }
+    $digits = ltrim($digits, '0');
+
+    return strlen($digits) === 10 ? '+880 ' . substr($digits, 0, 4) . ' ' . substr($digits, 4) : $phone;
+}

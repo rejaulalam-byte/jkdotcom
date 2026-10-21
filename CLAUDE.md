@@ -138,3 +138,10 @@ Not designed yet (discuss with owner): profile dashboard/edit, search results, s
 - About page desktop text 24px too (`body.page-about`, same method as Home).
 - Services page desktop sizes (2026-10-21): intro 24px, teal box text 26px (unchanged), letter headings 30px, service names 24px, columns gap 3.5rem so long names stay on one line; the Banglish switch under the search = one centred line without box, button at its right end.
 - Post-a-job page desktop (2026-10-21): text under heading + everything inside the fields 24px; typing hint one centred line, no box.
+- STANDING RULE (owner 2026-10-21): every NEW page: normal text 24px, all other font sizes = Figma size + 2px (desktop, via body.page-* class + --fs-body 1.5rem). Phones keep their own sizes.
+
+## Owner decisions (2026-10-21) — list page /today ("কাজ সম্পর্কে জানুন", Figma 2675-148)
+- Posted jobs appear here as rows of an exclusive accordion (newest first, newest open on load). The notice's heading is coloured (teal); everything else normal colour. Under the heading: "প্রচারের তারিখ" (= start date given in the form) and "সময়" (= server time when the notice was posted, Asia/Dhaka, `created_at`). Open row: বিস্তারিত, যোগাযোগ (name, address, থানা/উপজেলা, জেলা, বিভাগ), ফোন, ইমেইল.
+- Phone and e-mail are HIDDEN ("+880 1774 *** *43"); a click asks `POST /today/contact` (CSRF + 40 requests/hour per visitor) and shows call/mail links, so numbers cannot be scraped from the page source. Phones are shown with English digits.
+- Visible = approved, started, and (end date not passed, or no end date and within `settings.jobs_visible_days` = 3 days of the start). Without a database (local preview) a posted job is saved to `storage/demo-jobs.json` and shown AT ONCE (on the real site it waits for admin approval); two sample notices are built in (`DemoData::jobPosts`).
+- Not built yet: paging (limit 100), admin approval screen, search/filter on this page.

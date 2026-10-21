@@ -50,6 +50,34 @@ final class GeoRepository
         ];
     }
 
+    /**
+     * Area names of one place for display: upazila/thana, district, division (without the word "বিভাগ").
+     *
+     * @return array{upazila:string,district:string,division:string}
+     */
+    public static function names(int $upazilaId, int $districtId, int $divisionId): array
+    {
+        $geo = self::all();
+        $out = ['upazila' => '', 'district' => '', 'division' => ''];
+        foreach ($geo['upazilas'] as $u) {
+            if ($u['id'] === $upazilaId) {
+                $out['upazila'] = $u['short'] ?? $u['name'];
+            }
+        }
+        foreach ($geo['districts'] as $d) {
+            if ($d['id'] === $districtId) {
+                $out['district'] = $d['name'];
+            }
+        }
+        foreach ($geo['divisions'] as $v) {
+            if ($v['id'] === $divisionId) {
+                $out['division'] = trim((string) preg_replace('/\s*বিভাগ$/u', '', $v['name']));
+            }
+        }
+
+        return $out;
+    }
+
     /** True when the upazila belongs to the district and the district to the division. */
     public static function isConsistent(int $divisionId, int $districtId, int $upazilaId): bool
     {

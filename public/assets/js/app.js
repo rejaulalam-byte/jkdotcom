@@ -855,3 +855,59 @@
         }, true);
     });
 })();
+
+/* "আজকের প্রকাশিত" list: a click on the hidden phone number asks the server for the real number and e-mail
+   (limited per visitor) and shows them as call / mail links. */
+(function () {
+    var list = document.querySelector(".job-list");
+    if (!list) {
+        return;
+    }
+    list.addEventListener("click", function (e) {
+        var btn = e.target.closest ? e.target.closest(".job-reveal") : null;
+        if (!btn || btn.getAttribute("data-busy")) {
+            return;
+        }
+        e.preventDefault();
+        btn.setAttribute("data-busy", "1");
+        var body = new FormData();
+        body.append("id", btn.getAttribute("data-id"));
+        body.append("_token", list.getAttribute("data-token"));
+        var row = btn.parentNode;
+        var jobBody = btn.closest(".job__body");
+        var hint = row.querySelector(".job__hint");
+
+        fetch("/today/contact", { method: "POST", body: body, credentials: "same-origin" })
+            .then(function (r) {
+                return r.json().then(function (j) { return { ok: r.ok, data: j }; });
+            })
+            .then(function (res) {
+                if (!res.ok) {
+                    throw new Error(res.data && res.data.error);
+                }
+                var call = document.createElement("a");
+                call.className = "job-reveal";
+                call.href = "tel:+88" + String(res.data.tel).replace(/^88/, "");
+                call.textContent = res.data.phone;
+                btn.parentNode.replaceChild(call, btn);
+                if (hint) {
+                    hint.parentNode.removeChild(hint);
+                }
+                var mail = jobBody.querySelector(".job__email");
+                if (mail && res.data.email) {
+                    var link = document.createElement("a");
+                    link.className = "job-reveal";
+                    link.href = "mailto:" + res.data.email;
+                    link.textContent = res.data.email;
+                    mail.textContent = "";
+                    mail.appendChild(link);
+                }
+            })
+            .catch(function () {
+                btn.removeAttribute("data-busy");
+                if (hint) {
+                    hint.textContent = list.getAttribute("data-limit") || "";
+                }
+            });
+    });
+})();

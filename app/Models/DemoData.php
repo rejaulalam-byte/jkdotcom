@@ -23,6 +23,35 @@ final class DemoData
         return $rows;
     }
 
+    /**
+     * Two sample notices for the list page (only when no database is connected).
+     *
+     * @return list<array<string,mixed>>
+     */
+    public static function jobPosts(): array
+    {
+        $today = date('Y-m-d');
+
+        return [
+            [
+                'id' => 1, 'title' => 'এসি সার্ভিসিং এর কাজ।',
+                'details' => 'চারতলা বাসায় চালমান একটি এসি সার্ভিসিং করা লাগবে। যোগাযোগ করতে সকাল ১০টা থেকে বিকাল ৫টার মধ্যে অনুরোধ করা যাচ্ছে।',
+                'contact_name' => 'মি: আব্দুল আজিজ সরকার', 'phone' => '01774123443', 'email' => 'mr.azizsarkar@gmail.com',
+                'address' => 'বাসা-১৩৩, রোড নং- ১৭বি, এলাকা- কাফরুল',
+                'upazila_id' => 506, 'district_id' => 47, 'division_id' => 6,
+                'start_date' => $today, 'created_at' => $today . ' 10:55:17',
+            ],
+            [
+                'id' => 2, 'title' => 'সিলিং ফ্যান পরিবর্তন করা।',
+                'details' => 'বাসার তিনটি সিলিং ফ্যান পরিবর্তন করতে হবে। নতুন ফ্যান আমরা কিনে রেখেছি।',
+                'contact_name' => 'মিসেস রাবেয়া খাতুন', 'phone' => '01812345699', 'email' => '',
+                'address' => 'বাসা-২৫, রোড নং- ৪, সেক্টর- ১১',
+                'upazila_id' => 499, 'district_id' => 47, 'division_id' => 6,
+                'start_date' => $today, 'created_at' => $today . ' 00:25:47',
+            ],
+        ];
+    }
+
     /** @return list<array{title:string,image:string,width:int,height:int,link:?string}> */
     public static function ads(): array
     {

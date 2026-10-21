@@ -18,6 +18,73 @@ use App\Models\ServiceRepository;
 /** "আজকের প্রকাশিত": the form where a visitor posts the work they need done (/today/post). */
 final class TodayController
 {
+    /** The list of today's published notices (/today). @param array<string,mixed> $meta */
+    public function index(array $meta = []): void
+    {
+        $jobs = [];
+        foreach (JobPostRepository::listActive() as $job) {
+            $where = array_filter([
+                (string) $job['contact_name'],
+                (string) $job['address'],
+                $job['upazila'] !== '' ? 'থানা/উপজেলা- ' . $job['upazila'] : '',
+                $job['district'] !== '' ? $job['district'] . ' জেলা' : '',
+                $job['division'] !== '' ? 'বিভাগ - ' . $job['division'] : '',
+            ], static fn (string $part): bool => $part !== '');
+            $job['contact_line'] = implode(', ', $where) . '।';
+            $job['date_bn'] = bn_date((string) $job['start_date']);
+            $job['time_bn'] = bn_time((string) $job['created_at']);
+            $jobs[] = $job;
+        }
+
+        View::render('pages/today-list', [
+            'bodyClass' => 'page-today',
+            'title' => 'আজকের প্রকাশিত কাজের তালিকা — Jorurikaj.com',
+            'description' => content('today.list.intro'),
+            'heading' => content('today.list.title'),
+            'jobs' => $jobs,
+            'token' => Security::csrfToken(),
+        ]);
+    }
+
+    /**
+     * The hidden phone number and e-mail of one notice, shown after a click (JSON).
+     * Asking is limited per visitor, so lists of numbers cannot be collected in bulk.
+     *
+     * @param array<string,mixed> $meta
+     */
+    public function contact(array $meta = []): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            http_response_code(403);
+            echo json_encode(['error' => 'csrf']);
+
+            return;
+        }
+        if (RateLimiter::tooMany('job_contact', 40, 3600)) {
+            http_response_code(429);
+            echo json_encode(['error' => 'limit']);
+
+            return;
+        }
+
+        $contact = JobPostRepository::contactOf((int) ($_POST['id'] ?? 0));
+        if ($contact === null) {
+            http_response_code(404);
+            echo json_encode(['error' => 'none']);
+
+            return;
+        }
+
+        echo json_encode([
+            'phone' => format_phone($contact['phone']),
+            'tel' => preg_replace('/\D/', '', $contact['phone']),
+            'email' => $contact['email'],
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
     /** @param array<string,mixed> $meta */
     public function postForm(array $meta = []): void
     {
