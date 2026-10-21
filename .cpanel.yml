@@ -1,0 +1,8 @@
+---
+# cPanel Git Version Control: "Deploy HEAD Commit" এই কাজগুলো চালায়।
+# রিপো যেখানে ক্লোন হয় (যেমন ~/repositories/jkdotcom) সেখানেই সাইট চলে; সাব-ডোমেইনের
+# ডকুমেন্ট রুট = সেই ফোল্ডারের public। তাই ফাইল কপি করা লাগে না, শুধু লেখার ফোল্ডার তৈরি ও অনুমতি।
+deployment:
+  tasks:
+    - /bin/mkdir -p storage/logs storage/ratelimit storage/sessions public/uploads
+    - /bin/chmod -R u+rwX,go-rwx storage public/uploads
