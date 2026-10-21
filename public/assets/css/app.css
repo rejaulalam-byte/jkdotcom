@@ -2710,3 +2710,33 @@ textarea {
         white-space: nowrap;
     }
 }
+
+/* Post-a-job page tweaks (owner 2026-10-21, desktop): text under the main heading and the text inside the fields
+   (what is typed, the placeholders, the drop-down items) are 24px; the "type English letters" line is one centred
+   line without a box, its button at the right end. The teal note box keeps its size. */
+@media (min-width: 1200px) {
+    body.page-post {
+        --fs-body: 1.5rem;
+    }
+    .page-post .pf--date input {
+        font-size: 1.5rem;
+    }
+    .page-post .combo__list [role="option"] {
+        font-size: 1.5rem;
+    }
+    .page-post .combo__none,
+    .page-post .combo__use {
+        font-size: 1.25rem;
+    }
+    .page-post .post-form .bn-switch {
+        flex-wrap: nowrap;
+        justify-content: center;
+        margin: 0 0 1.75rem;
+        padding: 0;
+        border: 0;
+        background: transparent;
+    }
+    .page-post .post-form .bn-switch__text {
+        white-space: nowrap;
+    }
+}

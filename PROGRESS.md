@@ -24,6 +24,12 @@ Reference images: docs/references/service-card-reference.png (wanted service-car
 
 Also record in CLAUDE.md after finishing: these decisions (marquee text colouring, footer link editing, services scrolling rows) so the admin panel plan includes them.
 
+## 2026-10-21 (night) — state
+- Pages done (owner reviewing): Home, About `/about`, Services `/services`, Post-a-job `/today/post`. Next: list page "কাজ সম্পর্কে জানুন" `/today` (Figma 2675-148), then registration pages.
+- Done today besides pages: Banglish typing (Avro, `data-bn` fields + switch), site-name bold/gold, fonts experiment REVERTED (Poppins + Hind Siliguri stay; see CLAUDE.md), desktop text 24px on Home/About/Services/Post pages via `body.page-*` classes (other pages 22px), geo data nationwide, `Bangla Digits` fix for ১.
+- Not tested: real MySQL (run migrations 001, 002, 003 in order), e-mail sending, real phone keyboard for Banglish, admin panel (nothing built; all admin decisions are in CLAUDE.md).
+- A new chat is useful before starting the admin panel (big, separate area): read CLAUDE.md + PROGRESS.md first.
+
 ## 2026-10-21 (evening) — Post-a-job page `/today/post` built (needs owner review)
 - Form from Figma 2674-7 + validation + spam guard + admin e-mail + thank-you card; saves 'pending' rows (demo mode without DB logs it). Needs `database/migrations/003_today_jobs.sql` on the real MySQL (not run yet — no real DB tested).
 - Geo dropdowns work nationwide now (public MIT dataset + Dhaka thanas). Date inputs use the browser's own format.

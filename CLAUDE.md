@@ -137,3 +137,4 @@ Not designed yet (discuss with owner): profile dashboard/edit, search results, s
 - Home desktop text size (owner 2026-10-21): body text 24px (was 22px) via `body.page-home { --fs-body: 1.5rem }` (min-width 1200px; body class comes from `bodyClass` passed by the controller); buttons under that text 26.2px. Other pages keep 22px until the owner asks.
 - About page desktop text 24px too (`body.page-about`, same method as Home).
 - Services page desktop sizes (2026-10-21): intro 24px, teal box text 26px (unchanged), letter headings 30px, service names 24px, columns gap 3.5rem so long names stay on one line; the Banglish switch under the search = one centred line without box, button at its right end.
+- Post-a-job page desktop (2026-10-21): text under heading + everything inside the fields 24px; typing hint one centred line, no box.

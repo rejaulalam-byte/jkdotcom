@@ -24,6 +24,7 @@ final class TodayController
         $done = (bool) Session::pull('job_posted', false);
 
         View::render('pages/today-post', [
+            'bodyClass' => 'page-post',
             'title' => 'কাজ সম্পর্কে জানান — Jorurikaj.com',
             'description' => content('today.post.intro'),
             'heading' => content('today.post.title'),
