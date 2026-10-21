@@ -138,7 +138,6 @@ $helpTel = content('today.post.helpline_tel');
 <div class="post-toast" id="post-toast" role="status" aria-live="polite">
     <button class="post-toast__close" type="button" aria-label="বন্ধ করুন"><span aria-hidden="true">&times;</span></button>
     <img class="post-toast__icon" src="<?= e(asset('img/icons/check-circle.svg')) ?>" alt="" width="64" height="64">
-    <h3><?= e(content('today.post.done.title')) ?></h3>
     <p><?= e(content('today.post.done.text_1')) ?></p>
     <p><?= e(content('today.post.done.text_2')) ?></p>
     <p><?= e(content('today.post.done.text_3')) ?></p>
