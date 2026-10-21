@@ -22,7 +22,7 @@ $pageDescription = $description ?? content('site.description');
     <meta property="og:description" content="<?= e($pageDescription) ?>">
     <meta property="og:locale" content="bn_BD">
     <link rel="icon" type="image/png" href="<?= e(asset('img/site/logo-figma.png')) ?>">
-    <link rel="preload" href="<?= e(asset('fonts/hind-siliguri-400.woff2')) ?>" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="<?= e(asset('fonts/kalpurush.woff')) ?>" as="font" type="font/woff" crossorigin>
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
     <script src="<?= e(asset('js/app.js')) ?>" defer></script>
 </head>
