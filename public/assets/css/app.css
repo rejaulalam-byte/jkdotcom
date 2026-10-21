@@ -2218,3 +2218,255 @@ textarea {
 .page-banner .brandname {
     color: var(--gold);
 }
+
+/* ---- Post a job (Figma 2674-7) ------------------------------------------- */
+.section--post-job {
+    padding: 9.4rem 0 10rem;
+}
+.post-job__title {
+    margin-top: 0;
+    text-align: center;
+}
+.post-job__intro {
+    margin-top: 2.3rem;
+    font-size: var(--fs-body);
+    font-weight: 300;
+    line-height: 2.05;
+    text-align: justify;
+    color: var(--ink);
+}
+.post-job__note {
+    margin-top: 1.3rem;
+    padding: 1.5rem 2rem;
+    text-align: center;
+}
+.post-job__note p {
+    margin: 0;
+}
+.post-job__tel {
+    color: var(--amber);
+    font-weight: 600;
+    text-decoration: none;
+}
+.post-job__note strong {
+    color: var(--amber);
+    font-weight: 600;
+}
+.post-form {
+    max-width: 95.3rem;
+    margin: 3.7rem auto 0;
+}
+.post-form__errors {
+    margin-bottom: 2rem;
+}
+.post-form__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 40.75rem));
+    justify-content: space-between;
+    gap: 0 2rem;
+}
+.pf {
+    position: relative;
+    margin-bottom: 1.875rem;
+}
+.pf input,
+.pf select,
+.pf textarea {
+    display: block;
+    width: 100%;
+    height: 4.8125rem;
+    padding: 0 1.5rem 0 4.5rem;
+    border: 1px solid rgba(18, 90, 108, 0.49);
+    border-radius: 0.625rem;
+    background: var(--teal-05);
+    color: var(--ink);
+    font-size: var(--fs-body);
+    font-weight: 300;
+}
+.pf textarea {
+    height: 10.6875rem;
+    padding-top: 1.2rem;
+    line-height: 2.05;
+    resize: vertical;
+}
+.pf ::placeholder {
+    color: rgba(34, 34, 34, 0.6);
+    opacity: 1;
+}
+.pf select {
+    appearance: none;
+    cursor: pointer;
+    background-image: url("../img/icons/chevron-down.svg");
+    background-repeat: no-repeat;
+    background-position: right 1.5rem center;
+    background-size: 1.25rem;
+}
+.pf select:invalid {
+    color: rgba(34, 34, 34, 0.6);
+}
+.pf input:focus,
+.pf select:focus,
+.pf textarea:focus {
+    border-color: var(--teal);
+    outline: none;
+    background-color: var(--white);
+}
+.pf--date {
+    display: flex;
+    align-items: center;
+    height: 4.8125rem;
+    padding: 0 1.5rem 0 4.5rem;
+    border: 1px solid rgba(18, 90, 108, 0.49);
+    border-radius: 0.625rem;
+    background: var(--teal-05);
+}
+.pf--date:focus-within {
+    border-color: var(--teal);
+    background: var(--white);
+}
+.pf--date label {
+    flex: none;
+    font-size: var(--fs-body);
+    font-weight: 300;
+    color: rgba(34, 34, 34, 0.6);
+}
+.pf--date input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: right;
+    font-size: 1.125rem;
+}
+.pf--date input:focus {
+    background: transparent;
+}
+.post-form__submit {
+    margin-top: 4.4rem;
+    text-align: center;
+}
+.pf-submit {
+    min-height: 4.6875rem;
+    padding: 0.5rem 3.75rem;
+    border: 2px solid rgba(18, 90, 108, 0.5);
+    border-radius: 50px;
+    background: rgba(18, 90, 108, 0.25);
+    color: var(--teal);
+    font-size: 1.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+.pf-submit:hover,
+.pf-submit:focus-visible {
+    background: var(--teal);
+    color: var(--white);
+}
+
+/* thank-you card after a successful submit */
+.post-done {
+    max-width: 62rem;
+    margin: 3.7rem auto 0;
+    padding: 3.5rem 3rem;
+    border: 1px solid var(--teal-35);
+    border-radius: 1.25rem;
+    background: var(--teal-05);
+    text-align: center;
+}
+.post-done h3 {
+    margin-top: 1.2rem;
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--teal);
+}
+.post-done p {
+    margin-top: 1.1rem;
+    font-size: var(--fs-body);
+    line-height: 1.9;
+}
+.post-done__tel {
+    color: var(--teal);
+    font-weight: 600;
+    white-space: nowrap;
+}
+.post-done__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 2.2rem !important;
+}
+.btn--outline {
+    border: 2px solid var(--teal-35);
+    background: transparent;
+    color: var(--teal);
+}
+.btn--outline:hover {
+    background: var(--teal-10);
+}
+
+@media (max-width: 1199px) {
+    .section--post-job {
+        padding: 3rem 0 4rem;
+    }
+    .post-job__title {
+        font-size: 1.75rem;
+    }
+    .post-job__intro {
+        font-size: 1.0625rem;
+        line-height: 1.85;
+        text-align: left;
+    }
+    .post-job__note {
+        font-size: 1.0625rem;
+        padding: 1.2rem 1rem;
+    }
+    .post-form {
+        margin-top: 2rem;
+    }
+    .post-form__grid {
+        grid-template-columns: 1fr;
+    }
+    .pf {
+        margin-bottom: 1rem;
+    }
+    .pf input,
+    .pf select,
+    .pf textarea,
+    .pf--date {
+        height: 3.75rem;
+        padding-left: 1.2rem;
+        font-size: 1rem;
+    }
+    .pf textarea {
+        height: 9rem;
+        padding-top: 0.9rem;
+        line-height: 1.7;
+    }
+    .pf--date label {
+        font-size: 1rem;
+    }
+    .pf-submit {
+        width: 100%;
+        font-size: 1.375rem;
+    }
+    .post-form__submit {
+        margin-top: 2rem;
+    }
+    .post-done {
+        padding: 2rem 1.25rem;
+    }
+    .post-done h3 {
+        font-size: 1.5rem;
+    }
+    .post-done p {
+        font-size: 1.0625rem;
+    }
+}
+.post-done__icon {
+    display: block;
+    margin: 0 auto;
+}

@@ -388,3 +388,89 @@
         }
     });
 })();
+
+/* Post-a-job form: বিভাগ / জেলা / উপজেলা work together, in any order.
+   Choosing a larger area narrows the smaller ones; choosing a smaller one fills in the larger ones.
+   Without JavaScript all three lists stay complete and the server checks that they match. */
+(function () {
+    var upz = document.getElementById("pj-upazila");
+    var dis = document.getElementById("pj-district");
+    var div = document.getElementById("pj-division");
+    if (!upz || !dis || !div) {
+        return;
+    }
+
+    function read(select) {
+        return Array.prototype.slice.call(select.options, 1).map(function (o) {
+            return { v: o.value, t: o.textContent, p: o.getAttribute("data-parent") || "" };
+        });
+    }
+    var allUpz = read(upz);
+    var allDis = read(dis);
+    var placeholderUpz = upz.options[0].textContent;
+    var placeholderDis = dis.options[0].textContent;
+    var divOf = {};
+    allDis.forEach(function (d) {
+        divOf[d.v] = d.p;
+    });
+    var disOf = {};
+    allUpz.forEach(function (u) {
+        disOf[u.v] = u.p;
+    });
+
+    function fill(select, placeholder, items, value) {
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+        items.forEach(function (it) {
+            var o = document.createElement("option");
+            o.value = it.v;
+            o.textContent = it.t;
+            o.setAttribute("data-parent", it.p);
+            select.appendChild(o);
+        });
+        select.options[0].textContent = placeholder;
+        select.value = items.some(function (it) { return it.v === value; }) ? value : "";
+    }
+
+    var d = div.value;
+    var s = dis.value;
+    var u = upz.value;
+
+    function refresh() {
+        fill(dis, placeholderDis, d ? allDis.filter(function (x) { return x.p === d; }) : allDis, s);
+        s = dis.value;
+        var list = allUpz;
+        if (s) {
+            list = allUpz.filter(function (x) { return x.p === s; });
+        } else if (d) {
+            list = allUpz.filter(function (x) { return divOf[x.p] === d; });
+        }
+        fill(upz, placeholderUpz, list, u);
+        u = upz.value;
+    }
+
+    div.addEventListener("change", function () {
+        d = div.value;
+        if (s && divOf[s] !== d) { s = ""; }
+        if (u && divOf[disOf[u]] !== d) { u = ""; }
+        refresh();
+    });
+    dis.addEventListener("change", function () {
+        s = dis.value;
+        if (s) { d = divOf[s]; div.value = d; }
+        if (u && disOf[u] !== s) { u = ""; }
+        refresh();
+    });
+    upz.addEventListener("change", function () {
+        u = upz.value;
+        if (u) {
+            s = disOf[u];
+            d = divOf[s];
+            div.value = d;
+        }
+        refresh();
+        upz.value = u;
+    });
+    refresh();
+})();

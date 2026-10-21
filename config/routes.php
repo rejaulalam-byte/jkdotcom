@@ -7,6 +7,7 @@ use App\Controllers\HomeController;
 use App\Controllers\PageController;
 use App\Controllers\ServiceController;
 use App\Controllers\SubscribeController;
+use App\Controllers\TodayController;
 
 /*
  * Every public URL of the website.
@@ -23,7 +24,8 @@ return [
     ['GET',  '/services',        [ServiceController::class, 'index']],
     ['GET',  '/services/{slug}', [ServiceController::class, 'show']],
     ['GET',  '/today',           [PageController::class, 'soon', ['title' => 'আজকের প্রকাশিত কাজ']]],
-    ['GET',  '/today/post',      [PageController::class, 'soon', ['title' => 'কাজ সম্পর্কে জানান']]],
+    ['GET',  '/today/post',      [TodayController::class, 'postForm']],
+    ['POST', '/today/post',      [TodayController::class, 'postStore']],
     ['GET',  '/registration',    [PageController::class, 'soon', ['title' => 'রেজিস্ট্রেশন']]],
     ['GET',  '/registration/professional', [PageController::class, 'soon', ['title' => 'আগ্রহী পেশাদার কর্মী রেজিস্ট্রেশন']]],
     ['GET',  '/registration/agent',        [PageController::class, 'soon', ['title' => 'প্রতিনিধি রেজিস্ট্রেশন']]],

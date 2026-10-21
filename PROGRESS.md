@@ -24,6 +24,11 @@ Reference images: docs/references/service-card-reference.png (wanted service-car
 
 Also record in CLAUDE.md after finishing: these decisions (marquee text colouring, footer link editing, services scrolling rows) so the admin panel plan includes them.
 
+## 2026-10-21 (evening) — Post-a-job page `/today/post` built (needs owner review)
+- Form from Figma 2674-7 + validation + spam guard + admin e-mail + thank-you card; saves 'pending' rows (demo mode without DB logs it). Needs `database/migrations/003_today_jobs.sql` on the real MySQL (not run yet — no real DB tested).
+- Geo dropdowns work nationwide now (public MIT dataset + Dhaka thanas). Date inputs use the browser's own format.
+- NOT done: list page "কাজ সম্পর্কে জানুন" (/today, Figma 2675-148) — next; admin approval; e-mail sending untested (needs cPanel).
+
 ## 2026-10-21 (later) — Services page `/services` basic work DONE (owner: "প্রাথমিক কাজ হয়ে গেছে")
 - Built from Figma 2642-54: banner, intro, teal notice box, search pill, all services A-Z under letter headings in 3 balanced columns (`app/Models/ServiceDirectory.php`, view `app/Views/pages/services.php`). Letter groups never split; each service links to `/services/<slug>`.
 - Search now matches service NAMES only (`/services?q=`). Area (গ্রাম/থানা-উপজেলা/জেলা/বিভাগ), name, mobile search needs workers + geo tables (not built).
