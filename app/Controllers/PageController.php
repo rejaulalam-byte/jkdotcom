@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Content;
 use App\Core\View;
 
 /** Pages that are designed but not built yet show a friendly "coming soon" page. */
@@ -21,8 +22,9 @@ final class PageController
     {
         View::render('pages/about', [
             'title' => 'আমাদের সম্পর্কে — Jorurikaj.com',
-            'description' => content('about.heading'),
-            'heading' => content('about.title'),
+            'description' => 'মানুষের প্রয়োজনে, মানুষের পাশে — Jorurikaj.com-এর পরিচয় ও লক্ষ্য।',
+            'heading' => 'আমাদের পরিচয়, আমাদের লক্ষ্য',
+            'bodyHtml' => Content::get('page.about.html', (string) file_get_contents(BASE_PATH . '/app/Content/pages/about.html')),
         ]);
     }
 }

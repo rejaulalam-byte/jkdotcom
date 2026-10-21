@@ -1930,46 +1930,99 @@ textarea {
     }
 }
 
-/* ---- About page --------------------------------------------------------- */
-.section--about-page {
-    padding-bottom: 8rem;
+/* ---- Open page (About and similar): one free writing area ---------------
+   The body is rich HTML written in the admin editor. Images may float left or
+   right (text wraps around them), sit centred, or be resized by the editor
+   (inline width/height). Spacing from the Figma About frame: heading block
+   156px under the banner, 70px to the first text, headings 45px apart. */
+.section--open-page {
+    padding: 9.75rem 0 10rem;
 }
-.about-page__intro {
-    margin-top: 1.8rem;
-}
-.about-page__copy {
-    padding-top: 0;
-}
-.about-page__copy p + p,
-.about-page__block p + p {
-    margin-top: 1.5rem;
-}
-.about-page__sections {
-    margin-top: 4rem;
-}
-.about-page__block + .about-page__block {
-    margin-top: 3rem;
-}
-.about-page__block h3 {
-    margin-bottom: 1rem;
-    font-size: 2.1875rem; /* 35px, Figma */
-    font-weight: 600;
-    line-height: 1.5;
-    color: #000;
-}
-.about-page__block p {
+.rich {
     font-size: var(--fs-body);
     line-height: 2.05;
     color: #000;
+    display: flow-root; /* contains floated images */
 }
+.rich > :first-child {
+    margin-top: 0;
+}
+.rich h2 {
+    margin: 0 0 4.4rem;
+    font-size: var(--fs-h2);
+    font-weight: 500;
+    line-height: 1.35;
+}
+.rich h3 {
+    margin: 2.8rem 0 0.4rem;
+    font-size: 2.1875rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+.rich h4 {
+    margin: 2rem 0 0.4rem;
+    font-size: var(--fs-lead);
+    font-weight: 600;
+}
+.rich p {
+    margin: 0 0 1.2rem;
+}
+.rich ul,
+.rich ol {
+    margin: 0 0 1.2rem;
+    padding-left: 2.2rem;
+}
+.rich ul { list-style: disc; }
+.rich ol { list-style: decimal; }
+.rich table {
+    width: 100%;
+    margin: 0 0 1.2rem;
+    border-collapse: collapse;
+}
+.rich th,
+.rich td {
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--teal-20);
+}
+.rich img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.625rem;
+}
+.rich .img-right {
+    float: right;
+    margin: 0 0 1.5rem 3rem;
+}
+.rich .img-left {
+    float: left;
+    margin: 0 3rem 1.5rem 0;
+}
+.rich .img-center {
+    display: block;
+    margin: 0 auto 1.5rem;
+}
+.ta-center { text-align: center; }
+.ta-right { text-align: right; }
+.ta-justify { text-align: justify; }
+
 @media (max-width: 1199px) {
-    .about-page__sections {
-        margin-top: 2.5rem;
+    .section--open-page {
+        padding: 3rem 0 4rem;
     }
-    .about-page__block h3 {
+    .rich {
+        line-height: 1.85;
+    }
+    .rich h2 {
+        margin-bottom: 1.5rem;
+    }
+    .rich h3 {
+        margin-top: 2rem;
         font-size: 1.5rem;
     }
-    .about-page__block p {
-        line-height: 1.85;
+    .rich .img-right,
+    .rich .img-left {
+        float: none;
+        display: block;
+        margin: 0 auto 1.5rem;
     }
 }

@@ -106,3 +106,9 @@ Not designed yet (discuss with owner): profile dashboard/edit, search results, s
 - Feedback form: all five fields required (server + red *).
 - Step-card numbers use the device's Bangla font (Hind Siliguri's "১" looks like a blob).
 - Social icons (top bar + footer): ALL six are shown for now (empty ones link to "#"). The "hide icons without a link" behaviour is built but OFF: setting `settings.social_hide_empty` = '0' (app/Content/defaults.php). Switch it to '1' ONLY when the owner says so (then, in the admin, only icons with a link show). Admin panel must offer: per-icon address + this switch. Footer heading "সামাজিক যোগাযোগ মাধ্যম" always stays.
+
+## Owner decisions (2026-10-21) — "open pages" + rich-text editor (admin panel must include)
+- About (and every similar text page: guidelines, rules, privacy, terms, ...) = title banner + ONE open writing area (class `.rich`). No fixed blocks/gaps: headings, paragraphs and images flow like a document; images can float left/right (text wraps) or sit centred. Stored as one HTML value (About: key `page.about.html`, default in `app/Content/pages/about.html`). Figma spacing: heading 156px under banner, 70px to first text, headings ~45px apart, paragraphs about half a line apart.
+- Admin editor for these pages needs a FULL formatting toolbar: bold/italic/underline, bullets, numbering, indent, line/paragraph spacing, text wrap around images, image layout options + alignment, drag-and-drop images, resize images by dragging, tables (full table formatting), PNG with transparent edges wrapping text closely, etc. Whoever edits formats freely. (Skill `rtm-aktu-tinymce-toolbar` describes the owner's usual TinyMCE full toolset.)
+- Security: the HTML saved from the editor MUST be sanitised server-side (allow-list of tags/attributes/classes, no scripts/events) before it is stored or shown.
+- About page: the small badge above the big heading ("আমাদের পথ চলা") was removed by the owner.
