@@ -24,6 +24,13 @@ Reference images: docs/references/service-card-reference.png (wanted service-car
 
 Also record in CLAUDE.md after finishing: these decisions (marquee text colouring, footer link editing, services scrolling rows) so the admin panel plan includes them.
 
+## 2026-10-21 — Home final + About page DONE (owner: "আপাতত শেষ")
+- Home approved by owner. Safe copy of it with the Figma colours: git tag `home-final-figma-colors` + branch `backup/home-figma-colors` (pushed). Colour experiments (not merged, owner kept Figma colours): branches `experiment/logo-colors` (maroon), `experiment/colors-navy-gold`.
+- About page `/about` built from Figma 2621-103: banner + ONE open writing area (`.rich`, body in `app/Content/pages/about.html`, key `page.about.html`); small badge removed; map 350x446, 10px lower (`img-down-10`). Home button now "বিস্তারিত জানতে ক্লিক করুন" -> /about.
+- Owner decisions for open pages + full rich-text admin editor + CSP/inline-style note: see CLAUDE.md (2026-10-21).
+- Local commits on main are NOT pushed yet: push only when the owner says so.
+- Next page: Services (2642-54), after a short brief from the owner.
+
 ## State at end of 2026-10-20 (after Home tweaks round 1 + 2 and later polish) — all pushed to main
 Done after "Home tweaks round 1" (commits 925da04 … 7decece):
 - Menu logo: new one-picture logo `public/assets/img/site/logo-header.png` (original kept in `assets/brand/logo-header-original.png`); header sits a little lower.
