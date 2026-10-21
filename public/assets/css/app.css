@@ -2026,3 +2026,8 @@ textarea {
         margin: 0 auto 1.5rem;
     }
 }
+
+/* Image nudged 10px lower than the text's first line (owner request, About). */
+.rich img.img-down-10 {
+    margin-top: 10px;
+}
