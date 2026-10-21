@@ -85,7 +85,7 @@
     --fs-h1: 5rem;         /* 80px */
     --fs-h2: 3.125rem;     /* 50px */
     --fs-pill: 1.75rem;
-    --fs-nav: 1.75rem;
+    --fs-nav: 1.625rem;    /* 26px (owner 2026-10-22; Figma 28px) */
     --fs-btn: 1.5rem;
     --fs-card: 1.75rem;
     --fs-small: 1.125rem;  /* 18px */
