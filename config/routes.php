@@ -19,7 +19,7 @@ return [
     ['POST', '/subscribe',       [SubscribeController::class, 'store']],
 
     // Designed in Figma, to be built page by page (see PROGRESS.md)
-    ['GET',  '/about',           [PageController::class, 'soon', ['title' => 'আমাদের সম্পর্কে']]],
+    ['GET',  '/about',           [PageController::class, 'about']],
     ['GET',  '/services',        [PageController::class, 'soon', ['title' => 'সেবা সমূহ']]],
     ['GET',  '/services/{slug}', [ServiceController::class, 'show']],
     ['GET',  '/today',           [PageController::class, 'soon', ['title' => 'আজকের প্রকাশিত কাজ']]],

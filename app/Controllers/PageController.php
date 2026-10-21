@@ -15,4 +15,14 @@ final class PageController
         $title = (string) ($meta['title'] ?? 'শীঘ্রই আসছে');
         View::render('pages/coming-soon', ['title' => $title, 'heading' => $title]);
     }
+
+    /** About page (/about). */
+    public function about(): void
+    {
+        View::render('pages/about', [
+            'title' => 'আমাদের সম্পর্কে — Jorurikaj.com',
+            'description' => content('about.heading'),
+            'heading' => content('about.title'),
+        ]);
+    }
 }

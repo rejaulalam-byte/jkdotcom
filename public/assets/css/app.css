@@ -1929,3 +1929,47 @@ textarea {
         height: 3rem;
     }
 }
+
+/* ---- About page --------------------------------------------------------- */
+.section--about-page {
+    padding-bottom: 8rem;
+}
+.about-page__intro {
+    margin-top: 1.8rem;
+}
+.about-page__copy {
+    padding-top: 0;
+}
+.about-page__copy p + p,
+.about-page__block p + p {
+    margin-top: 1.5rem;
+}
+.about-page__sections {
+    margin-top: 4rem;
+}
+.about-page__block + .about-page__block {
+    margin-top: 3rem;
+}
+.about-page__block h3 {
+    margin-bottom: 1rem;
+    font-size: 2.1875rem; /* 35px, Figma */
+    font-weight: 600;
+    line-height: 1.5;
+    color: #000;
+}
+.about-page__block p {
+    font-size: var(--fs-body);
+    line-height: 2.05;
+    color: #000;
+}
+@media (max-width: 1199px) {
+    .about-page__sections {
+        margin-top: 2.5rem;
+    }
+    .about-page__block h3 {
+        font-size: 1.5rem;
+    }
+    .about-page__block p {
+        line-height: 1.85;
+    }
+}
