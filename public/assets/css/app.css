@@ -2683,6 +2683,49 @@ textarea {
     }
 }
 
+/* Registration rules overview (Figma 2631-395): text 24px, other sizes Figma +2px (standing rule), two buttons */
+.reg-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem 2rem;
+    margin-top: 4rem;
+}
+.reg-actions .btn {
+    border: 2px solid rgba(18, 90, 108, 0.5);
+    letter-spacing: 0.1em;
+}
+@media (min-width: 1200px) {
+    body.page-regrules {
+        --fs-body: 1.5rem;
+        --fs-h2: 3.25rem;
+    }
+    .page-regrules .rich h3 {
+        font-size: 2.25rem;
+    }
+    .page-regrules .rich h4 {
+        font-size: 1.875rem;
+        font-weight: 600;
+    }
+    .page-regrules .rich {
+        line-height: 1.875;
+    }
+    .page-regrules .reg-actions .btn {
+        min-width: 28rem;
+        font-size: 1.875rem;
+    }
+}
+@media (max-width: 1199px) {
+    .reg-actions {
+        flex-direction: column;
+        align-items: stretch;
+        margin-top: 2.5rem;
+    }
+    .reg-actions .btn {
+        padding-inline: 1.5rem;
+    }
+}
+
 /* Services page tweaks (owner 2026-10-21, desktop): intro 24px, letter headings +2px, service names 24px,
    the "type English letters" line under the search is one centred line (no box) with its button at the right end.
    Columns sit a little closer so the longest names stay on one line at 24px. The teal box text stays as it was. */

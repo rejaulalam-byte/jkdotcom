@@ -27,7 +27,7 @@ return [
     ['POST', '/today/contact',   [TodayController::class, 'contact']],
     ['GET',  '/today/post',      [TodayController::class, 'postForm']],
     ['POST', '/today/post',      [TodayController::class, 'postStore']],
-    ['GET',  '/registration',    [PageController::class, 'soon', ['title' => 'রেজিস্ট্রেশন']]],
+    ['GET',  '/registration',    [PageController::class, 'registrationRules']],
     ['GET',  '/registration/professional', [PageController::class, 'soon', ['title' => 'আগ্রহী পেশাদার কর্মী রেজিস্ট্রেশন']]],
     ['GET',  '/registration/agent',        [PageController::class, 'soon', ['title' => 'প্রতিনিধি রেজিস্ট্রেশন']]],
     ['GET',  '/login',                     [PageController::class, 'soon', ['title' => 'লগইন']]],

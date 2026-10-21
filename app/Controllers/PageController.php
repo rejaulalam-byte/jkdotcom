@@ -17,6 +17,18 @@ final class PageController
         View::render('pages/coming-soon', ['title' => $title, 'heading' => $title]);
     }
 
+    /** Registration rules overview (/registration): who can register + buttons to the two guidelines. */
+    public function registrationRules(): void
+    {
+        View::render('pages/registration-rules', [
+            'bodyClass' => 'page-regrules',
+            'title' => 'রেজিস্ট্রেশন নিয়মাবলী — Jorurikaj.com',
+            'description' => 'পেশাজীবী, সেবাগ্রহীতা ও প্রতিনিধি—কারা Jorurikaj.com-এ রেজিস্ট্রেশন করতে পারবেন।',
+            'heading' => Content::get('reg.rules.title'),
+            'bodyHtml' => Content::get('page.registration-rules.html', (string) file_get_contents(BASE_PATH . '/app/Content/pages/registration-rules.html')),
+        ]);
+    }
+
     /** About page (/about). */
     public function about(): void
     {
