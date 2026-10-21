@@ -48,7 +48,7 @@
             }
         });
     });
-    /* "Your post was published" pop-up: leaves by itself after 5 seconds, or at once with the x button. */
+    /* "Your post was published" pop-up: leaves by itself after 10 seconds, or at once with the x button. */
     var toast = document.getElementById("post-toast");
     if (toast) {
         var closeToast = function () {
@@ -59,7 +59,7 @@
             toastClose.addEventListener("click", closeToast);
             toastClose.focus();
         }
-        window.setTimeout(closeToast, 5000);
+        window.setTimeout(closeToast, 10000);
     }
 
     /* Date fields: the browser's own format (mm/dd/yyyy) is shown pale until a date is chosen. */

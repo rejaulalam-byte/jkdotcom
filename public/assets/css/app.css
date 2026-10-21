@@ -3270,14 +3270,14 @@ textarea {
     }
 }
 
-/* Pop-up message after a job was posted (owner 2026-10-22): fixed in the middle, gone after 5 seconds
+/* Pop-up message after a job was posted (owner 2026-10-22): fixed in the middle, gone after 10 seconds
    (app.js; the CSS animation does the same when JavaScript is off), closed at once by the x button. */
 .post-toast {
     position: fixed;
     top: 50%;
     left: 50%;
     z-index: 100;
-    width: min(46rem, calc(100vw - 2rem));
+    width: min(54rem, calc(100vw - 2rem));
     padding: 2.4rem 2.6rem 2.2rem;
     border: 1px solid var(--teal-35);
     border-radius: 1.25rem;
@@ -3285,7 +3285,7 @@ textarea {
     box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28);
     text-align: center;
     transform: translate(-50%, -50%);
-    animation: post-toast-out 0.4s ease 5s forwards;
+    animation: post-toast-out 0.4s ease 10s forwards;
 }
 .post-toast.is-closed {
     display: none;
@@ -3310,8 +3310,14 @@ textarea {
 }
 .post-toast p {
     margin-top: 0.9rem;
-    font-size: 1.25rem;
+    font-size: 1.0625rem;
     line-height: 1.8;
+}
+@media (min-width: 1200px) {
+    .post-toast p {
+        font-size: 1.5rem; /* 24px, owner 2026-10-22 */
+        line-height: 1.85;
+    }
 }
 .post-toast__close {
     position: absolute;
@@ -3334,6 +3340,6 @@ textarea {
 @media (prefers-reduced-motion: reduce) {
     .post-toast {
         animation-duration: 0.01s;
-        animation-delay: 5s;
+        animation-delay: 10s;
     }
 }
