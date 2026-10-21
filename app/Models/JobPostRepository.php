@@ -15,7 +15,7 @@ final class JobPostRepository
     /**
      * Saves a job posted from the public form. It waits as 'pending' until the admin approves it.
      *
-     * @param array{title:string,details:string,contact_name:string,phone:string,email:string,address:string,upazila_id:int,district_id:int,division_id:int,start_date:string,end_date:string} $data
+     * @param array{title:string,title_custom:int,details:string,contact_name:string,phone:string,email:string,address:string,upazila_id:int,district_id:int,division_id:int,start_date:string,end_date:string} $data
      */
     public static function create(array $data): bool
     {
@@ -29,14 +29,15 @@ final class JobPostRepository
         try {
             $stmt = $pdo->prepare(
                 "INSERT INTO job_posts
-                    (title, details, contact_name, phone, email, address, upazila_id, district_id, division_id,
+                    (title, title_custom, details, contact_name, phone, email, address, upazila_id, district_id, division_id,
                      start_date, end_date, ip_hash, status, created_at)
                  VALUES
-                    (:title, :details, :name, :phone, :email, :address, :upazila, :district, :division,
+                    (:title, :title_custom, :details, :name, :phone, :email, :address, :upazila, :district, :division,
                      :start_date, :end_date, :ip_hash, 'pending', NOW())"
             );
             $stmt->execute([
                 ':title' => $data['title'],
+                ':title_custom' => $data['title_custom'],
                 ':details' => $data['details'],
                 ':name' => $data['contact_name'],
                 ':phone' => $data['phone'],

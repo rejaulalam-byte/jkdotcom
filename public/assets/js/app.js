@@ -389,9 +389,185 @@
     });
 })();
 
-/* Post-a-job form: বিভাগ / জেলা / উপজেলা work together, in any order.
-   Choosing a larger area narrows the smaller ones; choosing a smaller one fills in the larger ones.
-   Without JavaScript all three lists stay complete and the server checks that they match. */
+/* Post-a-job form, part 1: "কাজের ধরন" becomes a searchable drop-down.
+   The services list (the <datalist> of the page) is shown while typing; the list gets shorter with every letter.
+   When nothing matches, a button lets the visitor use their own words (the admin corrects the spelling later).
+   Without JavaScript the field stays a plain text box with suggestions. */
+(function () {
+    var box = document.querySelector("[data-combo]");
+    if (!box) {
+        return;
+    }
+    var input = box.querySelector("input");
+    var dl = document.getElementById(input.getAttribute("list"));
+    if (!dl) {
+        return;
+    }
+    var names = Array.prototype.map.call(dl.options, function (o) {
+        return o.value;
+    });
+    input.removeAttribute("list");
+    dl.parentNode.removeChild(dl);
+
+    var list = document.createElement("ul");
+    list.className = "combo__list";
+    list.id = "pj-title-list";
+    list.setAttribute("role", "listbox");
+    list.hidden = true;
+    var hint = document.createElement("p");
+    hint.className = "pf__hint";
+    hint.hidden = true;
+    hint.textContent = box.getAttribute("data-hint") || "";
+    var toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "combo__toggle";
+    toggle.tabIndex = -1;
+    toggle.setAttribute("aria-label", "সেবার তালিকা খুলুন বা বন্ধ করুন");
+    box.appendChild(toggle);
+    box.appendChild(list);
+    box.appendChild(hint);
+
+    input.setAttribute("role", "combobox");
+    input.setAttribute("aria-autocomplete", "list");
+    input.setAttribute("aria-controls", list.id);
+    input.setAttribute("aria-expanded", "false");
+
+    var active = -1;
+    var shown = [];
+
+    function matches() {
+        var q = input.value.trim().toLowerCase();
+        if (q === "") {
+            return names.slice();
+        }
+        var starts = [];
+        var inside = [];
+        names.forEach(function (n) {
+            var i = n.toLowerCase().indexOf(q);
+            if (i === 0) {
+                starts.push(n);
+            } else if (i > 0) {
+                inside.push(n);
+            }
+        });
+        return starts.concat(inside);
+    }
+
+    function open() {
+        render();
+        list.hidden = false;
+        input.setAttribute("aria-expanded", "true");
+    }
+    function close() {
+        list.hidden = true;
+        input.setAttribute("aria-expanded", "false");
+        active = -1;
+        showHint();
+    }
+    function choose(value) {
+        input.value = value;
+        close();
+    }
+    function showHint() {
+        var v = input.value.trim();
+        hint.hidden = v === "" || names.indexOf(v) !== -1;
+    }
+
+    function render() {
+        shown = matches();
+        list.textContent = "";
+        active = -1;
+        if (shown.length === 0) {
+            var none = document.createElement("li");
+            none.className = "combo__none";
+            none.setAttribute("role", "presentation");
+            none.textContent = box.getAttribute("data-none") || "";
+            var use = document.createElement("button");
+            use.type = "button";
+            use.className = "combo__use";
+            use.textContent = box.getAttribute("data-use") || "";
+            use.addEventListener("click", function () {
+                choose(input.value.trim());
+            });
+            none.appendChild(use);
+            list.appendChild(none);
+            return;
+        }
+        shown.forEach(function (n, i) {
+            var li = document.createElement("li");
+            li.id = "pj-title-opt-" + i;
+            li.setAttribute("role", "option");
+            li.textContent = n;
+            li.addEventListener("click", function () {
+                choose(n);
+            });
+            list.appendChild(li);
+        });
+    }
+
+    function setActive(i) {
+        var items = list.querySelectorAll("[role=option]");
+        if (!items.length) {
+            return;
+        }
+        if (active >= 0 && items[active]) {
+            items[active].classList.remove("is-active");
+        }
+        active = (i + items.length) % items.length;
+        items[active].classList.add("is-active");
+        input.setAttribute("aria-activedescendant", items[active].id);
+        items[active].scrollIntoView({ block: "nearest" });
+    }
+
+    input.addEventListener("input", open);
+    input.addEventListener("focus", open);
+    input.addEventListener("click", function () {
+        if (list.hidden) {
+            open();
+        }
+    });
+    input.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            if (list.hidden) {
+                open();
+            }
+            setActive(active + 1);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            setActive(active - 1);
+        } else if (e.key === "Enter" && !list.hidden && active >= 0) {
+            e.preventDefault();
+            choose(shown[active]);
+        } else if (e.key === "Escape" || e.key === "Tab") {
+            close();
+        }
+    });
+    toggle.addEventListener("click", function () {
+        if (list.hidden) {
+            input.focus();
+            open();
+        } else {
+            close();
+        }
+    });
+    list.addEventListener("mousedown", function (e) {
+        e.preventDefault(); // keep the focus in the input
+    });
+    document.addEventListener("mousedown", function (e) {
+        if (!box.contains(e.target)) {
+            close();
+        }
+    });
+    showHint();
+})();
+
+/* Post-a-job form, part 2: উপজেলা / থানা, জেলা and বিভাগ work together, in any order.
+   Every name is listed once. Pick an upazila: the district list shows only the districts that have
+   an upazila with that name (several, if the name repeats, e.g. "সদর"). Pick a district: its division
+   fills in (or the divisions that have it). Auto-fill happens when only one answer is possible.
+   Three hidden fields carry the real ids to the server, which checks they belong together.
+   Without JavaScript the three lists stay complete and keep their own names. */
 (function () {
     var upz = document.getElementById("pj-upazila");
     var dis = document.getElementById("pj-district");
@@ -400,77 +576,123 @@
         return;
     }
 
-    function read(select) {
-        return Array.prototype.slice.call(select.options, 1).map(function (o) {
-            return { v: o.value, t: o.textContent, p: o.getAttribute("data-parent") || "" };
-        });
-    }
-    var allUpz = read(upz);
-    var allDis = read(dis);
-    var placeholderUpz = upz.options[0].textContent;
-    var placeholderDis = dis.options[0].textContent;
-    var divOf = {};
-    allDis.forEach(function (d) {
-        divOf[d.v] = d.p;
+    var divs = Array.prototype.slice.call(div.options, 1).map(function (o) {
+        return { id: o.value, name: o.textContent };
     });
-    var disOf = {};
-    allUpz.forEach(function (u) {
-        disOf[u.v] = u.p;
+    var dists = {};
+    Array.prototype.slice.call(dis.options, 1).forEach(function (o) {
+        dists[o.value] = { id: o.value, name: o.textContent, div: o.getAttribute("data-parent") };
+    });
+    var triples = Array.prototype.slice.call(upz.options, 1).map(function (o) {
+        var d = dists[o.getAttribute("data-parent")];
+        return { id: o.value, uName: o.getAttribute("data-name") || o.textContent, s: d.id, sName: d.name, d: d.div };
+    });
+    var placeholder = {
+        u: upz.options[0].textContent,
+        s: dis.options[0].textContent,
+        d: div.options[0].textContent
+    };
+
+    // start values (after a failed submit the server selects the earlier choice)
+    var U = "";
+    var S = "";
+    var D = div.value;
+    if (upz.value) {
+        triples.forEach(function (t) {
+            if (t.id === upz.value) {
+                U = t.uName;
+                S = t.sName;
+                D = t.d;
+            }
+        });
+    } else if (dis.value && dists[dis.value]) {
+        S = dists[dis.value].name;
+        D = dists[dis.value].div;
+    }
+
+    // the selects no longer send values themselves; hidden fields do
+    var hidden = {};
+    [["upazila_id", upz], ["district_id", dis], ["division_id", div]].forEach(function (pair) {
+        var h = document.createElement("input");
+        h.type = "hidden";
+        h.name = pair[0];
+        pair[1].removeAttribute("name");
+        pair[1].parentNode.appendChild(h);
+        hidden[pair[0]] = h;
     });
 
-    function fill(select, placeholder, items, value) {
+    function uniq(list) {
+        var seen = {};
+        return list.filter(function (x) {
+            if (seen[x]) {
+                return false;
+            }
+            seen[x] = true;
+            return true;
+        });
+    }
+    function fits(t, u, s, d) {
+        return (!u || t.uName === u) && (!s || t.sName === s) && (!d || t.d === d);
+    }
+    function avail() {
+        return {
+            d: uniq(triples.filter(function (t) { return fits(t, U, S, ""); }).map(function (t) { return t.d; })),
+            s: uniq(triples.filter(function (t) { return fits(t, U, "", D); }).map(function (t) { return t.sName; })),
+            u: uniq(triples.filter(function (t) { return fits(t, "", S, D); }).map(function (t) { return t.uName; }))
+        };
+    }
+
+    function settle() {
+        for (var round = 0; round < 4; round++) {
+            var a = avail();
+            if (D && a.d.indexOf(D) === -1) { D = ""; }
+            if (S && a.s.indexOf(S) === -1) { S = ""; }
+            if (U && a.u.indexOf(U) === -1) { U = ""; }
+            a = avail();
+            if (!D && (U || S) && a.d.length === 1) { D = a.d[0]; }
+            if (!S && (U || D) && a.s.length === 1) { S = a.s[0]; }
+            if (!U && (S || D) && a.u.length === 1) { U = a.u[0]; }
+        }
+    }
+
+    function fill(select, first, values, labels, current) {
         while (select.options.length > 1) {
             select.remove(1);
         }
-        items.forEach(function (it) {
+        select.options[0].textContent = first;
+        values.forEach(function (v, i) {
             var o = document.createElement("option");
-            o.value = it.v;
-            o.textContent = it.t;
-            o.setAttribute("data-parent", it.p);
+            o.value = v;
+            o.textContent = labels ? labels[i] : v;
             select.appendChild(o);
         });
-        select.options[0].textContent = placeholder;
-        select.value = items.some(function (it) { return it.v === value; }) ? value : "";
+        select.value = current;
     }
 
-    var d = div.value;
-    var s = dis.value;
-    var u = upz.value;
+    function render() {
+        var a = avail();
+        var divName = {};
+        divs.forEach(function (x) { divName[x.id] = x.name; });
+        fill(div, placeholder.d, divs.filter(function (x) { return a.d.indexOf(x.id) !== -1; }).map(function (x) { return x.id; }),
+            divs.filter(function (x) { return a.d.indexOf(x.id) !== -1; }).map(function (x) { return x.name; }), D);
+        fill(dis, placeholder.s, a.s, null, S);
+        fill(upz, placeholder.u, a.u, null, U);
 
-    function refresh() {
-        fill(dis, placeholderDis, d ? allDis.filter(function (x) { return x.p === d; }) : allDis, s);
-        s = dis.value;
-        var list = allUpz;
-        if (s) {
-            list = allUpz.filter(function (x) { return x.p === s; });
-        } else if (d) {
-            list = allUpz.filter(function (x) { return divOf[x.p] === d; });
+        var ids = { u: "", s: "", d: "" };
+        if (U && S) {
+            var m = triples.filter(function (t) { return fits(t, U, S, D); });
+            if (m.length === 1) {
+                ids = { u: m[0].id, s: m[0].s, d: m[0].d };
+            }
         }
-        fill(upz, placeholderUpz, list, u);
-        u = upz.value;
+        hidden.upazila_id.value = ids.u;
+        hidden.district_id.value = ids.s;
+        hidden.division_id.value = ids.d;
     }
 
-    div.addEventListener("change", function () {
-        d = div.value;
-        if (s && divOf[s] !== d) { s = ""; }
-        if (u && divOf[disOf[u]] !== d) { u = ""; }
-        refresh();
-    });
-    dis.addEventListener("change", function () {
-        s = dis.value;
-        if (s) { d = divOf[s]; div.value = d; }
-        if (u && disOf[u] !== s) { u = ""; }
-        refresh();
-    });
-    upz.addEventListener("change", function () {
-        u = upz.value;
-        if (u) {
-            s = disOf[u];
-            d = divOf[s];
-            div.value = d;
-        }
-        refresh();
-        upz.value = u;
-    });
-    refresh();
+    div.addEventListener("change", function () { D = div.value; settle(); render(); });
+    dis.addEventListener("change", function () { S = dis.value; settle(); render(); });
+    upz.addEventListener("change", function () { U = upz.value; settle(); render(); });
+    settle();
+    render();
 })();

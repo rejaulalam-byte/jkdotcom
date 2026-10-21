@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS upazilas (
 
 -- Extra columns of a posted job (job_posts.title = the kind of work, job_posts.details = the description)
 ALTER TABLE job_posts
+    ADD COLUMN title_custom TINYINT(1) NOT NULL DEFAULT 0 AFTER title,
     ADD COLUMN upazila_id  SMALLINT UNSIGNED NULL AFTER address,
     ADD COLUMN district_id SMALLINT UNSIGNED NULL AFTER upazila_id,
     ADD COLUMN division_id SMALLINT UNSIGNED NULL AFTER district_id,

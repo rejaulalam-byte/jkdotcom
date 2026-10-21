@@ -2470,3 +2470,96 @@ textarea {
     display: block;
     margin: 0 auto;
 }
+
+/* post-a-job: searchable "কাজের ধরন" list + layout tweaks (owner 2026-10-21) */
+.pf--combo input {
+    padding-right: 4rem;
+}
+.combo__toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4rem;
+    height: 4.8125rem;
+    border: 0;
+    background: url("../img/icons/chevron-down.svg") no-repeat center / 1.25rem;
+    cursor: pointer;
+}
+.combo__list {
+    position: absolute;
+    top: calc(100% - 1.75rem);
+    left: 0;
+    right: 0;
+    z-index: 30;
+    max-height: 19rem;
+    overflow-y: auto;
+    border: 1px solid rgba(18, 90, 108, 0.49);
+    border-radius: 0.625rem;
+    background: var(--white);
+    box-shadow: 0 0.75rem 1.75rem rgba(18, 90, 108, 0.18);
+}
+.combo__list [role="option"] {
+    padding: 0.55rem 1.5rem 0.55rem 4.5rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    cursor: pointer;
+}
+.combo__list [role="option"]:hover,
+.combo__list [role="option"].is-active {
+    background: var(--teal-10);
+    color: var(--teal);
+}
+.combo__none {
+    padding: 1rem 1.5rem 1rem 4.5rem;
+    font-size: 1.125rem;
+    color: rgba(34, 34, 34, 0.75);
+}
+.combo__use {
+    display: block;
+    margin-top: 0.7rem;
+    padding: 0.5rem 1.4rem;
+    border: 2px solid rgba(18, 90, 108, 0.5);
+    border-radius: 50px;
+    background: rgba(18, 90, 108, 0.12);
+    color: var(--teal);
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.combo__use:hover {
+    background: var(--teal);
+    color: var(--white);
+}
+.pf__hint {
+    position: absolute;
+    left: 0.25rem;
+    top: calc(100% + 0.1rem);
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: var(--teal);
+}
+/* the two field groups sit 25px closer to the middle; the details box spans exactly the same width */
+.post-form__grid {
+    padding-inline: 1.5625rem;
+}
+.pf--wide {
+    margin-inline: 1.5625rem;
+}
+@media (max-width: 1199px) {
+    .post-form__grid {
+        padding-inline: 0;
+    }
+    .pf--wide {
+        margin-inline: 0;
+    }
+    .combo__list [role="option"] {
+        padding-left: 1.2rem;
+        font-size: 1.0625rem;
+    }
+    .combo__none {
+        padding-left: 1.2rem;
+    }
+    .combo__toggle {
+        height: 3.75rem;
+    }
+}

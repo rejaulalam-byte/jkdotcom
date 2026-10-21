@@ -65,6 +65,10 @@ final class TodayController
             'details' => $this->clean($_POST['details'] ?? '', 3000, true),
         ];
 
+        // a kind of work that is not in the services list is marked, so the admin can check its spelling
+        $known = array_column(ServiceRepository::all(), 'name');
+        $data['title_custom'] = in_array($data['title'], $known, true) ? 0 : 1;
+
         $errors = $this->validate($data);
         if ($errors !== []) {
             $this->fail($errors, $data);

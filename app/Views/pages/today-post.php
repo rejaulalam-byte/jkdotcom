@@ -57,7 +57,8 @@ $helpTel = content('today.post.helpline_tel');
 
                 <div class="post-form__grid">
                     <div class="post-form__col">
-                        <div class="pf">
+                        <?php // without JavaScript this is a plain text box with suggestions (datalist); app.js makes it a searchable drop-down ?>
+                        <div class="pf pf--combo" data-combo data-none="<?= e(content('today.post.combo.none')) ?>" data-use="<?= e(content('today.post.combo.use')) ?>" data-hint="<?= e(content('today.post.combo.hint')) ?>">
                             <label class="sr-only" for="pj-title"><?= e(content('today.post.f.title')) ?></label>
                             <input id="pj-title" type="text" name="title" list="pj-types" maxlength="120" required autocomplete="off"
                                    placeholder="<?= $ph('title') ?>   <?= e(content('today.post.f.title_hint')) ?>" value="<?= $val('title') ?>">
@@ -100,7 +101,7 @@ $helpTel = content('today.post.helpline_tel');
                             <select id="pj-upazila" name="upazila_id" required>
                                 <option value=""><?= $ph('upazila') ?></option>
                                 <?php foreach ($geo['upazilas'] as $u): ?>
-                                    <option value="<?= $u['id'] ?>" data-parent="<?= $u['parent'] ?>"<?= $sel('upazila_id', $u['id']) ?>><?= e($u['name']) ?></option>
+                                    <option value="<?= $u['id'] ?>" data-parent="<?= $u['parent'] ?>" data-name="<?= e($u['short']) ?>"<?= $sel('upazila_id', $u['id']) ?>><?= e($u['name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>

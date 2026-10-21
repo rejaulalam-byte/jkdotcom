@@ -11,7 +11,7 @@ use Throwable;
 /** Areas: বিভাগ (division) -> জেলা (district) -> উপজেলা/থানা (upazila). */
 final class GeoRepository
 {
-    /** @var array{divisions:list<array{id:int,name:string}>,districts:list<array{id:int,parent:int,name:string}>,upazilas:list<array{id:int,parent:int,name:string}>}|null */
+    /** @var array{divisions:list<array{id:int,name:string}>,districts:list<array{id:int,parent:int,name:string}>,upazilas:list<array{id:int,parent:int,name:string,short?:string}>}|null */
     private static ?array $cache = null;
 
     /**
@@ -36,7 +36,7 @@ final class GeoRepository
         $upazilas = [];
         foreach ($raw['upazilas'] as $u) {
             $name = $count[$u[2]] > 1 ? $u[2] . ' (' . ($districtName[$u[1]] ?? '') . ')' : $u[2];
-            $upazilas[] = ['id' => (int) $u[0], 'parent' => (int) $u[1], 'name' => $name];
+            $upazilas[] = ['id' => (int) $u[0], 'parent' => (int) $u[1], 'name' => $name, 'short' => $u[2]];
         }
         usort($upazilas, static fn (array $a, array $b): int => strcmp($a['name'], $b['name']));
 
