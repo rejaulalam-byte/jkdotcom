@@ -55,7 +55,7 @@ $otherRole = $role === 'agent' ? 'worker' : 'agent';
             </p>
         </form>
 
-        <p class="login__help"><?= e(content('login.help_1')) ?><a class="login__tel" href="tel:<?= e($helpTel) ?>"><?= e(content('today.post.helpline')) ?></a></p>
+        <p class="login__help"><?= e(content('login.help_1')) ?><button class="login__forgot" type="button" data-forgot><?= e(content('login.help_link')) ?></button><?= e(content('login.help_2')) ?><a class="login__tel" href="tel:<?= e($helpTel) ?>"><?= e(content('today.post.helpline')) ?></a></p>
         <p class="login__links">
             <a href="<?= $otherRole === 'agent' ? '/login/agent' : '/login' ?>"><?= e(content('login.other.' . $otherRole)) ?></a>
             <span aria-hidden="true">·</span>
@@ -63,3 +63,6 @@ $otherRole = $role === 'agent' ? 'worker' : 'agent';
         </p>
     </div>
 </section>
+
+<?php // "পাসওয়ার্ড মনে নেই" পপ-আপ: ইমেইল → ৬ সংখ্যার কোড → নতুন পাসওয়ার্ড ?>
+<?php require BASE_PATH . '/app/Views/partials/forgot-dialog.php'; ?>

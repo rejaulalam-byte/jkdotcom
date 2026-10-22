@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Controllers\AuthController;
 use App\Controllers\FeedbackController;
 use App\Controllers\HomeController;
+use App\Controllers\PasswordResetController;
 use App\Controllers\PageController;
 use App\Controllers\RegistrationController;
 use App\Controllers\ServiceController;
@@ -42,6 +43,9 @@ return [
     ['GET',  '/login/agent',               [AuthController::class, 'loginForm', ['role' => 'agent']]],
     ['POST', '/login/agent',               [AuthController::class, 'loginStore', ['role' => 'agent']]],
     ['POST', '/logout',                    [AuthController::class, 'logout']],
+    ['POST', '/password/forgot',           [PasswordResetController::class, 'request']],
+    ['POST', '/password/verify',           [PasswordResetController::class, 'verify']],
+    ['POST', '/password/reset',            [PasswordResetController::class, 'reset']],
     ['GET',  '/welcome',                   [AuthController::class, 'welcome']],
     ['GET',  '/account/password',          [AuthController::class, 'passwordForm']],
     ['POST', '/account/password',          [AuthController::class, 'passwordStore']],

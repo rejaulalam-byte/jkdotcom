@@ -3776,3 +3776,24 @@ textarea {
         max-width: none;
     }
 }
+
+/* ---- "পাসওয়ার্ড মনে নেই" (লগইন পেইজ): লিংকের মতো বাটন ও পপ-আপের ধাপ (.lead পপ-আপের স্টাইলই) ---- */
+.login__forgot {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--teal);
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+    cursor: pointer;
+}
+.forgot em {
+    color: var(--teal);
+}
+.forgot .reg-form__note {
+    margin: -0.25rem 0 1rem;
+    width: auto;
+    font-size: 1rem;
+}

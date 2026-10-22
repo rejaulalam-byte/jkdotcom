@@ -1552,3 +1552,85 @@
         });
     });
 })();
+
+/* ---- "পাসওয়ার্ড মনে নেই" (লগইন পেইজের পপ-আপ) --------------------------------------------
+   ধাপ: email -> code -> password -> done। প্রতিটি ধাপ নিজের ফর্মের action-এ (/password/forgot, /verify, /reset)
+   POST করে JSON উত্তর পায়; ভুল হলে সার্ভারের বাংলা বার্তা ধাপের ভেতরেই দেখায়। JavaScript না থাকলে
+   এই লিংক কাজ করে না, তখন হেল্পলাইনে কল করা যায়। */
+(function () {
+    var dialog = document.getElementById("forgot-dialog");
+    var openers = document.querySelectorAll("[data-forgot]");
+    if (!dialog || !openers.length || typeof dialog.showModal !== "function") {
+        return;
+    }
+    var token = dialog.getAttribute("data-token");
+    var steps = dialog.querySelectorAll("[data-step]");
+
+    function show(name) {
+        Array.prototype.forEach.call(steps, function (el) {
+            el.hidden = el.getAttribute("data-step") !== name;
+        });
+        var first = dialog.querySelector('[data-step="' + name + '"] input');
+        if (first) {
+            first.focus();
+        }
+    }
+    function fail(step, text) {
+        var err = step.querySelector(".lead__error");
+        if (err) {
+            err.textContent = text;
+            err.hidden = !text;
+        }
+    }
+
+    openers.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            dialog.querySelectorAll("form").forEach(function (f) {
+                f.reset();
+                fail(f, "");
+            });
+            show("email");
+            dialog.showModal();
+        });
+    });
+    dialog.querySelectorAll('[data-act="close"]').forEach(function (b) {
+        b.addEventListener("click", function () {
+            dialog.close();
+        });
+    });
+
+    var next = { email: "code", code: "password", password: "done" };
+    dialog.querySelectorAll("form").forEach(function (form) {
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            var name = form.getAttribute("data-step");
+            var body = new FormData(form);
+            body.append("_token", token);
+            var send = form.querySelector('button[type="submit"]');
+            send.disabled = true;
+            fail(form, "");
+            fetch(form.getAttribute("action"), { method: "POST", body: body, credentials: "same-origin" })
+                .then(function (r) {
+                    return r.json().then(function (j) { return { ok: r.ok, data: j }; });
+                })
+                .then(function (res) {
+                    if (res.ok) {
+                        show(next[name]);
+                    } else {
+                        fail(form, res.data.message || dialog.getAttribute("data-net"));
+                        // মেয়াদ শেষ বা বেশি ভুল হলে আবার ইমেইল থেকে শুরু
+                        if (res.data.error === "expired" || res.data.error === "tries") {
+                            show("email");
+                            fail(dialog.querySelector('[data-step="email"]'), res.data.message);
+                        }
+                    }
+                })
+                .catch(function () {
+                    fail(form, dialog.getAttribute("data-net"));
+                })
+                .then(function () {
+                    send.disabled = false;
+                });
+        });
+    });
+})();
