@@ -78,6 +78,11 @@ $helpTel = content('today.post.helpline_tel');
                         </div>
                     <?php endif; ?>
 
+                    <div class="pf">
+                        <label class="sr-only" for="rf-email"><?= e(content('regform.f.email')) ?></label>
+                        <input id="rf-email" type="email" name="email" maxlength="150" required autocomplete="email" inputmode="email"
+                               placeholder="<?= $ph('email') ?>" value="<?= $val('email') ?>">
+                    </div>
                     <div class="pf pf--phone">
                         <label class="sr-only" for="rf-phone"><?= e(content('regform.f.phone')) ?></label>
                         <span class="pf__code" aria-hidden="true">+৮৮</span>

@@ -67,6 +67,7 @@ final class RegistrationController
             'role' => $role,
             'name' => $this->clean($_POST['name'] ?? '', 100),
             'phone' => normalize_phone($this->clean($_POST['phone'] ?? '', 20)),
+            'email' => mb_strtolower($this->clean($_POST['email'] ?? '', 150)),
             'address' => $this->clean($_POST['address'] ?? '', 250),
             'upazila_id' => (int) ($_POST['upazila_id'] ?? 0),
             'district_id' => (int) ($_POST['district_id'] ?? 0),
@@ -127,6 +128,7 @@ final class RegistrationController
         $rows = [
             'আবেদনের ধরন' => $isWorker ? 'পেশাজীবী কর্মী' : 'প্রতিনিধি',
             'নাম' => (string) $d['name'],
+            'ইমেইল' => (string) $d['email'],
             'মোবাইল' => format_phone((string) $d['phone']),
         ];
         if ($isWorker) {
@@ -159,7 +161,7 @@ final class RegistrationController
         $text .= "\nআবেদনটি অনুমোদনের অপেক্ষায় আছে।\n";
 
         $to = Env::get('MAIL_REGISTRATION_TO', 'registration@jorurikaj.com') ?? 'registration@jorurikaj.com';
-        if (!Mailer::sendHtml($to, 'নতুন রেজিস্ট্রেশন আবেদন: ' . $d['name'], $html, $text, $image)) {
+        if (!Mailer::sendHtml($to, 'নতুন রেজিস্ট্রেশন আবেদন: ' . $d['name'], $html, $text, $image, $d['email'])) {
             Logger::error('Registration e-mail could not be sent');
         }
     }
@@ -184,6 +186,11 @@ final class RegistrationController
             }
         } elseif (!preg_match('/^([0-9]{10}|[0-9]{13}|[0-9]{17})$/', (string) $d['nid_number'])) {
             $errors[] = 'জাতীয় পরিচয়পত্র নম্বর সঠিক নয়। ১০, ১৩ বা ১৭ সংখ্যার নম্বর দিন।';
+        }
+        if ($d['email'] === '') {
+            $errors[] = 'ইমেইল ঠিকানা লিখুন।';
+        } elseif (!filter_var($d['email'], FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'ইমেইল ঠিকানাটি সঠিক নয়।';
         }
         if ($d['phone'] === '') {
             $errors[] = 'মোবাইল নম্বর লিখুন।';
