@@ -1,4 +1,12 @@
 ## START HERE (written 2026-10-21 night, for a fresh chat)
+## STAGING (2026-10-22) — https://new.jorurikaj.com is LIVE on cPanel with real MySQL
+- Repo cloned by cPanel Git Version Control at `/home4/jorurikaj/repositories/jkdotcom` (HTTPS clone, public repo); sub-domain `new.jorurikaj.com` document root = its `public` folder; `.cpanel.yml` creates storage folders. UPDATE FLOW: push to main -> cPanel > Git Version Control > Manage > Pull or Deploy > "Update from Remote" (files are live at once) > "Deploy HEAD Commit".
+- Database `jorurika_jkn` + user `jorurika_jkn` (password only in the server `.env`, typed by the owner). Migrations 001-004 imported (11 tables; 94 services, 8 divisions, 64 districts, 511 upazilas). The OLD site DB `jorurika_jk` / user `jorurika_rzaman` were not touched.
+- `.env` lives at `/home4/jorurikaj/repositories/jkdotcom/.env` (APP_ENV=production, APP_URL=https://new.jorurikaj.com). HTTPS works and the redirect is enabled in `public/.htaccess`.
+- Tested on the real DB: post-a-job (job saved + shown in /today), feedback, subscribe, interest pop-up (click + lead saved, number revealed). NOT verified: e-mail delivery (check the info@jorurikaj.com inbox; mailbox no-reply@ does not exist), real phone keyboards.
+- Test rows (1 job, 1 feedback, 1 subscriber, 1 click, 1 lead) are still in the DB: delete them before real use. The two old sub-domains bar-clays-uk / bzst-de (not the owner's) were removed; their folders `/home4/jorurikaj/bar-clays-uk` and `bzst-de` still exist: inspect and delete.
+- `client-preview/` (git-ignored) = static HTML copy of the finished pages for showing the client; regenerate after page changes.
+
 Read CLAUDE.md first (all rules and owner decisions), then this section. Owner Reja works in Bangla; reply in Bangla; he reviews every change himself.
 - Run locally: double-click `start-server.bat` (portable PHP in tools/php) -> http://127.0.0.1:8000 . No database yet: demo mode (jobs posted in the form are saved in storage/demo-jobs.json and appear at once; clicks/leads in storage/demo-contact-log.json).
 - DONE and approved/under review: Home `/`, About `/about`, Services `/services`, Post-a-job `/today/post`, Job list `/today` (accordion, hidden phone/e-mail + "interested?" pop-up + click/lead tracking), sticky main menu, Banglish typing (data-bn), Bangladeshi phone format (+88 fixed, 11 digits), geo dropdowns nationwide.
