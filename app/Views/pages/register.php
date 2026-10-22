@@ -60,14 +60,16 @@ $helpTel = content('today.post.helpline_tel');
                     ?>
 
                     <?php if ($role === 'worker'): ?>
-                        <div class="pf pf--select">
+                        <?php // JavaScript ছাড়া পরামর্শসহ সাধারণ লেখার ঘর (datalist); app.js একে "যেকোনো অংশ মিললেই" খোঁজা-যায় এমন তালিকা বানায় ?>
+                        <div class="pf pf--combo" data-combo data-none="<?= e(content('regform.service.none')) ?>" data-use="<?= e(content('regform.service.use')) ?>" data-hint="<?= e(content('regform.service.hint')) ?>">
                             <label class="sr-only" for="rf-service"><?= e(content('regform.f.service')) ?></label>
-                            <select id="rf-service" name="service" required>
-                                <option value=""><?= $ph('service') ?></option>
+                            <input id="rf-service" data-bn type="text" name="service_name" list="rf-services" maxlength="100" required autocomplete="off"
+                                   placeholder="<?= $ph('service') ?>" value="<?= $val('service_name') ?>">
+                            <datalist id="rf-services">
                                 <?php foreach ($services as $service): ?>
-                                    <option value="<?= e($service['slug']) ?>"<?= (string) ($old['service_slug'] ?? '') === $service['slug'] ? ' selected' : '' ?>><?= e($service['name']) ?></option>
+                                    <option value="<?= e($service['name']) ?>"></option>
                                 <?php endforeach; ?>
-                            </select>
+                            </datalist>
                         </div>
                         <div class="pf">
                             <label class="sr-only" for="rf-exp"><?= e(content('regform.f.experience')) ?></label>
@@ -101,7 +103,7 @@ $helpTel = content('today.post.helpline_tel');
                     <?php // এলাকার তিন ড্রপডাউন: id-গুলো "কাজ সম্পর্কে জানান"-এর মতোই, app.js একই কোডে চালায় ?>
                     <div class="pf pf--select">
                         <label class="sr-only" for="pj-upazila"><?= e(content('regform.f.upazila')) ?></label>
-                        <select id="pj-upazila" name="upazila_id" required data-all="<?= e(content('geo.all.upazila')) ?>">
+                        <select id="pj-upazila" name="upazila_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.upazila')) ?>">
                             <option value=""><?= $ph('upazila') ?></option>
                             <?php foreach ($geo['upazilas'] as $u): ?>
                                 <option value="<?= $u['id'] ?>" data-parent="<?= $u['parent'] ?>" data-name="<?= e($u['short']) ?>"<?= $sel('upazila_id', $u['id']) ?>><?= e($u['name']) ?></option>
@@ -110,7 +112,7 @@ $helpTel = content('today.post.helpline_tel');
                     </div>
                     <div class="pf pf--select">
                         <label class="sr-only" for="pj-district"><?= e(content('regform.f.district')) ?></label>
-                        <select id="pj-district" name="district_id" required data-all="<?= e(content('geo.all.district')) ?>">
+                        <select id="pj-district" name="district_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.district')) ?>">
                             <option value=""><?= $ph('district') ?></option>
                             <?php foreach ($geo['districts'] as $d): ?>
                                 <option value="<?= $d['id'] ?>" data-parent="<?= $d['parent'] ?>"<?= $sel('district_id', $d['id']) ?>><?= e($d['name']) ?></option>
@@ -119,7 +121,7 @@ $helpTel = content('today.post.helpline_tel');
                     </div>
                     <div class="pf pf--select">
                         <label class="sr-only" for="pj-division"><?= e(content('regform.f.division')) ?></label>
-                        <select id="pj-division" name="division_id" required data-all="<?= e(content('geo.all.division')) ?>">
+                        <select id="pj-division" name="division_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.division')) ?>">
                             <option value=""><?= $ph('division') ?></option>
                             <?php foreach ($geo['divisions'] as $v): ?>
                                 <option value="<?= $v['id'] ?>"<?= $sel('division_id', $v['id']) ?>><?= e($v['name']) ?></option>

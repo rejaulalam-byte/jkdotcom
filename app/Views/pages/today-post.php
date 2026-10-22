@@ -93,7 +93,7 @@ $helpTel = content('today.post.helpline_tel');
                         <?php // Figma-র ক্রম: উপজেলা, জেলা, বিভাগ। app.js-এ তিনটির যেকোনোটা আগে বাছা যায়। ?>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-upazila"><?= e(content('today.post.f.upazila')) ?></label>
-                            <select id="pj-upazila" name="upazila_id" required data-all="<?= e(content('geo.all.upazila')) ?>">
+                            <select id="pj-upazila" name="upazila_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.upazila')) ?>">
                                 <option value=""><?= $ph('upazila') ?></option>
                                 <?php foreach ($geo['upazilas'] as $u): ?>
                                     <option value="<?= $u['id'] ?>" data-parent="<?= $u['parent'] ?>" data-name="<?= e($u['short']) ?>"<?= $sel('upazila_id', $u['id']) ?>><?= e($u['name']) ?></option>
@@ -102,7 +102,7 @@ $helpTel = content('today.post.helpline_tel');
                         </div>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-district"><?= e(content('today.post.f.district')) ?></label>
-                            <select id="pj-district" name="district_id" required data-all="<?= e(content('geo.all.district')) ?>">
+                            <select id="pj-district" name="district_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.district')) ?>">
                                 <option value=""><?= $ph('district') ?></option>
                                 <?php foreach ($geo['districts'] as $d): ?>
                                     <option value="<?= $d['id'] ?>" data-parent="<?= $d['parent'] ?>"<?= $sel('district_id', $d['id']) ?>><?= e($d['name']) ?></option>
@@ -111,7 +111,7 @@ $helpTel = content('today.post.helpline_tel');
                         </div>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-division"><?= e(content('today.post.f.division')) ?></label>
-                            <select id="pj-division" name="division_id" required data-all="<?= e(content('geo.all.division')) ?>">
+                            <select id="pj-division" name="division_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.division')) ?>">
                                 <option value=""><?= $ph('division') ?></option>
                                 <?php foreach ($geo['divisions'] as $v): ?>
                                     <option value="<?= $v['id'] ?>"<?= $sel('division_id', $v['id']) ?>><?= e($v['name']) ?></option>

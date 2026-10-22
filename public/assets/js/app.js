@@ -752,6 +752,11 @@
         hidden.upazila_id.value = ids.u;
         hidden.district_id.value = ids.s;
         hidden.division_id.value = ids.d;
+
+        // খোঁজার ঘরগুলোকে (নিচের অংশ) জানায় যে তালিকা ও বাছাই বদলেছে
+        [div, dis, upz].forEach(function (s) {
+            s.dispatchEvent(new CustomEvent("geo:render"));
+        });
     }
 
     function pick(select, set) {
@@ -770,6 +775,205 @@
     pick(upz, function (v) { U = v; });
     settle();
     render();
+})();
+
+/* ---- খোঁজা-যায় এমন ড্রপডাউন (select[data-search]): উপজেলা/থানা, জেলা, বিভাগ -------------------
+   আসল <select> থাকে (মান ও যুক্তি আগের অংশের হাতে) কিন্তু লুকানো; তার জায়গায় একটা লেখার ঘর। ২-৩ অক্ষর
+   লিখলেই যে নামের যেকোনো জায়গায় সেই অক্ষর আছে সেগুলো আসে (শুরুতে মিললে আগে)। বাছলে select-এর মান বদলে
+   "change" ঘটে, ফলে আগের অংশ বাকি দুই ঘর মিলিয়ে নেয়। তালিকা প্রতিবার select-এর তখনকার অপশন থেকে নেওয়া হয়। */
+(function () {
+    var RESET = "__all";
+
+    document.querySelectorAll("select[data-search]").forEach(function (select) {
+        var box = select.parentNode;
+        var placeholder = select.options[0] ? select.options[0].textContent : "";
+
+        var input = document.createElement("input");
+        input.type = "text";
+        input.id = select.id + "-search";
+        input.autocomplete = "off";
+        input.placeholder = placeholder;
+        input.setAttribute("data-bn", "");
+        input.setAttribute("data-ss", select.id);
+        input.setAttribute("role", "combobox");
+        input.setAttribute("aria-autocomplete", "list");
+        input.setAttribute("aria-expanded", "false");
+        if (select.required) {
+            input.required = true;
+        }
+        var label = box.querySelector('label[for="' + select.id + '"]');
+        if (label) {
+            label.setAttribute("for", input.id);
+        }
+
+        var list = document.createElement("ul");
+        list.className = "combo__list";
+        list.id = select.id + "-list";
+        list.setAttribute("role", "listbox");
+        list.hidden = true;
+        input.setAttribute("aria-controls", list.id);
+        var toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "combo__toggle";
+        toggle.tabIndex = -1;
+        toggle.setAttribute("aria-label", "তালিকা খুলুন বা বন্ধ করুন");
+
+        select.hidden = true;
+        select.tabIndex = -1;
+        box.insertBefore(input, select);
+        box.appendChild(toggle);
+        box.appendChild(list);
+
+        var typed = false; // ব্যবহারকারী নিজে লিখেছেন কি না; না লিখলে পুরো তালিকা
+        var active = -1;
+        var shown = [];
+
+        function selectedText() {
+            var o = select.options[select.selectedIndex];
+            return o && o.value !== "" && o.value !== RESET ? o.textContent : "";
+        }
+        function sync() {
+            input.value = selectedText();
+            typed = false;
+        }
+        function items() {
+            var q = typed ? input.value.trim().toLowerCase() : "";
+            var starts = [];
+            var inside = [];
+            Array.prototype.slice.call(select.options, 1).forEach(function (o) {
+                if (o.value === RESET) {
+                    if (q === "") {
+                        starts.unshift(o);
+                    }
+                } else if (q === "") {
+                    starts.push(o);
+                } else {
+                    var i = o.textContent.toLowerCase().indexOf(q);
+                    if (i === 0) {
+                        starts.push(o);
+                    } else if (i > 0) {
+                        inside.push(o);
+                    }
+                }
+            });
+            return starts.concat(inside);
+        }
+        function render() {
+            shown = items();
+            active = -1;
+            list.textContent = "";
+            if (!shown.length) {
+                var none = document.createElement("li");
+                none.className = "combo__none";
+                none.setAttribute("role", "presentation");
+                none.textContent = select.getAttribute("data-none") || "";
+                list.appendChild(none);
+                return;
+            }
+            shown.forEach(function (o, i) {
+                var li = document.createElement("li");
+                li.id = list.id + "-" + i;
+                li.setAttribute("role", "option");
+                li.textContent = o.textContent;
+                li.addEventListener("click", function () {
+                    choose(o);
+                });
+                list.appendChild(li);
+            });
+        }
+        function open() {
+            render();
+            list.hidden = false;
+            input.setAttribute("aria-expanded", "true");
+        }
+        function close() {
+            list.hidden = true;
+            input.setAttribute("aria-expanded", "false");
+            sync();
+        }
+        function choose(option) {
+            select.value = option.value;
+            list.hidden = true;
+            input.setAttribute("aria-expanded", "false");
+            select.dispatchEvent(new Event("change"));
+            sync();
+            input.dispatchEvent(new Event("change"));
+        }
+        function setActive(i) {
+            var nodes = list.querySelectorAll("[role=option]");
+            if (!nodes.length) {
+                return;
+            }
+            if (nodes[active]) {
+                nodes[active].classList.remove("is-active");
+            }
+            active = (i + nodes.length) % nodes.length;
+            nodes[active].classList.add("is-active");
+            input.setAttribute("aria-activedescendant", nodes[active].id);
+            nodes[active].scrollIntoView({ block: "nearest" });
+        }
+
+        input.addEventListener("focus", function () {
+            input.select();
+            open();
+        });
+        input.addEventListener("click", function () {
+            if (list.hidden) {
+                open();
+            }
+        });
+        input.addEventListener("input", function () {
+            typed = true;
+            open();
+        });
+        input.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                if (list.hidden) {
+                    open();
+                }
+                setActive(active + 1);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActive(active - 1);
+            } else if (e.key === "Enter" && !list.hidden) {
+                e.preventDefault();
+                if (active >= 0) {
+                    choose(shown[active]);
+                } else if (shown.length === 1) {
+                    choose(shown[0]);
+                }
+            } else if (e.key === "Escape" || e.key === "Tab") {
+                if (e.key === "Tab" && typed && shown.length === 1 && !list.hidden) {
+                    choose(shown[0]);
+                } else {
+                    close();
+                }
+            }
+        });
+        toggle.addEventListener("click", function () {
+            if (list.hidden) {
+                input.focus();
+                open();
+            } else {
+                close();
+            }
+        });
+        list.addEventListener("mousedown", function (e) {
+            e.preventDefault(); // ফোকাস লেখার ঘরেই থাকে
+        });
+        document.addEventListener("mousedown", function (e) {
+            if (!box.contains(e.target) && !list.hidden) {
+                close();
+            }
+        });
+        select.addEventListener("geo:render", function () {
+            if (list.hidden) {
+                sync();
+            }
+        });
+        sync();
+    });
 })();
 
 /* ---- Banglish টাইপিং: ইংরেজি অক্ষরে লিখলে বাংলা (Avro ফোনেটিক): ami = আমি, tomake = তোমাকে ------
@@ -1258,9 +1462,10 @@
 
         /* ঘরটা ভুল হলে বার্তা, ঠিক থাকলে ফাঁকা লেখা ফেরত দেয় */
         function check(field, live) {
-            var v = field.value.trim();
+            var linked = field.getAttribute("data-ss"); // খোঁজার ঘর: মান আসে তার আসল select থেকে
+            var v = (linked ? document.getElementById(linked).value : field.value).trim();
             var required = field.hasAttribute("required");
-            if (field.tagName === "SELECT") {
+            if (linked || field.tagName === "SELECT") {
                 return required && (v === "" || v === "__all") ? msg("select") : "";
             }
             if (v === "") {
@@ -1310,7 +1515,7 @@
                 }
             });
             field.addEventListener("change", function () {
-                if (field.tagName === "SELECT") {
+                if (field.tagName === "SELECT" || field.hasAttribute("data-ss")) {
                     show(field, check(field, false));
                 }
             });

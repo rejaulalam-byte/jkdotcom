@@ -1,3 +1,5 @@
+- 2026-10-22 night: searchable profession + area fields done (migration 009 `users.service_custom` must be run on staging in phpMyAdmin before the cPanel update). Not yet pushed to staging until the owner logs in to cPanel.
+
 ## HAND-OVER FOR A NEW CHAT (end of 2026-10-22) — read this first
 - DONE and live on https://new.jorurikaj.com (real MySQL, migrations 001-008 run): Home, About, Services, Post-a-job, Today list, 3 registration-rules pages, login x2, registration forms x2, welcome. Latest commit on main: see `git log`. Server update flow + DB steps: section STAGING below.
 - OWNER WORKING MODE: he fixes ONE page in Figma at a time and sends its link; do exactly that page, push to main, update staging (cPanel pane: he logs in himself, never type passwords; after login the cpsess token in the URL changes), then wait. He wants Bangla answers.

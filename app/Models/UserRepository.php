@@ -39,10 +39,10 @@ final class UserRepository
         try {
             $stmt = $pdo->prepare(
                 "INSERT INTO users
-                    (role, status, name, gender, phone, email, password_hash, service_slug, experience_years, bio, nid_number,
+                    (role, status, name, gender, phone, email, password_hash, service_slug, service_custom, experience_years, bio, nid_number,
                      address, upazila_id, district_id, division_id, photo, ip_hash, created_at)
                  VALUES
-                    (:role, 'pending', :name, :gender, :phone, :email, :hash, :service, :experience, :bio, :nid,
+                    (:role, 'pending', :name, :gender, :phone, :email, :hash, :service, :custom, :experience, :bio, :nid,
                      :address, :upazila, :district, :division, :photo, :ip_hash, NOW())"
             );
             $stmt->execute([
@@ -53,6 +53,7 @@ final class UserRepository
                 ':email' => $data['email'],
                 ':hash' => $data['password_hash'],
                 ':service' => $data['service_slug'] ?? null,
+                ':custom' => $data['service_custom'] ?? null,
                 ':experience' => $data['experience_years'] ?? null,
                 ':bio' => ($data['bio'] ?? '') !== '' ? $data['bio'] : null,
                 ':nid' => $data['nid_number'] ?? null,

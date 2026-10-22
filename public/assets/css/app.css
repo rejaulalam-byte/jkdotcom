@@ -2439,8 +2439,13 @@ textarea {
 }
 
 /* "কাজের ধরন": খোঁজা-যায় এমন ড্রপডাউন (.combo, app.js বানায়) ও ফর্মের বিন্যাস-সংশোধন */
-.pf--combo input {
+.pf--combo input,
+.pf--select input {
     padding-right: 4rem;
+}
+/* খোঁজার ঘর যে select-এর জায়গা নেয় সেটা লুকানো থাকে (.pf select-এর display তাকে হারাত) */
+.pf select[hidden] {
+    display: none;
 }
 .combo__toggle {
     position: absolute;

@@ -75,7 +75,10 @@ final class RegistrationController
             'division_id' => (int) ($_POST['division_id'] ?? 0),
         ];
         if ($role === 'worker') {
-            $data['service_slug'] = $this->clean($_POST['service'] ?? '', 80);
+            // তালিকার নামের সঙ্গে মিললে সেবার slug; না মিললে লেখাটা service_custom-এ জমা হয় (অ্যাডমিন যাচাই করবেন)
+            $data['service_name'] = $this->clean($_POST['service_name'] ?? '', 100);
+            $data['service_slug'] = $this->matchService($data['service_name']);
+            $data['service_custom'] = $data['service_slug'] === null && $data['service_name'] !== '' ? $data['service_name'] : null;
             $data['experience_years'] = trim((string) ($_POST['experience'] ?? '')) === '' ? null : (int) $_POST['experience'];
             $data['bio'] = $this->clean($_POST['bio'] ?? '', 2000, true);
         } else {
@@ -126,11 +129,9 @@ final class RegistrationController
     private function notifyAdmin(array $d): void
     {
         $geo = GeoRepository::names((int) $d['upazila_id'], (int) $d['district_id'], (int) $d['division_id']);
-        $service = '';
-        foreach (ServiceRepository::all() as $s) {
-            if ($s['slug'] === ($d['service_slug'] ?? null)) {
-                $service = $s['name'];
-            }
+        $service = (string) ($d['service_name'] ?? '');
+        if (($d['service_custom'] ?? null) !== null) {
+            $service .= ' (তালিকায় নেই — নাম যাচাই করে সেবা-তালিকায় যোগ করুন)';
         }
         $isWorker = $d['role'] === 'worker';
         $rows = [
@@ -186,9 +187,8 @@ final class RegistrationController
             $errors[] = 'আপনার নাম লিখুন।';
         }
         if ($d['role'] === 'worker') {
-            $known = array_column(ServiceRepository::all(), 'slug');
-            if ($d['service_slug'] === '' || !in_array($d['service_slug'], $known, true)) {
-                $errors[] = 'আপনার পেশা তালিকা থেকে বাছাই করুন।';
+            if (mb_strlen((string) $d['service_name']) < 2) {
+                $errors[] = 'আপনার পেশা লিখুন বা তালিকা থেকে বাছাই করুন।';
             }
             if ($d['experience_years'] !== null && ($d['experience_years'] < 0 || $d['experience_years'] > 70)) {
                 $errors[] = 'কাজের অভিজ্ঞতা ০ থেকে ৭০ বছরের মধ্যে লিখুন।';
@@ -230,6 +230,19 @@ final class RegistrationController
         }
 
         return $errors;
+    }
+
+    /** লেখা পেশার নাম সেবা-তালিকার কোনো নামের সঙ্গে হুবহু মিললে তার slug, নইলে null। */
+    private function matchService(string $name): ?string
+    {
+        $needle = mb_strtolower(trim($name));
+        foreach (ServiceRepository::all() as $service) {
+            if (mb_strtolower($service['name']) === $needle) {
+                return $service['slug'];
+            }
+        }
+
+        return null;
     }
 
     /** ত্রুটির কারণে সংরক্ষিত কিন্তু আর দরকার-নেই ছবি মুছে ফেলে। */
