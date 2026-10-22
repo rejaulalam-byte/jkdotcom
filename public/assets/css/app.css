@@ -3658,3 +3658,54 @@ textarea {
         font-size: 1.125rem;
     }
 }
+
+/* ---- সফল জমার বার্তা-বক্স, কার্ড-ধরন (Figma 2827-341): রেজিস্ট্রেশন ফর্মে ---------------------
+   সাদা বাক্স, পাতলা সবুজ কিনারা; ওপরের কিনারার ওপর বসা সবুজ বৃত্তে হলুদ টিক; ডানে ওপরে চৌকো বন্ধ-বাটন।
+   বন্ধ হওয়ার নিয়ম (১০ সেকেন্ড, ✕) আগের .post-toast-এর মতোই। */
+.post-toast--card {
+    width: min(71.625rem, calc(100vw - 2rem)); /* ১১৪৬px */
+    min-height: 27.4375rem;                    /* ৪৩৯px */
+    padding: 11rem 4rem 3rem;
+    border: 2px solid rgba(49, 155, 7, 0.34);
+    border-radius: 0;
+}
+.post-toast__tick {
+    position: absolute;
+    top: -5.6875rem;
+    left: 50%;
+    width: 11.9375rem;
+    height: auto;
+    transform: translateX(-50%);
+}
+.post-toast--card .post-toast__close {
+    top: 1.0625rem;
+    right: 1.375rem;
+    width: 2.625rem;
+    height: 2.625rem;
+    border: 1px solid #cbcbcb;
+    border-radius: 0;
+    background: var(--white);
+}
+.post-toast--card p {
+    margin: 0 auto;
+    max-width: 61.8125rem; /* ৯৮৯px */
+    font-size: 1.0625rem;
+    line-height: 1.9;
+    color: #000;
+}
+@media (min-width: 1200px) {
+    .post-toast--card p {
+        font-size: 1.5rem;     /* ২৪px */
+        line-height: 3.125rem; /* ৫০px */
+    }
+}
+@media (max-width: 1199px) {
+    .post-toast--card {
+        min-height: 0;
+        padding: 6.5rem 1.25rem 1.75rem;
+    }
+    .post-toast__tick {
+        top: -3.5rem;
+        width: 7rem;
+    }
+}

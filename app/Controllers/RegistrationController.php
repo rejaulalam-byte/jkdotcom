@@ -38,7 +38,7 @@ final class RegistrationController
             'crumb' => content($key . 'crumb'),
             'role' => $role,
             'action' => $role === 'agent' ? '/registration/agent/form' : '/registration/professional/form',
-            'done' => (bool) Session::pull('reg_done', false),
+            'done' => Session::pull('reg_done', null),
             'errors' => Session::pull('reg_errors', []),
             'old' => Session::pull('reg_old', []),
             'geo' => GeoRepository::all(),
@@ -107,7 +107,12 @@ final class RegistrationController
 
         $this->notifyAdmin($data);
 
-        Session::flash('reg_done', true);
+        // পপ-আপে আবেদনকারীর নাম ও এলাকা দেখানো হয় (প্রতিনিধির লেখায়)
+        $geo = GeoRepository::names($data['upazila_id'], $data['district_id'], $data['division_id']);
+        Session::flash('reg_done', [
+            'name' => $data['name'],
+            'area' => implode(', ', array_filter([$geo['upazila'], $geo['district'], $geo['division']])),
+        ]);
         redirect($back);
     }
 
