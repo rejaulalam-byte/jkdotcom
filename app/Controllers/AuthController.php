@@ -131,7 +131,6 @@ final class AuthController
             'title' => content('password.crumb') . ' — Jorurikaj.com',
             'heading' => content('password.banner'),
             'forced' => (int) ($user['must_change_password'] ?? 0) === 1,
-            'done' => Session::pull('password_done', false) === true,
             'errors' => Session::pull('password_errors', []),
         ]);
     }
@@ -185,8 +184,8 @@ final class AuthController
             $this->failPassword(['দুঃখিত, পাসওয়ার্ড সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।']);
         }
         Auth::login((int) $user['id']);
-        Session::flash('password_done', true);
-        redirect($back);
+        Session::flash('password_changed', true);
+        redirect('/profile');
     }
 
     /** @param list<string> $errors */

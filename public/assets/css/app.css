@@ -3821,3 +3821,16 @@ a.user-menu__item {
 a.user-menu__item:hover {
     background: var(--teal-10);
 }
+
+/* ---- ফর্ম-ঘরের ওপরের দৃশ্যমান নাম (প্রোফাইল পেইজ): ঘরের ঠিক ওপরে, ঘরের সঙ্গে লাগোয়া ---- */
+.pf__label {
+    display: block;
+    margin: 0 0 0.4rem 0.25rem;
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--ink);
+}
+.pf__star {
+    color: #c0392b;
+}

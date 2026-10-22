@@ -44,6 +44,7 @@ final class ProfileController
             'role' => (string) $user['role'],
             'done' => Session::pull('profile_done', false) === true,
             'unlocked' => Session::pull('login_unlocked', false) === true,
+            'passwordChanged' => Session::pull('password_changed', false) === true,
             'errors' => Session::pull('profile_errors', []),
             'geo' => GeoRepository::all(),
             'services' => $user['role'] === 'worker' ? ServiceRepository::all() : [],

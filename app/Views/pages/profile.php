@@ -7,6 +7,7 @@
  * @var array<string,mixed> $user
  * @var array<string,mixed> $old   ফর্মের শুরুর মান (সংরক্ষিত তথ্য, বা ভুল জমার পর লেখা মান)
  * @var string $role      'worker' | 'agent'
+ * @var bool   $passwordChanged  এইমাত্র পাসওয়ার্ড বদলানো হয়েছে
  * @var bool   $unlocked  ৫ ভুলের লক থাকা সত্ত্বেও সঠিক পাসওয়ার্ডে ঢুকেছেন (বিশেষ বিবেচনার বার্তা)
  * @var bool   $done      এইমাত্র সংরক্ষণ হয়েছে
  * @var list<string> $errors
@@ -21,12 +22,18 @@ $val = static fn (string $name): string => e((string) ($old[$name] ?? ''));
 $sel = static fn (string $name, int $id): string => (int) ($old[$name] ?? 0) === $id ? ' selected' : '';
 $ph = static fn (string $field, bool $required = true): string => e(content('regform.f.' . $field)) . ($required ? ' *' : '');
 $helpTel = content('today.post.helpline_tel');
+// ঘরের ঠিক ওপরের দৃশ্যমান নাম (ফাঁকা অবস্থায়ও কোন ঘরে কী তা বোঝা যায়); $required হলে লাল *
+$label = static fn (string $for, string $key, bool $required = false): string =>
+    '<label class="pf__label" for="' . e($for) . '">' . e(content('profile.l.' . $key)) . ($required ? ' <span class="pf__star">*</span>' : '') . '</label>';
 ?>
 <section class="section section--post-job section--regform" aria-labelledby="pf-title">
     <div class="container">
         <h2 id="pf-title" class="section__title post-job__title"><?= e(content('profile.title')) ?></h2>
         <p class="post-job__intro"><?= e(honorific_name($user['gender'] ?? null, (string) $user['name'])) ?>, <?= e(content('profile.intro')) ?></p>
 
+        <?php if ($passwordChanged): ?>
+            <p class="notice notice--ok profile__done" role="status"><?= e(content('password.changed')) ?></p>
+        <?php endif; ?>
         <?php if ($unlocked): ?>
             <p class="notice notice--ok profile__done" role="status"><?= e(content('login.unlocked')) ?></p>
         <?php endif; ?>
@@ -56,18 +63,18 @@ $helpTel = content('today.post.helpline_tel');
             <div class="reg-form__grid">
                 <div class="reg-form__col">
                     <?php // বদলানো-যায়-না তথ্য: ঘরের মতো দেখায় কিন্তু শুধু পড়া যায় ?>
+                    <?= $label('pf-name', 'name') ?>
                     <div class="pf pf--locked">
-                        <label class="sr-only" for="pf-name"><?= e(content('regform.f.name')) ?></label>
                         <input id="pf-name" type="text" value="<?= e((string) $user['name']) ?>" readonly tabindex="-1">
                     </div>
+                    <?= $label('pf-email', 'email') ?>
                     <div class="pf pf--locked">
-                        <label class="sr-only" for="pf-email"><?= e(content('regform.f.email')) ?></label>
                         <input id="pf-email" type="text" value="<?= e((string) ($user['email'] ?? '')) ?>" placeholder="<?= e(content('profile.no_email')) ?>" readonly tabindex="-1">
                     </div>
 
                     <?php if ($role === 'worker'): ?>
+                        <?= $label('rf-service', 'service', true) ?>
                         <div class="pf pf--combo" data-combo data-none="<?= e(content('regform.service.none')) ?>" data-use="<?= e(content('regform.service.use')) ?>" data-hint="<?= e(content('regform.service.hint')) ?>">
-                            <label class="sr-only" for="rf-service"><?= e(content('regform.f.service')) ?></label>
                             <input id="rf-service" data-bn type="text" name="service_name" list="rf-services" maxlength="100" required autocomplete="off"
                                    placeholder="<?= $ph('service') ?>" value="<?= $val('service_name') ?>">
                             <datalist id="rf-services">
@@ -76,37 +83,36 @@ $helpTel = content('today.post.helpline_tel');
                                 <?php endforeach; ?>
                             </datalist>
                         </div>
+                        <?= $label('rf-exp', 'experience') ?>
                         <div class="pf">
-                            <label class="sr-only" for="rf-exp"><?= e(content('regform.f.experience')) ?></label>
                             <input id="rf-exp" type="number" name="experience" min="0" max="70" inputmode="numeric"
                                    placeholder="<?= $ph('experience', false) ?>" value="<?= $val('experience_years') ?>">
                         </div>
                     <?php else: ?>
+                        <?= $label('pf-nid', 'nid') ?>
                         <div class="pf pf--locked">
-                            <label class="sr-only" for="pf-nid"><?= e(content('regform.f.nid')) ?></label>
                             <input id="pf-nid" type="text" value="<?= e((string) ($user['nid_number'] ?? '')) ?>" readonly tabindex="-1">
                         </div>
                     <?php endif; ?>
 
+                    <?= $label('rf-phone', 'phone', true) ?>
                     <div class="pf pf--phone">
-                        <label class="sr-only" for="rf-phone"><?= e(content('regform.f.phone')) ?></label>
                         <span class="pf__code" aria-hidden="true">+৮৮</span>
                         <input id="rf-phone" type="tel" name="phone" maxlength="14" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
                                placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                     </div>
+                    <?= $label('pf-current', 'current') ?>
                     <div class="pf">
-                        <label class="sr-only" for="pf-current"><?= e(content('profile.f.current')) ?></label>
-                        <input id="pf-current" type="password" name="current_password" maxlength="72" autocomplete="current-password"
-                               placeholder="<?= e(content('profile.f.current')) ?>">
+                        <input id="pf-current" type="password" name="current_password" maxlength="72" autocomplete="new-password" data-no-autofill>
                     </div>
+                    <?= $label('rf-address', 'address', true) ?>
                     <div class="pf">
-                        <label class="sr-only" for="rf-address"><?= e(content('regform.f.address')) ?></label>
                         <input id="rf-address" data-bn type="text" name="address" maxlength="250" required autocomplete="street-address"
                                placeholder="<?= $ph('address') ?>" value="<?= $val('address') ?>">
                     </div>
                     <?php // এলাকার তিন ড্রপডাউন: id-গুলো "কাজ সম্পর্কে জানান"-এর মতোই, app.js একই কোডে চালায় ?>
+                    <?= $label('pj-upazila', 'upazila', true) ?>
                     <div class="pf pf--select">
-                        <label class="sr-only" for="pj-upazila"><?= e(content('regform.f.upazila')) ?></label>
                         <select id="pj-upazila" name="upazila_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.upazila')) ?>">
                             <option value=""><?= $ph('upazila') ?></option>
                             <?php foreach ($geo['upazilas'] as $u): ?>
@@ -114,8 +120,8 @@ $helpTel = content('today.post.helpline_tel');
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <?= $label('pj-district', 'district', true) ?>
                     <div class="pf pf--select">
-                        <label class="sr-only" for="pj-district"><?= e(content('regform.f.district')) ?></label>
                         <select id="pj-district" name="district_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.district')) ?>">
                             <option value=""><?= $ph('district') ?></option>
                             <?php foreach ($geo['districts'] as $d): ?>
@@ -123,8 +129,8 @@ $helpTel = content('today.post.helpline_tel');
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <?= $label('pj-division', 'division', true) ?>
                     <div class="pf pf--select">
-                        <label class="sr-only" for="pj-division"><?= e(content('regform.f.division')) ?></label>
                         <select id="pj-division" name="division_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.division')) ?>">
                             <option value=""><?= $ph('division') ?></option>
                             <?php foreach ($geo['divisions'] as $v): ?>
@@ -153,8 +159,8 @@ $helpTel = content('today.post.helpline_tel');
             </div>
 
             <?php if ($role === 'worker'): ?>
+                <?= $label('rf-bio', 'bio') ?>
                 <div class="pf pf--wide">
-                    <label class="sr-only" for="rf-bio"><?= e(content('regform.f.bio')) ?></label>
                     <textarea id="rf-bio" data-bn name="bio" maxlength="2000"
                               placeholder="<?= $ph('bio', false) ?>"><?= $val('bio') ?></textarea>
                 </div>

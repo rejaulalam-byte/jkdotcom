@@ -817,7 +817,7 @@
         if (select.required) {
             input.required = true;
         }
-        var label = box.querySelector('label[for="' + select.id + '"]');
+        var label = document.querySelector('label[for="' + select.id + '"]');
         if (label) {
             label.setAttribute("for", input.id);
         }
@@ -1634,5 +1634,21 @@
                     send.disabled = false;
                 });
         });
+    });
+})();
+
+/* ---- "বর্তমান পাসওয়ার্ড" ঘরে ব্রাউজারের পুরনো পাসওয়ার্ড বসানো আটকানো (data-no-autofill) ---------
+   ব্রাউজার অন্য অ্যাকাউন্টের মনে-রাখা পাসওয়ার্ড নিজে বসিয়ে দিলে সার্ভার "বর্তমান পাসওয়ার্ড ভুল" বলত।
+   autocomplete="new-password" বেশিরভাগ ব্রাউজারে আটকায়; তবু বসে গেলে ব্যবহারকারী লেখার আগে ঘরটা খালি করা হয়। */
+(function () {
+    document.querySelectorAll("input[data-no-autofill]").forEach(function (field) {
+        var typed = false;
+        field.addEventListener("keydown", function () { typed = true; });
+        function clearIfAutofilled() {
+            if (!typed && field.value !== "") {
+                field.value = "";
+            }
+        }
+        [100, 500, 1200].forEach(function (ms) { window.setTimeout(clearIfAutofilled, ms); });
     });
 })();

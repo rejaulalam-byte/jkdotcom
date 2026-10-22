@@ -4,7 +4,6 @@
  *
  * @var string $heading
  * @var bool   $forced   প্রথম লগইনে পাসওয়ার্ড বদলানো বাধ্যতামূলক (must_change_password)
- * @var bool   $done     এইমাত্র সফলভাবে বদলানো হয়েছে
  * @var list<string> $errors
  */
 $crumbs = [['/', 'হোম'], [null, content('password.crumb')]];
@@ -12,7 +11,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
 
 $helpTel = content('today.post.helpline_tel');
 $rows = [
-    ['pw-current', 'current_password', 'password.f.current', 'current-password'],
+    ['pw-current', 'current_password', 'password.f.current', 'new-password'],
     ['pw-new', 'password', 'password.f.new', 'new-password'],
     ['pw-confirm', 'password_confirm', 'password.f.confirm', 'new-password'],
 ];
@@ -23,9 +22,6 @@ $rows = [
 
         <?php if ($forced): ?>
             <p class="notice notice--error login__notice"><?= e(content('password.forced')) ?></p>
-        <?php endif; ?>
-        <?php if ($done): ?>
-            <p class="notice notice--ok login__notice" role="status"><?= e(content('password.done')) ?></p>
         <?php endif; ?>
 
         <form class="login-card" id="form" action="/account/password" method="post" novalidate <?= form_msg_attrs() ?>>
@@ -44,7 +40,7 @@ $rows = [
                 <div class="login-card__row">
                     <label for="<?= e($id) ?>"><?= e(content($labelKey)) ?></label>
                     <div class="lg-field">
-                        <input id="<?= e($id) ?>" type="password" name="<?= e($name) ?>" maxlength="72" required autocomplete="<?= e($autocomplete) ?>"<?= $name !== 'current_password' ? ' minlength="8"' : '' ?>>
+                        <input id="<?= e($id) ?>" type="password" name="<?= e($name) ?>" maxlength="72" required autocomplete="<?= e($autocomplete) ?>"<?= $name === 'current_password' ? ' data-no-autofill' : '' ?><?= $name !== 'current_password' ? ' minlength="8"' : '' ?>>
                         <?php // বাটন লুকানো থাকে; app.js দেখায় (JavaScript ছাড়া পাসওয়ার্ড ঢাকাই থাকে) ?>
                         <button class="lg-eye" type="button" hidden aria-pressed="false" aria-controls="<?= e($id) ?>"
                                 data-show="<?= e(content('login.f.show')) ?>" data-hide="<?= e(content('login.f.hide')) ?>"

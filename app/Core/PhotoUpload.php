@@ -86,10 +86,10 @@ final class PhotoUpload
         return BASE_PATH . '/storage/uploads/photos';
     }
 
-    /** সংরক্ষিত ছবির ওয়েব ঠিকানা (/photo/<নাম>)। */
+    /** সংরক্ষিত ছবির ওয়েব ঠিকানা (/photo/<৩২-অক্ষরের নাম>, এক্সটেনশন ছাড়া: রুট নিজে ফাইলের ধরন খোঁজে)। */
     public static function url(?string $name): ?string
     {
-        return $name !== null && preg_match('/^[a-f0-9]{32}\.(jpg|png|webp)$/', $name) === 1 ? '/photo/' . $name : null;
+        return $name !== null && preg_match('/^[a-f0-9]{32}\.(jpg|png|webp)$/', $name) === 1 ? '/photo/' . pathinfo($name, PATHINFO_FILENAME) : null;
     }
 
     /** ফাইলের আসল ধরনে MIME (সার্ভ করার সময়)। */
