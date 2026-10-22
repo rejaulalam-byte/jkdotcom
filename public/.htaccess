@@ -6,9 +6,9 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Force HTTPS in production (enable once the SSL certificate is installed)
-    # RewriteCond %{HTTPS} off
-    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # Force HTTPS in production
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     # Real files (css/js/images) are served directly, everything else goes to the front controller
     RewriteCond %{REQUEST_FILENAME} !-f
