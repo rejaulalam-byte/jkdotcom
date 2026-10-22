@@ -54,6 +54,10 @@ $helpTel = content('today.post.helpline_tel');
                         <input id="rf-name" data-bn type="text" name="name" maxlength="100" required autocomplete="name"
                                placeholder="<?= $ph('name') ?>" value="<?= $val('name') ?>">
                     </div>
+                    <?php
+                    $genderId = 'rf-gender'; $genderName = 'gender'; $genderLabel = content('regform.f.gender'); $genderValue = (string) ($old['gender'] ?? '');
+                    require BASE_PATH . '/app/Views/partials/gender-field.php';
+                    ?>
 
                     <?php if ($role === 'worker'): ?>
                         <div class="pf pf--select">

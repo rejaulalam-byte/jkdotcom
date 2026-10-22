@@ -123,7 +123,7 @@ final class AuthController
             'heading' => content($key . 'banner'),
             'crumb' => content($key . 'crumb'),
             'role' => $role,
-            'name' => (string) $user['name'],
+            'name' => honorific_name($user['gender'] ?? null, (string) $user['name']),
             'token' => Security::csrfToken(),
         ]);
     }

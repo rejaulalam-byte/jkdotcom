@@ -225,3 +225,22 @@ function form_msg_attrs(): string
 
     return $out;
 }
+
+/**
+ * নামের আগে সম্বোধন: পুরুষ → "মি: নাম", মহিলা → "মিস নাম", অন্যান্য বা অজানা → শুধু "নাম"।
+ * (নাম দেখে লিঙ্গ আন্দাজ করা হয় না; ব্যবহারকারী নিজে ফর্মে জেন্ডার বাছেন।)
+ */
+function honorific_name(?string $gender, string $name): string
+{
+    return match ($gender) {
+        'male' => 'মি: ' . $name,
+        'female' => 'মিস ' . $name,
+        default => $name,
+    };
+}
+
+/** ফর্মে আসা জেন্ডার মান ঠিক আছে কি না: 'male' | 'female' | 'other', নইলে খালি লেখা। */
+function clean_gender(mixed $value): string
+{
+    return in_array($value, ['male', 'female', 'other'], true) ? (string) $value : '';
+}

@@ -19,7 +19,7 @@ final class UserRepository
      * নতুন আবেদন সংরক্ষণ করে; আসল সাইটে status = 'pending' (অ্যাডমিন অনুমোদন দিলে সক্রিয়)।
      * মোবাইল আগেই থাকলে 'duplicate', অন্য সমস্যায় 'error', সফল হলে 'ok' ফেরত দেয়।
      *
-     * @param array<string,mixed> $data role, name, phone, email, password_hash, address, upazila_id, district_id, division_id,
+     * @param array<string,mixed> $data role, name, gender, phone, email, password_hash, address, upazila_id, district_id, division_id,
      *                                  photo, এবং কর্মীর জন্য service_slug, experience_years, bio / প্রতিনিধির জন্য nid_number
      */
     public static function create(array $data): string
@@ -39,15 +39,16 @@ final class UserRepository
         try {
             $stmt = $pdo->prepare(
                 "INSERT INTO users
-                    (role, status, name, phone, email, password_hash, service_slug, experience_years, bio, nid_number,
+                    (role, status, name, gender, phone, email, password_hash, service_slug, experience_years, bio, nid_number,
                      address, upazila_id, district_id, division_id, photo, ip_hash, created_at)
                  VALUES
-                    (:role, 'pending', :name, :phone, :email, :hash, :service, :experience, :bio, :nid,
+                    (:role, 'pending', :name, :gender, :phone, :email, :hash, :service, :experience, :bio, :nid,
                      :address, :upazila, :district, :division, :photo, :ip_hash, NOW())"
             );
             $stmt->execute([
                 ':role' => $data['role'],
                 ':name' => $data['name'],
+                ':gender' => $data['gender'] !== '' ? $data['gender'] : null,
                 ':phone' => $data['phone'],
                 ':email' => $data['email'],
                 ':hash' => $data['password_hash'],

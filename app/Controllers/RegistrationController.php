@@ -66,6 +66,7 @@ final class RegistrationController
         $data = [
             'role' => $role,
             'name' => $this->clean($_POST['name'] ?? '', 100),
+            'gender' => clean_gender($_POST['gender'] ?? null),
             'phone' => normalize_phone($this->clean($_POST['phone'] ?? '', 20)),
             'email' => mb_strtolower($this->clean($_POST['email'] ?? '', 150)),
             'address' => $this->clean($_POST['address'] ?? '', 250),
@@ -110,7 +111,7 @@ final class RegistrationController
         // পপ-আপে আবেদনকারীর নাম ও এলাকা দেখানো হয় (প্রতিনিধির লেখায়)
         $geo = GeoRepository::names($data['upazila_id'], $data['district_id'], $data['division_id']);
         Session::flash('reg_done', [
-            'name' => $data['name'],
+            'name' => honorific_name($data['gender'], $data['name']),
             'area' => implode(', ', array_filter([$geo['upazila'], $geo['district'], $geo['division']])),
         ]);
         redirect($back);
@@ -135,6 +136,7 @@ final class RegistrationController
         $rows = [
             'আবেদনের ধরন' => $isWorker ? 'পেশাজীবী কর্মী' : 'প্রতিনিধি',
             'নাম' => (string) $d['name'],
+            'জেন্ডার' => ['male' => 'পুরুষ', 'female' => 'মহিলা', 'other' => 'অন্যান্য'][$d['gender']] ?? '',
             'ইমেইল' => (string) $d['email'],
             'মোবাইল' => format_phone((string) $d['phone']),
         ];
@@ -193,6 +195,9 @@ final class RegistrationController
             }
         } elseif (!preg_match('/^([0-9]{10}|[0-9]{13}|[0-9]{17})$/', (string) $d['nid_number'])) {
             $errors[] = 'জাতীয় পরিচয়পত্র নম্বর সঠিক নয়। ১০, ১৩ বা ১৭ সংখ্যার নম্বর দিন।';
+        }
+        if ($d['gender'] === '') {
+            $errors[] = 'জেন্ডার বাছাই করুন।';
         }
         if ($d['email'] === '') {
             $errors[] = 'ইমেইল ঠিকানা লিখুন।';

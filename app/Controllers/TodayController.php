@@ -186,6 +186,7 @@ final class TodayController
         $data = [
             'title' => $this->clean($_POST['title'] ?? '', 120),
             'contact_name' => $this->clean($_POST['contact_name'] ?? '', 100),
+            'contact_gender' => clean_gender($_POST['contact_gender'] ?? null),
             'phone' => normalize_phone($this->clean($_POST['phone'] ?? '', 20)),
             'email' => $this->clean($_POST['email'] ?? '', 150),
             'address' => $this->clean($_POST['address'] ?? '', 250),
@@ -225,7 +226,7 @@ final class TodayController
         // বার্তা-বক্সে জানানোকারীর নাম ও এলাকা দেখানো হয়
         $geo = GeoRepository::names($data['upazila_id'], $data['district_id'], $data['division_id']);
         Session::flash('job_posted', [
-            'name' => $data['contact_name'],
+            'name' => honorific_name($data['contact_gender'], $data['contact_name']),
             'area' => implode(', ', array_filter([$geo['upazila'], $geo['district'], $geo['division']])),
         ]);
         redirect('/today/post');
@@ -243,6 +244,9 @@ final class TodayController
         }
         if ($d['contact_name'] === '') {
             $errors[] = 'আপনার নাম লিখুন।';
+        }
+        if ($d['contact_gender'] === '') {
+            $errors[] = 'জেন্ডার বাছাই করুন।';
         }
         if ($d['phone'] === '') {
             $errors[] = 'মোবাইল নাম্বার লিখুন।';

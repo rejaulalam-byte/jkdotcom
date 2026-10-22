@@ -16,7 +16,7 @@ final class JobPostRepository
     /**
      * সর্বজনীন ফর্ম থেকে জানানো কাজ সংরক্ষণ করে। সঙ্গে সঙ্গে প্রকাশিত হয় (status 'approved'); অ্যাডমিন পরে সম্পাদনা বা লুকাতে পারবেন।
      *
-     * @param array{title:string,title_custom:int,details:string,contact_name:string,phone:string,email:string,address:string,upazila_id:int,district_id:int,division_id:int,start_date:string,end_date:string} $data
+     * @param array{title:string,title_custom:int,details:string,contact_name:string,contact_gender:string,phone:string,email:string,address:string,upazila_id:int,district_id:int,division_id:int,start_date:string,end_date:string} $data
      */
     public static function create(array $data): bool
     {
@@ -30,10 +30,10 @@ final class JobPostRepository
         try {
             $stmt = $pdo->prepare(
                 "INSERT INTO job_posts
-                    (title, title_custom, details, contact_name, phone, email, address, upazila_id, district_id, division_id,
+                    (title, title_custom, details, contact_name, contact_gender, phone, email, address, upazila_id, district_id, division_id,
                      start_date, end_date, ip_hash, status, published_at, created_at)
                  VALUES
-                    (:title, :title_custom, :details, :name, :phone, :email, :address, :upazila, :district, :division,
+                    (:title, :title_custom, :details, :name, :gender, :phone, :email, :address, :upazila, :district, :division,
                      :start_date, :end_date, :ip_hash, 'approved', NOW(), NOW())"
             );
             $stmt->execute([
@@ -41,6 +41,7 @@ final class JobPostRepository
                 ':title_custom' => $data['title_custom'],
                 ':details' => $data['details'],
                 ':name' => $data['contact_name'],
+                ':gender' => $data['contact_gender'] !== '' ? $data['contact_gender'] : null,
                 ':phone' => $data['phone'],
                 ':email' => $data['email'] !== '' ? $data['email'] : null,
                 ':address' => $data['address'],
@@ -199,6 +200,7 @@ final class JobPostRepository
             'title' => $data['title'],
             'details' => $data['details'],
             'contact_name' => $data['contact_name'],
+            'contact_gender' => $data['contact_gender'],
             'phone' => $data['phone'],
             'email' => $data['email'],
             'address' => $data['address'],

@@ -63,6 +63,10 @@ $helpTel = content('today.post.helpline_tel');
                             <input id="pj-name" data-bn type="text" name="contact_name" maxlength="100" required autocomplete="name"
                                    placeholder="<?= $ph('name') ?>" value="<?= $val('contact_name') ?>">
                         </div>
+                        <?php
+                        $genderId = 'pj-gender'; $genderName = 'contact_gender'; $genderLabel = content('today.post.f.gender'); $genderValue = (string) ($old['contact_gender'] ?? '');
+                        require BASE_PATH . '/app/Views/partials/gender-field.php';
+                        ?>
                         <div class="pf pf--phone">
                             <label class="sr-only" for="pj-phone"><?= e(content('today.post.f.phone')) ?></label>
                             <span class="pf__code" aria-hidden="true">+৮৮</span>
