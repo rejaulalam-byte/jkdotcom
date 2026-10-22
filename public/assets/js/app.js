@@ -70,11 +70,13 @@
             }
         });
     }
-    /* ---- "আপনার পোস্ট প্রকাশিত" বার্তা-বক্স: ২০ সেকেন্ড পরে নিজে সরে যায়, ✕ বাটনে সঙ্গে সঙ্গে ---- */
+    /* ---- সফল-জমার বার্তা-বক্স (কাজ জানান, দুই রেজিস্ট্রেশন): ২০ সেকেন্ড পরে নিজে সরে যায়, ✕ বাটনে সঙ্গে সঙ্গে;
+       সরে যাওয়ার পর হোম পেইজে নিয়ে যায়, কারণ ফর্মের পেইজে আর কিছু করার নেই ---- */
     var toast = document.getElementById("post-toast");
     if (toast) {
         var closeToast = function () {
             toast.classList.add("is-closed");
+            window.location.assign("/");
         };
         var toastClose = toast.querySelector(".post-toast__close");
         if (toastClose) {
