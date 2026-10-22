@@ -5,7 +5,7 @@
      মেনু (মোবাইল মেনু, সাব-মেনু) · বার্তা-বক্স · তারিখ ঘর · Hero অক্ষরের অ্যানিমেশন
      ওপরে-যাওয়ার বাটন · FAQ · আজকের কাজের তালিকা · Marquee · Services সারি
      Advertisement strip · কাজের ধরন ড্রপডাউন · এলাকার তিন ড্রপডাউন
-     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ
+     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ · পাসওয়ার্ড দেখা/লুকানো · রেজিস্ট্রেশনের ছবি
 
    প্রতিটি অংশ নিজের মতো স্বাধীন: ওই অংশের উপাদান পেইজে না থাকলে সে চুপচাপ বাদ পড়ে।
    ========================================================================== */
@@ -1047,5 +1047,71 @@
                 err.textContent = list.getAttribute("data-limit") || "";
                 err.hidden = false;
             });
+    });
+})();
+
+/* ---- পাসওয়ার্ড দেখা/লুকানো (লগইন): চোখ-বাটন JavaScript চালু থাকলেই দেখা যায় -------------- */
+(function () {
+    document.querySelectorAll(".lg-eye").forEach(function (btn) {
+        var input = document.getElementById(btn.getAttribute("aria-controls"));
+        if (!input) {
+            return;
+        }
+        btn.hidden = false;
+        btn.addEventListener("click", function () {
+            var show = input.type === "password";
+            input.type = show ? "text" : "password";
+            btn.setAttribute("aria-pressed", String(show));
+            var label = btn.getAttribute(show ? "data-hide" : "data-show");
+            btn.setAttribute("aria-label", label);
+        });
+    });
+})();
+
+/* ---- রেজিস্ট্রেশনের ছবি: নাম ও প্রিভিউ দেখায় এবং ১৫০ KB / JPG-PNG-WebP আগেই যাচাই করে --------
+   সার্ভারে আবার যাচাই হয় (PhotoUpload); এখানে শুধু দর্শককে দ্রুত জানানো। প্রিভিউ data: ঠিকানায়
+   (Content-Security-Policy-তে blob: নিষিদ্ধ)। */
+(function () {
+    var box = document.querySelector("[data-photo]");
+    if (!box) {
+        return;
+    }
+    var input = box.querySelector("input[type=file]");
+    var nameEl = box.querySelector("[data-photo-name]");
+    var preview = box.querySelector("[data-photo-preview]");
+    var errorEl = box.querySelector("[data-photo-error]");
+    var placeholder = preview.getAttribute("src");
+    var max = parseInt(box.getAttribute("data-max"), 10);
+    var types = ["image/jpeg", "image/png", "image/webp"];
+
+    function reset(message) {
+        input.value = "";
+        preview.src = placeholder;
+        nameEl.textContent = box.getAttribute("data-none");
+        errorEl.textContent = message || "";
+        errorEl.hidden = !message;
+    }
+
+    input.addEventListener("change", function () {
+        var file = input.files && input.files[0];
+        if (!file) {
+            reset("");
+            return;
+        }
+        if (types.indexOf(file.type) === -1) {
+            reset(box.getAttribute("data-bad-type"));
+            return;
+        }
+        if (file.size > max) {
+            reset(box.getAttribute("data-too-big"));
+            return;
+        }
+        errorEl.hidden = true;
+        nameEl.textContent = box.getAttribute("data-chosen") + file.name;
+        var reader = new FileReader();
+        reader.onload = function () {
+            preview.src = String(reader.result);
+        };
+        reader.readAsDataURL(file);
     });
 })();

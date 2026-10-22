@@ -203,3 +203,11 @@ function mask_email(string $email): string
     return substr($name, 0, 2) . str_repeat('*', max(3, strlen($name) - 2)) . substr($email, $at);
 }
 
+/** বাংলা অঙ্কসহ লেখা থেকে শুধু ইংরেজি অঙ্ক (০-৯ → 0-9), অন্য সব চিহ্ন বাদ (যেমন জাতীয় পরিচয়পত্র নম্বর)। */
+function normalize_digits(string $value): string
+{
+    $value = strtr($value, ['০' => '0', '১' => '1', '২' => '2', '৩' => '3', '৪' => '4', '৫' => '5', '৬' => '6', '৭' => '7', '৮' => '8', '৯' => '9']);
+
+    return (string) preg_replace('/\D/', '', $value);
+}
+

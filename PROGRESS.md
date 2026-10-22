@@ -1,3 +1,8 @@
+## STEP 1 (2026-10-22) — login, registration forms, welcome built (needs owner review)
+- Pages: /login, /login/agent, /registration/professional/form, /registration/agent/form, /welcome (see CLAUDE.md "step 1" for the rules and additions beyond Figma). Migration 005_users.sql must be run on every database (done on staging after this commit). Desktop 1920 measured against Figma (fields 652x77, card 1059x494, photo block 506 wide, preview 249x273); mobile 390 checked, no sideways scroll.
+- Test accounts may exist in the staging DB (users table): delete before real use. Worker/agent applications stay pending until an admin approves (admin panel not built: approve in phpMyAdmin by setting status='approved').
+- NEXT: professionals list per service (/services/<slug>) + personal info page, dashboard (incl. change password), admin panel, old-data import, redirects, contact page (owner sends Figma link).
+
 ## START HERE (written 2026-10-21 night, for a fresh chat)
 ## STAGING (2026-10-22) — https://new.jorurikaj.com is LIVE on cPanel with real MySQL
 - Repo cloned by cPanel Git Version Control at `/home4/jorurikaj/repositories/jkdotcom` (HTTPS clone, public repo); sub-domain `new.jorurikaj.com` document root = its `public` folder; `.cpanel.yml` creates storage folders. UPDATE FLOW: push to main -> cPanel > Git Version Control > Manage > Pull or Deploy > "Update from Remote" (files are live at once) > "Deploy HEAD Commit".

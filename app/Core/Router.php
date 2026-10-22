@@ -31,7 +31,7 @@ final class Router
             return;
         }
 
-        /** @var list<array{0:string,1:string,2:array{0:class-string,1:string},3?:array<string,mixed>}> $routes */
+        /** @var list<array{0:string,1:string,2:array{0:class-string,1:string,2?:array<string,mixed>},3?:array<string,mixed>}> $routes */
         $routes = require BASE_PATH . '/config/routes.php';
 
         $pathExists = false;
@@ -43,7 +43,8 @@ final class Router
             $pathExists = true;
             if ($route[0] === $method) {
                 [$class, $action] = $route[2];
-                (new $class())->$action(($route[3] ?? []) + $params);
+                // বাড়তি তথ্য (যেমন ['role' => 'agent']) কন্ট্রোলার-জোড়ার তৃতীয় ঘরে বা রুটের চতুর্থ ঘরে থাকতে পারে
+                (new $class())->$action(($route[2][2] ?? $route[3] ?? []) + $params);
                 return;
             }
         }

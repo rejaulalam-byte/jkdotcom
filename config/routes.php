@@ -2,16 +2,19 @@
 
 declare(strict_types=1);
 
+use App\Controllers\AuthController;
 use App\Controllers\FeedbackController;
 use App\Controllers\HomeController;
 use App\Controllers\PageController;
+use App\Controllers\RegistrationController;
 use App\Controllers\ServiceController;
 use App\Controllers\SubscribeController;
 use App\Controllers\TodayController;
 
 /*
  * ওয়েবসাইটের প্রতিটি সর্বজনীন URL।
- * ধরন: [HTTP মেথড, পাথ, [Controller::class, 'মেথড'], ঐচ্ছিক বাড়তি তথ্য]
+ * ধরন: [HTTP মেথড, পাথ, [Controller::class, 'মেথড', ঐচ্ছিক বাড়তি তথ্য]]
+ * (বাড়তি তথ্য যেমন ['role' => 'agent'] কন্ট্রোলারের মেথডে $meta হয়ে পৌঁছায়।)
  * নতুন পেইজ যোগ করতে: কন্ট্রোলারের মেথড + ভিউ বানান, তারপর এখানে এক লাইন যোগ করুন।
  */
 return [
@@ -29,10 +32,18 @@ return [
     ['POST', '/today/post',      [TodayController::class, 'postStore']],
     ['GET',  '/registration',    [PageController::class, 'registrationRules']],
     ['GET',  '/registration/professional', [PageController::class, 'registrationProfessional']],
-    ['GET',  '/registration/professional/form', [PageController::class, 'soon', ['title' => 'আগ্রহী পেশাদার কর্মী রেজিস্ট্রেশন']]],
+    ['GET',  '/registration/professional/form', [RegistrationController::class, 'form', ['role' => 'worker']]],
+    ['POST', '/registration/professional/form', [RegistrationController::class, 'store', ['role' => 'worker']]],
     ['GET',  '/registration/agent',        [PageController::class, 'registrationAgent']],
-    ['GET',  '/registration/agent/form',   [PageController::class, 'soon', ['title' => 'প্রতিনিধি রেজিস্ট্রেশন']]],
-    ['GET',  '/login',                     [PageController::class, 'soon', ['title' => 'লগইন']]],
+    ['GET',  '/registration/agent/form',   [RegistrationController::class, 'form', ['role' => 'agent']]],
+    ['POST', '/registration/agent/form',   [RegistrationController::class, 'store', ['role' => 'agent']]],
+    ['GET',  '/login',                     [AuthController::class, 'loginForm', ['role' => 'worker']]],
+    ['POST', '/login',                     [AuthController::class, 'loginStore', ['role' => 'worker']]],
+    ['GET',  '/login/agent',               [AuthController::class, 'loginForm', ['role' => 'agent']]],
+    ['POST', '/login/agent',               [AuthController::class, 'loginStore', ['role' => 'agent']]],
+    ['POST', '/logout',                    [AuthController::class, 'logout']],
+    ['GET',  '/welcome',                   [AuthController::class, 'welcome']],
+    ['GET',  '/photo/{slug}',              [AuthController::class, 'photo']],
     ['GET',  '/dashboard',                 [PageController::class, 'soon', ['title' => 'ড্যাশবোর্ড']]],
     ['GET',  '/contact',         [PageController::class, 'soon', ['title' => 'যোগাযোগ']]],
     ['GET',  '/privacy',         [PageController::class, 'soon', ['title' => 'প্রাইভেসি পলিসি']]],

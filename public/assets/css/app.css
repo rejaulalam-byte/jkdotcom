@@ -12,7 +12,7 @@
      ৩. হোম পেইজ: Hero · Advertisements · Services · About · Steps · FAQ + feedback
      ৪. Tablet + phone (১২০০px-এর নিচে): হোম ও সাধারণ অংশের মোবাইল নিয়ম
      ৫. Open page (খোলা লেখার পেইজ, .rich) · Services page · Site name
-     ৬. Post a job · Today's published list · Registration rules
+     ৬. Post a job · Today's published list · Registration rules · Login · Welcome · Registration forms
      ৭. পেইজ-ভিত্তিক ডেস্কটপ ফন্ট-সাইজ (body.page-* ক্লাস): ২৪px নিয়ম
 
    নতুন পেইজের স্টাইল: ফাইলের নিচের দিকে নিজের নামে একটা সেকশন খুলুন এবং
@@ -3259,5 +3259,382 @@ textarea {
 @media (max-width: 1199px) {
     .post-toast__icon {
         width: 5rem;
+    }
+}
+
+/* ---- Login (Figma 2660-816 পেশাজীবী, 2686-619 প্রতিনিধি): টিল কার্ডে লগইন আইডি ও পাসওয়ার্ড ---- */
+.section--login {
+    padding: 9.4rem 0 10rem;
+}
+.login__title {
+    margin-top: 0;
+    text-align: center;
+}
+.login-card {
+    max-width: 66.1875rem; /* ১০৫৯px */
+    margin: 4rem auto 0;
+    padding: 5.75rem 0 5.75rem;
+    border-radius: 0.5rem;
+    background: var(--teal);
+    color: var(--white);
+}
+.login-card__errors {
+    margin: -2.5rem 3rem 2rem;
+    font-size: var(--fs-small);
+}
+.login-card__row {
+    display: grid;
+    grid-template-columns: 22.625rem 27.8125rem; /* লেবেল ডানে-মেলানো ৩৬২px, ঘর ৪৪৫px */
+    column-gap: 2.8125rem;
+    align-items: center;
+    margin-bottom: 3.1875rem;
+}
+.login-card__row label {
+    font-size: 1.875rem;
+    text-align: right;
+}
+.lg-field {
+    position: relative;
+}
+.lg-field input {
+    display: block;
+    width: 100%;
+    height: 4.1875rem;
+    padding: 0 3.75rem 0 1.5rem;
+    border: 2px solid transparent;
+    border-radius: 0.4rem;
+    background: #dde5e8;
+    color: var(--ink);
+    font-size: var(--fs-body);
+}
+.lg-field input::placeholder {
+    color: rgba(34, 34, 34, 0.55);
+    opacity: 1;
+}
+.lg-field input:focus {
+    border-color: var(--gold);
+    outline: none;
+    background: var(--white);
+}
+.lg-eye {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: url("../img/icons/eye.svg") no-repeat center / 1.5rem;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+.lg-eye[aria-pressed="true"] {
+    background-image: url("../img/icons/eye-off.svg");
+}
+.lg-eye:focus-visible {
+    outline: 2px solid var(--teal);
+}
+.login-card__submit {
+    margin: 0 0 0 25.375rem; /* ঘরের বাঁ কিনারার সঙ্গে সোজা */
+}
+.lg-submit {
+    min-width: 16.5rem;
+    min-height: 4.625rem;
+    padding: 0.5rem 2rem;
+    border: 2px solid var(--gold);
+    border-radius: 0.4rem;
+    background: #fff8d2;
+    color: var(--teal);
+    font-size: 1.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.lg-submit:hover,
+.lg-submit:focus-visible {
+    background: var(--gold);
+}
+.login__help,
+.login__links {
+    margin-top: 2.25rem;
+    text-align: center;
+    font-size: var(--fs-body);
+}
+.login__links {
+    margin-top: 1rem;
+    font-size: var(--fs-small);
+}
+.login__tel,
+.login__links a {
+    color: var(--teal);
+    font-weight: 600;
+}
+.login__links span {
+    margin: 0 0.5rem;
+}
+
+/* ---- Welcome (Figma 2663-981, 2686-740): লগইনের পরের স্বাগত লেখা -------------------- */
+.section--welcome {
+    padding: 9rem 0;
+    text-align: center;
+}
+.welcome__line {
+    margin: 0;
+    font-size: var(--fs-body);
+    line-height: 1.875;
+}
+.welcome__name {
+    display: inline-block;
+    min-width: 12rem;
+    padding: 0 0.5rem;
+    border-bottom: 3px dotted var(--amber);
+    font-weight: 600;
+}
+.welcome__out {
+    margin-top: 3.5rem;
+}
+.welcome__out .pf-submit {
+    min-height: 4rem;
+    font-size: 1.5rem;
+}
+
+/* ---- Header avatar: লগইন-করা সদস্যের ছবি (Figma 2663-981) ---------------------------- */
+.nav__avatar {
+    display: block;
+    flex: none;
+    width: 3.625rem;
+    height: 3.625rem;
+    margin-left: 1.75rem;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background: var(--teal);
+    color: var(--white);
+    text-align: center;
+    text-decoration: none;
+}
+.nav__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.nav__avatar span {
+    display: block;
+    font-size: 1.875rem;
+    line-height: 3.625rem;
+}
+
+/* ---- Registration forms (Figma 2658-504 পেশাজীবী, 2682-2 প্রতিনিধি) --------------------
+   ঘর, নোট-বাক্স ও বাটন "কাজ সম্পর্কে জানান"-এর ক্লাসই (.pf, .post-form); এখানে শুধু দুই-কলামের বিন্যাস ও ছবির অংশ। */
+.reg-form {
+    max-width: 85.25rem; /* ১৩৬৪px: বিস্তারিত-বাক্সের চওড়া */
+}
+.reg-form__grid {
+    display: grid;
+    grid-template-columns: 40.75rem 31.625rem;
+    column-gap: 10.4375rem;
+    align-items: start;
+}
+.reg-form .pf--wide {
+    margin-inline: 0; /* Figma: বিস্তারিত-বাক্স ১৩৬৪px, দুই কলামের পুরো চওড়া */
+}
+.reg-form__note {
+    width: 36.125rem;
+    margin: -0.25rem 0 1.1rem 2.75rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    text-align: justify;
+    color: #000;
+}
+.reg-photo {
+    text-align: center;
+}
+.reg-photo__pick {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4.8125rem;
+    border-radius: 0.625rem;
+    background: #f3f7f8;
+}
+.reg-photo__label {
+    padding-left: 2.8rem;
+    font-size: 1.875rem;
+    color: rgba(34, 34, 34, 0.6);
+}
+.reg-photo__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 9.4375rem;
+    height: 100%;
+    border-radius: 0.625rem;
+    background: #cdcdcd;
+    color: #000;
+    font-size: 1.875rem;
+    font-weight: 500;
+}
+/* আসল ফাইল-ঘরটা পুরো বাক্স জুড়ে স্বচ্ছ: যেকোনো জায়গায় ক্লিকে ফাইল-বাছাই খোলে */
+.reg-photo__pick input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+.reg-photo__pick:focus-within {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
+}
+.reg-photo__name {
+    margin: 1.6rem 0 0;
+    padding-left: 5.8rem;
+    font-size: var(--fs-body);
+    text-align: left;
+    color: rgba(34, 34, 34, 0.9);
+    overflow-wrap: anywhere;
+}
+.reg-photo__preview {
+    width: 15.5625rem;
+    height: 17.0625rem;
+    margin: 1.6rem auto 0;
+    border-radius: 0.625rem;
+    object-fit: cover;
+}
+.reg-photo__note {
+    margin: 2rem 0 0;
+    font-size: 1.375rem;
+    line-height: 1.5;
+    color: rgba(34, 34, 34, 0.9);
+}
+.reg-photo__error {
+    margin: 1rem 0 0;
+    color: #8a1111;
+    font-size: var(--fs-small);
+}
+
+@media (max-width: 1199px) {
+    .section--login {
+        padding: 3rem 0 4rem;
+    }
+    .login__title {
+        font-size: 1.5rem;
+    }
+    .login-card {
+        margin-top: 1.75rem;
+        padding: 2rem 1.25rem 2.25rem;
+    }
+    .login-card__errors {
+        margin: 0 0 1.25rem;
+    }
+    .login-card__row {
+        grid-template-columns: 1fr;
+        row-gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+    .login-card__row label {
+        font-size: 1.125rem;
+        text-align: left;
+    }
+    .lg-field input {
+        height: 3.5rem;
+        font-size: 1rem;
+    }
+    .login-card__submit {
+        margin: 0;
+    }
+    .lg-submit {
+        width: 100%;
+        min-height: 3.5rem;
+        font-size: 1.25rem;
+    }
+    .login__help {
+        font-size: 1rem;
+    }
+    .login__links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .login__links span {
+        display: none;
+    }
+    .section--welcome {
+        padding: 3.5rem 0;
+    }
+    .welcome__line {
+        font-size: 1.0625rem;
+        line-height: 1.9;
+    }
+    .welcome__name {
+        min-width: 5rem;
+    }
+    .welcome__out {
+        margin-top: 2rem;
+    }
+    .welcome__out .pf-submit {
+        width: auto;
+        min-height: 3.25rem;
+        padding: 0.25rem 2rem;
+        font-size: 1.125rem;
+    }
+    .nav__avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        margin: 0.75rem 0 0;
+    }
+    .nav__avatar span {
+        font-size: 1.25rem;
+        line-height: 2.5rem;
+    }
+    .reg-form__grid {
+        grid-template-columns: 1fr;
+    }
+    .reg-form__note {
+        width: auto;
+        margin: -0.25rem 0 0.75rem;
+        font-size: 0.9375rem;
+    }
+    .reg-photo__pick {
+        height: 3.75rem;
+    }
+    .reg-photo__label,
+    .reg-photo__btn {
+        font-size: 1.0625rem;
+    }
+    .reg-photo__label {
+        padding-left: 1.2rem;
+    }
+    .reg-photo__btn {
+        width: 6.5rem;
+    }
+    .reg-photo__name {
+        padding-left: 0;
+        font-size: 0.9375rem;
+    }
+    .reg-photo__preview {
+        width: 11rem;
+        height: 12rem;
+    }
+    .reg-photo__note {
+        font-size: 0.9375rem;
+    }
+    .reg-form .pf--wide {
+        margin-top: 1.5rem;
+    }
+}
+
+/* ---- Login / Welcome / Registration form (ডেস্কটপ): সাধারণ লেখা ২৪px, বাকি Figma + ২px ---- */
+@media (min-width: 1200px) {
+    body.page-login,
+    body.page-welcome,
+    body.page-regform {
+        --fs-body: 1.5rem;
+    }
+    .page-login .login__title,
+    .page-regform .post-job__title {
+        font-size: 3.25rem; /* Figma ৫০px + ২ */
     }
 }
