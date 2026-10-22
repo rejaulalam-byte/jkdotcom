@@ -3660,14 +3660,15 @@ textarea {
 }
 
 /* ---- সফল জমার বার্তা-বক্স, কার্ড-ধরন (Figma 2827-341): রেজিস্ট্রেশন ফর্মে ---------------------
-   সাদা বাক্স, পাতলা সবুজ কিনারা; ওপরের কিনারার ওপর বসা সবুজ বৃত্তে হলুদ টিক; ডানে ওপরে চৌকো বন্ধ-বাটন।
+   হালকা ধূসর-নীল বাক্স, ১০px গোল কোণ, পাতলা সবুজ কিনারা; ওপরের কিনারার ওপর বসা সবুজ বৃত্তে হলুদ টিক; ডানে ওপরে চৌকো বন্ধ-বাটন।
    বন্ধ হওয়ার নিয়ম (১০ সেকেন্ড, ✕) আগের .post-toast-এর মতোই। */
 .post-toast--card {
     width: min(71.625rem, calc(100vw - 2rem)); /* ১১৪৬px */
     min-height: 27.4375rem;                    /* ৪৩৯px */
     padding: 11rem 4rem 3rem;
     border: 2px solid rgba(49, 155, 7, 0.34);
-    border-radius: 0;
+    border-radius: 0.625rem; /* ১০px */
+    background: #e6edef;
 }
 .post-toast__tick {
     position: absolute;
@@ -3682,7 +3683,7 @@ textarea {
     right: 1.375rem;
     width: 2.625rem;
     height: 2.625rem;
-    border: 1px solid #cbcbcb;
+    border: 1px solid #767676;
     border-radius: 0;
     background: var(--white);
 }
@@ -3695,7 +3696,7 @@ textarea {
 }
 @media (min-width: 1200px) {
     .post-toast--card p {
-        font-size: 1.5rem;     /* ২৪px */
+        font-size: 1.75rem;    /* ২৮px: ধন্যবাদের লেখা বড় */
         line-height: 3.125rem; /* ৫০px */
     }
 }

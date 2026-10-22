@@ -152,7 +152,7 @@ final class TodayController
     /** @param array<string,mixed> $meta */
     public function postForm(array $meta = []): void
     {
-        $done = (bool) Session::pull('job_posted', false);
+        $done = Session::pull('job_posted', null);
 
         View::render('pages/today-post', [
             'bodyClass' => 'page-post',
@@ -222,7 +222,12 @@ final class TodayController
             Logger::error('Job post e-mail could not be sent');
         }
 
-        Session::flash('job_posted', true);
+        // বার্তা-বক্সে জানানোকারীর নাম ও এলাকা দেখানো হয়
+        $geo = GeoRepository::names($data['upazila_id'], $data['district_id'], $data['division_id']);
+        Session::flash('job_posted', [
+            'name' => $data['contact_name'],
+            'area' => implode(', ', array_filter([$geo['upazila'], $geo['district'], $geo['division']])),
+        ]);
         redirect('/today/post');
     }
 

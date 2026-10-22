@@ -5,7 +5,7 @@
  * কাজ করে এবং সার্ভারে আবার যাচাই হয়।
  *
  * @var string $heading
- * @var bool $done        সফলভাবে জমা দেওয়ার ঠিক পরে true (১০ সেকেন্ডের জন্য বার্তা-বক্স দেখায়)
+ * @var array{name:string,area:string}|null $done  সফলভাবে জমা দেওয়ার ঠিক পরে জানানোকারীর নাম ও এলাকা (১০ সেকেন্ডের জন্য বার্তা-বক্স দেখায়)
  * @var list<string> $errors
  * @var array<string,mixed> $old
  * @var array{divisions:list<array{id:int,name:string}>,districts:list<array{id:int,parent:int,name:string}>,upazilas:list<array{id:int,parent:int,name:string}>} $geo
@@ -134,12 +134,16 @@ $helpTel = content('today.post.helpline_tel');
     </div>
 </section>
 
-<?php if ($done): ?>
-<div class="post-toast" id="post-toast" role="status" aria-live="polite">
+<?php if ($done !== null):
+    $say = static fn (string $key): string => e(strtr(content('today.post.done.' . $key), ['{name}' => (string) $done['name'], '{area}' => (string) $done['area']]));
+?>
+<?php // সফল জমার বার্তা-বক্স (Figma 2830-465): রেজিস্ট্রেশনের বক্সের মতোই কার্ড-ধরন; ১০ সেকেন্ড পরে সরে যায় ?>
+<div class="post-toast post-toast--card" id="post-toast" role="status" aria-live="polite">
+    <img class="post-toast__tick" src="<?= e(asset('img/icons/done-check.svg')) ?>" alt="" width="191" height="193">
     <button class="post-toast__close" type="button" aria-label="বন্ধ করুন"><span aria-hidden="true">&times;</span></button>
-    <img class="post-toast__icon" src="<?= e(asset('img/icons/check-circle.svg')) ?>" alt="" width="64" height="64">
-    <p><?= e(content('today.post.done.text_1')) ?></p>
-    <p><?= e(content('today.post.done.text_2')) ?></p>
-    <p><?= e(content('today.post.done.text_3')) ?></p>
+    <p><?= $say('text_0') ?></p>
+    <p><?= $say('text_1') ?></p>
+    <p><?= $say('text_2') ?></p>
+    <p><?= $say('text_3') ?></p>
 </div>
 <?php endif; ?>
