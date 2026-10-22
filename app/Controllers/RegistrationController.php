@@ -102,18 +102,66 @@ final class RegistrationController
                 : 'দুঃখিত, তথ্যগুলো সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।'], $data);
         }
 
-        // অ্যাডমিনকে জানানো (পাসওয়ার্ড কখনও নয়); না গেলেও আবেদন জমা থাকে
-        $to = Env::get('MAIL_TO', 'info@jorurikaj.com') ?? 'info@jorurikaj.com';
-        $body = 'নতুন ' . ($role === 'worker' ? 'পেশাজীবী কর্মীর' : 'প্রতিনিধির') . " রেজিস্ট্রেশন আবেদন — jorurikaj.com\n\n"
-            . "নাম: {$data['name']}\nমোবাইল: {$data['phone']}\nঠিকানা: {$data['address']}\n"
-            . ($role === 'worker' ? 'পেশা: ' . ($data['service_slug'] ?? '') . "\n" : '')
-            . "\nআবেদনটি অনুমোদনের অপেক্ষায় আছে।\n";
-        if (!Mailer::send($to, 'নতুন রেজিস্ট্রেশন আবেদন: ' . $data['name'], $body)) {
-            Logger::error('Registration e-mail could not be sent');
-        }
+        $this->notifyAdmin($data);
 
         Session::flash('reg_done', true);
         redirect($back);
+    }
+
+    /**
+     * registration@ ঠিকানায় ইমেইল: আবেদনের তথ্য ও আবেদনকারীর ছোট ছবি, যাতে এক নজরে বোঝা যায় কার আবেদন।
+     * পাসওয়ার্ড কখনও নয়। না গেলেও আবেদন ডাটাবেসে জমা থাকে (অ্যাডমিন প্যানেল সেখান থেকেই দেখাবে)।
+     *
+     * @param array<string,mixed> $d
+     */
+    private function notifyAdmin(array $d): void
+    {
+        $geo = GeoRepository::names((int) $d['upazila_id'], (int) $d['district_id'], (int) $d['division_id']);
+        $service = '';
+        foreach (ServiceRepository::all() as $s) {
+            if ($s['slug'] === ($d['service_slug'] ?? null)) {
+                $service = $s['name'];
+            }
+        }
+        $isWorker = $d['role'] === 'worker';
+        $rows = [
+            'আবেদনের ধরন' => $isWorker ? 'পেশাজীবী কর্মী' : 'প্রতিনিধি',
+            'নাম' => (string) $d['name'],
+            'মোবাইল' => format_phone((string) $d['phone']),
+        ];
+        if ($isWorker) {
+            $rows['পেশা'] = $service;
+            $rows['কাজের অভিজ্ঞতা'] = $d['experience_years'] === null ? '' : bn((int) $d['experience_years']) . ' বছর';
+        } else {
+            $rows['জাতীয় পরিচয়পত্র নম্বর'] = (string) $d['nid_number'];
+        }
+        $rows['ঠিকানা'] = (string) $d['address'];
+        $rows['থানা/উপজেলা, জেলা, বিভাগ'] = implode(', ', array_filter([$geo['upazila'], $geo['district'], $geo['division']]));
+        if ($isWorker && (string) $d['bio'] !== '') {
+            $rows['সংক্ষিপ্ত বিবরণ'] = (string) $d['bio'];
+        }
+        $rows['আবেদনের সময়'] = bn_date(date('Y-m-d')) . ', ' . bn_time(date('Y-m-d H:i:s'));
+
+        $photo = isset($d['photo']) ? PhotoUpload::directory() . '/' . $d['photo'] : null;
+        $image = $photo !== null && is_file($photo) ? ['path' => $photo, 'mime' => PhotoUpload::mimeOf((string) $d['photo'])] : null;
+
+        $html = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#222;max-width:560px">'
+            . '<h2 style="color:#125a6c;margin:0 0 12px">নতুন রেজিস্ট্রেশন আবেদন — jorurikaj.com</h2>'
+            . ($image !== null ? '<p style="margin:0 0 14px"><img src="cid:photo" alt="" width="110" style="border-radius:8px;display:block"></p>' : '')
+            . '<table cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%">';
+        $text = "নতুন রেজিস্ট্রেশন আবেদন — jorurikaj.com\n\n";
+        foreach ($rows as $label => $value) {
+            $html .= '<tr><td style="border-bottom:1px solid #dfe6e9;color:#555;width:38%;vertical-align:top">' . e($label) . '</td>'
+                . '<td style="border-bottom:1px solid #dfe6e9">' . nl2br(e($value)) . '</td></tr>';
+            $text .= $label . ': ' . $value . "\n";
+        }
+        $html .= '</table><p style="margin-top:14px;color:#555">আবেদনটি অনুমোদনের অপেক্ষায় আছে।</p></div>';
+        $text .= "\nআবেদনটি অনুমোদনের অপেক্ষায় আছে।\n";
+
+        $to = Env::get('MAIL_REGISTRATION_TO', 'registration@jorurikaj.com') ?? 'registration@jorurikaj.com';
+        if (!Mailer::sendHtml($to, 'নতুন রেজিস্ট্রেশন আবেদন: ' . $d['name'], $html, $text, $image)) {
+            Logger::error('Registration e-mail could not be sent');
+        }
     }
 
     /**
