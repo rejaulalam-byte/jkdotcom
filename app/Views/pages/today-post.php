@@ -29,7 +29,7 @@ $helpTel = content('today.post.helpline_tel');
                 <p><?= rich(content('today.post.required')) ?></p>
             </div>
 
-            <form class="post-form" id="form" action="/today/post" method="post" novalidate>
+            <form class="post-form" id="form" action="/today/post" method="post" novalidate <?= form_msg_attrs() ?>>
                 <?php if ($errors): ?>
                     <ul class="notice notice--error post-form__errors" role="alert">
                         <?php foreach ($errors as $error): ?>
@@ -66,7 +66,7 @@ $helpTel = content('today.post.helpline_tel');
                         <div class="pf pf--phone">
                             <label class="sr-only" for="pj-phone"><?= e(content('today.post.f.phone')) ?></label>
                             <span class="pf__code" aria-hidden="true">+৮৮</span>
-                            <input id="pj-phone" type="tel" name="phone" maxlength="11" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
+                            <input id="pj-phone" type="tel" name="phone" maxlength="14" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
                                    placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                         </div>
                         <div class="pf">
@@ -89,7 +89,7 @@ $helpTel = content('today.post.helpline_tel');
                         <?php // Figma-র ক্রম: উপজেলা, জেলা, বিভাগ। app.js-এ তিনটির যেকোনোটা আগে বাছা যায়। ?>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-upazila"><?= e(content('today.post.f.upazila')) ?></label>
-                            <select id="pj-upazila" name="upazila_id" required>
+                            <select id="pj-upazila" name="upazila_id" required data-all="<?= e(content('geo.all.upazila')) ?>">
                                 <option value=""><?= $ph('upazila') ?></option>
                                 <?php foreach ($geo['upazilas'] as $u): ?>
                                     <option value="<?= $u['id'] ?>" data-parent="<?= $u['parent'] ?>" data-name="<?= e($u['short']) ?>"<?= $sel('upazila_id', $u['id']) ?>><?= e($u['name']) ?></option>
@@ -98,7 +98,7 @@ $helpTel = content('today.post.helpline_tel');
                         </div>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-district"><?= e(content('today.post.f.district')) ?></label>
-                            <select id="pj-district" name="district_id" required>
+                            <select id="pj-district" name="district_id" required data-all="<?= e(content('geo.all.district')) ?>">
                                 <option value=""><?= $ph('district') ?></option>
                                 <?php foreach ($geo['districts'] as $d): ?>
                                     <option value="<?= $d['id'] ?>" data-parent="<?= $d['parent'] ?>"<?= $sel('district_id', $d['id']) ?>><?= e($d['name']) ?></option>
@@ -107,7 +107,7 @@ $helpTel = content('today.post.helpline_tel');
                         </div>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-division"><?= e(content('today.post.f.division')) ?></label>
-                            <select id="pj-division" name="division_id" required>
+                            <select id="pj-division" name="division_id" required data-all="<?= e(content('geo.all.division')) ?>">
                                 <option value=""><?= $ph('division') ?></option>
                                 <?php foreach ($geo['divisions'] as $v): ?>
                                     <option value="<?= $v['id'] ?>"<?= $sel('division_id', $v['id']) ?>><?= e($v['name']) ?></option>

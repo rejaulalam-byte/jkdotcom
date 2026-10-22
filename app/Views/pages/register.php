@@ -33,7 +33,7 @@ $helpTel = content('today.post.helpline_tel');
             <p><?= rich(content('today.post.required')) ?></p>
         </div>
 
-        <form class="post-form reg-form" id="form" action="<?= e($action) ?>" method="post" enctype="multipart/form-data" novalidate>
+        <form class="post-form reg-form" id="form" action="<?= e($action) ?>" method="post" enctype="multipart/form-data" novalidate <?= form_msg_attrs() ?>>
             <?php if ($errors): ?>
                 <ul class="notice notice--error post-form__errors" role="alert">
                     <?php foreach ($errors as $error): ?>
@@ -86,7 +86,7 @@ $helpTel = content('today.post.helpline_tel');
                     <div class="pf pf--phone">
                         <label class="sr-only" for="rf-phone"><?= e(content('regform.f.phone')) ?></label>
                         <span class="pf__code" aria-hidden="true">+৮৮</span>
-                        <input id="rf-phone" type="tel" name="phone" maxlength="11" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
+                        <input id="rf-phone" type="tel" name="phone" maxlength="14" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
                                placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                     </div>
                     <div class="pf">
@@ -97,7 +97,7 @@ $helpTel = content('today.post.helpline_tel');
                     <?php // এলাকার তিন ড্রপডাউন: id-গুলো "কাজ সম্পর্কে জানান"-এর মতোই, app.js একই কোডে চালায় ?>
                     <div class="pf pf--select">
                         <label class="sr-only" for="pj-upazila"><?= e(content('regform.f.upazila')) ?></label>
-                        <select id="pj-upazila" name="upazila_id" required>
+                        <select id="pj-upazila" name="upazila_id" required data-all="<?= e(content('geo.all.upazila')) ?>">
                             <option value=""><?= $ph('upazila') ?></option>
                             <?php foreach ($geo['upazilas'] as $u): ?>
                                 <option value="<?= $u['id'] ?>" data-parent="<?= $u['parent'] ?>" data-name="<?= e($u['short']) ?>"<?= $sel('upazila_id', $u['id']) ?>><?= e($u['name']) ?></option>
@@ -106,7 +106,7 @@ $helpTel = content('today.post.helpline_tel');
                     </div>
                     <div class="pf pf--select">
                         <label class="sr-only" for="pj-district"><?= e(content('regform.f.district')) ?></label>
-                        <select id="pj-district" name="district_id" required>
+                        <select id="pj-district" name="district_id" required data-all="<?= e(content('geo.all.district')) ?>">
                             <option value=""><?= $ph('district') ?></option>
                             <?php foreach ($geo['districts'] as $d): ?>
                                 <option value="<?= $d['id'] ?>" data-parent="<?= $d['parent'] ?>"<?= $sel('district_id', $d['id']) ?>><?= e($d['name']) ?></option>
@@ -115,7 +115,7 @@ $helpTel = content('today.post.helpline_tel');
                     </div>
                     <div class="pf pf--select">
                         <label class="sr-only" for="pj-division"><?= e(content('regform.f.division')) ?></label>
-                        <select id="pj-division" name="division_id" required>
+                        <select id="pj-division" name="division_id" required data-all="<?= e(content('geo.all.division')) ?>">
                             <option value=""><?= $ph('division') ?></option>
                             <?php foreach ($geo['divisions'] as $v): ?>
                                 <option value="<?= $v['id'] ?>"<?= $sel('division_id', $v['id']) ?>><?= e($v['name']) ?></option>
@@ -140,7 +140,8 @@ $helpTel = content('today.post.helpline_tel');
                 <div class="reg-form__col reg-photo" data-photo
                      data-max="<?= \App\Core\PhotoUpload::MAX_BYTES ?>"
                      data-none="<?= e(content('regform.photo.none')) ?>" data-chosen="<?= e(content('regform.photo.chosen')) ?>"
-                     data-too-big="<?= e(content('regform.photo.too_big')) ?>" data-bad-type="<?= e(content('regform.photo.bad_type')) ?>">
+                     data-too-big="<?= e(content('regform.photo.too_big')) ?>"
+                     data-size-shrunk="<?= e(content('regform.photo.size_shrunk')) ?>" data-size-same="<?= e(content('regform.photo.size_same')) ?>" data-bad-type="<?= e(content('regform.photo.bad_type')) ?>">
                     <div class="reg-photo__pick">
                         <label class="reg-photo__label" for="rf-photo"><?= e(content('regform.photo.label')) ?></label>
                         <span class="reg-photo__btn" aria-hidden="true"><?= e(content('regform.photo.browse')) ?></span>
@@ -148,7 +149,7 @@ $helpTel = content('today.post.helpline_tel');
                     </div>
                     <p class="reg-photo__name" data-photo-name><?= e(content('regform.photo.none')) ?></p>
                     <img class="reg-photo__preview" data-photo-preview src="<?= e(asset('img/icons/user-placeholder.svg')) ?>" alt="" width="249" height="273">
-                    <p class="reg-photo__note"><?= e(content('regform.photo.note_1')) ?><br><?= e(content('regform.photo.note_2')) ?></p>
+                    <p class="reg-photo__note"><?= e(content('regform.photo.note_1')) ?><br><span data-photo-size><?= e(content('regform.photo.note_2')) ?></span></p>
                     <p class="reg-photo__error" data-photo-error role="alert" hidden></p>
                 </div>
             </div>

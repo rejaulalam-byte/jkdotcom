@@ -3638,3 +3638,23 @@ textarea {
         font-size: 3.25rem; /* Figma ৫০px + ২ */
     }
 }
+
+/* ---- ফর্মের ভুল-বার্তা (app.js "ফর্মের ভুল-বার্তা"): ঘরের নিচে লাল লেখা, ঘরের কিনারা লাল ---------- */
+.pf__msg {
+    margin: 0.4rem 0 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #a61b1b;
+}
+.pf.is-invalid input,
+.pf.is-invalid select,
+.pf.is-invalid textarea,
+.pf--date.is-invalid {
+    border-color: #c0392b;
+}
+@media (min-width: 1200px) {
+    .page-post .pf__msg,
+    .page-regform .pf__msg {
+        font-size: 1.125rem;
+    }
+}

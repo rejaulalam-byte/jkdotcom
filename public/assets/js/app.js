@@ -5,7 +5,7 @@
      মেনু (মোবাইল মেনু, সাব-মেনু) · বার্তা-বক্স · তারিখ ঘর · Hero অক্ষরের অ্যানিমেশন
      ওপরে-যাওয়ার বাটন · FAQ · আজকের কাজের তালিকা · Marquee · Services সারি
      Advertisement strip · কাজের ধরন ড্রপডাউন · এলাকার তিন ড্রপডাউন
-     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ · পাসওয়ার্ড দেখা/লুকানো · রেজিস্ট্রেশনের ছবি
+     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ · পাসওয়ার্ড দেখা/লুকানো · রেজিস্ট্রেশনের ছবি · ফর্মের ভুল-বার্তা
 
    প্রতিটি অংশ নিজের মতো স্বাধীন: ওই অংশের উপাদান পেইজে না থাকলে সে চুপচাপ বাদ পড়ে।
    ========================================================================== */
@@ -710,11 +710,20 @@
         }
     }
 
-    function fill(select, first, values, labels, current) {
+    /* reset: "সকল ... দেখান" অপশন; কিছু বাছা থাকলেই (তালিকা ছোট হয়ে থাকলে) প্লেসহোল্ডারের ঠিক নিচে বসে।
+       এটা বাছলে তিনটি ঘরই খালি হয়ে সব নাম ফিরে আসে (RESET মান)। */
+    var RESET = "__all";
+    function fill(select, first, values, labels, current, reset) {
         while (select.options.length > 1) {
             select.remove(1);
         }
         select.options[0].textContent = first;
+        if (reset && (U || S || D)) {
+            var r = document.createElement("option");
+            r.value = RESET;
+            r.textContent = reset;
+            select.appendChild(r);
+        }
         values.forEach(function (v, i) {
             var o = document.createElement("option");
             o.value = v;
@@ -729,9 +738,9 @@
         var divName = {};
         divs.forEach(function (x) { divName[x.id] = x.name; });
         fill(div, placeholder.d, divs.filter(function (x) { return a.d.indexOf(x.id) !== -1; }).map(function (x) { return x.id; }),
-            divs.filter(function (x) { return a.d.indexOf(x.id) !== -1; }).map(function (x) { return x.name; }), D);
-        fill(dis, placeholder.s, a.s, null, S);
-        fill(upz, placeholder.u, a.u, null, U);
+            divs.filter(function (x) { return a.d.indexOf(x.id) !== -1; }).map(function (x) { return x.name; }), D, div.getAttribute("data-all"));
+        fill(dis, placeholder.s, a.s, null, S, dis.getAttribute("data-all"));
+        fill(upz, placeholder.u, a.u, null, U, upz.getAttribute("data-all"));
 
         var ids = { u: "", s: "", d: "" };
         if (U && S) {
@@ -745,9 +754,20 @@
         hidden.division_id.value = ids.d;
     }
 
-    div.addEventListener("change", function () { D = div.value; settle(); render(); });
-    dis.addEventListener("change", function () { S = dis.value; settle(); render(); });
-    upz.addEventListener("change", function () { U = upz.value; settle(); render(); });
+    function pick(select, set) {
+        select.addEventListener("change", function () {
+            if (select.value === RESET) {
+                U = S = D = "";
+            } else {
+                set(select.value);
+            }
+            settle();
+            render();
+        });
+    }
+    pick(div, function (v) { D = v; });
+    pick(dis, function (v) { S = v; });
+    pick(upz, function (v) { U = v; });
     settle();
     render();
 })();
@@ -1068,9 +1088,10 @@
     });
 })();
 
-/* ---- রেজিস্ট্রেশনের ছবি: নাম ও প্রিভিউ দেখায় এবং ১৫০ KB / JPG-PNG-WebP আগেই যাচাই করে --------
-   সার্ভারে আবার যাচাই হয় (PhotoUpload); এখানে শুধু দর্শককে দ্রুত জানানো। প্রিভিউ data: ঠিকানায়
-   (Content-Security-Policy-তে blob: নিষিদ্ধ)। */
+/* ---- রেজিস্ট্রেশনের ছবি: নাম ও প্রিভিউ দেখায়, বড় ছবি নিজে ছোট করে ---------------------------
+   মোবাইলের ছবি কয়েক MB হয়; ১৫০ KB-এর বেশি হলে ছবির মান যতটা সম্ভব ধরে রেখে ব্রাউজারেই ছোট করা হয়
+   (আগে মাপ ধরে রেখে গুণমান কমে, তারপর মাপ)। আসল সাইজ ও নতুন সাইজ ছবির নিচের লেখায় বসে।
+   সার্ভারে আবার যাচাই হয় (PhotoUpload); প্রিভিউ data: ঠিকানায় (Content-Security-Policy-তে blob: নিষিদ্ধ)। */
 (function () {
     var box = document.querySelector("[data-photo]");
     if (!box) {
@@ -1080,16 +1101,87 @@
     var nameEl = box.querySelector("[data-photo-name]");
     var preview = box.querySelector("[data-photo-preview]");
     var errorEl = box.querySelector("[data-photo-error]");
+    var sizeEl = box.querySelector("[data-photo-size]");
     var placeholder = preview.getAttribute("src");
+    var sizeDefault = sizeEl ? sizeEl.textContent : "";
     var max = parseInt(box.getAttribute("data-max"), 10);
     var types = ["image/jpeg", "image/png", "image/webp"];
+    var sides = [1600, 1280, 1024, 800, 640, 480];
+    var qualities = [0.9, 0.82, 0.74, 0.66, 0.58];
+    var canWebp = document.createElement("canvas").toDataURL("image/webp").indexOf("data:image/webp") === 0;
+
+    function fmt(bytes) {
+        return bytes >= 1048576 ? (bytes / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(bytes / 1024)) + " KB";
+    }
+    function say(attr, original, size) {
+        return box.getAttribute(attr).replace("{original}", fmt(original)).replace("{size}", fmt(size));
+    }
 
     function reset(message) {
         input.value = "";
         preview.src = placeholder;
         nameEl.textContent = box.getAttribute("data-none");
+        if (sizeEl) {
+            sizeEl.textContent = sizeDefault;
+        }
         errorEl.textContent = message || "";
         errorEl.hidden = !message;
+    }
+
+    function readImage(file) {
+        return new Promise(function (resolve, reject) {
+            var reader = new FileReader();
+            reader.onerror = reject;
+            reader.onload = function () {
+                var img = new Image();
+                img.onload = function () { resolve({ img: img, url: String(reader.result) }); };
+                img.onerror = reject;
+                img.src = String(reader.result);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function toBlob(img, side, type, quality) {
+        var scale = Math.min(1, side / Math.max(img.naturalWidth, img.naturalHeight));
+        var canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+        var ctx = canvas.getContext("2d");
+        if (type === "image/jpeg") {
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        return new Promise(function (resolve) { canvas.toBlob(resolve, type, quality); });
+    }
+
+    /* বড় ছবি ছোট করে: প্রথম যে মাপ-গুণমানে max-এর ভিতরে আসে সেটাই নেওয়া হয় (সবচেয়ে ভালো মান) */
+    function shrink(img) {
+        var type = canWebp ? "image/webp" : "image/jpeg";
+        var steps = [];
+        sides.forEach(function (side) {
+            qualities.forEach(function (q) { steps.push([side, q]); });
+        });
+        return steps.reduce(function (chain, step) {
+            return chain.then(function (found) {
+                return found || toBlob(img, step[0], type, step[1]).then(function (blob) {
+                    return blob && blob.size <= max ? blob : null;
+                });
+            });
+        }, Promise.resolve(null));
+    }
+
+    function useFile(file, url, original, shrunk) {
+        var dt = new DataTransfer();
+        dt.items.add(file);
+        input.files = dt.files;
+        preview.src = url;
+        nameEl.textContent = box.getAttribute("data-chosen") + file.name;
+        if (sizeEl) {
+            sizeEl.textContent = shrunk ? say("data-size-shrunk", original, file.size) : say("data-size-same", original, file.size);
+        }
+        errorEl.hidden = true;
     }
 
     input.addEventListener("change", function () {
@@ -1102,16 +1194,142 @@
             reset(box.getAttribute("data-bad-type"));
             return;
         }
-        if (file.size > max) {
-            reset(box.getAttribute("data-too-big"));
-            return;
+        readImage(file).then(function (loaded) {
+            if (file.size <= max) {
+                useFile(file, loaded.url, file.size, false);
+                return null;
+            }
+            return shrink(loaded.img).then(function (blob) {
+                if (!blob) {
+                    reset(box.getAttribute("data-too-big"));
+                    return;
+                }
+                var ext = blob.type === "image/webp" ? "webp" : "jpg";
+                var small = new File([blob], file.name.replace(/\.[^.]+$/, "") + "." + ext, { type: blob.type });
+                return readImage(small).then(function (done) {
+                    useFile(small, done.url, file.size, true);
+                });
+            });
+        }).catch(function () {
+            reset(box.getAttribute("data-bad-type"));
+        });
+    });
+})();
+
+/* ---- ফর্মের ভুল-বার্তা: ঘর ভুল হলে ঠিক তার নিচে বাংলায় বলে (form[data-validate]) --------------
+   মোবাইল ১১ সংখ্যা না হলে, ইমেইল/জাতীয় পরিচয়পত্র/পাসওয়ার্ড ভুল হলে, বাধ্যতামূলক ঘর খালি থাকলে।
+   মোবাইল ও পরিচয়পত্র ঘরে শুধু অঙ্ক চলে (বাংলা অঙ্ক নিজে ইংরেজি হয়)। ভুল থাকলে জমা আটকায় ও প্রথম
+   ভুল ঘরে নিয়ে যায়। সার্ভারও একই যাচাই করে, এটা শুধু দ্রুত জানানোর জন্য। */
+(function () {
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var bnDigits = { "০": "0", "১": "1", "২": "2", "৩": "3", "৪": "4", "৫": "5", "৬": "6", "৭": "7", "৮": "8", "৯": "9" };
+
+    function digits(value) {
+        return value.replace(/[০-৯]/g, function (c) { return bnDigits[c]; }).replace(/\D/g, "");
+    }
+
+    document.querySelectorAll("form[data-validate]").forEach(function (form) {
+        var msg = function (key) { return form.getAttribute("data-msg-" + key) || ""; };
+
+        function holder(field) {
+            return field.closest(".pf") || field.parentNode;
         }
-        errorEl.hidden = true;
-        nameEl.textContent = box.getAttribute("data-chosen") + file.name;
-        var reader = new FileReader();
-        reader.onload = function () {
-            preview.src = String(reader.result);
-        };
-        reader.readAsDataURL(file);
+        function show(field, text) {
+            var box = holder(field);
+            var note = box.querySelector(".pf__msg");
+            if (!text) {
+                box.classList.remove("is-invalid");
+                if (note) {
+                    note.remove();
+                }
+                field.removeAttribute("aria-invalid");
+                return;
+            }
+            if (!note) {
+                note = document.createElement("p");
+                note.className = "pf__msg";
+                note.setAttribute("role", "alert");
+                box.appendChild(note);
+            }
+            note.textContent = text;
+            box.classList.add("is-invalid");
+            field.setAttribute("aria-invalid", "true");
+        }
+
+        /* ঘরটা ভুল হলে বার্তা, ঠিক থাকলে ফাঁকা লেখা ফেরত দেয় */
+        function check(field, live) {
+            var v = field.value.trim();
+            var required = field.hasAttribute("required");
+            if (field.tagName === "SELECT") {
+                return required && (v === "" || v === "__all") ? msg("select") : "";
+            }
+            if (v === "") {
+                return required ? msg("required") : "";
+            }
+            if (field.type === "tel" && field.hasAttribute("pattern")) {
+                if (v.length > 11) {
+                    return msg("phone-long");
+                }
+                return live && v.length < 11 ? "" : (/^01[3-9][0-9]{8}$/.test(v) ? "" : msg("phone"));
+            }
+            if (field.name === "nid") {
+                return live || /^([0-9]{10}|[0-9]{13}|[0-9]{17})$/.test(v) ? "" : msg("nid");
+            }
+            if (field.type === "email") {
+                return live || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "" : msg("email");
+            }
+            if (field.name === "password" && field.hasAttribute("minlength")) {
+                return live || v.length >= parseInt(field.getAttribute("minlength"), 10) ? "" : msg("password");
+            }
+            if (field.name === "password_confirm") {
+                return live || v === form.elements.password.value ? "" : msg("match");
+            }
+            return "";
+        }
+
+        var fields = Array.prototype.filter.call(form.querySelectorAll("input, select, textarea"), function (f) {
+            return f.type !== "hidden" && f.type !== "file" && f.type !== "submit" && !f.classList.contains("hp") && f.tabIndex !== -1;
+        });
+
+        fields.forEach(function (field) {
+            if (field.type === "tel" && field.hasAttribute("pattern") || field.name === "nid") {
+                field.addEventListener("input", function () {
+                    var cleaned = digits(field.value);
+                    if (cleaned !== field.value) {
+                        field.value = cleaned;
+                    }
+                });
+            }
+            field.addEventListener("input", function () {
+                // টাইপের সময় শুধু "বেশি হয়ে গেছে"-জাতীয় স্পষ্ট ভুল বলে; বাকিটা ঘর ছাড়ার সময়
+                show(field, field.type === "tel" ? check(field, true) : (holder(field).classList.contains("is-invalid") ? check(field, false) : ""));
+            });
+            field.addEventListener("blur", function () {
+                if (field.value !== "" || holder(field).classList.contains("is-invalid")) {
+                    show(field, check(field, false));
+                }
+            });
+            field.addEventListener("change", function () {
+                if (field.tagName === "SELECT") {
+                    show(field, check(field, false));
+                }
+            });
+        });
+
+        form.addEventListener("submit", function (e) {
+            var first = null;
+            fields.forEach(function (field) {
+                var text = check(field, false);
+                show(field, text);
+                if (text && !first) {
+                    first = field;
+                }
+            });
+            if (first) {
+                e.preventDefault();
+                first.focus({ preventScroll: true });
+                first.scrollIntoView({ block: "center", behavior: reduceMotion ? "auto" : "smooth" });
+            }
+        });
     });
 })();

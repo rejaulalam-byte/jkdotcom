@@ -211,3 +211,17 @@ function normalize_digits(string $value): string
     return (string) preg_replace('/\D/', '', $value);
 }
 
+
+/**
+ * ফর্মের <form> ট্যাগে বসানোর data-* অ্যাট্রিবিউট: app.js এই বার্তাগুলো ঘরের নিচে দেখায়
+ * (মোবাইল ১১ সংখ্যা না হলে, ইমেইল ভুল হলে ইত্যাদি)। লেখাগুলো defaults.php-র form.msg.*।
+ */
+function form_msg_attrs(): string
+{
+    $out = 'data-validate';
+    foreach (['required', 'select', 'phone', 'phone_long', 'email', 'nid', 'password', 'match'] as $key) {
+        $out .= ' data-msg-' . str_replace('_', '-', $key) . '="' . e(content('form.msg.' . $key)) . '"';
+    }
+
+    return $out;
+}
