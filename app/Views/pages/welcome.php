@@ -14,7 +14,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
 ?>
 <section class="section section--welcome">
     <div class="container">
-        <p class="welcome__line"><span class="welcome__name"><?= e($name) ?></span>, <?= e(content('welcome.' . $role . '.line_1')) ?></p>
+        <p class="welcome__line"><span class="welcome__name"><?= e($name) ?>,</span> <?= e(content('welcome.' . $role . '.line_1')) ?></p>
         <p class="welcome__line"><?= e(content('welcome.line_2')) ?></p>
 
         <form class="welcome__out" action="/logout" method="post">

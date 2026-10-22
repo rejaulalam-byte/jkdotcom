@@ -3390,8 +3390,9 @@ textarea {
     line-height: 1.875;
 }
 .welcome__name {
-    display: inline-block;
+    display: inline-block; /* কমা নামের ভেতরেই, তাই নাম যত বড় হোক কমা নামের গায়ে লেগে থাকে */
     min-width: 12rem;
+    text-align: left;
     padding: 0 0.5rem;
     border-bottom: 3px dotted var(--amber);
     font-weight: 600;
