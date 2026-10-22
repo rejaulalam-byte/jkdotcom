@@ -95,7 +95,84 @@ final class AuthController
         $rehash = password_needs_rehash((string) $user['password_hash'], PASSWORD_DEFAULT) ? password_hash($password, PASSWORD_DEFAULT) : null;
         UserRepository::touchLogin((int) $user['id'], $rehash);
         Auth::login((int) $user['id']);
-        redirect('/welcome');
+        redirect((int) ($user['must_change_password'] ?? 0) === 1 ? '/account/password' : '/welcome');
+    }
+
+    /** পাসওয়ার্ড পরিবর্তনের পেইজ (লগইন না থাকলে লগইনে পাঠায়)। */
+    public function passwordForm(): void
+    {
+        $user = Auth::user();
+        if ($user === null) {
+            redirect('/login');
+        }
+
+        View::render('pages/password', [
+            'bodyClass' => 'page-login',
+            'title' => content('password.crumb') . ' — Jorurikaj.com',
+            'heading' => content('password.banner'),
+            'forced' => (int) ($user['must_change_password'] ?? 0) === 1,
+            'done' => Session::pull('password_done', false) === true,
+            'errors' => Session::pull('password_errors', []),
+        ]);
+    }
+
+    /** পাসওয়ার্ড বদলায়: বর্তমান পাসওয়ার্ড মিলতে হবে; সফল হলে সেশন-id নতুন হয় ও must_change_password মুছে যায়। */
+    public function passwordStore(): void
+    {
+        $user = Auth::user();
+        if ($user === null) {
+            redirect('/login');
+        }
+        $back = '/account/password';
+
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            $this->failPassword(['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+        }
+        if (trim((string) ($_POST['website'] ?? '')) !== '') {
+            redirect($back);
+        }
+        // বর্তমান পাসওয়ার্ড অনুমানের চেষ্টা ঠেকাতে সদস্য-ভিত্তিক সীমা
+        if (RateLimiter::tooMany('pwchange_' . $user['id'], 5, 900)) {
+            $this->failPassword(['অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
+        }
+
+        $current = (string) ($_POST['current_password'] ?? '');
+        $new = (string) ($_POST['password'] ?? '');
+        $confirm = (string) ($_POST['password_confirm'] ?? '');
+
+        $errors = [];
+        if (!password_verify($current, (string) $user['password_hash'])) {
+            $errors[] = 'বর্তমান পাসওয়ার্ডটি সঠিক নয়।';
+        }
+        // bcrypt ৭২ বাইটের পরের অংশ উপেক্ষা করে, তাই বেশি লম্বা পাসওয়ার্ড আটকানো হয়
+        if (mb_strlen($new) < 8) {
+            $errors[] = 'নতুন পাসওয়ার্ড অবশ্যই ৮ (আট) অক্ষর বা তার বেশি হতে হবে।';
+        } elseif (strlen($new) > 72) {
+            $errors[] = 'নতুন পাসওয়ার্ড সর্বোচ্চ ৭২ বাইট (প্রায় ৭০ ইংরেজি অক্ষর) হতে পারে।';
+        } elseif ($new === $current) {
+            $errors[] = 'নতুন পাসওয়ার্ড বর্তমান পাসওয়ার্ডের চেয়ে আলাদা হতে হবে।';
+        } elseif ($new === (string) $user['phone']) {
+            $errors[] = 'মোবাইল নাম্বারকে পাসওয়ার্ড হিসেবে ব্যবহার করবেন না।';
+        } elseif ($new !== $confirm) {
+            $errors[] = 'দুইবার লেখা নতুন পাসওয়ার্ড একই নয়।';
+        }
+        if ($errors !== []) {
+            $this->failPassword($errors);
+        }
+
+        if (!UserRepository::changePassword((int) $user['id'], password_hash($new, PASSWORD_DEFAULT))) {
+            $this->failPassword(['দুঃখিত, পাসওয়ার্ড সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।']);
+        }
+        Auth::login((int) $user['id']);
+        Session::flash('password_done', true);
+        redirect($back);
+    }
+
+    /** @param list<string> $errors */
+    private function failPassword(array $errors): never
+    {
+        Session::flash('password_errors', $errors);
+        redirect('/account/password#form');
     }
 
     /** লগআউট শুধু POST + CSRF দিয়ে: অন্য সাইট থেকে লিংকের মাধ্যমে কাউকে বের করে দেওয়া যায় না। */
@@ -113,6 +190,9 @@ final class AuthController
         $user = Auth::user();
         if ($user === null) {
             redirect('/login');
+        }
+        if ((int) ($user['must_change_password'] ?? 0) === 1) {
+            redirect('/account/password');
         }
         $role = (string) $user['role'];
         $key = 'welcome.' . $role . '.';

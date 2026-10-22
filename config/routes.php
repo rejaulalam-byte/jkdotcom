@@ -43,6 +43,8 @@ return [
     ['POST', '/login/agent',               [AuthController::class, 'loginStore', ['role' => 'agent']]],
     ['POST', '/logout',                    [AuthController::class, 'logout']],
     ['GET',  '/welcome',                   [AuthController::class, 'welcome']],
+    ['GET',  '/account/password',          [AuthController::class, 'passwordForm']],
+    ['POST', '/account/password',          [AuthController::class, 'passwordStore']],
     ['GET',  '/photo/{slug}',              [AuthController::class, 'photo']],
     ['GET',  '/dashboard',                 [PageController::class, 'soon', ['title' => 'ড্যাশবোর্ড']]],
     ['GET',  '/contact',         [PageController::class, 'soon', ['title' => 'যোগাযোগ']]],

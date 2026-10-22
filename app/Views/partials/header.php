@@ -84,8 +84,8 @@ $registrationPaths = ['/login', '/welcome'];
                     </summary>
                     <div class="user-menu">
                         <p class="user-menu__name"><?= e((string) $member['name']) ?></p>
-                        <?php // পাসওয়ার্ড পরিবর্তন ও প্রোফাইল এখন শুধু লেখা; লিংক পরে বসবে ?>
-                        <p class="user-menu__item"><?= e(content('nav.password')) ?></p>
+                        <?php // প্রোফাইল এখন শুধু লেখা; লিংক পরে বসবে ?>
+                        <a class="user-menu__item" href="/account/password"><?= e(content('nav.password')) ?></a>
                         <p class="user-menu__item"><?= e(content('nav.profile')) ?></p>
                         <form action="/logout" method="post">
                             <?= csrf_field() ?>

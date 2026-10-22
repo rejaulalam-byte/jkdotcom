@@ -3755,3 +3755,24 @@ textarea {
         width: 7rem;
     }
 }
+
+/* ---- পাসওয়ার্ড পরিবর্তন: লগইন কার্ডের বিন্যাসই; শুধু বার্তা ও নোট ---- */
+.login__notice {
+    max-width: 66.1875rem;
+    margin: 2rem auto 0;
+}
+.pw-note {
+    margin: -1.5rem 0 2.5rem 25.375rem; /* ঘরের বাঁ কিনারার সঙ্গে সোজা */
+    max-width: 27.8125rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+.login-card .pf__msg {
+    color: #ffd9d9; /* টিল কার্ডের ওপরে পড়ার মতো হালকা লাল */
+}
+@media (max-width: 1199px) {
+    .pw-note {
+        margin: -0.5rem 1.25rem 1.5rem;
+        max-width: none;
+    }
+}

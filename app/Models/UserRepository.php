@@ -197,6 +197,33 @@ final class UserRepository
         }
     }
 
+    /** নতুন পাসওয়ার্ড-হ্যাশ বসায় এবং "পাসওয়ার্ড বদলাতে হবে" চিহ্ন মুছে দেয়। সফল হলে true। */
+    public static function changePassword(int $id, string $hash): bool
+    {
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = self::demoRead();
+            foreach ($rows as $i => $row) {
+                if ((int) $row['id'] === $id) {
+                    $rows[$i]['password_hash'] = $hash;
+                    $rows[$i]['must_change_password'] = 0;
+                }
+            }
+
+            return self::demoWrite($rows);
+        }
+
+        try {
+            $stmt = $pdo->prepare('UPDATE users SET password_hash = :hash, must_change_password = 0 WHERE id = :id');
+
+            return $stmt->execute([':hash' => $hash, ':id' => $id]);
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::changePassword failed: ' . $e->getMessage());
+
+            return false;
+        }
+    }
+
     /** @return list<array<string,mixed>> */
     private static function demoRead(): array
     {
