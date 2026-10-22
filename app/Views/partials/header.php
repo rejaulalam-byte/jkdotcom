@@ -14,8 +14,8 @@ $menu = [
     ]],
     ['/registration', 'রেজিস্ট্রেশন',        [
         ['/registration',              'রেজিস্ট্রেশন সম্পর্কিত তথ্যাবলী'],
-        ['/registration/professional', 'আগ্রহী পেশাদার কর্মী রেজিস্ট্রেশন'],
-        ['/registration/agent',        'প্রতিনিধি রেজিস্ট্রেশন'],
+        ['/registration/professional/form', 'পেশাজীবীদের রেজিস্ট্রেশন'],
+        ['/registration/agent/form',   'প্রতিনিধি রেজিস্ট্রেশন'],
         ['/login',                     'পেশাজীবী লগইন'],
         ['/login/agent',               'প্রতিনিধি লগইন'],
         ['/dashboard',                 'ড্যাশবোর্ড'],

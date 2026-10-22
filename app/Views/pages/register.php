@@ -120,13 +120,13 @@ $helpTel = content('today.post.helpline_tel');
 
                     <div class="pf">
                         <label class="sr-only" for="rf-pass"><?= e(content('regform.f.password')) ?></label>
-                        <input id="rf-pass" type="password" name="password" minlength="12" maxlength="72" required autocomplete="new-password"
+                        <input id="rf-pass" type="password" name="password" minlength="8" maxlength="72" required autocomplete="new-password"
                                placeholder="<?= $ph('password') ?>">
                     </div>
                     <p class="reg-form__note"><?= e(content('regform.password_note')) ?></p>
                     <div class="pf">
                         <label class="sr-only" for="rf-pass2"><?= e(content('regform.f.password2')) ?></label>
-                        <input id="rf-pass2" type="password" name="password_confirm" minlength="12" maxlength="72" required autocomplete="new-password"
+                        <input id="rf-pass2" type="password" name="password_confirm" minlength="8" maxlength="72" required autocomplete="new-password"
                                placeholder="<?= $ph('password2') ?>">
                     </div>
                 </div>

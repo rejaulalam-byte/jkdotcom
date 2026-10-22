@@ -22,7 +22,7 @@ use App\Models\UserRepository;
  */
 final class RegistrationController
 {
-    private const MIN_PASSWORD = 12;
+    private const MIN_PASSWORD = 8;
 
     /** @param array<string,mixed> $meta role => 'worker'|'agent' */
     public function form(array $meta = []): void
@@ -153,7 +153,7 @@ final class RegistrationController
 
         // bcrypt ৭২ বাইটের পরের অংশ উপেক্ষা করে, তাই বেশি লম্বা পাসওয়ার্ড আটকানো হয়
         if (mb_strlen($password) < self::MIN_PASSWORD) {
-            $errors[] = 'লগইন পাসওয়ার্ড অবশ্যই ১২ অক্ষরের হতে হবে।';
+            $errors[] = 'লগইন পাসওয়ার্ড অবশ্যই ৮ (আট) অক্ষর বা তার বেশি হতে হবে।';
         } elseif (strlen($password) > 72) {
             $errors[] = 'লগইন পাসওয়ার্ড সর্বোচ্চ ৭২ বাইট (প্রায় ৭০ ইংরেজি অক্ষর) হতে পারে।';
         } elseif ($password === (string) $d['phone']) {
