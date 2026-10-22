@@ -1567,11 +1567,15 @@
     }
     var token = dialog.getAttribute("data-token");
     var steps = dialog.querySelectorAll("[data-step]");
+    var heading = dialog.querySelector("h3");
+    var mainTitle = heading.textContent;
 
     function show(name) {
         Array.prototype.forEach.call(steps, function (el) {
             el.hidden = el.getAttribute("data-step") !== name;
         });
+        // সফল ধাপে শিরোনাম বদলে যায় ("পাসওয়ার্ড পরিবর্তন"), অন্য ধাপে মূল শিরোনাম
+        heading.textContent = dialog.querySelector('[data-step="' + name + '"]').getAttribute("data-title") || mainTitle;
         var first = dialog.querySelector('[data-step="' + name + '"] input');
         if (first) {
             first.focus();

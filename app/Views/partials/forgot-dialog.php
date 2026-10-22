@@ -54,7 +54,7 @@
         </p>
     </form>
 
-    <div class="forgot__step" data-step="done" hidden>
+    <div class="forgot__step" data-step="done" data-title="<?= e(content('forgot.done_title')) ?>" hidden>
         <p><?= e(content('forgot.done_1')) ?></p>
         <p><em><?= e(content('forgot.done_2')) ?></em></p>
         <p class="lead__actions">
