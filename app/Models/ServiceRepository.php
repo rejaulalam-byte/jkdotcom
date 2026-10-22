@@ -41,6 +41,19 @@ final class ServiceRepository
         }
     }
 
+    /** লেখা পেশার নাম সেবা-তালিকার কোনো নামের সঙ্গে হুবহু মিললে তার slug, নইলে null। */
+    public static function slugByName(string $name): ?string
+    {
+        $needle = mb_strtolower(trim($name));
+        foreach (self::all() as $service) {
+            if (mb_strtolower($service['name']) === $needle) {
+                return $service['slug'];
+            }
+        }
+
+        return null;
+    }
+
     /** @return array{name:string,slug:string,icon:?string}|null */
     public static function findBySlug(string $slug): ?array
     {

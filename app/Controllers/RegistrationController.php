@@ -77,7 +77,7 @@ final class RegistrationController
         if ($role === 'worker') {
             // তালিকার নামের সঙ্গে মিললে সেবার slug; না মিললে লেখাটা service_custom-এ জমা হয় (অ্যাডমিন যাচাই করবেন)
             $data['service_name'] = $this->clean($_POST['service_name'] ?? '', 100);
-            $data['service_slug'] = $this->matchService($data['service_name']);
+            $data['service_slug'] = ServiceRepository::slugByName($data['service_name']);
             $data['service_custom'] = $data['service_slug'] === null && $data['service_name'] !== '' ? $data['service_name'] : null;
             $data['experience_years'] = trim((string) ($_POST['experience'] ?? '')) === '' ? null : (int) $_POST['experience'];
             $data['bio'] = $this->clean($_POST['bio'] ?? '', 2000, true);
@@ -232,19 +232,6 @@ final class RegistrationController
         return $errors;
     }
 
-    /** লেখা পেশার নাম সেবা-তালিকার কোনো নামের সঙ্গে হুবহু মিললে তার slug, নইলে null। */
-    private function matchService(string $name): ?string
-    {
-        $needle = mb_strtolower(trim($name));
-        foreach (ServiceRepository::all() as $service) {
-            if (mb_strtolower($service['name']) === $needle) {
-                return $service['slug'];
-            }
-        }
-
-        return null;
-    }
-
     /** ত্রুটির কারণে সংরক্ষিত কিন্তু আর দরকার-নেই ছবি মুছে ফেলে। */
     private function discard(?string $photo): void
     {
@@ -261,10 +248,7 @@ final class RegistrationController
 
     private function clean(mixed $value, int $max, bool $multiline = false): string
     {
-        $value = is_string($value) ? $value : '';
-        $value = (string) preg_replace($multiline ? '/[^\P{C}\n]+/u' : '/\p{C}+/u', '', str_replace("\r\n", "\n", $value));
-
-        return mb_substr(trim($value), 0, $max);
+        return clean_input($value, $max, $multiline);
     }
 
     /**

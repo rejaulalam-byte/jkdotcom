@@ -18,7 +18,6 @@ $menu = [
         ['/registration/agent/form',   'প্রতিনিধি রেজিস্ট্রেশন'],
         ['/login',                     'পেশাজীবী লগইন'],
         ['/login/agent',               'প্রতিনিধি লগইন'],
-        ['/dashboard',                 'ড্যাশবোর্ড'],
     ]],
     ['/contact',      'যোগাযোগ',           []],
 ];
@@ -84,9 +83,8 @@ $registrationPaths = ['/login', '/welcome'];
                     </summary>
                     <div class="user-menu">
                         <p class="user-menu__name"><?= e((string) $member['name']) ?></p>
-                        <?php // প্রোফাইল এখন শুধু লেখা; লিংক পরে বসবে ?>
                         <a class="user-menu__item" href="/account/password"><?= e(content('nav.password')) ?></a>
-                        <p class="user-menu__item"><?= e(content('nav.profile')) ?></p>
+                        <a class="user-menu__item" href="/profile"><?= e(content('nav.profile')) ?></a>
                         <form action="/logout" method="post">
                             <?= csrf_field() ?>
                             <button class="user-menu__item user-menu__logout" type="submit"><?= e(content('nav.logout')) ?></button>

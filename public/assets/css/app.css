@@ -3797,3 +3797,27 @@ textarea {
     width: auto;
     font-size: 1rem;
 }
+
+/* ---- প্রোফাইল পেইজ: রেজিস্ট্রেশন ফর্মের বিন্যাসই; শুধু পড়া-যায়-এমন ঘর ও বার্তা ---- */
+.pf--locked input {
+    background: var(--teal-10);
+    color: rgba(34, 34, 34, 0.7);
+    cursor: not-allowed;
+}
+.profile__done {
+    max-width: 85.25rem;
+    margin: 0 auto 2rem;
+}
+.profile__pw {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+.profile__pw a,
+a.user-menu__item {
+    color: var(--teal);
+    font-weight: 600;
+    text-decoration: none;
+}
+a.user-menu__item:hover {
+    background: var(--teal-10);
+}

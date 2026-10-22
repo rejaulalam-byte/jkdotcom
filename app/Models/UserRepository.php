@@ -197,6 +197,71 @@ final class UserRepository
         }
     }
 
+    /**
+     * সদস্যের নিজে-বদলানো যায় এমন তথ্য সংরক্ষণ করে (নাম, ইমেইল, জেন্ডার, NID কখনও নয়)।
+     * মোবাইল অন্য কারও হলে 'duplicate', সফল হলে 'ok', নইলে 'error'। 'photo' কী না থাকলে ছবি অপরিবর্তিত।
+     *
+     * @param array<string,mixed> $data phone, address, upazila_id, district_id, division_id, ঐচ্ছিক photo,
+     *                                  কর্মীর জন্য service_slug, service_custom, experience_years, bio
+     */
+    public static function updateProfile(int $id, array $data): string
+    {
+        $other = self::findByPhone((string) $data['phone']);
+        if ($other !== null && (int) $other['id'] !== $id) {
+            return 'duplicate';
+        }
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = self::demoRead();
+            foreach ($rows as $i => $row) {
+                if ((int) $row['id'] === $id) {
+                    $rows[$i] = array_merge($row, array_intersect_key($data, array_flip([
+                        'phone', 'address', 'upazila_id', 'district_id', 'division_id', 'photo',
+                        'service_slug', 'service_custom', 'experience_years', 'bio',
+                    ])));
+                }
+            }
+
+            return self::demoWrite($rows) ? 'ok' : 'error';
+        }
+
+        $sets = ['phone = :phone', 'address = :address', 'upazila_id = :upazila', 'district_id = :district', 'division_id = :division'];
+        $args = [
+            ':id' => $id, ':phone' => $data['phone'], ':address' => $data['address'],
+            ':upazila' => $data['upazila_id'], ':district' => $data['district_id'], ':division' => $data['division_id'],
+        ];
+        if (array_key_exists('service_slug', $data)) {
+            $sets[] = 'service_slug = :service';
+            $sets[] = 'service_custom = :custom';
+            $sets[] = 'experience_years = :experience';
+            $sets[] = 'bio = :bio';
+            $args += [
+                ':service' => $data['service_slug'], ':custom' => $data['service_custom'],
+                ':experience' => $data['experience_years'], ':bio' => ($data['bio'] ?? '') !== '' ? $data['bio'] : null,
+            ];
+        }
+        if (array_key_exists('photo', $data)) {
+            $sets[] = 'photo = :photo';
+            $args[':photo'] = $data['photo'];
+        }
+
+        try {
+            $stmt = $pdo->prepare('UPDATE users SET ' . implode(', ', $sets) . ' WHERE id = :id');
+            $stmt->execute($args);
+
+            return 'ok';
+        } catch (Throwable $e) {
+            // একই মোবাইলে একসঙ্গে দুটো বদল এলে ইউনিক-কী আটকায়
+            if ($e instanceof \PDOException && ($e->errorInfo[1] ?? 0) === 1062) {
+                return 'duplicate';
+            }
+            Logger::error('UserRepository::updateProfile failed: ' . $e->getMessage());
+
+            return 'error';
+        }
+    }
+
     /** নতুন পাসওয়ার্ড-হ্যাশ বসায় এবং "পাসওয়ার্ড বদলাতে হবে" চিহ্ন মুছে দেয়। সফল হলে true। */
     public static function changePassword(int $id, string $hash): bool
     {

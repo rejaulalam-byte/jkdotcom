@@ -244,3 +244,12 @@ function clean_gender(mixed $value): string
 {
     return in_array($value, ['male', 'female', 'other'], true) ? (string) $value : '';
 }
+
+/** ফর্মের লেখা পরিষ্কার করে: কন্ট্রোল-অক্ষর বাদ, দুই পাশের ফাঁকা বাদ, সর্বোচ্চ $max অক্ষর ($multiline হলে নতুন লাইন থাকে)। */
+function clean_input(mixed $value, int $max, bool $multiline = false): string
+{
+    $value = is_string($value) ? $value : '';
+    $value = (string) preg_replace($multiline ? '/[^\P{C}\n]+/u' : '/\p{C}+/u', '', str_replace("\r\n", "\n", $value));
+
+    return mb_substr(trim($value), 0, $max);
+}

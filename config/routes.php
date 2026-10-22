@@ -7,6 +7,7 @@ use App\Controllers\FeedbackController;
 use App\Controllers\HomeController;
 use App\Controllers\PasswordResetController;
 use App\Controllers\PageController;
+use App\Controllers\ProfileController;
 use App\Controllers\RegistrationController;
 use App\Controllers\ServiceController;
 use App\Controllers\SubscribeController;
@@ -50,7 +51,9 @@ return [
     ['GET',  '/account/password',          [AuthController::class, 'passwordForm']],
     ['POST', '/account/password',          [AuthController::class, 'passwordStore']],
     ['GET',  '/photo/{slug}',              [AuthController::class, 'photo']],
-    ['GET',  '/dashboard',                 [PageController::class, 'soon', ['title' => 'ড্যাশবোর্ড']]],
+    ['GET',  '/profile',                   [ProfileController::class, 'form']],
+    ['POST', '/profile',                   [ProfileController::class, 'update']],
+    ['GET',  '/dashboard',                 [ProfileController::class, 'dashboardRedirect']],
     ['GET',  '/contact',         [PageController::class, 'soon', ['title' => 'যোগাযোগ']]],
     ['GET',  '/privacy',         [PageController::class, 'soon', ['title' => 'প্রাইভেসি পলিসি']]],
     ['GET',  '/terms',           [PageController::class, 'soon', ['title' => 'শর্তাবলী']]],

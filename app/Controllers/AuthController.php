@@ -26,7 +26,7 @@ final class AuthController
     {
         $role = $this->role($meta);
         if (Auth::user() !== null) {
-            redirect('/welcome');
+            redirect('/profile');
         }
 
         $key = 'login.' . $role . '.';
@@ -56,8 +56,9 @@ final class AuthController
         if (trim((string) ($_POST['website'] ?? '')) !== '') {
             redirect($back);
         }
-        if (RateLimiter::tooMany('login', 10, 900)) {
-            $this->fail($back, ['অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
+        // সীমা শুধু ব্যর্থ লগইনে গোনা হয়: সঠিক লগইন কখনও আটকায় না
+        if (RateLimiter::blocked('login', 10, 900)) {
+            $this->fail($back, ['এই ডিভাইস থেকে ১০ বার ভুল চেষ্টা করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
         }
 
         // লগইন আইডি = ইমেইল অথবা রেজিস্টার্ড মোবাইল নাম্বার (@ থাকলে ইমেইল)
@@ -70,13 +71,15 @@ final class AuthController
             $this->fail($back, ['লগইন আইডি (ইমেইল বা রেজিস্টার্ড মোবাইল নাম্বার) ও পাসওয়ার্ড দিন।'], $id);
         }
         // একই আইডিতে বারবার অনুমান ঠেকাতে আইডি-ভিত্তিক সীমা
-        if (RateLimiter::tooMany('login_' . $id, 5, 900)) {
-            $this->fail($back, ['এই আইডিতে অনেকবার ভুল চেষ্টা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।'], $id);
+        if (RateLimiter::blocked('login_' . $id, 5, 900)) {
+            $this->fail($back, ['আপনি ৫ বার ভুল চেষ্টা করেছেন। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।'], $id);
         }
 
         $user = $byEmail ? UserRepository::findByEmail($id) : UserRepository::findByPhone($id);
         $ok = password_verify($password, $user !== null ? (string) $user['password_hash'] : self::DUMMY_HASH);
         if ($user === null || !$ok) {
+            RateLimiter::hit('login', 900);
+            RateLimiter::hit('login_' . $id, 900);
             $this->fail($back, ['লগইন আইডি বা পাসওয়ার্ড সঠিক নয়।'], $id);
         }
         // পাসওয়ার্ড ঠিক আছে: এবার অ্যাকাউন্টের অবস্থা বলা নিরাপদ
@@ -95,7 +98,7 @@ final class AuthController
         $rehash = password_needs_rehash((string) $user['password_hash'], PASSWORD_DEFAULT) ? password_hash($password, PASSWORD_DEFAULT) : null;
         UserRepository::touchLogin((int) $user['id'], $rehash);
         Auth::login((int) $user['id']);
-        redirect((int) ($user['must_change_password'] ?? 0) === 1 ? '/account/password' : '/welcome');
+        redirect((int) ($user['must_change_password'] ?? 0) === 1 ? '/account/password' : '/profile');
     }
 
     /** পাসওয়ার্ড পরিবর্তনের পেইজ (লগইন না থাকলে লগইনে পাঠায়)। */
@@ -132,8 +135,8 @@ final class AuthController
             redirect($back);
         }
         // বর্তমান পাসওয়ার্ড অনুমানের চেষ্টা ঠেকাতে সদস্য-ভিত্তিক সীমা
-        if (RateLimiter::tooMany('pwchange_' . $user['id'], 5, 900)) {
-            $this->failPassword(['অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
+        if (RateLimiter::blocked('pwchange_' . $user['id'], 5, 900)) {
+            $this->failPassword(['আপনি বর্তমান পাসওয়ার্ড ৫ বার ভুল লিখেছেন। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
         }
 
         $current = (string) ($_POST['current_password'] ?? '');
@@ -142,6 +145,7 @@ final class AuthController
 
         $errors = [];
         if (!password_verify($current, (string) $user['password_hash'])) {
+            RateLimiter::hit('pwchange_' . $user['id'], 900);
             $errors[] = 'বর্তমান পাসওয়ার্ডটি সঠিক নয়।';
         }
         // bcrypt ৭২ বাইটের পরের অংশ উপেক্ষা করে, তাই বেশি লম্বা পাসওয়ার্ড আটকানো হয়
