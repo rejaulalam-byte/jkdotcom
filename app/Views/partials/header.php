@@ -24,6 +24,14 @@ $menu = [
 ];
 $current = \App\Core\Router::currentPath();
 $member = \App\Core\Auth::user();
+// লগইন-করা সদস্যের নিজের ভূমিকার লগইন-আইটেম মেনুতে থাকে না (পেশাজীবী -> শুধু প্রতিনিধি লগইন, উল্টোটাও); লগআউটে ফিরে আসে
+if ($member !== null) {
+    $ownLogin = $member['role'] === 'agent' ? '/login/agent' : '/login';
+    foreach ($menu as &$menuItem) {
+        $menuItem[2] = array_values(array_filter($menuItem[2], static fn (array $sub): bool => $sub[0] !== $ownLogin));
+    }
+    unset($menuItem);
+}
 // লগইন ও স্বাগত পেইজেও "রেজিস্ট্রেশন" মেনু হাইলাইট থাকে (Figma)
 $registrationPaths = ['/login', '/welcome'];
 ?>
@@ -65,14 +73,25 @@ $registrationPaths = ['/login', '/welcome'];
             </a>
             <?php if ($member !== null):
                 $avatar = \App\Core\PhotoUpload::url($member['photo'] ?? null); ?>
-                <?php // লগইন-করা সদস্যের ছবি (Figma 2663-981): ক্লিকে স্বাগত পেইজ ?>
-                <a class="nav__avatar" href="/welcome" aria-label="<?= e((string) $member['name']) ?> — আমার অ্যাকাউন্ট">
-                    <?php if ($avatar !== null): ?>
-                        <img src="<?= e($avatar) ?>" alt="" width="58" height="58">
-                    <?php else: ?>
-                        <span aria-hidden="true"><?= e(mb_substr((string) $member['name'], 0, 1)) ?></span>
-                    <?php endif; ?>
-                </a>
+                <?php // লগইন-করা সদস্যের ছবি (Figma 2663-981): ক্লিকে ছবির গায়ে নাম, প্রোফাইল ও লগআউটের মেনু নামে ?>
+                <details class="nav__user">
+                    <summary class="nav__avatar" aria-label="<?= e((string) $member['name']) ?> — আমার অ্যাকাউন্ট">
+                        <?php if ($avatar !== null): ?>
+                            <img src="<?= e($avatar) ?>" alt="" width="58" height="58">
+                        <?php else: ?>
+                            <span aria-hidden="true"><?= e(mb_substr((string) $member['name'], 0, 1)) ?></span>
+                        <?php endif; ?>
+                    </summary>
+                    <div class="user-menu">
+                        <p class="user-menu__name"><?= e((string) $member['name']) ?></p>
+                        <?php // প্রোফাইল এখন শুধু লেখা; লিংক পরে বসবে ?>
+                        <p class="user-menu__item"><?= e(content('nav.profile')) ?></p>
+                        <form action="/logout" method="post">
+                            <?= csrf_field() ?>
+                            <button class="user-menu__item user-menu__logout" type="submit"><?= e(content('nav.logout')) ?></button>
+                        </form>
+                    </div>
+                </details>
             <?php endif; ?>
         </nav>
     </div>

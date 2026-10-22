@@ -56,6 +56,20 @@
             }
         });
     });
+    /* ---- লগইন-করা সদস্যের ছবির মেনু (<details class="nav__user">): বাইরে ক্লিকে বা Esc-এ বন্ধ ---- */
+    var userMenu = document.querySelector(".nav__user");
+    if (userMenu) {
+        document.addEventListener("click", function (e) {
+            if (!userMenu.contains(e.target)) {
+                userMenu.removeAttribute("open");
+            }
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") {
+                userMenu.removeAttribute("open");
+            }
+        });
+    }
     /* ---- "আপনার পোস্ট প্রকাশিত" বার্তা-বক্স: ২০ সেকেন্ড পরে নিজে সরে যায়, ✕ বাটনে সঙ্গে সঙ্গে ---- */
     var toast = document.getElementById("post-toast");
     if (toast) {

@@ -124,7 +124,6 @@ final class AuthController
             'crumb' => content($key . 'crumb'),
             'role' => $role,
             'name' => honorific_name($user['gender'] ?? null, (string) $user['name']),
-            'token' => Security::csrfToken(),
         ]);
     }
 
