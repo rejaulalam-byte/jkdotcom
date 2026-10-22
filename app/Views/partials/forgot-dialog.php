@@ -3,7 +3,7 @@
  * "পাসওয়ার্ড মনে নেই" পপ-আপ (লগইন পেইজ): ১) ইমেইল ২) ইমেইলে আসা ৬ সংখ্যার কোড ৩) নতুন পাসওয়ার্ড ৪) সফল বার্তা।
  * ধাপগুলো app.js-এর "পাসওয়ার্ড মনে নেই" অংশ চালায় (/password/forgot, /verify, /reset)।
  *
- * @var string $loginUrl  সফল হওয়ার পর "লগইন করুন" বাটন যেখানে যায়
+ * @var string $doneLabel  সফল-বার্তার বাটনের লেখা (লগইন পেইজে "লগইন করুন", পাসওয়ার্ড পেইজে "ঠিক আছে")
  */
 ?>
 <dialog class="lead forgot" id="forgot-dialog" aria-labelledby="forgot-title"
@@ -58,7 +58,7 @@
         <p><?= e(content('forgot.done_1')) ?></p>
         <p><em><?= e(content('forgot.done_2')) ?></em></p>
         <p class="lead__actions">
-            <button class="pf-submit" type="button" data-act="close"><?= e(content('forgot.login')) ?></button>
+            <button class="pf-submit" type="button" data-act="close"><?= e($doneLabel) ?></button>
         </p>
     </div>
 </dialog>

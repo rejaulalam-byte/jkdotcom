@@ -14,7 +14,6 @@
 $crumbs = [['/', 'হোম'], ['/registration', 'রেজিস্ট্রেশন'], [null, $crumb]];
 require BASE_PATH . '/app/Views/partials/page-banner.php';
 
-$helpTel = content('today.post.helpline_tel');
 $otherRole = $role === 'agent' ? 'worker' : 'agent';
 ?>
 <section class="section section--login" aria-labelledby="login-title">
@@ -55,7 +54,7 @@ $otherRole = $role === 'agent' ? 'worker' : 'agent';
             </p>
         </form>
 
-        <p class="login__help"><?= e(content('login.help_1')) ?><button class="login__forgot" type="button" data-forgot><?= e(content('login.help_link')) ?></button><?= e(content('login.help_2')) ?><a class="login__tel" href="tel:<?= e($helpTel) ?>"><?= e(content('today.post.helpline')) ?></a></p>
+        <?php require BASE_PATH . '/app/Views/partials/forgot-help.php'; ?>
         <p class="login__links">
             <a href="<?= $otherRole === 'agent' ? '/login/agent' : '/login' ?>"><?= e(content('login.other.' . $otherRole)) ?></a>
             <span aria-hidden="true">·</span>
@@ -65,4 +64,4 @@ $otherRole = $role === 'agent' ? 'worker' : 'agent';
 </section>
 
 <?php // "পাসওয়ার্ড মনে নেই" পপ-আপ: ইমেইল → ৬ সংখ্যার কোড → নতুন পাসওয়ার্ড ?>
-<?php require BASE_PATH . '/app/Views/partials/forgot-dialog.php'; ?>
+<?php $doneLabel = content('forgot.login'); require BASE_PATH . '/app/Views/partials/forgot-dialog.php'; ?>

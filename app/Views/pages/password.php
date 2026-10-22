@@ -9,7 +9,6 @@
 $crumbs = [['/', 'হোম'], [null, content('password.crumb')]];
 require BASE_PATH . '/app/Views/partials/page-banner.php';
 
-$helpTel = content('today.post.helpline_tel');
 $rows = [
     ['pw-current', 'current_password', 'password.f.current', 'new-password'],
     ['pw-new', 'password', 'password.f.new', 'new-password'],
@@ -54,6 +53,9 @@ $rows = [
             </p>
         </form>
 
-        <p class="login__help"><?= e(content('password.help')) ?><a class="login__tel" href="tel:<?= e($helpTel) ?>"><?= e(content('today.post.helpline')) ?></a></p>
+        <?php require BASE_PATH . '/app/Views/partials/forgot-help.php'; ?>
     </div>
 </section>
+
+<?php // "পাসওয়ার্ড মনে নেই" পপ-আপ: বর্তমান পাসওয়ার্ড মনে না থাকলে ইমেইলের কোড দিয়ে নতুন পাসওয়ার্ড ?>
+<?php $doneLabel = content('forgot.ok'); require BASE_PATH . '/app/Views/partials/forgot-dialog.php'; ?>
