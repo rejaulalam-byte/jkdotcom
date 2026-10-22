@@ -56,7 +56,7 @@
             }
         });
     });
-    /* ---- "আপনার পোস্ট প্রকাশিত" বার্তা-বক্স: ১০ সেকেন্ড পরে নিজে সরে যায়, ✕ বাটনে সঙ্গে সঙ্গে ---- */
+    /* ---- "আপনার পোস্ট প্রকাশিত" বার্তা-বক্স: ২০ সেকেন্ড পরে নিজে সরে যায়, ✕ বাটনে সঙ্গে সঙ্গে ---- */
     var toast = document.getElementById("post-toast");
     if (toast) {
         var closeToast = function () {
@@ -67,7 +67,7 @@
             toastClose.addEventListener("click", closeToast);
             toastClose.focus();
         }
-        window.setTimeout(closeToast, 10000);
+        window.setTimeout(closeToast, 20000);
     }
 
     /* ---- তারিখের ঘর: তারিখ বাছার আগে ব্রাউজারের নিজের ফরম্যাট (mm/dd/yyyy) ফ্যাকাশে দেখায় ---- */

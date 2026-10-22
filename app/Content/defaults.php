@@ -246,7 +246,7 @@ return [
     'regform.f.experience'   => 'কাজের অভিজ্ঞতা (বছর)',
     'regform.f.nid'          => 'জাতীয় পরিচয়পত্র নম্বর',
     'regform.f.gender'       => 'জেন্ডার নির্বাচন করুন',
-    'regform.f.email'        => 'আপনার ইমেইল',
+    'regform.f.email'        => 'আপনার ইমেইল --- অবশ্যই ইংরেজিতে',
     'regform.f.phone'        => 'মোবাইল নম্বর',
     'regform.f.address'      => 'বর্তমান ঠিকানা (বাসা নং, রোড নং, সড়ক নাম, এলাকা)',
     'regform.f.upazila'      => 'উপজেলা / থানা নির্বাচন করুন',

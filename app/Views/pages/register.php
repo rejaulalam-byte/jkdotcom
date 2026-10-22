@@ -8,7 +8,7 @@
  * @var string $crumb
  * @var string $role      'worker' | 'agent'
  * @var string $action
- * @var array{name:string,area:string}|null $done  সফলভাবে জমা দেওয়ার ঠিক পরে আবেদনকারীর নাম ও এলাকা (১০ সেকেন্ডের জন্য বার্তা-বক্স দেখায়)
+ * @var array{name:string,area:string}|null $done  সফলভাবে জমা দেওয়ার ঠিক পরে আবেদনকারীর নাম ও এলাকা (২০ সেকেন্ডের জন্য বার্তা-বক্স দেখায়)
  * @var list<string> $errors
  * @var array<string,mixed> $old
  * @var array{divisions:list<array{id:int,name:string}>,districts:list<array{id:int,parent:int,name:string}>,upazilas:list<array{id:int,parent:int,name:string}>} $geo
@@ -178,7 +178,7 @@ $helpTel = content('today.post.helpline_tel');
 <?php if ($done !== null):
     $say = static fn (string $key): string => e(strtr(content('regform.' . $role . '.done.' . $key), ['{name}' => (string) $done['name'], '{area}' => (string) $done['area']]));
 ?>
-<?php // সফল জমার বার্তা-বক্স (Figma 2827-341): সাদা বাক্স, সবুজ কিনারা, ওপরে সবুজ বৃত্তে হলুদ টিক; ১০ সেকেন্ড পরে সরে যায় ?>
+<?php // সফল জমার বার্তা-বক্স (Figma 2827-341): সাদা বাক্স, সবুজ কিনারা, ওপরে সবুজ বৃত্তে হলুদ টিক; ২০ সেকেন্ড পরে সরে যায় ?>
 <div class="post-toast post-toast--card" id="post-toast" role="status" aria-live="polite">
     <img class="post-toast__tick" src="<?= e(asset('img/icons/done-check.svg')) ?>" alt="" width="191" height="193">
     <button class="post-toast__close" type="button" aria-label="বন্ধ করুন"><span aria-hidden="true">&times;</span></button>

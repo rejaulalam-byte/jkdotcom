@@ -3188,7 +3188,7 @@ textarea {
     }
 }
 
-/* কাজ জমা দেওয়ার পরের বার্তা-বক্স (.post-toast): পর্দার মাঝখানে বসানো, ১০ সেকেন্ড পর মিলিয়ে যায়
+/* কাজ জমা দেওয়ার পরের বার্তা-বক্স (.post-toast): পর্দার মাঝখানে বসানো, ২০ সেকেন্ড পর মিলিয়ে যায়
    (app.js বন্ধ করে; JavaScript বন্ধ থাকলে CSS অ্যানিমেশনই একই কাজ করে), ✕ বাটনে সঙ্গে সঙ্গে বন্ধ। */
 .post-toast {
     position: fixed;
@@ -3203,7 +3203,7 @@ textarea {
     box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28);
     text-align: center;
     transform: translate(-50%, -50%);
-    animation: post-toast-out 0.4s ease 10s forwards;
+    animation: post-toast-out 0.4s ease 20s forwards;
 }
 .post-toast.is-closed {
     display: none;
@@ -3258,7 +3258,7 @@ textarea {
 @media (prefers-reduced-motion: reduce) {
     .post-toast {
         animation-duration: 0.01s;
-        animation-delay: 10s;
+        animation-delay: 20s;
     }
 }
 @media (max-width: 1199px) {
@@ -3666,7 +3666,7 @@ textarea {
 
 /* ---- সফল জমার বার্তা-বক্স, কার্ড-ধরন (Figma 2827-341): রেজিস্ট্রেশন ফর্মে ---------------------
    হালকা ধূসর-নীল বাক্স, ১০px গোল কোণ, পাতলা সবুজ কিনারা; ওপরের কিনারার ওপর বসা সবুজ বৃত্তে হলুদ টিক; ডানে ওপরে চৌকো বন্ধ-বাটন।
-   বন্ধ হওয়ার নিয়ম (১০ সেকেন্ড, ✕) আগের .post-toast-এর মতোই। */
+   বন্ধ হওয়ার নিয়ম (২০ সেকেন্ড, ✕) আগের .post-toast-এর মতোই। */
 .post-toast--card {
     width: min(71.625rem, calc(100vw - 2rem)); /* ১১৪৬px */
     min-height: 27.4375rem;                    /* ৪৩৯px */
