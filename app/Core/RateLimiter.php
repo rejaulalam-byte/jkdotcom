@@ -28,6 +28,21 @@ final class RateLimiter
         return count(self::hits($bucket, $windowSeconds)[1]) >= $maxAttempts;
     }
 
+    /** মেয়াদের-ভেতরে এই বালতিতে এখন কতটি চেষ্টা গোনা আছে। */
+    public static function count(string $bucket, int $windowSeconds): int
+    {
+        return count(self::hits($bucket, $windowSeconds)[1]);
+    }
+
+    /** এই দর্শকের এই বালতির হিসাব মুছে দেয় (যেমন সঠিক লগইনের পর ব্যর্থ-চেষ্টার গোনা শূন্য)। */
+    public static function clear(string $bucket): void
+    {
+        [$file] = self::hits($bucket, 1);
+        if (is_file($file)) {
+            @unlink($file);
+        }
+    }
+
     /** একটা চেষ্টা গুনে রাখে। */
     public static function hit(string $bucket, int $windowSeconds): void
     {

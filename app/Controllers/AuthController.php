@@ -18,6 +18,12 @@ use App\Models\UserRepository;
  */
 final class AuthController
 {
+    /** ব্যর্থ-চেষ্টার হিসাবের মেয়াদ (১৫ মিনিট) ও সীমা: আইডি-প্রতি নরম ৫, কড়া ১০; ডিভাইস-প্রতি কড়া ২০। */
+    private const WINDOW = 900;
+    private const ID_SOFT_LIMIT = 5;
+    private const ID_HARD_LIMIT = 10;
+    private const DEVICE_HARD_LIMIT = 20;
+
     /** আসল ব্যবহারকারী না মিললেও একই সময় লাগানোর জন্য নকল হ্যাশ: ফলে মোবাইল-নাম্বার আছে কি না সময় মেপে জানা যায় না। */
     private const DUMMY_HASH = '$2y$10$jAX9q737WKgze0Ox2Hg28OtOoPWtS0.WFdEf2wUrFQMl73taY7U3e';
 
@@ -57,8 +63,8 @@ final class AuthController
             redirect($back);
         }
         // সীমা শুধু ব্যর্থ লগইনে গোনা হয়: সঠিক লগইন কখনও আটকায় না
-        if (RateLimiter::blocked('login', 10, 900)) {
-            $this->fail($back, ['এই ডিভাইস থেকে ১০ বার ভুল চেষ্টা করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
+        if (RateLimiter::count('login', self::WINDOW) >= self::DEVICE_HARD_LIMIT) {
+            $this->fail($back, ['এই ডিভাইস থেকে অনেকবার ভুল চেষ্টা করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
         }
 
         // লগইন আইডি = ইমেইল অথবা রেজিস্টার্ড মোবাইল নাম্বার (@ থাকলে ইমেইল)
@@ -70,17 +76,22 @@ final class AuthController
         if (!$validId || $password === '' || strlen($password) > 200) {
             $this->fail($back, ['লগইন আইডি (ইমেইল বা রেজিস্টার্ড মোবাইল নাম্বার) ও পাসওয়ার্ড দিন।'], $id);
         }
-        // একই আইডিতে বারবার অনুমান ঠেকাতে আইডি-ভিত্তিক সীমা
-        if (RateLimiter::blocked('login_' . $id, 5, 900)) {
-            $this->fail($back, ['আপনি ৫ বার ভুল চেষ্টা করেছেন। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।'], $id);
+        // একই আইডিতে বারবার অনুমান ঠেকাতে আইডি-ভিত্তিক সীমা: ৫ ভুলে "নরম লক" (সঠিক পাসওয়ার্ড তখনও ঢুকতে দেয়,
+        // কিন্তু বার্তা দেখায়), ১০ ভুলে "কড়া লক" (সঠিক পাসওয়ার্ডও ঢোকে না)
+        $bucket = 'login_' . $id;
+        $fails = RateLimiter::count($bucket, self::WINDOW);
+        if ($fails >= self::ID_HARD_LIMIT) {
+            $this->fail($back, ['আপনি ১০ বার ভুল চেষ্টা করেছেন। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।'], $id);
         }
 
         $user = $byEmail ? UserRepository::findByEmail($id) : UserRepository::findByPhone($id);
         $ok = password_verify($password, $user !== null ? (string) $user['password_hash'] : self::DUMMY_HASH);
         if ($user === null || !$ok) {
-            RateLimiter::hit('login', 900);
-            RateLimiter::hit('login_' . $id, 900);
-            $this->fail($back, ['লগইন আইডি বা পাসওয়ার্ড সঠিক নয়।'], $id);
+            RateLimiter::hit('login', self::WINDOW);
+            RateLimiter::hit($bucket, self::WINDOW);
+            $this->fail($back, [$fails + 1 >= self::ID_SOFT_LIMIT
+                ? 'আপনি ৫ বার ভুল চেষ্টা করেছেন। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।'
+                : 'লগইন আইডি বা পাসওয়ার্ড সঠিক নয়।'], $id);
         }
         // পাসওয়ার্ড ঠিক আছে: এবার অ্যাকাউন্টের অবস্থা বলা নিরাপদ
         if ($user['role'] !== $role) {
@@ -94,6 +105,12 @@ final class AuthController
         if ($user['status'] !== 'approved') {
             $this->fail($back, ['আপনার অ্যাকাউন্টটি এখন সক্রিয় নেই। অনুগ্রহ করে হেল্পলাইনে যোগাযোগ করুন।'], $id);
         }
+
+        // নরম লকে থাকা সদস্য সঠিক পাসওয়ার্ড দিলে ঢোকে; বার্তাটা প্রোফাইলে দেখানো হয়, গোনা শূন্য হয়
+        if ($fails >= self::ID_SOFT_LIMIT) {
+            Session::flash('login_unlocked', true);
+        }
+        RateLimiter::clear($bucket);
 
         $rehash = password_needs_rehash((string) $user['password_hash'], PASSWORD_DEFAULT) ? password_hash($password, PASSWORD_DEFAULT) : null;
         UserRepository::touchLogin((int) $user['id'], $rehash);

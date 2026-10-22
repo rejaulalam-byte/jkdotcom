@@ -7,6 +7,7 @@
  * @var array<string,mixed> $user
  * @var array<string,mixed> $old   ফর্মের শুরুর মান (সংরক্ষিত তথ্য, বা ভুল জমার পর লেখা মান)
  * @var string $role      'worker' | 'agent'
+ * @var bool   $unlocked  ৫ ভুলের লক থাকা সত্ত্বেও সঠিক পাসওয়ার্ডে ঢুকেছেন (বিশেষ বিবেচনার বার্তা)
  * @var bool   $done      এইমাত্র সংরক্ষণ হয়েছে
  * @var list<string> $errors
  * @var array{divisions:list<array{id:int,name:string}>,districts:list<array{id:int,parent:int,name:string}>,upazilas:list<array{id:int,parent:int,name:string}>} $geo
@@ -26,6 +27,9 @@ $helpTel = content('today.post.helpline_tel');
         <h2 id="pf-title" class="section__title post-job__title"><?= e(content('profile.title')) ?></h2>
         <p class="post-job__intro"><?= e(honorific_name($user['gender'] ?? null, (string) $user['name'])) ?>, <?= e(content('profile.intro')) ?></p>
 
+        <?php if ($unlocked): ?>
+            <p class="notice notice--ok profile__done" role="status"><?= e(content('login.unlocked')) ?></p>
+        <?php endif; ?>
         <?php if ($done): ?>
             <p class="notice notice--ok profile__done" role="status"><?= e(content('profile.done')) ?></p>
         <?php endif; ?>
