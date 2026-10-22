@@ -36,7 +36,7 @@ $otherRole = $role === 'agent' ? 'worker' : 'agent';
             <div class="login-card__row">
                 <label for="lg-id"><?= e(content('login.f.id')) ?></label>
                 <div class="lg-field">
-                    <input id="lg-id" type="tel" name="login_id" maxlength="20" required autocomplete="username" inputmode="numeric"
+                    <input id="lg-id" type="text" name="login_id" maxlength="150" required autocomplete="username" autocapitalize="none" spellcheck="false"
                            placeholder="<?= e(content('login.f.id_hint')) ?>" value="<?= e($oldPhone) ?>">
                 </div>
             </div>

@@ -27,6 +27,9 @@ final class UserRepository
         if (self::findByPhone((string) $data['phone']) !== null) {
             return 'duplicate';
         }
+        if (self::findByEmail((string) $data['email']) !== null) {
+            return 'duplicate_email';
+        }
 
         $pdo = Database::connection();
         if ($pdo === null) {
@@ -98,6 +101,41 @@ final class UserRepository
             return $row === false ? null : $row;
         } catch (Throwable $e) {
             Logger::error('UserRepository::findByPhone failed: ' . $e->getMessage());
+
+            return null;
+        }
+    }
+
+    /**
+     * ইমেইল দিয়ে অ্যাকাউন্ট খোঁজে (বড়-ছোট হাতের পার্থক্য ছাড়া)।
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function findByEmail(string $email): ?array
+    {
+        $email = mb_strtolower(trim($email));
+        if ($email === '') {
+            return null;
+        }
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            foreach (self::demoRead() as $row) {
+                if (mb_strtolower((string) ($row['email'] ?? '')) === $email) {
+                    return $row;
+                }
+            }
+
+            return null;
+        }
+
+        try {
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email LIMIT 1');
+            $stmt->execute([':email' => $email]);
+            $row = $stmt->fetch();
+
+            return $row === false ? null : $row;
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::findByEmail failed: ' . $e->getMessage());
 
             return null;
         }

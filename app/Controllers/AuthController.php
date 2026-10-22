@@ -60,32 +60,36 @@ final class AuthController
             $this->fail($back, ['অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
         }
 
-        $phone = normalize_phone((string) ($_POST['login_id'] ?? ''));
+        // লগইন আইডি = ইমেইল অথবা রেজিস্টার্ড মোবাইল নাম্বার (@ থাকলে ইমেইল)
+        $id = trim((string) ($_POST['login_id'] ?? ''));
+        $byEmail = str_contains($id, '@');
+        $id = $byEmail ? mb_strtolower(mb_substr($id, 0, 150)) : normalize_phone($id);
         $password = (string) ($_POST['password'] ?? '');
-        if (!preg_match('/^01[3-9][0-9]{8}$/', $phone) || $password === '' || strlen($password) > 200) {
-            $this->fail($back, ['লগইন আইডি (রেজিস্টার্ড মোবাইল নাম্বার) ও পাসওয়ার্ড দিন।'], $phone);
+        $validId = $byEmail ? filter_var($id, FILTER_VALIDATE_EMAIL) !== false : preg_match('/^01[3-9][0-9]{8}$/', $id) === 1;
+        if (!$validId || $password === '' || strlen($password) > 200) {
+            $this->fail($back, ['লগইন আইডি (ইমেইল বা রেজিস্টার্ড মোবাইল নাম্বার) ও পাসওয়ার্ড দিন।'], $id);
         }
-        // একই নাম্বারে বারবার অনুমান ঠেকাতে নাম্বার-ভিত্তিক সীমা
-        if (RateLimiter::tooMany('login_' . $phone, 5, 900)) {
-            $this->fail($back, ['এই নাম্বারে অনেকবার ভুল চেষ্টা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।'], $phone);
+        // একই আইডিতে বারবার অনুমান ঠেকাতে আইডি-ভিত্তিক সীমা
+        if (RateLimiter::tooMany('login_' . $id, 5, 900)) {
+            $this->fail($back, ['এই আইডিতে অনেকবার ভুল চেষ্টা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।'], $id);
         }
 
-        $user = UserRepository::findByPhone($phone);
+        $user = $byEmail ? UserRepository::findByEmail($id) : UserRepository::findByPhone($id);
         $ok = password_verify($password, $user !== null ? (string) $user['password_hash'] : self::DUMMY_HASH);
         if ($user === null || !$ok) {
-            $this->fail($back, ['লগইন আইডি বা পাসওয়ার্ড সঠিক নয়।'], $phone);
+            $this->fail($back, ['লগইন আইডি বা পাসওয়ার্ড সঠিক নয়।'], $id);
         }
         // পাসওয়ার্ড ঠিক আছে: এবার অ্যাকাউন্টের অবস্থা বলা নিরাপদ
         if ($user['role'] !== $role) {
             $this->fail($back, [$role === 'agent'
-                ? 'এই নাম্বারটি পেশাজীবী কর্মীর অ্যাকাউন্ট। পেশাজীবীদের লগইন পেইজ ব্যবহার করুন।'
-                : 'এই নাম্বারটি প্রতিনিধির অ্যাকাউন্ট। প্রতিনিধিদের লগইন পেইজ ব্যবহার করুন।'], $phone);
+                ? 'এই অ্যাকাউন্টটি পেশাজীবী কর্মীর। পেশাজীবীদের লগইন পেইজ ব্যবহার করুন।'
+                : 'এই অ্যাকাউন্টটি প্রতিনিধির। প্রতিনিধিদের লগইন পেইজ ব্যবহার করুন।'], $id);
         }
         if ($user['status'] === 'pending') {
-            $this->fail($back, ['আপনার আবেদনটি এখনও অনুমোদনের অপেক্ষায় আছে। অনুমোদন হলে আপনি লগইন করতে পারবেন।'], $phone);
+            $this->fail($back, ['আপনার আবেদনটি এখনও অনুমোদনের অপেক্ষায় আছে। অনুমোদন হলে আপনি লগইন করতে পারবেন।'], $id);
         }
         if ($user['status'] !== 'approved') {
-            $this->fail($back, ['আপনার অ্যাকাউন্টটি এখন সক্রিয় নেই। অনুগ্রহ করে হেল্পলাইনে যোগাযোগ করুন।'], $phone);
+            $this->fail($back, ['আপনার অ্যাকাউন্টটি এখন সক্রিয় নেই। অনুগ্রহ করে হেল্পলাইনে যোগাযোগ করুন।'], $id);
         }
 
         $rehash = password_needs_rehash((string) $user['password_hash'], PASSWORD_DEFAULT) ? password_hash($password, PASSWORD_DEFAULT) : null;
@@ -157,10 +161,10 @@ final class AuthController
     }
 
     /** @param list<string> $errors */
-    private function fail(string $back, array $errors, string $phone = ''): never
+    private function fail(string $back, array $errors, string $id = ''): never
     {
         Session::flash('login_errors', $errors);
-        Session::flash('login_phone', $phone);
+        Session::flash('login_phone', $id);
         redirect($back . '#form');
     }
 }

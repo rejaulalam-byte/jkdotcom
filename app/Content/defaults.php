@@ -205,7 +205,7 @@ return [
     'login.agent.crumb'    => 'প্রতিনিধি লগইন',
     'login.agent.heading'  => 'প্রতিনিধির নিজস্ব একাউন্ট লগইন পেইজ',
     'login.f.id'           => 'লগইন আইডি',
-    'login.f.id_hint'      => 'রেজিস্টার্ড মোবাইল নাম্বার',
+    'login.f.id_hint'      => 'ইমেইল বা রেজিস্টার্ড মোবাইল নাম্বার',
     'login.f.password'     => 'পাসওয়ার্ড',
     'login.f.show'         => 'পাসওয়ার্ড দেখুন',
     'login.f.hide'         => 'পাসওয়ার্ড লুকান',

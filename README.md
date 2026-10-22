@@ -22,7 +22,7 @@ app/
   Content/defaults.php   default wording of every editable text
   Content/pages/   long "open page" texts as HTML (About, registration rules ...)
 config/routes.php  list of all URLs
-database/migrations/     SQL to create tables (run 001 to 006 in order in phpMyAdmin)
+database/migrations/     SQL to create tables (run 001 to 007 in order in phpMyAdmin)
 database/seeds/          data lists (services, areas, icons) used by the migrations and by demo mode
 docs/                    CODING-STANDARD.md and design references
 tools/php/               portable PHP for Windows (git-ignored); start-server.bat starts the site with it
