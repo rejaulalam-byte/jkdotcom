@@ -22,6 +22,7 @@ return [
     'site.top_tagline'    => ' বাংলাদেশে একটি বৃহৎ ওয়ার্কস্টেশন।',
     'site.phone_top'      => '+880 1761 441 911',
     'site.email'          => 'info@jorurikaj.com',
+    'site.email_registration' => 'registration@jorurikaj.com',
     'site.phone_footer'   => '(+88) 01761441911',
     'site.hotline'        => '(+88) 01761441911',
     'site.website'        => 'www.jorurikaj.com',
@@ -194,6 +195,23 @@ return [
     'workers.lead.title'   => 'এই পেশাজীবীর সঙ্গে কি যোগাযোগ করতে চান?',
     'workers.lead.ask'     => 'আপনি কি এই পেশাজীবীর সেবা নিতে আগ্রহী? হ্যাঁ হলে তাঁর যোগাযোগের তথ্য দেখতে পাবেন।',
     'workers.lead.form_text' => 'আপনার নাম ও মোবাইল নাম্বার দিন। এতে আমরা জানতে পারব কে যোগাযোগ করতে চান। তথ্য জমা দিলেই নাম্বারটি দেখতে পাবেন।',
+    // ---- যোগাযোগ পেইজ (/contact) ----------------------------------------------------
+    'contact.banner'       => 'আস্থার বন্ধনে একসাথে',
+    'contact.intro'        => 'আপনার যেকোনো প্রশ্ন, মতামত বা পরামর্শ জানাতে আমরা আছি আপনার পাশে। JoruriKaj.com সম্পর্কে কিছু জানতে চাইলে কিংবা কোনো সহযোগিতার প্রয়োজন হলে নির্দ্বিধায় আমাদের সঙ্গে যোগাযোগ করুন। আপনার মতামত ও সহযোগিতা আমাদের আরও ভালো সেবা দিতে অনুপ্রাণিত করবে।',
+    'contact.holiday'      => 'Holiday only {Friday}', // {শব্দ} = মোটা
+    'contact.mobile'       => 'Mobile:',
+    'contact.hotline'      => 'Hotline:',
+    'contact.open'         => 'Office Open:',
+    'contact.open_time'    => '9:00 am to 8:30 pm',
+    'contact.communication' => 'Communication:',
+    'contact.registration' => 'Registration:',
+    'contact.web'          => 'Web.:',
+    'contact.location'     => 'Location:',
+    'contact.ceo.heading'  => 'Driven by a Dream to Help People',
+    'contact.ceo.name'     => 'Md. Sadrul Amin',
+    'contact.ceo.role'     => 'CEO, Joruri Kaj dot Com',
+    'contact.ceo.alt'      => 'Md. Sadrul Amin, CEO',
+
     // ---- কর্মীর ব্যক্তিগত পেইজ (/workers/<id>) ------------------------------------
     'worker.banner'        => 'আপনার প্রয়োজনের পেশাদার খুঁজুন',
     'worker.title'         => 'পেশাজীবীর বিস্তারিত তথ্য',

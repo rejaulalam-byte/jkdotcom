@@ -58,7 +58,7 @@ return [
     ['GET',  '/profile',                   [ProfileController::class, 'form']],
     ['POST', '/profile',                   [ProfileController::class, 'update']],
     ['GET',  '/dashboard',                 [ProfileController::class, 'dashboardRedirect']],
-    ['GET',  '/contact',         [PageController::class, 'soon', ['title' => 'যোগাযোগ']]],
+    ['GET',  '/contact',         [PageController::class, 'contact']],
     ['GET',  '/privacy',         [PageController::class, 'soon', ['title' => 'প্রাইভেসি পলিসি']]],
     ['GET',  '/terms',           [PageController::class, 'soon', ['title' => 'শর্তাবলী']]],
 ];

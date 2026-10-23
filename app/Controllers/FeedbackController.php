@@ -12,25 +12,31 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Models\FeedbackRepository;
 
-/** হোম পেইজের "মতামত জমা দিন" ফর্ম সামলায়। */
+/** "মতামত জমা দিন" ফর্ম (হোম ও যোগাযোগ পেইজ) সামলায়। */
 final class FeedbackController
 {
+    /** ফর্ম থেকে ফেরার অনুমোদিত ঠিকানা (open-redirect ঠেকাতে তালিকা বাঁধা)। */
+    private const RETURN_TO = ['/#feedback', '/contact#feedback'];
+
     /** @param array<string,mixed> $meta */
     public function store(array $meta = []): void
     {
+        // জমার পর যে পেইজ থেকে ফর্ম এসেছিল সেখানে ফেরা; অনুমোদিত ঠিকানার বাইরে হলে হোম
+        $back = in_array($_POST['return'] ?? '', self::RETURN_TO, true) ? (string) $_POST['return'] : '/#feedback';
+
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
             Session::flash('feedback_errors', ['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
-            redirect('/#feedback');
+            redirect($back);
         }
 
         // লুকানো "website" ঘর: আসল মানুষ ফাঁকা রাখে, স্প্যাম-বট ভরে ফেলে
         if (trim((string) ($_POST['website'] ?? '')) !== '') {
-            redirect('/#feedback');
+            redirect($back);
         }
 
         if (RateLimiter::tooMany('feedback', 5, 3600)) {
             Session::flash('feedback_errors', ['অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
-            redirect('/#feedback');
+            redirect($back);
         }
 
         $data = [
@@ -66,13 +72,13 @@ final class FeedbackController
         if ($errors !== []) {
             Session::flash('feedback_errors', $errors);
             Session::flash('feedback_old', $data);
-            redirect('/#feedback');
+            redirect($back);
         }
 
         if (!FeedbackRepository::save($data)) {
             Session::flash('feedback_errors', ['দুঃখিত, মতামতটি সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
             Session::flash('feedback_old', $data);
-            redirect('/#feedback');
+            redirect($back);
         }
 
         $to = Env::get('MAIL_TO', 'info@jorurikaj.com') ?? 'info@jorurikaj.com';
@@ -86,7 +92,7 @@ final class FeedbackController
         }
 
         Session::flash('feedback_ok', 'আপনার মতামত পাঠানো হয়েছে। ধন্যবাদ!');
-        redirect('/#feedback');
+        redirect($back);
     }
 
     /**
