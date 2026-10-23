@@ -2,7 +2,7 @@
 /**
  * প্রশ্ন-উত্তরের তালিকা (সব বন্ধ, একসঙ্গে একটাই খোলা)। হোম ও যোগাযোগ পেইজ একই তালিকা নেয়।
  *
- * @var list<int> $faqKeys    কোন কোন প্রশ্ন (home.faq.<n>.q / .a)
+ * @var list<int> $faqKeys    কোন কোন প্রশ্ন (faq.<n>.q / .a)
  * @var bool $faqButton      "আরো জানতে ভিজিট করুন" বাটন দেখাবে কি না (ডিফল্ট: দেখায়)
  */
 ?>
@@ -12,12 +12,12 @@
         <details class="faq-item" name="faq">
             <summary>
                 <img src="<?= e(asset('img/icons/dot.svg')) ?>" alt="" width="14" height="14">
-                <span><?= e(content('home.faq.' . $n . '.q')) ?></span>
+                <span><?= e(content('faq.' . $n . '.q')) ?></span>
             </summary>
-            <p><?= e(content('home.faq.' . $n . '.a')) ?></p>
+            <p><?= e(content('faq.' . $n . '.a')) ?></p>
         </details>
     <?php endforeach; ?>
     <?php if ($faqButton ?? true): ?>
-        <p><a class="btn btn--teal-soft" href="/#faq"><?= e(content('home.faq.button')) ?></a></p>
+        <p><a class="btn btn--teal-soft" href="/faq"><?= e(content('home.faq.button')) ?></a></p>
     <?php endif; ?>
 </div>

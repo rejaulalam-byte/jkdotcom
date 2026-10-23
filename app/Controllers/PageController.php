@@ -67,6 +67,20 @@ final class PageController
             'old' => Session::pull('feedback_old', []),
         ]);
     }
+    /** প্রশ্ন ও উত্তর পেইজ (/faq): ২০টি প্রশ্ন-উত্তর (একসঙ্গে একটাই খোলা) ও পাশে মতামতের ফর্ম। */
+    public function faq(): void
+    {
+        View::render('pages/faq', [
+            'bodyClass' => 'page-faq',
+            'title' => 'প্রশ্ন ও উত্তর — Jorurikaj.com',
+            'description' => Content::get('faq.intro'),
+            'heading' => Content::get('faq.banner'),
+            'faqKeys' => range(1, 20),
+            'feedbackOk' => Session::pull('feedback_ok'),
+            'feedbackErrors' => Session::pull('feedback_errors', []),
+            'old' => Session::pull('feedback_old', []),
+        ]);
+    }
     /** আমাদের সম্পর্কে পেইজ (/about)। */
     public function about(): void
     {

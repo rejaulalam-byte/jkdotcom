@@ -16,7 +16,7 @@ use App\Models\FeedbackRepository;
 final class FeedbackController
 {
     /** ফর্ম থেকে ফেরার অনুমোদিত ঠিকানা (open-redirect ঠেকাতে তালিকা বাঁধা)। */
-    private const RETURN_TO = ['/#feedback', '/contact#feedback'];
+    private const RETURN_TO = ['/#feedback', '/contact#feedback', '/faq#feedback'];
 
     /** @param array<string,mixed> $meta */
     public function store(array $meta = []): void
