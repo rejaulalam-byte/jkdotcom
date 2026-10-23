@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Security;
 use App\Core\View;
 use App\Models\ServiceDirectory;
 use App\Models\ServiceRepository;
+use App\Models\UserRepository;
+use App\Models\WorkerDirectory;
 
-/** একটা সেবার পেইজ: /services/<slug> (সেবাদাতাদের তালিকা — এখনও বানানো হয়নি; আপাতত "coming soon")। */
+/** সেবার পেইজ: সব সেবার তালিকা (/services) ও একটা সেবার কর্মী-তালিকা (/services/<slug>)। */
 final class ServiceController
 {
     /** সব সেবা বর্ণানুক্রমে তিনটি সমান কলামে, খোঁজার সুবিধাসহ: /services */
@@ -39,10 +42,29 @@ final class ServiceController
             return;
         }
 
-        View::render('pages/coming-soon', [
-            'title' => $service['name'],
-            'heading' => $service['name'],
-            'crumbs' => [['/', 'হোম'], ['/services', 'সেবা সমূহ'], [null, $service['name']]],
+        $query = mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 100);
+        $perPage = WorkerDirectory::perPage($_GET['n'] ?? null);
+
+        $all = UserRepository::listWorkersByService($service['slug']);
+        $found = WorkerDirectory::filter($all, $query);
+        $paged = WorkerDirectory::paginate($found, $perPage, (int) ($_GET['p'] ?? 1));
+
+        View::render('pages/workers', [
+            'bodyClass' => 'page-workers',
+            'title' => $service['name'] . ' — Jorurikaj.com',
+            'description' => content('services.intro'),
+            'heading' => content('services.title'),
+            'service' => $service,
+            'query' => $query,
+            'perPage' => $perPage,
+            'total' => count($all),
+            'found' => count($found),
+            'divisions' => WorkerDirectory::divisions($found),
+            'workers' => $paged['items'],
+            'offset' => $paged['offset'],
+            'page' => $paged['page'],
+            'pages' => $paged['pages'],
+            'token' => Security::csrfToken(),
         ]);
     }
 }

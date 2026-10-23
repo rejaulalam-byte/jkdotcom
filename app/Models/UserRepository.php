@@ -170,6 +170,64 @@ final class UserRepository
         }
     }
 
+    /**
+     * একটা সেবার অনুমোদিত সব কর্মী, নামের বর্ণানুক্রমে (সেবার তালিকা-পেইজ /services/<slug>)।
+     * এলাকার নাম আগেই বসানো থাকে, যাতে খোঁজা ও দেখানো এক জায়গায় হয়।
+     *
+     * @return list<array{id:int,name:string,phone:string,address:string,upazila:string,district:string,division:string}>
+     */
+    public static function listWorkersByService(string $slug): array
+    {
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = array_values(array_filter(
+                self::demoRead(),
+                static fn (array $r): bool => ($r['role'] ?? '') === 'worker' && ($r['status'] ?? '') === 'approved'
+                    && (string) ($r['service_slug'] ?? '') === $slug
+            ));
+        } else {
+            try {
+                $stmt = $pdo->prepare(
+                    "SELECT id, name, phone, address, upazila_id, district_id, division_id FROM users
+                     WHERE role = 'worker' AND status = 'approved' AND service_slug = :slug
+                     ORDER BY name ASC, id ASC"
+                );
+                $stmt->execute([':slug' => $slug]);
+                $rows = $stmt->fetchAll();
+            } catch (Throwable $e) {
+                Logger::error('UserRepository::listWorkersByService failed: ' . $e->getMessage());
+
+                return [];
+            }
+        }
+
+        $list = [];
+        foreach ($rows as $r) {
+            $geo = GeoRepository::names((int) $r['upazila_id'], (int) $r['district_id'], (int) $r['division_id']);
+            $list[] = [
+                'id' => (int) $r['id'],
+                'name' => (string) $r['name'],
+                'phone' => (string) $r['phone'],
+                'address' => (string) $r['address'],
+            ] + $geo;
+        }
+        usort($list, static fn (array $a, array $b): int => strcmp($a['name'], $b['name']));
+
+        return $list;
+    }
+
+    /**
+     * সর্বজনীনভাবে দেখানো যায় এমন কর্মী: শুধু 'approved' কর্মী (প্রতিনিধি বা অপেক্ষমাণ নয়)।
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function findPublicWorker(int $id): ?array
+    {
+        $row = self::findById($id);
+
+        return $row !== null && ($row['role'] ?? '') === 'worker' && ($row['status'] ?? '') === 'approved' ? $row : null;
+    }
+
     /** সফল লগইনের সময় লিখে রাখে; পুরনো হ্যাশ দুর্বল হলে নতুন হ্যাশ বসায় (password_needs_rehash)। */
     public static function touchLogin(int $id, ?string $newHash = null): void
     {

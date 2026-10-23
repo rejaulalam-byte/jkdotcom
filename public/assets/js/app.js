@@ -5,7 +5,7 @@
      মেনু (মোবাইল মেনু, সাব-মেনু) · বার্তা-বক্স · তারিখ ঘর · Hero অক্ষরের অ্যানিমেশন
      ওপরে-যাওয়ার বাটন · FAQ · আজকের কাজের তালিকা · Marquee · Services সারি
      Advertisement strip · কাজের ধরন ড্রপডাউন · এলাকার তিন ড্রপডাউন
-     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ · পাসওয়ার্ড দেখা/লুকানো · রেজিস্ট্রেশনের ছবি · ফর্মের ভুল-বার্তা
+     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ · কর্মী-তালিকা · পাসওয়ার্ড দেখা/লুকানো · রেজিস্ট্রেশনের ছবি · ফর্মের ভুল-বার্তা
 
    প্রতিটি অংশ নিজের মতো স্বাধীন: ওই অংশের উপাদান পেইজে না থাকলে সে চুপচাপ বাদ পড়ে।
    ========================================================================== */
@@ -1151,12 +1151,12 @@
     });
 })();
 
-/* ---- "আজকের প্রকাশিত" তালিকা: লুকানো ফোন নাম্বার / ইমেইল --------------------------
+/* ---- লুকানো ফোন নাম্বার / ইমেইল ("আজকের প্রকাশিত" তালিকা ও কর্মীর বিস্তারিত তথ্য) --------------------------
    একটাতে ক্লিক করলে সার্ভার সেটাকে একটা "কল" হিসেবে গোনে। এই দর্শক আগে পরিচয় না দিয়ে থাকলে পপ-আপ
    জিজ্ঞেস করে "আপনি কি আগ্রহী?"; "হ্যাঁ" বললে নাম + মোবাইল দিতে হয়, তারপরই (শুধু যেটাতে ক্লিক
    করেছিলেন সেই) ফোন নাম্বার বা ইমেইল কল/মেইল লিংক হয়ে দেখায়। পেইজের সোর্সে আসল তথ্য থাকে না। */
 (function () {
-    var list = document.querySelector(".job-list");
+    var list = document.querySelector(".job-list, [data-lead-root]");
     var dialog = document.getElementById("lead-dialog");
     if (!list) {
         return;
@@ -1168,7 +1168,7 @@
         var body = new FormData();
         Object.keys(fields).forEach(function (k) { body.append(k, fields[k]); });
         body.append("_token", token);
-        return fetch("/today/contact", { method: "POST", body: body, credentials: "same-origin" })
+        return fetch(list.getAttribute("data-contact-url") || "/today/contact", { method: "POST", body: body, credentials: "same-origin" })
             .then(function (r) {
                 return r.json().then(function (j) { return { ok: r.ok, status: r.status, data: j }; });
             });
@@ -1290,6 +1290,89 @@
     });
 })();
 
+/* ---- কর্মী-তালিকা (/services/<slug>): প্রতি-পৃষ্ঠার সংখ্যা বদলালেই পাঠানো + "বিস্তারিত তথ্য" পপ-আপ --------
+   "ক্লিক করুন" /workers/info থেকে একজনের সংক্ষিপ্ত তথ্য এনে পপ-আপে বসায় (লেখা textContent দিয়ে, তাই নিরাপদ)।
+   ফোন/ইমেইলের লুকানো বাটন আগের অংশের আগ্রহ-পপ-আপের নিয়মেই চলে। */
+(function () {
+    document.querySelectorAll("select[data-autosubmit]").forEach(function (select) {
+        select.addEventListener("change", function () {
+            select.form.submit();
+        });
+    });
+
+    var root = document.querySelector("[data-info-url]");
+    var dialog = document.getElementById("wk-dialog");
+    if (!root || !dialog || !dialog.showModal) {
+        return;
+    }
+    var photo = dialog.querySelector(".wk-dialog__photo");
+
+    function field(name) {
+        return dialog.querySelector('[data-f="' + name + '"]');
+    }
+
+    function fill(info) {
+        ["name", "profession", "area", "bio", "experience"].forEach(function (key) {
+            var el = field(key);
+            el.textContent = info[key] || "";
+            var row = el.closest("[data-row]");
+            if (row && key !== "name" && key !== "profession") {
+                row.hidden = !info[key];
+            }
+        });
+        photo.src = info.photo || photo.getAttribute("data-placeholder");
+        [["phone", info.phone_masked], ["email", info.email_masked]].forEach(function (pair) {
+            var row = dialog.querySelector('[data-row="' + pair[0] + '"]');
+            row.hidden = !pair[1];
+            var btn = row.querySelector(".job-reveal, a.job-reveal");
+            // আগের বার ফোন/ইমেইল দেখানো হয়ে লিংক হয়ে থাকলে আবার লুকানো বাটন বানাই
+            if (btn.tagName !== "BUTTON") {
+                var fresh = document.createElement("button");
+                fresh.type = "button";
+                fresh.className = "job-reveal";
+                fresh.setAttribute("data-kind", pair[0]);
+                row.replaceChild(fresh, btn);
+                btn = fresh;
+                if (pair[0] === "phone") {
+                    var hint = document.createElement("span");
+                    hint.className = "job__hint";
+                    hint.textContent = dialog.getAttribute("data-phone-hint") || "";
+                    row.appendChild(hint);
+                }
+            }
+            btn.setAttribute("data-id", String(info.id));
+            btn.textContent = pair[1] || "";
+        });
+    }
+
+    root.addEventListener("click", function (e) {
+        var open = e.target.closest ? e.target.closest(".wk-open") : null;
+        if (!open || open.getAttribute("data-busy")) {
+            return;
+        }
+        open.setAttribute("data-busy", "1");
+        var body = new FormData();
+        body.append("id", open.getAttribute("data-id"));
+        body.append("_token", root.getAttribute("data-token"));
+        fetch(root.getAttribute("data-info-url"), { method: "POST", body: body, credentials: "same-origin" })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+            .then(function (info) {
+                open.removeAttribute("data-busy");
+                fill(info);
+                dialog.showModal();
+            })
+            .catch(function () {
+                open.removeAttribute("data-busy");
+                window.alert(dialog.getAttribute("data-error") || "");
+            });
+    });
+
+    dialog.addEventListener("click", function (e) {
+        if (e.target === dialog || (e.target.hasAttribute && e.target.hasAttribute("data-close"))) {
+            dialog.close();
+        }
+    });
+})();
 /* ---- পাসওয়ার্ড দেখা/লুকানো (লগইন): চোখ-বাটন JavaScript চালু থাকলেই দেখা যায় -------------- */
 (function () {
     document.querySelectorAll(".lg-eye").forEach(function (btn) {

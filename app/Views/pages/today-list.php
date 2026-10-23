@@ -55,33 +55,4 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
     </div>
 </section>
 
-<?php // লুকানো নাম্বার/ইমেইলে ক্লিক করলে পপ-আপ: "আপনি কি আগ্রহী?" → নাম + মোবাইল → যোগাযোগ দেখানো ?>
-<dialog class="lead" id="lead-dialog" aria-labelledby="lead-title">
-    <div class="lead__step" data-step="ask">
-        <h3 id="lead-title"><?= e(content('today.lead.title')) ?></h3>
-        <p><?= e(content('today.lead.ask')) ?></p>
-        <p class="lead__actions">
-            <button class="pf-submit" type="button" data-act="yes"><?= e(content('today.lead.yes')) ?></button>
-            <button class="lead__no" type="button" data-act="no"><?= e(content('today.lead.no')) ?></button>
-        </p>
-    </div>
-    <form class="lead__step" data-step="form" hidden novalidate>
-        <h3><?= e(content('today.lead.form_title')) ?></h3>
-        <p><?= e(content('today.lead.form_text')) ?></p>
-        <?php require BASE_PATH . '/app/Views/partials/bn-switch.php'; ?>
-        <div class="pf">
-            <label class="sr-only" for="lead-name"><?= e(content('today.lead.name')) ?></label>
-            <input id="lead-name" data-bn type="text" name="name" maxlength="100" required autocomplete="name" placeholder="<?= e(content('today.lead.name')) ?> *">
-        </div>
-        <div class="pf pf--phone">
-            <label class="sr-only" for="lead-phone"><?= e(content('today.lead.phone')) ?></label>
-            <span class="pf__code" aria-hidden="true">+৮৮</span>
-            <input id="lead-phone" type="tel" name="phone" maxlength="11" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}" placeholder="<?= e(content('today.lead.phone')) ?> *">
-        </div>
-        <p class="lead__error" role="alert" hidden></p>
-        <p class="lead__actions">
-            <button class="pf-submit" type="submit"><?= e(content('today.lead.submit')) ?></button>
-            <button class="lead__no" type="button" data-act="no"><?= e(content('today.lead.cancel')) ?></button>
-        </p>
-    </form>
-</dialog>
+<?php require BASE_PATH . '/app/Views/partials/lead-dialog.php'; ?>

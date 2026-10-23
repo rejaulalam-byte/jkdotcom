@@ -12,6 +12,7 @@ use App\Controllers\RegistrationController;
 use App\Controllers\ServiceController;
 use App\Controllers\SubscribeController;
 use App\Controllers\TodayController;
+use App\Controllers\WorkerController;
 
 /*
  * ওয়েবসাইটের প্রতিটি সর্বজনীন URL।
@@ -28,6 +29,8 @@ return [
     ['GET',  '/about',           [PageController::class, 'about']],
     ['GET',  '/services',        [ServiceController::class, 'index']],
     ['GET',  '/services/{slug}', [ServiceController::class, 'show']],
+    ['POST', '/workers/info',    [WorkerController::class, 'info']],
+    ['POST', '/workers/contact', [WorkerController::class, 'contact']],
     ['GET',  '/today',           [TodayController::class, 'index']],
     ['POST', '/today/contact',   [TodayController::class, 'contact']],
     ['GET',  '/today/post',      [TodayController::class, 'postForm']],
