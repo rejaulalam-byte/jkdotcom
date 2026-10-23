@@ -83,7 +83,10 @@ final class RegistrationController
             $data['service_custom'] = $data['service_slug'] === null && $data['service_name'] !== '' ? $data['service_name'] : null;
             $data['experience_years'] = trim((string) ($_POST['experience'] ?? '')) === '' ? null : (int) $_POST['experience'];
             $data['bio'] = $this->clean($_POST['bio'] ?? '', 2000, true);
-            $data['work_district_id'] = (int) ($_POST['work_district_id'] ?? 0) ?: null;
+            $work = GeoRepository::parseWorkDistricts($_POST['work_districts'] ?? [], $_POST['work_all'] ?? '', $_POST['work_district_pick'] ?? '');
+            $data['work_district_ids'] = $work['ids'];
+            $data['work_all_districts'] = $work['all'] ? 1 : 0;
+            $data['work_error'] = $work['error'];
             $data['reference_1'] = $this->clean($_POST['reference_1'] ?? '', 300);
             $data['reference_2'] = $this->clean($_POST['reference_2'] ?? '', 300);
         } else {
@@ -150,8 +153,7 @@ final class RegistrationController
         if ($isWorker) {
             $rows['পেশা'] = $service;
             $rows['কাজের অভিজ্ঞতা'] = $d['experience_years'] === null ? '' : bn((int) $d['experience_years']) . ' বছর';
-            $workDistrict = $d['work_district_id'] !== null ? GeoRepository::names(0, (int) $d['work_district_id'], 0)['district'] : '';
-            $rows['কাজ করতে আগ্রহী জেলা'] = $workDistrict;
+            $rows['কাজ করতে আগ্রহী জেলা'] = GeoRepository::workDistrictsText((array) $d['work_district_ids'], (bool) $d['work_all_districts']);
             $rows['রেফারেন্স-১'] = (string) $d['reference_1'];
             $rows['রেফারেন্স-২'] = (string) $d['reference_2'];
         } else {
@@ -213,8 +215,8 @@ final class RegistrationController
             if ($d['reference_1'] === '' || $d['reference_2'] === '') {
                 $errors[] = 'দুইজন রেফারেন্সের নাম, পেশা, মোবাইল নাম্বার ও ঠিকানা লিখুন।';
             }
-            if ($d['work_district_id'] !== null && !GeoRepository::districtExists((int) $d['work_district_id'])) {
-                $errors[] = 'কাজ করতে আগ্রহী জেলাটি সঠিক নয়। আবার নির্বাচন করুন।';
+            if ($d['work_error'] !== null) {
+                $errors[] = $d['work_error'];
             }
         }
         if (!$d['consent']) {

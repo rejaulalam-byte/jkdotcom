@@ -4918,3 +4918,53 @@ a.wk-pages__item:focus-visible {
         padding: 1rem 1rem 0.1rem;
     }
 }
+
+/* ---- কাজ করতে আগ্রহী জেলা: বাছা জেলাগুলো ট্যাগ হয়ে বসে (partials/work-districts.php) ------------ */
+.pf--chips .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0.8rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.chips__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem 0.35rem 1.1rem;
+    border: 1px solid rgba(18, 90, 108, 0.5);
+    border-radius: 3rem;
+    background: var(--teal-10);
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: var(--ink);
+}
+.chips__item button {
+    width: 1.9rem;
+    height: 1.9rem;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--teal);
+    cursor: pointer;
+}
+.chips__item button:hover,
+.chips__item button:focus-visible {
+    background: var(--teal-20);
+}
+.chips__hint {
+    margin: 0.6rem 0 0;
+    font-size: 1.125rem;
+    color: #8a1111;
+}
+.pf--wide-block {
+    margin-bottom: 0;
+}
+@media (max-width: 1199px) {
+    .chips__item {
+        font-size: 1rem;
+    }
+}

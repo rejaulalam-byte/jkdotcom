@@ -14,10 +14,11 @@ final class WorkerDirectory
     public const PER_PAGE = [15, 25, 50, 0];
 
     /**
-     * নাম, মোবাইল, এলাকা (ঠিকানা), উপজেলা/থানা, জেলা অথবা বিভাগের যেকোনো একটার সঙ্গে লেখার অংশ মিললেই কর্মী থাকে।
+     * নাম, মোবাইল, এলাকা (ঠিকানা), উপজেলা/থানা, জেলা, বিভাগ অথবা কাজ করতে আগ্রহী জেলার সঙ্গে লেখার অংশ মিললেই কর্মী থাকে।
+     * যিনি "সব জেলা" দিয়েছেন, তিনি যেকোনো জেলার নাম খুঁজলেই আসেন।
      *
-     * @param list<array{id:int,name:string,phone:string,address:string,upazila:string,district:string,division:string}> $workers
-     * @return list<array{id:int,name:string,phone:string,address:string,upazila:string,district:string,division:string}>
+     * @param list<array<string,mixed>> $workers
+     * @return list<array<string,mixed>>
      */
     public static function filter(array $workers, string $query): array
     {
@@ -34,11 +35,23 @@ final class WorkerDirectory
             $digits = normalize_phone($digits);
         }
 
-        return array_values(array_filter($workers, static function (array $w) use ($needle, $digits, $byPhone): bool {
+        // খোঁজার লেখা কি কোনো জেলার নামের অংশ? ("সব জেলা"-র কর্মী তখন আসবেন)
+        $isDistrict = false;
+        foreach (GeoRepository::all()['districts'] as $district) {
+            if (str_contains(mb_strtolower($district['name']), $needle)) {
+                $isDistrict = true;
+                break;
+            }
+        }
+
+        return array_values(array_filter($workers, static function (array $w) use ($needle, $digits, $byPhone, $isDistrict): bool {
             if ($byPhone) {
                 return str_contains($w['phone'], $digits);
             }
-            foreach ([$w['name'], $w['address'], $w['upazila'], $w['district'], $w['division']] as $field) {
+            if ($isDistrict && !empty($w['work_all'])) {
+                return true;
+            }
+            foreach (array_merge([$w['name'], $w['address'], $w['upazila'], $w['district'], $w['division']], (array) ($w['work_districts'] ?? [])) as $field) {
                 if ($field !== '' && str_contains(mb_strtolower($field), $needle)) {
                     return true;
                 }

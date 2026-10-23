@@ -5,7 +5,7 @@
      মেনু (মোবাইল মেনু, সাব-মেনু) · বার্তা-বক্স · তারিখ ঘর · Hero অক্ষরের অ্যানিমেশন
      ওপরে-যাওয়ার বাটন · FAQ · আজকের কাজের তালিকা · Marquee · Services সারি
      Advertisement strip · কাজের ধরন ড্রপডাউন · এলাকার তিন ড্রপডাউন
-     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ · কর্মী-তালিকা · পাসওয়ার্ড দেখা/লুকানো · রেজিস্ট্রেশনের ছবি · ফর্মের ভুল-বার্তা
+     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ · কর্মী-তালিকা · কাজের জেলার ট্যাগ · পাসওয়ার্ড দেখা/লুকানো · রেজিস্ট্রেশনের ছবি · ফর্মের ভুল-বার্তা
 
    প্রতিটি অংশ নিজের মতো স্বাধীন: ওই অংশের উপাদান পেইজে না থাকলে সে চুপচাপ বাদ পড়ে।
    ========================================================================== */
@@ -1680,5 +1680,78 @@
             }
         }
         [100, 500, 1200].forEach(function (ms) { window.setTimeout(clearIfAutofilled, ms); });
+    });
+})();
+
+/* ---- কাজ করতে আগ্রহী জেলা ([data-work-districts]): সর্বোচ্চ ৫টি জেলা অথবা "সব জেলা" ----------------
+   খোঁজা-যায় এমন তালিকা (select) থেকে বাছলেই জেলাটা ট্যাগ হয়ে নিচে বসে ও লুকানো ঘরে (work_districts[]) জমা হয়;
+   তালিকা আবার ফাঁকা হয়ে যায়। "সব জেলা" বাছলে আলাদা ট্যাগগুলো সরে যায় (work_all)। ৫টি পূর্ণ হলে বার্তা দেয়।
+   ট্যাগের × বাদ দেয়। সার্ভার আবার যাচাই করে (GeoRepository::parseWorkDistricts)। */
+(function () {
+    document.querySelectorAll("[data-work-districts]").forEach(function (box) {
+        var select = box.querySelector("select");
+        var list = box.querySelector("[data-chips]");
+        var hint = box.querySelector("[data-chips-hint]");
+        var max = parseInt(box.getAttribute("data-max"), 10) || 5;
+
+        function say(text) {
+            hint.textContent = text || "";
+            hint.hidden = !text;
+        }
+        function makeChip(label, inputName, value, extra) {
+            var li = document.createElement("li");
+            li.className = "chips__item";
+            li.setAttribute(extra, value);
+            var span = document.createElement("span");
+            span.textContent = label;
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.setAttribute("aria-label", box.getAttribute("data-remove") || "");
+            btn.textContent = "×";
+            var input = document.createElement("input");
+            input.type = "hidden";
+            input.name = inputName;
+            input.value = value === "" ? "1" : value;
+            li.appendChild(span);
+            li.appendChild(btn);
+            li.appendChild(input);
+            return li;
+        }
+
+        select.addEventListener("change", function () {
+            var value = select.value;
+            if (value === "") {
+                return;
+            }
+            var label = select.options[select.selectedIndex].textContent;
+            select.value = ""; // তালিকা আবার ফাঁকা (খোঁজার ঘরও ফাঁকা হয়)
+            say("");
+
+            if (value === "all") {
+                list.textContent = "";
+                list.appendChild(makeChip(box.getAttribute("data-all-label") || label, "work_all", "", "data-all"));
+                return;
+            }
+            var all = list.querySelector("[data-all]");
+            if (all) {
+                all.remove();
+            }
+            if (list.querySelector('[data-id="' + value + '"]')) {
+                return;
+            }
+            if (list.querySelectorAll("[data-id]").length >= max) {
+                say(box.getAttribute("data-msg-max"));
+                return;
+            }
+            list.appendChild(makeChip(label, "work_districts[]", value, "data-id"));
+        });
+
+        list.addEventListener("click", function (e) {
+            var btn = e.target.closest ? e.target.closest("button") : null;
+            if (btn) {
+                btn.parentNode.remove();
+                say("");
+            }
+        });
     });
 })();

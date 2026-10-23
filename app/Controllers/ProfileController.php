@@ -33,7 +33,12 @@ final class ProfileController
 
         $service = (string) ($user['service_slug'] ?? '') !== '' ? ServiceRepository::findBySlug((string) $user['service_slug']) : null;
         // ভুল জমার পর ব্যবহারকারীর লেখা মান ফিরে আসে, নইলে সংরক্ষিত মান
-        $old = Session::pull('profile_old', []) + $user + ['service_name' => $service['name'] ?? (string) ($user['service_custom'] ?? '')];
+        $work = UserRepository::workDistricts($user);
+        $old = Session::pull('profile_old', []) + $user + [
+            'service_name' => $service['name'] ?? (string) ($user['service_custom'] ?? ''),
+            'work_district_ids' => $work['ids'],
+            'work_all_districts' => $work['all'] ? 1 : 0,
+        ];
 
         View::render('pages/profile', [
             'bodyClass' => 'page-regform',
@@ -88,6 +93,10 @@ final class ProfileController
             $data['service_custom'] = $data['service_slug'] === null && $data['service_name'] !== '' ? $data['service_name'] : null;
             $data['experience_years'] = trim((string) ($_POST['experience'] ?? '')) === '' ? null : (int) $_POST['experience'];
             $data['bio'] = clean_input($_POST['bio'] ?? '', 2000, true);
+            $work = GeoRepository::parseWorkDistricts($_POST['work_districts'] ?? [], $_POST['work_all'] ?? '', $_POST['work_district_pick'] ?? '');
+            $data['work_district_ids'] = $work['ids'];
+            $data['work_all_districts'] = $work['all'] ? 1 : 0;
+            $data['work_error'] = $work['error'];
         }
 
         $errors = $this->validate($user, $data, (string) ($_POST['current_password'] ?? ''), $isWorker);
@@ -103,6 +112,7 @@ final class ProfileController
         if ($photo !== null) {
             $data['photo'] = $photo;
         }
+        unset($data['work_error']);
         $result = UserRepository::updateProfile((int) $user['id'], $data);
         if ($result !== 'ok') {
             $this->discard($photo);
@@ -156,6 +166,9 @@ final class ProfileController
             }
             if ($d['experience_years'] !== null && ($d['experience_years'] < 0 || $d['experience_years'] > 70)) {
                 $errors[] = 'কাজের অভিজ্ঞতা ০ থেকে ৭০ বছরের মধ্যে লিখুন।';
+            }
+            if ($d['work_error'] !== null) {
+                $errors[] = $d['work_error'];
             }
         }
 

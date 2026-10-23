@@ -41,10 +41,10 @@ final class UserRepository
             $stmt = $pdo->prepare(
                 "INSERT INTO users
                     (role, status, name, gender, phone, email, password_hash, service_slug, service_custom, experience_years, bio, nid_number,
-                     address, upazila_id, district_id, division_id, work_district_id, reference_1, reference_2, photo, ip_hash, consent_at, created_at)
+                     address, upazila_id, district_id, division_id, work_all_districts, reference_1, reference_2, photo, ip_hash, consent_at, created_at)
                  VALUES
                     (:role, 'pending', :name, :gender, :phone, :email, :hash, :service, :custom, :experience, :bio, :nid,
-                     :address, :upazila, :district, :division, :work_district, :ref1, :ref2, :photo, :ip_hash, :consent_at, NOW())"
+                     :address, :upazila, :district, :division, :work_all, :ref1, :ref2, :photo, :ip_hash, :consent_at, NOW())"
             );
             $stmt->execute([
                 ':role' => $data['role'],
@@ -62,13 +62,14 @@ final class UserRepository
                 ':upazila' => $data['upazila_id'],
                 ':district' => $data['district_id'],
                 ':division' => $data['division_id'],
-                ':work_district' => $data['work_district_id'] ?? null,
+                ':work_all' => (int) ($data['work_all_districts'] ?? 0),
                 ':ref1' => ((string) ($data['reference_1'] ?? '')) !== '' ? $data['reference_1'] : null,
                 ':ref2' => ((string) ($data['reference_2'] ?? '')) !== '' ? $data['reference_2'] : null,
                 ':photo' => $data['photo'] ?? null,
                 ':ip_hash' => Security::ipHash(),
                 ':consent_at' => $data['consent_at'] ?? null,
             ]);
+            self::saveWorkDistricts($pdo, (int) $pdo->lastInsertId(), (array) ($data['work_district_ids'] ?? []));
 
             return 'ok';
         } catch (Throwable $e) {
@@ -179,7 +180,7 @@ final class UserRepository
      * একটা সেবার অনুমোদিত সব কর্মী, নামের বর্ণানুক্রমে (সেবার তালিকা-পেইজ /services/<slug>)।
      * এলাকার নাম আগেই বসানো থাকে, যাতে খোঁজা ও দেখানো এক জায়গায় হয়।
      *
-     * @return list<array{id:int,name:string,phone:string,address:string,upazila:string,district:string,division:string}>
+     * @return list<array{id:int,name:string,phone:string,address:string,upazila:string,district:string,division:string,work_all:bool,work_districts:list<string>}>
      */
     public static function listWorkersByService(string $slug): array
     {
@@ -193,7 +194,7 @@ final class UserRepository
         } else {
             try {
                 $stmt = $pdo->prepare(
-                    "SELECT id, name, phone, address, upazila_id, district_id, division_id FROM users
+                    "SELECT id, name, phone, address, upazila_id, district_id, division_id, work_all_districts FROM users
                      WHERE role = 'worker' AND status = 'approved' AND service_slug = :slug
                      ORDER BY name ASC, id ASC"
                 );
@@ -206,19 +207,52 @@ final class UserRepository
             }
         }
 
+        $work = self::workDistrictsOf($pdo, array_map(static fn (array $r): int => (int) $r['id'], $rows));
         $list = [];
         foreach ($rows as $r) {
             $geo = GeoRepository::names((int) $r['upazila_id'], (int) $r['district_id'], (int) $r['division_id']);
+            $ids = $pdo === null ? array_map('intval', (array) ($r['work_district_ids'] ?? [])) : ($work[(int) $r['id']] ?? []);
             $list[] = [
                 'id' => (int) $r['id'],
                 'name' => (string) $r['name'],
                 'phone' => (string) $r['phone'],
                 'address' => (string) $r['address'],
+                'work_all' => !empty($r['work_all_districts']),
+                'work_districts' => GeoRepository::workDistrictNames($ids),
             ] + $geo;
         }
         usort($list, static fn (array $a, array $b): int => strcmp($a['name'], $b['name']));
 
         return $list;
+    }
+
+    /**
+     * কয়েকজন কর্মীর কাজের জেলার id (কর্মীর id => জেলার id-তালিকা)। ডাটাবেস না থাকলে ফাঁকা।
+     *
+     * @param list<int> $userIds
+     * @return array<int,list<int>>
+     */
+    private static function workDistrictsOf(?\PDO $pdo, array $userIds): array
+    {
+        if ($pdo === null || $userIds === []) {
+            return [];
+        }
+
+        try {
+            $in = implode(',', array_fill(0, count($userIds), '?'));
+            $stmt = $pdo->prepare("SELECT user_id, district_id FROM worker_work_districts WHERE user_id IN ($in) ORDER BY district_id");
+            $stmt->execute(array_values($userIds));
+            $out = [];
+            foreach ($stmt->fetchAll() as $row) {
+                $out[(int) $row['user_id']][] = (int) $row['district_id'];
+            }
+
+            return $out;
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::workDistrictsOf failed: ' . $e->getMessage());
+
+            return [];
+        }
     }
 
     /**
@@ -231,6 +265,46 @@ final class UserRepository
         $row = self::findById($id);
 
         return $row !== null && ($row['role'] ?? '') === 'worker' && ($row['status'] ?? '') === 'approved' ? $row : null;
+    }
+
+    /**
+     * কর্মীর "কাজ করতে আগ্রহী" জেলাগুলো নতুন করে বসায় (আগেরগুলো মুছে)।
+     *
+     * @param list<int> $ids
+     */
+    private static function saveWorkDistricts(\PDO $pdo, int $userId, array $ids): void
+    {
+        $pdo->prepare('DELETE FROM worker_work_districts WHERE user_id = :u')->execute([':u' => $userId]);
+        $insert = $pdo->prepare('INSERT IGNORE INTO worker_work_districts (user_id, district_id) VALUES (:u, :d)');
+        foreach (array_slice($ids, 0, GeoRepository::MAX_WORK_DISTRICTS) as $districtId) {
+            $insert->execute([':u' => $userId, ':d' => (int) $districtId]);
+        }
+    }
+
+    /**
+     * একজন কর্মীর কাজের জেলার id-গুলো ও "সব জেলা" চিহ্ন।
+     *
+     * @param array<string,mixed> $user users-এর সারি
+     * @return array{ids:list<int>,all:bool}
+     */
+    public static function workDistricts(array $user): array
+    {
+        $all = !empty($user['work_all_districts']);
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            return ['ids' => array_map('intval', (array) ($user['work_district_ids'] ?? [])), 'all' => $all];
+        }
+
+        try {
+            $stmt = $pdo->prepare('SELECT district_id FROM worker_work_districts WHERE user_id = :u ORDER BY district_id');
+            $stmt->execute([':u' => (int) $user['id']]);
+
+            return ['ids' => array_map('intval', array_column($stmt->fetchAll(), 'district_id')), 'all' => $all];
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::workDistricts failed: ' . $e->getMessage());
+
+            return ['ids' => [], 'all' => $all];
+        }
     }
 
     /** সফল লগইনের সময় লিখে রাখে; পুরনো হ্যাশ দুর্বল হলে নতুন হ্যাশ বসায় (password_needs_rehash)। */
@@ -281,7 +355,7 @@ final class UserRepository
                 if ((int) $row['id'] === $id) {
                     $rows[$i] = array_merge($row, array_intersect_key($data, array_flip([
                         'phone', 'address', 'upazila_id', 'district_id', 'division_id', 'photo',
-                        'service_slug', 'service_custom', 'experience_years', 'bio',
+                        'service_slug', 'service_custom', 'experience_years', 'bio', 'work_district_ids', 'work_all_districts',
                     ])));
                 }
             }
@@ -299,6 +373,8 @@ final class UserRepository
             $sets[] = 'service_custom = :custom';
             $sets[] = 'experience_years = :experience';
             $sets[] = 'bio = :bio';
+            $sets[] = 'work_all_districts = :work_all';
+            $args[':work_all'] = (int) ($data['work_all_districts'] ?? 0);
             $args += [
                 ':service' => $data['service_slug'], ':custom' => $data['service_custom'],
                 ':experience' => $data['experience_years'], ':bio' => ($data['bio'] ?? '') !== '' ? $data['bio'] : null,
@@ -312,6 +388,9 @@ final class UserRepository
         try {
             $stmt = $pdo->prepare('UPDATE users SET ' . implode(', ', $sets) . ' WHERE id = :id');
             $stmt->execute($args);
+            if (array_key_exists('work_district_ids', $data)) {
+                self::saveWorkDistricts($pdo, $id, (array) $data['work_district_ids']);
+            }
 
             return 'ok';
         } catch (Throwable $e) {

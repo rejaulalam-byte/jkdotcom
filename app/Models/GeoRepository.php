@@ -78,6 +78,71 @@ final class GeoRepository
         return $out;
     }
 
+    /** একজন কর্মী সর্বোচ্চ কতটি জেলা বাছতে পারেন ("সব জেলা" আলাদা বাছাই)। */
+    public const MAX_WORK_DISTRICTS = 5;
+
+    /**
+     * ফর্মে আসা "কোন জেলায় কাজ করতে আগ্রহী" মান পড়ে যাচাই করে।
+     * $ids = work_districts[] (ট্যাগগুলো), $all = work_all ("সব জেলা"), $pick = JavaScript ছাড়া একটা জেলা বাছার ঘর।
+     * "সব জেলা" হলে আলাদা জেলার তালিকা ফাঁকা থাকে।
+     *
+     * @return array{ids:list<int>,all:bool,error:?string}
+     */
+    public static function parseWorkDistricts(mixed $ids, mixed $all, mixed $pick): array
+    {
+        $list = [];
+        foreach (is_array($ids) ? $ids : [] as $id) {
+            $list[(int) $id] = (int) $id;
+        }
+        $isAll = !empty($all) || $pick === 'all';
+        if (!$isAll && $list === [] && (int) $pick > 0) {
+            $list[(int) $pick] = (int) $pick;
+        }
+        if ($isAll) {
+            return ['ids' => [], 'all' => true, 'error' => null];
+        }
+        foreach ($list as $id) {
+            if (!self::districtExists($id)) {
+                return ['ids' => [], 'all' => false, 'error' => 'কাজ করতে আগ্রহী জেলাটি সঠিক নয়। আবার নির্বাচন করুন।'];
+            }
+        }
+        if (count($list) > self::MAX_WORK_DISTRICTS) {
+            return ['ids' => [], 'all' => false, 'error' => 'কাজ করতে আগ্রহী জেলা সর্বোচ্চ ' . bn(self::MAX_WORK_DISTRICTS) . 'টি বাছাই করা যাবে। বেশি জেলা হলে "সব জেলা" বাছুন।'];
+        }
+
+        return ['ids' => array_values($list), 'all' => false, 'error' => null];
+    }
+
+    /**
+     * বাছা কাজের জেলাগুলো একটা লেখায় ("ঢাকা, বরিশাল" বা "সব জেলা"); কিছু না থাকলে ফাঁকা।
+     *
+     * @param list<int> $ids
+     */
+    public static function workDistrictsText(array $ids, bool $all): string
+    {
+        if ($all) {
+            return 'সব জেলা';
+        }
+
+        return implode(', ', self::workDistrictNames($ids));
+    }
+
+    /**
+     * জেলার id থেকে নাম (বাছাইয়ের ক্রমে)।
+     *
+     * @param list<int> $ids
+     * @return list<string>
+     */
+    public static function workDistrictNames(array $ids): array
+    {
+        $byId = [];
+        foreach (self::all()['districts'] as $d) {
+            $byId[$d['id']] = $d['name'];
+        }
+
+        return array_values(array_filter(array_map(static fn ($id): string => $byId[(int) $id] ?? '', $ids), static fn (string $n): bool => $n !== ''));
+    }
+
     /** এই id-র জেলা আছে কি না (ফর্মে আসা মান যাচাইয়ের জন্য)। */
     public static function districtExists(int $districtId): bool
     {

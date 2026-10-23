@@ -130,16 +130,8 @@ $helpTel = content('today.post.helpline_tel');
                     </div>
 
                     <?php if ($role === 'worker'): ?>
-                        <?php // কোন জেলায় কাজ করতে আগ্রহী (ঐচ্ছিক): নিজের আলাদা খোঁজা-যায় তালিকা, ঠিকানার তিন ঘরের সঙ্গে জোড়া নয় ?>
-                        <div class="pf pf--select">
-                            <label class="sr-only" for="rf-work-district"><?= e(content('regform.f.work_district')) ?></label>
-                            <select id="rf-work-district" name="work_district_id" data-search data-none="<?= e(content('geo.search.none')) ?>">
-                                <option value=""><?= $ph('work_district', false) ?></option>
-                                <?php foreach ($geo['districts'] as $d): ?>
-                                    <option value="<?= $d['id'] ?>"<?= $sel('work_district_id', $d['id']) ?>><?= e($d['name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                        <?php // কোন জেলায় কাজ করতে আগ্রহী (ঐচ্ছিক): সর্বোচ্চ ৫টি জেলা বা "সব জেলা", ট্যাগ হয়ে বসে; ঠিকানার তিন ঘরের সঙ্গে জোড়া নয় ?>
+                        <?php $wdIds = array_map('intval', (array) ($old['work_district_ids'] ?? [])); $wdAll = !empty($old['work_all_districts']); require BASE_PATH . '/app/Views/partials/work-districts.php'; ?>
 
                         <?php // দুইজন রেফারেন্স (দুটোই আবশ্যক) ?>
                         <fieldset class="reg-refs">
