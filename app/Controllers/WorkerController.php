@@ -10,60 +10,91 @@ use App\Core\Mailer;
 use App\Core\PhotoUpload;
 use App\Core\RateLimiter;
 use App\Core\Security;
+use App\Core\Session;
+use App\Core\View;
 use App\Models\ContactTrackingRepository;
 use App\Models\GeoRepository;
+use App\Models\RatingRepository;
 use App\Models\ServiceRepository;
 use App\Models\UserRepository;
 
 /**
- * কর্মী-তালিকার (/services/<slug>) পেছনের JSON অনুরোধ:
- *  - POST /workers/info    একজন কর্মীর সংক্ষিপ্ত তথ্য ("বিস্তারিত তথ্য: ক্লিক করুন"), ফোন/ইমেইল লুকানো রূপে;
- *  - POST /workers/contact লুকানো ফোন বা ইমেইল দেখানো (কাজের তালিকার /today/contact-এর মতোই দুই ধাপে)।
+ * কর্মীর ব্যক্তিগত পেইজ ও তার পেছনের অনুরোধ:
+ *  - GET  /workers/<id>      কর্মীর বিস্তারিত তথ্য (ফোন/ইমেইল লুকানো), রেটিং-ফর্ম;
+ *  - POST /workers/rate      কাজের মূল্যায়ন (রেটিং) জমা;
+ *  - POST /workers/contact   লুকানো ফোন বা ইমেইল দেখানো (কাজের তালিকার /today/contact-এর মতোই দুই ধাপে, JSON)।
  */
 final class WorkerController
 {
     /** @param array<string,mixed> $meta */
-    public function info(array $meta = []): void
+    public function show(array $meta = []): void
     {
-        $this->jsonHeaders();
-        if (!$this->guard('worker_info', 120)) {
-            return;
-        }
-
-        $user = UserRepository::findPublicWorker((int) ($_POST['id'] ?? 0));
+        $id = ctype_digit((string) ($meta['slug'] ?? '')) ? (int) $meta['slug'] : 0;
+        $user = UserRepository::findPublicWorker($id);
         if ($user === null) {
-            $this->reply(['error' => 'none'], 404);
+            http_response_code(404);
+            View::render('pages/error', ['title' => 'পেজটি পাওয়া যায়নি', 'code' => 404]);
 
             return;
         }
 
+        $service = ServiceRepository::findBySlug((string) ($user['service_slug'] ?? ''));
+        $profession = (string) ($user['service_custom'] ?? '') !== '' ? (string) $user['service_custom'] : ($service['name'] ?? '');
         $geo = GeoRepository::names((int) $user['upazila_id'], (int) $user['district_id'], (int) $user['division_id']);
-        $profession = (string) ($user['service_custom'] ?? '');
-        if ($profession === '') {
-            $service = ServiceRepository::findBySlug((string) ($user['service_slug'] ?? ''));
-            $profession = $service['name'] ?? '';
-        }
-        $area = array_filter([
-            (string) $user['address'],
-            $geo['upazila'] !== '' ? 'থানা/উপজেলা- ' . $geo['upazila'] : '',
-            $geo['district'] !== '' ? $geo['district'] . ' জেলা' : '',
-            $geo['division'] !== '' ? 'বিভাগ - ' . $geo['division'] : '',
-        ], static fn (string $part): bool => $part !== '');
-
+        $address = implode(', ', array_filter(
+            [(string) $user['address'], $geo['upazila'], $geo['district'], $geo['division'], 'বাংলাদেশ'],
+            static fn (string $part): bool => $part !== ''
+        ));
         $email = (string) ($user['email'] ?? '');
-        $this->reply([
+        $listUrl = $service !== null ? '/services/' . $service['slug'] : '/services';
+
+        View::render('pages/worker', [
+            'bodyClass' => 'page-worker',
+            'title' => $user['name'] . ' — Jorurikaj.com',
+            'description' => content('worker.title'),
+            'heading' => content('worker.banner'),
             'id' => (int) $user['id'],
             'name' => (string) $user['name'],
-            'photo' => PhotoUpload::url($user['photo'] !== null ? (string) $user['photo'] : null) ?? '',
+            'photo' => PhotoUpload::url($user['photo'] !== null ? (string) $user['photo'] : null),
             'profession' => $profession,
-            'experience' => $user['experience_years'] !== null ? bn((int) $user['experience_years']) : '',
-            'area' => implode(', ', $area) . '।',
+            'listUrl' => $listUrl,
+            'experience' => $user['experience_years'] !== null ? (int) $user['experience_years'] : null,
             'bio' => (string) ($user['bio'] ?? ''),
-            'phone_masked' => mask_phone((string) $user['phone']),
-            'email_masked' => $email !== '' ? mask_email($email) : '',
+            'address' => $address . '।',
+            'phoneMasked' => mask_phone((string) $user['phone']),
+            'emailMasked' => $email !== '' ? mask_email($email) : '',
+            'rating' => RatingRepository::summary((int) $user['id']),
+            'choices' => RatingRepository::CHOICES,
+            'ratingMessage' => Session::pull('rating_message'),
+            'token' => Security::csrfToken(),
         ]);
     }
 
+    /** কাজের মূল্যায়ন জমা: একই ব্রাউজার-সেশন একই কর্মীকে একটাই রেটিং দিতে পারে, আবার দিলে বদলে যায়। @param array<string,mixed> $meta */
+    public function rate(array $meta = []): void
+    {
+        $id = (int) ($_POST['id'] ?? 0);
+        $back = '/workers/' . $id . '#rating';
+
+        if (!Security::verifyCsrf($_POST['_token'] ?? null) || UserRepository::findPublicWorker($id) === null) {
+            redirect($id > 0 ? '/workers/' . $id : '/services');
+        }
+        if (RateLimiter::tooMany('worker_rate', 10, 3600)) {
+            Session::flash('rating_message', ['error', content('worker.rate.limit')]);
+            redirect($back);
+        }
+
+        $rating = RatingRepository::parse($_POST['rating'] ?? null);
+        if ($rating === null) {
+            Session::flash('rating_message', ['error', content('worker.rate.invalid')]);
+            redirect($back);
+        }
+
+        $_SESSION['voter'] ??= bin2hex(random_bytes(16));
+        $ok = RatingRepository::submit($id, (string) $_SESSION['voter'], $rating);
+        Session::flash('rating_message', $ok ? ['ok', content('worker.rate.thanks')] : ['error', content('worker.rate.error')]);
+        redirect($back);
+    }
     /**
      * step=click: প্রতিটি ক্লিক একটা "কল" হিসেবে গোনা হয়; দর্শক আগে পরিচয় দিয়ে থাকলে যোগাযোগ দেখায়, নইলে {need_lead: true}।
      * step=lead: দর্শকের নাম + মোবাইল সংরক্ষণ, অ্যাডমিনকে ইমেইল, তারপর যোগাযোগ দেখানো।

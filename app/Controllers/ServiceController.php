@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Security;
 use App\Core\View;
+use App\Models\RatingRepository;
 use App\Models\ServiceDirectory;
 use App\Models\ServiceRepository;
 use App\Models\UserRepository;
@@ -64,7 +64,7 @@ final class ServiceController
             'offset' => $paged['offset'],
             'page' => $paged['page'],
             'pages' => $paged['pages'],
-            'token' => Security::csrfToken(),
+            'ratings' => RatingRepository::averages(array_column($paged['items'], 'id')),
         ]);
     }
 }

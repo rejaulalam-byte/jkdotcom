@@ -3955,7 +3955,9 @@ a.user-menu__item:hover {
     color: var(--teal);
 }
 .wk-open {
+    display: inline-block;
     padding: 0.4rem 0.8rem;
+    text-decoration: none;
     border: 0;
     background: transparent;
     color: var(--teal);
@@ -4004,80 +4006,6 @@ a.wk-pages__item:focus-visible {
 .wk-pages__gap {
     line-height: 2.3125rem;
     opacity: 0.5;
-}
-
-/* "বিস্তারিত তথ্য" পপ-আপ */
-.wk-dialog {
-    position: relative;
-    width: min(92vw, 50rem);
-    max-width: none;
-    padding: 2.6rem 2.8rem 2.2rem;
-    border: 0;
-    border-radius: 1.25rem;
-    background: var(--white);
-    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.35);
-    color: var(--ink);
-}
-.wk-dialog::backdrop {
-    background: rgba(8, 40, 48, 0.6);
-}
-.wk-dialog__close {
-    position: absolute;
-    top: 0.8rem;
-    right: 1rem;
-    width: 3rem;
-    height: 3rem;
-    border: 0;
-    background: transparent;
-    font-size: 2.4rem;
-    line-height: 1;
-    color: var(--teal);
-    cursor: pointer;
-}
-.wk-dialog__head {
-    display: flex;
-    align-items: center;
-    gap: 1.6rem;
-    margin-bottom: 1.4rem;
-}
-.wk-dialog__photo {
-    flex: none;
-    width: 7rem;
-    height: 7rem;
-    border-radius: 50%;
-    object-fit: cover;
-    background: var(--teal-10);
-}
-.wk-dialog h3 {
-    margin: 0;
-    font-size: 2rem;
-    font-weight: 600;
-    line-height: 1.35;
-    color: var(--teal);
-}
-.wk-dialog__profession {
-    margin: 0.2rem 0 0;
-    font-size: var(--fs-body);
-}
-.wk-dialog__list {
-    margin: 0 0 1rem;
-}
-.wk-dialog__list div {
-    margin-bottom: 0.7rem;
-    font-size: var(--fs-body);
-    line-height: 1.7;
-}
-.wk-dialog__list dt {
-    display: inline;
-    font-weight: 600;
-}
-.wk-dialog__list dd {
-    display: inline;
-    margin: 0 0 0 0.4rem;
-}
-.wk-dialog .job__row {
-    margin: 0 0 0.5rem;
-    font-size: var(--fs-body);
 }
 
 @media (min-width: 1200px) {
@@ -4170,19 +4098,344 @@ a.wk-pages__item:focus-visible {
     .wk-pages__item {
         font-size: 1rem;
     }
-    .wk-dialog {
-        padding: 1.6rem 1.25rem 1.4rem;
+}
+
+/* ---- কর্মীর ব্যক্তিগত পেইজ /workers/<id> (Figma 2845-920) ------------------------- */
+.section--worker {
+    padding: 10rem 0;
+}
+.wk-heading {
+    margin: 0 0 4.6rem;
+    font-size: 3.125rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+}
+.wk-layout {
+    display: grid;
+    grid-template-columns: 57.5rem 36.75rem; /* Figma: ৯২০px + ৫৮৮px */
+    column-gap: 4.9rem;
+    align-items: start;
+}
+.wk-card {
+    position: relative;
+    padding: 3.75rem 2.5rem 4.5rem;
+    border: 1px solid rgba(18, 90, 108, 0.8);
+    border-radius: 1.25rem;
+}
+.wk-photo {
+    position: absolute;
+    top: 3.75rem;
+    right: 1.8rem;
+    width: 8.875rem; /* ১৪২px */
+    height: 10rem; /* ১৬০px */
+    overflow: hidden;
+    border: 2px solid #a0a0a0;
+    border-radius: 0.625rem;
+    background: var(--teal-10);
+}
+.wk-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.wk-info {
+    display: grid;
+    row-gap: 1.65rem; /* Figma: সারির মাঝে ৬৮px */
+    margin: 0;
+}
+.wk-info__row {
+    display: grid;
+    grid-template-columns: 19.3rem 1fr; /* লেখার নাম | মান */
+    align-items: baseline;
+}
+.wk-info dt {
+    font-size: var(--fs-body);
+}
+.wk-info dd {
+    margin: 0;
+    font-size: 1.75rem;
+    line-height: 1.5;
+}
+.wk-info__row--short dd {
+    padding-right: 10.5rem; /* ছবির নিচে লেখা যেন না যায় */
+}
+.wk-info .job-reveal {
+    padding: 0;
+    font-weight: 400;
+    color: var(--ink);
+    text-decoration: underline dashed var(--teal-35);
+}
+.wk-info .job-reveal:hover,
+.wk-info .job-reveal:focus-visible {
+    background: var(--teal-10);
+}
+.wk-info a.job-reveal {
+    color: var(--teal);
+    font-weight: 600;
+    text-decoration: underline;
+}
+.wk-hint {
+    margin: 1rem 0 0 19.3rem;
+    font-size: 1.375rem; /* ছোট ব্যাখ্যার লেখা: Figma-র ২২px, ২৪px করলে লাইন ভেঙে যায় */
+    line-height: 1.6;
+}
+.wk-hint strong {
+    color: #0043fd;
+    font-weight: 600;
+}
+.wk-note {
+    max-width: 52.5rem;
+    margin-top: 2.2rem;
+    padding: 0.9rem 2.25rem 1rem;
+    border: 1px solid rgba(18, 90, 108, 0.8);
+    border-radius: 0.625rem;
+    background: rgba(18, 90, 108, 0.15);
+    font-size: 1.375rem; /* Figma-র ২২px */
+    line-height: 1.4;
+}
+.wk-note p {
+    margin: 0;
+}
+.wk-rate {
+    margin-top: 2.8rem;
+}
+.wk-rate__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem 1.4rem;
+}
+.wk-rate__label {
+    min-width: 11.5rem;
+    padding-left: 0.4rem;
+    font-size: 1.75rem;
+    font-weight: 500;
+}
+.wk-rate select {
+    width: 5.75rem; /* ৯২px */
+    height: 3.125rem; /* ৫০px */
+    padding: 0 0.4rem;
+    border: 1px solid var(--teal);
+    border-radius: 0.625rem;
+    background: #fbff00;
+    color: var(--teal);
+    font: inherit;
+    font-size: 1.75rem;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+}
+.wk-rate select:focus-visible,
+.wk-rate__submit:focus-visible,
+.wk-back__btn:focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
+}
+.wk-rate__submit {
+    height: 3.125rem;
+    padding: 0 1.6rem;
+    border: 0;
+    border-radius: 3.125rem;
+    background: var(--teal);
+    color: var(--white);
+    font: inherit;
+    font-size: 1.375rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+.wk-rate__submit:hover {
+    background: #0e4a59;
+}
+.wk-rate__current {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 0 0 0 auto;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+.wk-rate__badge {
+    min-width: 4.4rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    background: var(--teal);
+    color: var(--white);
+    text-align: center;
+}
+.wk-rate__legend {
+    margin: 1rem 0 0;
+    font-size: 1.375rem;
+}
+.wk-rate__msg {
+    margin: 0 0 1.2rem;
+    padding: 0.7rem 1.2rem;
+    border-radius: 0.625rem;
+    font-size: var(--fs-body);
+    font-weight: 500;
+}
+.wk-rate__msg.is-ok {
+    background: #e3f4e6;
+    color: #1d5a2a;
+}
+.wk-rate__msg.is-error {
+    background: #fbe6e6;
+    color: #8a1111;
+}
+.wk-warn {
+    min-height: 47.9rem; /* Figma: ৭৬৭px */
+    padding: 4.3rem 3.2rem 3.4rem;
+    border-radius: 1.25rem;
+    background: var(--teal);
+    color: var(--white);
+}
+.wk-warn__title {
+    margin: 0;
+    padding: 0.2rem 1rem;
+    border-radius: 0.625rem;
+    background: var(--white);
+    font-size: 3.125rem;
+    font-weight: 700;
+    line-height: 5.9rem;
+    text-align: center;
+    color: #f00;
+}
+.wk-warn ul {
+    margin: 3.2rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.wk-warn li {
+    position: relative;
+    margin-bottom: 2rem;
+    padding-left: 2.2rem;
+    font-size: 1.625rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+.wk-warn li::before {
+    content: "";
+    position: absolute;
+    top: 0.65em;
+    left: 0.2rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background: #ffeb33;
+}
+.wk-warn .brandname {
+    color: #ffeb33;
+}
+.wk-back {
+    margin: 4.4rem 0 0;
+}
+.wk-back__btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 4.6875rem; /* ৭৫px */
+    padding: 0 3.75rem;
+    border: 2px solid rgba(18, 90, 108, 0.5);
+    border-radius: 3.125rem;
+    background: rgba(18, 90, 108, 0.6);
+    color: var(--white);
+    font-size: 1.75rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+.wk-back__btn:hover {
+    background: rgba(18, 90, 108, 0.8);
+}
+
+@media (min-width: 1200px) {
+    body.page-worker {
+        --fs-body: 1.5rem; /* সাধারণ লেখা ২৪px; বাকি সাইজ Figma + ২px */
     }
-    .wk-dialog h3 {
-        font-size: 1.375rem;
+    .page-worker .wk-heading {
+        font-size: 3.25rem;
     }
-    .wk-dialog__photo {
-        width: 5rem;
-        height: 5rem;
+    .page-worker .wk-back__btn {
+        font-size: 1.875rem;
     }
-    .wk-dialog__list div,
-    .wk-dialog__profession,
-    .wk-dialog .job__row {
+}
+@media (max-width: 1199px) {
+    .section--worker {
+        padding: 2.5rem 0 4rem;
+    }
+    .wk-heading {
+        margin-bottom: 1.6rem;
+        font-size: 1.5rem;
+    }
+    .wk-layout {
+        grid-template-columns: 1fr;
+        row-gap: 1.6rem;
+    }
+    .wk-card {
+        padding: 1.25rem 1rem 1.4rem;
+    }
+    .wk-photo {
+        position: static;
+        width: 7.5rem;
+        height: 8.5rem;
+        margin: 0 auto 1.2rem;
+    }
+    .wk-info__row {
+        grid-template-columns: 1fr;
+        row-gap: 0.1rem;
+    }
+    .wk-info dt,
+    .wk-info dd,
+    .wk-hint,
+    .wk-note,
+    .wk-rate__legend {
         font-size: 1rem;
+    }
+    .wk-info dt {
+        font-weight: 600;
+    }
+    .wk-info__row--short dd {
+        padding-right: 0;
+    }
+    .wk-hint {
+        margin-left: 0;
+    }
+    .wk-note {
+        padding: 0.9rem 1rem;
+    }
+    .wk-rate__label {
+        min-width: 0;
+        font-size: 1.125rem;
+    }
+    .wk-rate select {
+        font-size: 1.25rem;
+    }
+    .wk-rate__submit {
+        font-size: 1rem;
+    }
+    .wk-rate__current {
+        margin-left: 0;
+        font-size: 1rem;
+    }
+    .wk-warn {
+        padding: 1.6rem 1.25rem 1.2rem;
+    }
+    .wk-warn__title {
+        font-size: 1.875rem;
+    }
+    .wk-warn ul {
+        margin-top: 1.4rem;
+    }
+    .wk-warn li {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+    .wk-back {
+        margin-top: 1.6rem;
+    }
+    .wk-back__btn {
+        width: 100%;
+        justify-content: center;
+        min-height: 3.5rem;
+        padding: 0 1.25rem;
+        font-size: 1.125rem;
     }
 }

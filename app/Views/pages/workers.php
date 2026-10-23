@@ -1,7 +1,7 @@
 <?php
 /**
  * একটা সেবার পেশাজীবী-তালিকা (Figma node 2841-673): খোঁজার ঘর, বিভাগের নাম, প্রতি-পৃষ্ঠার সংখ্যা,
- * টেবিল, পৃষ্ঠা-নাম্বার। "বিস্তারিত তথ্য: ক্লিক করুন" একটা পপ-আপে সংক্ষিপ্ত তথ্য দেখায় (ফোন/ইমেইল লুকানো)।
+ * টেবিল, পৃষ্ঠা-নাম্বার। "বিস্তারিত তথ্য: ক্লিক করুন" কর্মীর ব্যক্তিগত পেইজে (/workers/<id>) নেয়।
  *
  * @var string $heading                       ব্যানারের বড় শিরোনাম
  * @var array{name:string,slug:string} $service
@@ -14,7 +14,7 @@
  * @var int $offset       এই পৃষ্ঠার আগে কতজন (ক্রমিক নম্বরের জন্য)
  * @var int $page
  * @var int $pages
- * @var string $token     "বিস্তারিত তথ্য" ও যোগাযোগ অনুরোধের CSRF টোকেন
+ * @var array<int,float> $ratings  কর্মীর id => গড় রেটিং (যার রেটিং নেই সে থাকে না)
  */
 $crumbs = [['/', 'হোম'], ['/services', 'সেবাসমূহ'], [null, $service['name']]];
 require BASE_PATH . '/app/Views/partials/page-banner.php';
@@ -34,8 +34,7 @@ $divisionText = count($divisions) > 1
     ? implode(', ', array_slice($divisions, 0, -1)) . ' ও ' . end($divisions)
     : ($divisions[0] ?? '');
 ?>
-<section class="section section--workers" data-lead-root data-token="<?= e($token) ?>" data-contact-url="/workers/contact"
-         data-info-url="/workers/info" data-limit="<?= e(content('today.list.too_many')) ?>">
+<section class="section section--workers">
     <div class="container">
         <form class="svc-search wk-search" action="<?= e($base) ?>" method="get" role="search">
             <label class="sr-only" for="wk-q"><?= e(content('workers.search.placeholder')) ?></label>
@@ -106,9 +105,9 @@ $divisionText = count($divisions) > 1
                             <td data-label="<?= e(content('workers.col.area')) ?>"><?= $w['address'] !== '' ? e($w['address']) : '—' ?></td>
                             <td data-label="<?= e(content('workers.col.upazila')) ?>"><?= $w['upazila'] !== '' ? e($w['upazila']) : '—' ?></td>
                             <td data-label="<?= e(content('workers.col.district')) ?>"><?= $w['district'] !== '' ? e($w['district']) : '—' ?></td>
-                            <td class="wk-rating" data-label="<?= e(content('workers.col.rating')) ?>"><?= e(content('workers.rating_none')) ?></td>
+                            <td class="wk-rating" data-label="<?= e(content('workers.col.rating')) ?>"><?= isset($ratings[$w['id']]) ? e(bn(rtrim(rtrim(number_format($ratings[$w['id']], 1, '.', ''), '0'), '.'))) : e(content('workers.rating_none')) ?></td>
                             <td class="wk-details">
-                                <button class="wk-open" type="button" data-id="<?= (int) $w['id'] ?>"><?= e(content('workers.details_btn')) ?></button>
+                                <a class="wk-open" href="/workers/<?= (int) $w['id'] ?>"><?= e(content('workers.details_btn')) ?></a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -138,32 +137,4 @@ $divisionText = count($divisions) > 1
         <?php endif; ?>
     </div>
 
-    <?php // "বিস্তারিত তথ্য" পপ-আপ: app.js /workers/info থেকে ভরে; ফোন/ইমেইল লুকানো, ক্লিকে আগ্রহের পপ-আপ ?>
-    <dialog class="wk-dialog" id="wk-dialog" aria-labelledby="wk-dialog-name" data-error="<?= e(content('workers.info.error')) ?>" data-phone-hint="<?= e(content('workers.info.phone_hint')) ?>">
-        <button class="wk-dialog__close" type="button" data-close aria-label="<?= e(content('workers.info.close')) ?>">&times;</button>
-        <div class="wk-dialog__head">
-            <img class="wk-dialog__photo" src="<?= e(asset('img/icons/user-placeholder.svg')) ?>" alt="" width="144" height="144"
-                 data-placeholder="<?= e(asset('img/icons/user-placeholder.svg')) ?>">
-            <div>
-                <h3 id="wk-dialog-name" data-f="name"></h3>
-                <p class="wk-dialog__profession" data-f="profession"></p>
-            </div>
-        </div>
-        <dl class="wk-dialog__list">
-            <div data-row="experience"><dt><?= e(content('workers.info.experience')) ?></dt><dd><span data-f="experience"></span> <?= e(content('workers.info.experience_unit')) ?></dd></div>
-            <div data-row="area"><dt><?= e(content('workers.info.area')) ?></dt><dd data-f="area"></dd></div>
-            <div data-row="bio"><dt><?= e(content('workers.info.bio')) ?></dt><dd data-f="bio"></dd></div>
-        </dl>
-        <p class="job__row" data-row="phone">
-            <?= e(content('workers.info.phone')) ?>
-            <button class="job-reveal" type="button" data-id="" data-kind="phone"></button>
-            <span class="job__hint"><?= e(content('workers.info.phone_hint')) ?></span>
-        </p>
-        <p class="job__row" data-row="email">
-            <?= e(content('workers.info.email')) ?>
-            <button class="job-reveal" type="button" data-id="" data-kind="email"></button>
-        </p>
-    </dialog>
 </section>
-
-<?php $leadPrefix = 'workers.lead'; require BASE_PATH . '/app/Views/partials/lead-dialog.php'; ?>

@@ -1290,9 +1290,10 @@
     });
 })();
 
-/* ---- কর্মী-তালিকা (/services/<slug>): প্রতি-পৃষ্ঠার সংখ্যা বদলালেই পাঠানো + "বিস্তারিত তথ্য" পপ-আপ --------
-   "ক্লিক করুন" /workers/info থেকে একজনের সংক্ষিপ্ত তথ্য এনে পপ-আপে বসায় (লেখা textContent দিয়ে, তাই নিরাপদ)।
-   ফোন/ইমেইলের লুকানো বাটন আগের অংশের আগ্রহ-পপ-আপের নিয়মেই চলে। */
+/* ---- কর্মী-তালিকা ও ব্যক্তিগত পেইজ --------------------------------------------------------
+   তালিকায় প্রতি-পৃষ্ঠার সংখ্যা বদলালেই ফর্ম পাঠানো হয়। ব্যক্তিগত পেইজের "পূর্বের পৃষ্ঠায় ফিরে যান" তালিকা
+   থেকে এসে থাকলে ব্রাউজারের ইতিহাসে পিছিয়ে যায়, ফলে আগের খোঁজা/পৃষ্ঠা-নাম্বার ঠিক থাকে;
+   নইলে লিংকের (পেশার তালিকা) ঠিকানাতেই যায়। */
 (function () {
     document.querySelectorAll("select[data-autosubmit]").forEach(function (select) {
         select.addEventListener("change", function () {
@@ -1300,78 +1301,17 @@
         });
     });
 
-    var root = document.querySelector("[data-info-url]");
-    var dialog = document.getElementById("wk-dialog");
-    if (!root || !dialog || !dialog.showModal) {
-        return;
-    }
-    var photo = dialog.querySelector(".wk-dialog__photo");
-
-    function field(name) {
-        return dialog.querySelector('[data-f="' + name + '"]');
-    }
-
-    function fill(info) {
-        ["name", "profession", "area", "bio", "experience"].forEach(function (key) {
-            var el = field(key);
-            el.textContent = info[key] || "";
-            var row = el.closest("[data-row]");
-            if (row && key !== "name" && key !== "profession") {
-                row.hidden = !info[key];
-            }
-        });
-        photo.src = info.photo || photo.getAttribute("data-placeholder");
-        [["phone", info.phone_masked], ["email", info.email_masked]].forEach(function (pair) {
-            var row = dialog.querySelector('[data-row="' + pair[0] + '"]');
-            row.hidden = !pair[1];
-            var btn = row.querySelector(".job-reveal, a.job-reveal");
-            // আগের বার ফোন/ইমেইল দেখানো হয়ে লিংক হয়ে থাকলে আবার লুকানো বাটন বানাই
-            if (btn.tagName !== "BUTTON") {
-                var fresh = document.createElement("button");
-                fresh.type = "button";
-                fresh.className = "job-reveal";
-                fresh.setAttribute("data-kind", pair[0]);
-                row.replaceChild(fresh, btn);
-                btn = fresh;
-                if (pair[0] === "phone") {
-                    var hint = document.createElement("span");
-                    hint.className = "job__hint";
-                    hint.textContent = dialog.getAttribute("data-phone-hint") || "";
-                    row.appendChild(hint);
-                }
-            }
-            btn.setAttribute("data-id", String(info.id));
-            btn.textContent = pair[1] || "";
-        });
-    }
-
-    root.addEventListener("click", function (e) {
-        var open = e.target.closest ? e.target.closest(".wk-open") : null;
-        if (!open || open.getAttribute("data-busy")) {
-            return;
-        }
-        open.setAttribute("data-busy", "1");
-        var body = new FormData();
-        body.append("id", open.getAttribute("data-id"));
-        body.append("_token", root.getAttribute("data-token"));
-        fetch(root.getAttribute("data-info-url"), { method: "POST", body: body, credentials: "same-origin" })
-            .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-            .then(function (info) {
-                open.removeAttribute("data-busy");
-                fill(info);
-                dialog.showModal();
-            })
-            .catch(function () {
-                open.removeAttribute("data-busy");
-                window.alert(dialog.getAttribute("data-error") || "");
+    var back = document.querySelector("a[data-back]");
+    if (back && document.referrer && window.history.length > 1) {
+        var from = document.createElement("a");
+        from.href = document.referrer;
+        if (from.origin === window.location.origin && from.pathname === back.pathname) {
+            back.addEventListener("click", function (e) {
+                e.preventDefault();
+                window.history.back();
             });
-    });
-
-    dialog.addEventListener("click", function (e) {
-        if (e.target === dialog || (e.target.hasAttribute && e.target.hasAttribute("data-close"))) {
-            dialog.close();
         }
-    });
+    }
 })();
 /* ---- পাসওয়ার্ড দেখা/লুকানো (লগইন): চোখ-বাটন JavaScript চালু থাকলেই দেখা যায় -------------- */
 (function () {
