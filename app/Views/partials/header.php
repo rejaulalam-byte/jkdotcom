@@ -50,6 +50,7 @@ $registrationPaths = ['/login', '/welcome'];
             <ul class="nav__list">
                 <?php foreach ($menu as [$href, $label, $children]):
                     $active = $current === $href || ($href !== '/' && str_starts_with($current, $href . '/'))
+                        || ($href === '/' && $current === '/faq')
                         || ($href === '/registration' && (in_array($current, $registrationPaths, true) || str_starts_with($current, '/login/')));
                     ?>
                     <li class="nav__item<?= $children ? ' has-sub' : '' ?>">

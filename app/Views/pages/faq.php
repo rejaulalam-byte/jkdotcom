@@ -4,7 +4,7 @@
  * ডানে মতামতের ফর্ম (পেইজ স্ক্রল করলেও পাশে আটকে থাকে)।
  *
  * @var string $heading
- * @var list<int> $faqKeys
+ * @var list<array{title:string,keys:list<int>}> $faqGroups  শিরোনাম ও তার নিচের প্রশ্ন-নম্বর
  * @var string|null $feedbackOk
  * @var list<string> $feedbackErrors
  * @var array<string,string> $old
@@ -18,7 +18,14 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
         <p class="faq-page__intro"><?= e(content('faq.intro')) ?></p>
 
         <div class="faq-page__grid">
-            <?php $faqButton = false; require BASE_PATH . '/app/Views/partials/faq-list.php'; ?>
+            <div class="faq-page__main">
+                <?php foreach ($faqGroups as $group): ?>
+                    <section class="faq-group">
+                        <h3 class="faq-group__title"><?= e($group['title']) ?></h3>
+                        <?php $faqKeys = $group['keys']; $faqButton = false; require BASE_PATH . '/app/Views/partials/faq-list.php'; ?>
+                    </section>
+                <?php endforeach; ?>
+            </div>
             <?php $feedbackReturn = '/faq#feedback'; $feedbackClass = 'feedback--faq'; require BASE_PATH . '/app/Views/partials/feedback-form.php'; ?>
         </div>
     </div>

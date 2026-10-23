@@ -4711,6 +4711,16 @@ a.wk-pages__item:focus-visible {
     align-items: start;
     margin-top: 1.4rem;
 }
+.faq-group + .faq-group {
+    margin-top: 3.2rem;
+}
+.faq-group__title {
+    margin: 0 0 1.4rem;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--teal);
+}
 .faq-page__grid .faq-item {
     border: 1px solid #bbb;
 }

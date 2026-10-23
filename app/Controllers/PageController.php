@@ -67,7 +67,7 @@ final class PageController
             'old' => Session::pull('feedback_old', []),
         ]);
     }
-    /** প্রশ্ন ও উত্তর পেইজ (/faq): ২০টি প্রশ্ন-উত্তর (একসঙ্গে একটাই খোলা) ও পাশে মতামতের ফর্ম। */
+    /** প্রশ্ন ও উত্তর পেইজ (/faq): ২০টি প্রশ্ন-উত্তর ৪টি শিরোনামের নিচে (একসঙ্গে একটাই খোলা) ও পাশে মতামতের ফর্ম। */
     public function faq(): void
     {
         View::render('pages/faq', [
@@ -75,7 +75,11 @@ final class PageController
             'title' => 'প্রশ্ন ও উত্তর — Jorurikaj.com',
             'description' => Content::get('faq.intro'),
             'heading' => Content::get('faq.banner'),
-            'faqKeys' => range(1, 20),
+            // ৪টি শিরোনামের নিচে ৫টি করে প্রশ্ন (FAQ.docx-এর ক্রম)
+            'faqGroups' => array_map(
+                static fn (int $g): array => ['title' => Content::get("faq.group.{$g}"), 'keys' => range(($g - 1) * 5 + 1, $g * 5)],
+                [1, 2, 3, 4]
+            ),
             'feedbackOk' => Session::pull('feedback_ok'),
             'feedbackErrors' => Session::pull('feedback_errors', []),
             'old' => Session::pull('feedback_old', []),
