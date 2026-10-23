@@ -4575,7 +4575,7 @@ a.wk-pages__item:focus-visible {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 62% 50%; /* পিন ডান দিকে, বাঁয়ের এলাকা বেশি */
+    object-position: 50% 50%; /* পিন মাঝখানে */
 }
 .contact-map__credit {
     position: absolute;
