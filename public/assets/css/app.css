@@ -2020,9 +2020,15 @@ textarea {
     float: left;
     margin: 0 3rem 1.5rem 0;
 }
+.rich .indent {
+    margin-left: 4rem; /* যোগাযোগের তথ্য ডান দিকে একটু ভেতরে */
+}
 .rich .img-center {
     display: block;
     margin: 0 auto 1.5rem;
+}
+.rich .legal-meta {
+    line-height: 1.6;
 }
 .ta-center { text-align: center; }
 .ta-right { text-align: right; }
@@ -2642,6 +2648,9 @@ textarea {
     }
     .page-legal .rich {
         line-height: 1.875;
+    }
+    .page-legal .rich h2 {
+        font-size: 3.25rem;
     }
 }
 
