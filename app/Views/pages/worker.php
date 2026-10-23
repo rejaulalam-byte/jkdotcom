@@ -19,7 +19,7 @@
  * @var ?array{0:string,1:string} $ratingMessage  ['ok'|'error', লেখা] রেটিং জমার ফল
  * @var string $token                        যোগাযোগ-অনুরোধের CSRF টোকেন
  */
-$crumbs = [['/', 'হোম'], ['/services', 'সেবাসমূহ'], [$listUrl, $profession !== '' ? $profession : 'পেশাজীবী']];
+$crumbs = [['/', 'হোম'], ['/services', 'সেবাসমূহ'], [$listUrl, $profession !== '' ? $profession : 'পেশাজীবী'], [null, $name]];
 require BASE_PATH . '/app/Views/partials/page-banner.php';
 
 // রেটিং: ৪.০ → "৪"; ৪.৫ → "৪.৫" (Figma-র বাছাইয়ের মতো)
@@ -42,8 +42,8 @@ $fmt = static fn (float $n): string => bn(rtrim(rtrim(number_format($n, 1, '.', 
                     <div class="wk-info__row wk-info__row--short"><dt><?= e(content('worker.l.experience')) ?></dt><dd><?= $experience !== null ? e(bn(str_pad((string) $experience, 2, '0', STR_PAD_LEFT))) . ' ' . e(content('worker.experience_unit')) . '।' : '—' ?></dd></div>
                     <div class="wk-info__row"><dt><?= e(content('worker.l.bio')) ?></dt><dd><?= $bio !== '' ? nl2br(e($bio)) : '—' ?></dd></div>
                     <div class="wk-info__row"><dt><?= e(content('worker.l.address')) ?></dt><dd><?= e($address) ?></dd></div>
-                    <div class="wk-info__row"><dt><?= e(content('worker.l.phone')) ?></dt><dd><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="phone"><?= e($phoneMasked) ?></button></dd></div>
-                    <div class="wk-info__row"><dt><?= e(content('worker.l.email')) ?></dt><dd><?php if ($emailMasked !== ''): ?><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="email"><?= e($emailMasked) ?></button><?php else: ?>—<?php endif; ?></dd></div>
+                    <div class="wk-info__row wk-info__row--contact"><dt><?= e(content('worker.l.phone')) ?></dt><dd><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="phone"><?= e($phoneMasked) ?></button></dd></div>
+                    <div class="wk-info__row wk-info__row--contact"><dt><?= e(content('worker.l.email')) ?></dt><dd><?php if ($emailMasked !== ''): ?><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="email"><?= e($emailMasked) ?></button><?php else: ?>—<?php endif; ?></dd></div>
                 </dl>
 
                 <p class="wk-hint">
@@ -53,7 +53,7 @@ $fmt = static fn (float $n): string => bn(rtrim(rtrim(number_format($n, 1, '.', 
 
                 <div class="wk-note">
                     <strong><?= e(content('worker.note.title')) ?></strong>
-                    <p><?= e(content('worker.note.text')) ?></p>
+                    <p><?= colored(content('worker.note.text')) ?></p>
                 </div>
 
                 <form class="wk-rate" id="rating" action="/workers/rate" method="post">

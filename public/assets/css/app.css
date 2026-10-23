@@ -4154,8 +4154,11 @@ a.wk-pages__item:focus-visible {
 }
 .wk-info dd {
     margin: 0;
-    font-size: 1.75rem;
+    font-size: var(--fs-body); /* বাঁ পাশের লেখার সমান */
     line-height: 1.5;
+}
+.wk-info__row--contact dd {
+    font-size: 1.75rem; /* মোবাইল ও ইমেইল: Figma ২৬px + ২px */
 }
 .wk-info__row--short dd {
     padding-right: 10.5rem; /* ছবির নিচে লেখা যেন না যায় */
