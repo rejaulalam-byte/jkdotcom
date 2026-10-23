@@ -3946,6 +3946,14 @@ a.user-menu__item:hover {
 .wk-table tbody tr:hover th {
     background: var(--teal-05);
 }
+.wk-table tbody tr.wk-empty td {
+    padding: 1rem;
+    text-align: center;
+}
+.wk-empty a {
+    margin-left: 0.6rem;
+    color: var(--teal);
+}
 .wk-open {
     padding: 0.4rem 0.8rem;
     border: 0;

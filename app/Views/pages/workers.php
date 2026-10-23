@@ -53,84 +53,88 @@ $divisionText = count($divisions) > 1
 
         <h2 class="wk-title"><?= e(content('workers.title')) ?>(<?= e($service['name']) ?>)</h2>
 
-        <?php if ($total === 0): ?>
-            <p class="job-empty"><?= e(content('workers.empty')) ?></p>
-        <?php elseif ($found === 0): ?>
-            <p class="job-empty">
-                “<?= e($query) ?>” — <?= e(content('workers.nomatch')) ?>
-                <a href="<?= e($base) ?>"><?= e(content('workers.all')) ?></a>
+        <?php // বিভাগের লাইন, প্রতি-পৃষ্ঠা ও টেবিলের মাথা সবসময় থাকে; কেউ না থাকলে একটা খালি সারিতে বার্তা ?>
+        <div class="wk-bar">
+            <p class="wk-bar__division">
+                <?= e(content('workers.division')) ?>
+                <span><?= $divisionText !== '' ? e($divisionText) : '—' ?></span>
             </p>
-        <?php else: ?>
-            <div class="wk-bar">
-                <p class="wk-bar__division">
-                    <?= e(content('workers.division')) ?>
-                    <span><?= e($divisionText) ?></span>
-                </p>
-                <form class="wk-bar__per" action="<?= e($base) ?>" method="get">
-                    <?php if ($query !== ''): ?><input type="hidden" name="q" value="<?= e($query) ?>"><?php endif; ?>
-                    <label for="wk-per"><?= e(content('workers.per_page')) ?></label>
-                    <select id="wk-per" name="n" data-autosubmit>
-                        <?php foreach ([15, 25, 50, 0] as $n): ?>
-                            <option value="<?= $n === 0 ? 'all' : $n ?>"<?= $n === $perPage ? ' selected' : '' ?>><?= $n === 0 ? e(content('workers.per_page_all')) : e(bn($n)) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <span><?= e(content('workers.per_page_unit')) ?></span>
-                    <noscript><button type="submit">&#10003;</button></noscript>
-                </form>
-            </div>
+            <form class="wk-bar__per" action="<?= e($base) ?>" method="get">
+                <?php if ($query !== ''): ?><input type="hidden" name="q" value="<?= e($query) ?>"><?php endif; ?>
+                <label for="wk-per"><?= e(content('workers.per_page')) ?></label>
+                <select id="wk-per" name="n" data-autosubmit>
+                    <?php foreach ([15, 25, 50, 0] as $n): ?>
+                        <option value="<?= $n === 0 ? 'all' : $n ?>"<?= $n === $perPage ? ' selected' : '' ?>><?= $n === 0 ? e(content('workers.per_page_all')) : e(bn($n)) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <span><?= e(content('workers.per_page_unit')) ?></span>
+                <noscript><button type="submit">&#10003;</button></noscript>
+            </form>
+        </div>
 
-            <div class="wk-tablewrap">
-                <table class="wk-table">
-                    <thead>
-                        <tr>
-                            <th class="wk-no" scope="col"><?= e(content('workers.col.no')) ?></th>
-                            <th class="wk-name" scope="col"><?= e(content('workers.col.name')) ?></th>
-                            <th scope="col"><?= e(content('workers.col.area')) ?></th>
-                            <th scope="col"><?= e(content('workers.col.upazila')) ?></th>
-                            <th scope="col"><?= e(content('workers.col.district')) ?></th>
-                            <th class="wk-rating" scope="col"><?= e(content('workers.col.rating')) ?></th>
-                            <th class="wk-details" scope="col"><?= e(content('workers.col.details')) ?></th>
+        <div class="wk-tablewrap">
+            <table class="wk-table">
+                <thead>
+                    <tr>
+                        <th class="wk-no" scope="col"><?= e(content('workers.col.no')) ?></th>
+                        <th class="wk-name" scope="col"><?= e(content('workers.col.name')) ?></th>
+                        <th scope="col"><?= e(content('workers.col.area')) ?></th>
+                        <th scope="col"><?= e(content('workers.col.upazila')) ?></th>
+                        <th scope="col"><?= e(content('workers.col.district')) ?></th>
+                        <th class="wk-rating" scope="col"><?= e(content('workers.col.rating')) ?></th>
+                        <th class="wk-details" scope="col"><?= e(content('workers.col.details')) ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($workers === []): ?>
+                        <tr class="wk-empty">
+                            <td colspan="7">
+                                <?php if ($total === 0): ?>
+                                    <?= e(content('workers.empty')) ?>
+                                <?php else: ?>
+                                    “<?= e($query) ?>” — <?= e(content('workers.nomatch')) ?>
+                                    <a href="<?= e($base) ?>"><?= e(content('workers.all')) ?></a>
+                                <?php endif; ?>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($workers as $i => $w): ?>
-                            <?php $serial = $offset + $i + 1; ?>
-                            <tr>
-                                <td class="wk-no" data-label="<?= e(content('workers.col.no')) ?>"><?= e(bn(str_pad((string) $serial, 2, '0', STR_PAD_LEFT))) ?>.</td>
-                                <th class="wk-name" scope="row"><?= e($w['name']) ?></th>
-                                <td data-label="<?= e(content('workers.col.area')) ?>"><?= $w['address'] !== '' ? e($w['address']) : '—' ?></td>
-                                <td data-label="<?= e(content('workers.col.upazila')) ?>"><?= $w['upazila'] !== '' ? e($w['upazila']) : '—' ?></td>
-                                <td data-label="<?= e(content('workers.col.district')) ?>"><?= $w['district'] !== '' ? e($w['district']) : '—' ?></td>
-                                <td class="wk-rating" data-label="<?= e(content('workers.col.rating')) ?>"><?= e(content('workers.rating_none')) ?></td>
-                                <td class="wk-details">
-                                    <button class="wk-open" type="button" data-id="<?= (int) $w['id'] ?>"><?= e(content('workers.details_btn')) ?></button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+                    <?php endif; ?>
+                    <?php foreach ($workers as $i => $w): ?>
+                        <?php $serial = $offset + $i + 1; ?>
+                        <tr>
+                            <td class="wk-no" data-label="<?= e(content('workers.col.no')) ?>"><?= e(bn(str_pad((string) $serial, 2, '0', STR_PAD_LEFT))) ?>.</td>
+                            <th class="wk-name" scope="row"><?= e($w['name']) ?></th>
+                            <td data-label="<?= e(content('workers.col.area')) ?>"><?= $w['address'] !== '' ? e($w['address']) : '—' ?></td>
+                            <td data-label="<?= e(content('workers.col.upazila')) ?>"><?= $w['upazila'] !== '' ? e($w['upazila']) : '—' ?></td>
+                            <td data-label="<?= e(content('workers.col.district')) ?>"><?= $w['district'] !== '' ? e($w['district']) : '—' ?></td>
+                            <td class="wk-rating" data-label="<?= e(content('workers.col.rating')) ?>"><?= e(content('workers.rating_none')) ?></td>
+                            <td class="wk-details">
+                                <button class="wk-open" type="button" data-id="<?= (int) $w['id'] ?>"><?= e(content('workers.details_btn')) ?></button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
 
-            <?php if ($pages > 1): ?>
-                <nav class="wk-pages" aria-label="<?= e(content('workers.pages_label')) ?>">
-                    <?php
-                    // প্রথম, শেষ ও এখনকার পৃষ্ঠার দুই পাশের নাম্বার; মাঝের ফাঁকে "…"
-                    $shown = array_unique(array_filter(array_merge([1, $pages], range($page - 2, $page + 2)), static fn (int $n): bool => $n >= 1 && $n <= $pages));
-                    sort($shown);
-                    $prev = 0;
-                    foreach ($shown as $n):
-                        if ($prev !== 0 && $n - $prev > 1): ?>
-                            <span class="wk-pages__gap" aria-hidden="true">…</span>
-                        <?php endif;
-                        if ($n === $page): ?>
-                            <span class="wk-pages__item is-current" aria-current="page"><?= e(bn($n)) ?></span>
-                        <?php else: ?>
-                            <a class="wk-pages__item" href="<?= e($link($n)) ?>" aria-label="<?= e(content('workers.page')) ?> <?= e(bn($n)) ?>"><?= e(bn($n)) ?></a>
-                        <?php endif;
-                        $prev = $n;
-                    endforeach; ?>
-                </nav>
-            <?php endif; ?>
+        <?php if ($pages > 1): ?>
+            <nav class="wk-pages" aria-label="<?= e(content('workers.pages_label')) ?>">
+                <?php
+                // প্রথম, শেষ ও এখনকার পৃষ্ঠার দুই পাশের নাম্বার; মাঝের ফাঁকে "…"
+                $shown = array_unique(array_filter(array_merge([1, $pages], range($page - 2, $page + 2)), static fn (int $n): bool => $n >= 1 && $n <= $pages));
+                sort($shown);
+                $prev = 0;
+                foreach ($shown as $n):
+                    if ($prev !== 0 && $n - $prev > 1): ?>
+                        <span class="wk-pages__gap" aria-hidden="true">…</span>
+                    <?php endif;
+                    if ($n === $page): ?>
+                        <span class="wk-pages__item is-current" aria-current="page"><?= e(bn($n)) ?></span>
+                    <?php else: ?>
+                        <a class="wk-pages__item" href="<?= e($link($n)) ?>" aria-label="<?= e(content('workers.page')) ?> <?= e(bn($n)) ?>"><?= e(bn($n)) ?></a>
+                    <?php endif;
+                    $prev = $n;
+                endforeach; ?>
+            </nav>
         <?php endif; ?>
     </div>
 
