@@ -9,7 +9,7 @@ use App\Core\Logger;
 use App\Core\Security;
 use Throwable;
 
-/** হোম hero-র নিচের চলমান স্ট্রিপে দেখানো বিজ্ঞাপন-ব্যানার। */
+/** হোম hero-র নিচের চলমান স্ট্রিপে দেখানো বিজ্ঞাপন-ব্যানার (সক্রিয় বিজ্ঞাপন না থাকলে বা অ্যাডমিন বন্ধ করলে স্ট্রিপের সাদা বক্স থাকে না)। */
 final class AdRepository
 {
     /** @return list<array{title:string,image:string,width:int,height:int,link:?string}> */
@@ -38,7 +38,10 @@ final class AdRepository
         foreach ($rows as $r) {
             $ads[] = [
                 'title' => (string) $r['title'],
-                'image' => '/uploads/ads/' . basename((string) $r['image_path']),
+                // '/assets/...' = ছবি সাইটের সঙ্গে আসা (নমুনা বিজ্ঞাপন); নইলে অ্যাডমিনের আপলোড-করা ফাইলের নাম
+                'image' => str_starts_with((string) $r['image_path'], '/assets/img/ads/')
+                    ? '/assets/img/ads/' . basename((string) $r['image_path'])
+                    : '/uploads/ads/' . basename((string) $r['image_path']),
                 'width' => max(1, (int) $r['width']),
                 'height' => max(1, (int) $r['height']),
                 'link' => Security::safeUrl($r['link_url'] !== null ? (string) $r['link_url'] : null),

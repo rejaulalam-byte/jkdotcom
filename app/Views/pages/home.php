@@ -49,25 +49,26 @@ $faqKeys = [1, 2, 3, 4, 5];
 
 <!-- 2. ADVERTISEMENTS + REPRESENTATIVE BAR --------------------------- -->
 <section class="ads" aria-label="<?= e(content('home.ads.label')) ?>">
+    <?php // সক্রিয় বিজ্ঞাপন থাকলে এবং অ্যাডমিন লুকিয়ে না রাখলে (home.ads.show) তবেই সাদা বক্স ও স্ট্রিপ ?>
+    <?php if ($ads !== [] && content('home.ads.show', '1') !== '0'): ?>
     <div class="container ads__card">
-        <?php if ($ads !== []): ?>
-            <div class="ad-strip" data-ad-strip>
-                <ul class="ad-strip__track">
-                    <?php foreach ($ads as $ad): ?>
-                        <li class="ad-strip__item">
-                            <?php if ($ad['link'] !== null): ?>
-                                <a href="<?= e($ad['link']) ?>" target="_blank" rel="noopener noreferrer nofollow sponsored">
-                                    <img src="<?= e($ad['image']) ?>" alt="<?= e($ad['title']) ?>" width="<?= e($ad['width']) ?>" height="<?= e($ad['height']) ?>">
-                                </a>
-                            <?php else: ?>
+        <div class="ad-strip" data-ad-strip>
+            <ul class="ad-strip__track">
+                <?php foreach ($ads as $ad): ?>
+                    <li class="ad-strip__item">
+                        <?php if ($ad['link'] !== null): ?>
+                            <a href="<?= e($ad['link']) ?>" target="_blank" rel="noopener noreferrer nofollow sponsored">
                                 <img src="<?= e($ad['image']) ?>" alt="<?= e($ad['title']) ?>" width="<?= e($ad['width']) ?>" height="<?= e($ad['height']) ?>">
-                            <?php endif; ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
+                            </a>
+                        <?php else: ?>
+                            <img src="<?= e($ad['image']) ?>" alt="<?= e($ad['title']) ?>" width="<?= e($ad['width']) ?>" height="<?= e($ad['height']) ?>">
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
     </div>
+    <?php endif; ?>
     <div class="rep-bar" data-marquee>
         <p class="rep-bar__text"><span class="rep-bar__move"><?= colored(content('home.rep.text')) ?></span></p>
     </div>
