@@ -1,10 +1,9 @@
 <?php
 /**
  * যোগাযোগ পেইজ (Figma node 2692-2): ওপরে পরিচিতি-লেখা ও চারটি যোগাযোগ-কার্ড, মাঝে প্রধান নির্বাহীর ছবি,
- * নিচে হালকা টিল ব্যান্ডে বাঁয়ে মতামতের ফর্ম, ডানে প্রশ্ন-উত্তর।
+ * নিচে হালকা টিল ব্যান্ডে বাঁয়ে মতামতের ফর্ম, ডানে গুগল ম্যাপ (হোমের মতো ছবি, ক্লিকে গুগল ম্যাপ খোলে)।
  *
  * @var string $heading
- * @var list<int> $faqKeys
  * @var string|null $feedbackOk
  * @var list<string> $feedbackErrors
  * @var array<string,string> $old
@@ -70,14 +69,16 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
     </div>
 </section>
 
-<section class="section contact-faq" id="faq" aria-labelledby="contact-faq-title">
+<section class="section contact-faq" aria-labelledby="contact-faq-title">
     <div class="container">
         <h2 class="contact-faq__title" id="contact-faq-title"><?= e(content('home.faq.title')) ?></h2>
         <p class="contact-faq__text"><?= e(content('home.faq.text')) ?></p>
 
         <div class="contact-split">
             <?php $feedbackReturn = '/contact#feedback'; $feedbackClass = 'feedback--contact'; require BASE_PATH . '/app/Views/partials/feedback-form.php'; ?>
-            <?php $faqButton = false; require BASE_PATH . '/app/Views/partials/faq-list.php'; ?>
+            <a class="contact-map" href="https://www.google.com/maps?q=<?= e(rawurlencode(str_replace(' ', '', content('site.coordinates')))) ?>" target="_blank" rel="noopener noreferrer">
+                <img src="<?= e(asset('img/site/map-location.png')) ?>" alt="<?= e(content('home.map.alt')) ?>" width="1221" height="580" loading="lazy">
+            </a>
         </div>
     </div>
 </section>

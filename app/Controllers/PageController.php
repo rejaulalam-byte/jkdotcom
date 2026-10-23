@@ -54,7 +54,7 @@ final class PageController
         ]);
     }
 
-    /** যোগাযোগ পেইজ (/contact): ঠিকানা-কার্ড, প্রধান নির্বাহীর পরিচিতি, প্রশ্ন-উত্তর ও মতামতের ফর্ম। */
+    /** যোগাযোগ পেইজ (/contact): ঠিকানা-কার্ড, প্রধান নির্বাহীর পরিচিতি, মতামতের ফর্ম ও গুগল ম্যাপ। */
     public function contact(): void
     {
         View::render('pages/contact', [
@@ -62,7 +62,6 @@ final class PageController
             'title' => 'যোগাযোগ — Jorurikaj.com',
             'description' => Content::get('contact.intro'),
             'heading' => Content::get('contact.banner'),
-            'faqKeys' => [1, 2, 3, 4, 5],
             'feedbackOk' => Session::pull('feedback_ok'),
             'feedbackErrors' => Session::pull('feedback_errors', []),
             'old' => Session::pull('feedback_old', []),
