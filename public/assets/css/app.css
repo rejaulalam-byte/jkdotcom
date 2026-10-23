@@ -4563,18 +4563,29 @@ a.wk-pages__item:focus-visible {
 }
 .contact-map {
     position: relative;
-    display: block;
     min-height: 58.1875rem; /* Figma: ৯৩১px; ফর্ম এর চেয়ে লম্বা হলে ম্যাপও ফর্মের সমান লম্বা হয় */
     overflow: hidden;
     border-radius: 0.625rem;
 }
-.contact-map img {
+.contact-map > a:first-child {
     position: absolute;
     inset: 0;
+}
+.contact-map img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: 60% 50%; /* পিন ও তার নামের লেখা দুটোই ধরে */
+    object-position: 62% 50%; /* পিন ডান দিকে, বাঁয়ের এলাকা বেশি */
+}
+.contact-map__credit {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 0.15rem 0.6rem;
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 0.75rem;
+    color: #333;
+    text-decoration: none;
 }
 .feedback--contact {
     padding-inline: 4.75rem;

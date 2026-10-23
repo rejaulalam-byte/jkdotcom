@@ -1,7 +1,7 @@
 <?php
 /**
  * যোগাযোগ পেইজ (Figma node 2692-2): ওপরে পরিচিতি-লেখা ও চারটি যোগাযোগ-কার্ড, মাঝে প্রধান নির্বাহীর ছবি,
- * নিচে হালকা টিল ব্যান্ডে বাঁয়ে মতামতের ফর্ম, ডানে গুগল ম্যাপ (হোমের মতো ছবি, ক্লিকে গুগল ম্যাপ খোলে)।
+ * নিচে হালকা টিল ব্যান্ডে বাঁয়ে মতামতের ফর্ম, ডানে মানচিত্র (OpenStreetMap-এর ছবি; ক্লিকে গুগল ম্যাপ খোলে)।
  *
  * @var string $heading
  * @var string|null $feedbackOk
@@ -76,9 +76,13 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
 
         <div class="contact-split">
             <?php $feedbackReturn = '/contact#feedback'; $feedbackClass = 'feedback--contact'; require BASE_PATH . '/app/Views/partials/feedback-form.php'; ?>
-            <a class="contact-map" href="https://www.google.com/maps?q=<?= e(rawurlencode(str_replace(' ', '', content('site.coordinates')))) ?>" target="_blank" rel="noopener noreferrer">
-                <img src="<?= e(asset('img/site/map-location.png')) ?>" alt="<?= e(content('home.map.alt')) ?>" width="1221" height="580" loading="lazy">
-            </a>
+            <?php // মানচিত্র: OpenStreetMap-এর ছবি (লাইসেন্সের শর্তে নিচে কৃতজ্ঞতা-লিংক); ক্লিকে গুগল ম্যাপ খোলে ?>
+            <div class="contact-map">
+                <a href="https://www.google.com/maps?q=<?= e(rawurlencode(str_replace(' ', '', content('site.coordinates')))) ?>" target="_blank" rel="noopener noreferrer">
+                    <img src="<?= e(asset('img/site/map-contact.jpg')) ?>" alt="<?= e(content('home.map.alt')) ?>" width="1005" height="1280" loading="lazy">
+                </a>
+                <a class="contact-map__credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>
+            </div>
         </div>
     </div>
 </section>
