@@ -131,6 +131,8 @@ $helpTel = content('today.post.helpline_tel');
                               placeholder="<?= $ph('details') ?>"><?= $val('details') ?></textarea>
                 </div>
 
+                <?php $consentKey = 'post'; $consentChecked = !empty($old['consent']); require BASE_PATH . '/app/Views/partials/consent.php'; ?>
+
                 <p class="post-form__submit">
                     <button class="pf-submit" type="submit"><?= e(content('today.post.submit')) ?></button>
                 </p>

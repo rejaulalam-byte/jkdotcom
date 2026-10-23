@@ -4796,3 +4796,125 @@ a.wk-pages__item:focus-visible {
         padding-inline: 1.25rem;
     }
 }
+
+/* ---- সম্মতি (তিন ফর্মে: ঘোষণার লেখা + টিক-বক্স; partials/consent.php) -------------------- */
+.consent {
+    margin: 2.6rem 1.5625rem 0; /* "কাজ প্রকাশ" ফর্মে বিস্তারিত-বাক্সের মতোই ২৫px ভেতরে */
+}
+.reg-form .consent {
+    margin-inline: 0;
+}
+.consent__text {
+    margin: 0;
+    font-size: var(--fs-body);
+    line-height: 2.8125rem; /* ৪৫px */
+    text-align: justify;
+    color: #000;
+}
+.consent__box {
+    margin-top: 1.6rem;
+}
+.consent__label {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    cursor: pointer;
+}
+.consent__label input {
+    appearance: none;
+    flex: none;
+    position: relative;
+    width: 3rem; /* Figma: ৪৮px */
+    height: 3rem;
+    margin: 0;
+    border: 1px solid #cecece;
+    border-radius: 0.2rem;
+    background: var(--white);
+    cursor: pointer;
+}
+.consent__label input:checked {
+    border-color: var(--teal);
+    background: var(--teal-10);
+}
+.consent__label input:checked::after {
+    content: "";
+    position: absolute;
+    left: 1rem;
+    top: 0.3rem;
+    width: 0.8rem;
+    height: 1.6rem;
+    border: solid var(--teal);
+    border-width: 0 0.3rem 0.3rem 0;
+    transform: rotate(45deg);
+}
+.consent__label input:focus-visible {
+    outline: 3px solid var(--amber);
+    outline-offset: 2px;
+}
+.consent__label span {
+    font-size: var(--fs-body);
+    line-height: 2.8125rem;
+    color: #000;
+}
+.consent__label a {
+    color: var(--teal);
+    font-weight: 600;
+}
+.consent__box.is-invalid .consent__label input {
+    border-color: #c0392b;
+}
+.consent__box .pf__msg {
+    margin: 0.6rem 0 0;
+}
+
+/* ---- পেশাজীবীর ফর্ম: দুইজন রেফারেন্সের বাক্স (Figma 2826-2) ---------------------------------- */
+.reg-refs {
+    margin: 0 0 1.875rem;
+    padding: 0;
+    border: 0;
+}
+.reg-refs legend {
+    padding: 0 0 0.4rem 0.8rem;
+    font-size: var(--fs-body);
+    color: #000;
+}
+.reg-refs__box {
+    padding: 1.3rem 1.9rem 0;
+    border: 1px solid rgba(18, 90, 108, 0.5);
+    border-radius: 0.625rem;
+}
+.reg-refs .pf {
+    margin-bottom: 1.25rem;
+}
+.reg-refs .pf textarea {
+    height: 6.875rem; /* ১১০px */
+    min-height: 0;
+}
+
+@media (max-width: 1199px) {
+    .consent {
+        margin-inline: 0;
+    }
+    .consent__text,
+    .consent__label span {
+        font-size: 1rem;
+        line-height: 1.8;
+    }
+    .consent__label {
+        gap: 0.9rem;
+    }
+    .consent__label input {
+        width: 2rem;
+        height: 2rem;
+    }
+    .consent__label input:checked::after {
+        left: 0.6rem;
+        top: 0.1rem;
+        width: 0.5rem;
+        height: 1.1rem;
+        border-width: 0 0.22rem 0.22rem 0;
+    }
+    .reg-refs__box {
+        padding: 1rem 1rem 0.1rem;
+    }
+}

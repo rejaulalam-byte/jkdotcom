@@ -196,6 +196,7 @@ final class TodayController
             'start_date' => $this->clean($_POST['start_date'] ?? '', 10),
             'end_date' => $this->clean($_POST['end_date'] ?? '', 10),
             'details' => $this->clean($_POST['details'] ?? '', 3000, true),
+            'consent' => !empty($_POST['consent']) ? 1 : 0,
         ];
 
         // সেবার তালিকায় নেই এমন কাজের ধরনে চিহ্ন দেওয়া হয়, যাতে অ্যাডমিন বানান যাচাই করতে পারেন
@@ -207,6 +208,7 @@ final class TodayController
             $this->fail($errors, $data);
         }
 
+        $data['consent_at'] = date('Y-m-d H:i:s');
         if (!JobPostRepository::create($data)) {
             $this->fail(['দুঃখিত, তথ্যগুলো সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।'], $data);
         }
@@ -284,6 +286,9 @@ final class TodayController
         }
         if (mb_strlen($d['details']) < 10) {
             $errors[] = 'কাজ সম্পর্কে বিস্তারিত লিখুন (কমপক্ষে ১০ অক্ষর)।';
+        }
+        if (!$d['consent']) {
+            $errors[] = content('consent.error');
         }
 
         return $errors;

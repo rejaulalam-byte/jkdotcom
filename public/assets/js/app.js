@@ -1475,7 +1475,7 @@
         var msg = function (key) { return form.getAttribute("data-msg-" + key) || ""; };
 
         function holder(field) {
-            return field.closest(".pf") || field.parentNode;
+            return field.closest(".pf, .consent__box") || field.parentNode;
         }
         function show(field, text) {
             var box = holder(field);
@@ -1501,6 +1501,9 @@
 
         /* ঘরটা ভুল হলে বার্তা, ঠিক থাকলে ফাঁকা লেখা ফেরত দেয় */
         function check(field, live) {
+            if (field.type === "checkbox") {
+                return field.hasAttribute("required") && !field.checked ? msg("consent") : "";
+            }
             var linked = field.getAttribute("data-ss"); // খোঁজার ঘর: মান আসে তার আসল select থেকে
             var v = (linked ? document.getElementById(linked).value : field.value).trim();
             var required = field.hasAttribute("required");
@@ -1554,7 +1557,7 @@
                 }
             });
             field.addEventListener("change", function () {
-                if (field.tagName === "SELECT" || field.hasAttribute("data-ss")) {
+                if (field.tagName === "SELECT" || field.hasAttribute("data-ss") || field.type === "checkbox") {
                     show(field, check(field, false));
                 }
             });

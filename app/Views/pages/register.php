@@ -129,6 +129,36 @@ $helpTel = content('today.post.helpline_tel');
                         </select>
                     </div>
 
+                    <?php if ($role === 'worker'): ?>
+                        <?php // কোন জেলায় কাজ করতে আগ্রহী (ঐচ্ছিক): নিজের আলাদা খোঁজা-যায় তালিকা, ঠিকানার তিন ঘরের সঙ্গে জোড়া নয় ?>
+                        <div class="pf pf--select">
+                            <label class="sr-only" for="rf-work-district"><?= e(content('regform.f.work_district')) ?></label>
+                            <select id="rf-work-district" name="work_district_id" data-search data-none="<?= e(content('geo.search.none')) ?>">
+                                <option value=""><?= $ph('work_district', false) ?></option>
+                                <?php foreach ($geo['districts'] as $d): ?>
+                                    <option value="<?= $d['id'] ?>"<?= $sel('work_district_id', $d['id']) ?>><?= e($d['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <?php // দুইজন রেফারেন্স (দুটোই আবশ্যক) ?>
+                        <fieldset class="reg-refs">
+                            <legend><?= e(content('regform.f.references')) ?></legend>
+                            <div class="reg-refs__box">
+                            <div class="pf">
+                                <label class="sr-only" for="rf-ref1"><?= e(content('regform.f.ref1')) ?></label>
+                                <textarea id="rf-ref1" data-bn name="reference_1" maxlength="300" required rows="3"
+                                          placeholder="<?= $ph('ref1') ?>"><?= $val('reference_1') ?></textarea>
+                            </div>
+                            <div class="pf">
+                                <label class="sr-only" for="rf-ref2"><?= e(content('regform.f.ref2')) ?></label>
+                                <textarea id="rf-ref2" data-bn name="reference_2" maxlength="300" required rows="3"
+                                          placeholder="<?= $ph('ref2') ?>"><?= $val('reference_2') ?></textarea>
+                            </div>
+                            </div>
+                        </fieldset>
+                    <?php endif; ?>
+
                     <div class="pf">
                         <label class="sr-only" for="rf-pass"><?= e(content('regform.f.password')) ?></label>
                         <input id="rf-pass" type="password" name="password" minlength="8" maxlength="72" required autocomplete="new-password"
@@ -167,6 +197,8 @@ $helpTel = content('today.post.helpline_tel');
                               placeholder="<?= $ph('bio', false) ?>"><?= $val('bio') ?></textarea>
                 </div>
             <?php endif; ?>
+
+            <?php $consentKey = $role; $consentChecked = !empty($old['consent']); require BASE_PATH . '/app/Views/partials/consent.php'; ?>
 
             <p class="post-form__submit">
                 <button class="pf-submit" type="submit"><?= e(content('regform.submit')) ?></button>

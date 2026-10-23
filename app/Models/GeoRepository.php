@@ -78,6 +78,18 @@ final class GeoRepository
         return $out;
     }
 
+    /** এই id-র জেলা আছে কি না (ফর্মে আসা মান যাচাইয়ের জন্য)। */
+    public static function districtExists(int $districtId): bool
+    {
+        foreach (self::all()['districts'] as $d) {
+            if ($d['id'] === $districtId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** উপজেলা জেলার অন্তর্গত এবং জেলা বিভাগের অন্তর্গত হলে true। */
     public static function isConsistent(int $divisionId, int $districtId, int $upazilaId): bool
     {

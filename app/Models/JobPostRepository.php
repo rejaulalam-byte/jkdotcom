@@ -31,10 +31,10 @@ final class JobPostRepository
             $stmt = $pdo->prepare(
                 "INSERT INTO job_posts
                     (title, title_custom, details, contact_name, contact_gender, phone, email, address, upazila_id, district_id, division_id,
-                     start_date, end_date, ip_hash, status, published_at, created_at)
+                     start_date, end_date, ip_hash, status, published_at, consent_at, created_at)
                  VALUES
                     (:title, :title_custom, :details, :name, :gender, :phone, :email, :address, :upazila, :district, :division,
-                     :start_date, :end_date, :ip_hash, 'approved', NOW(), NOW())"
+                     :start_date, :end_date, :ip_hash, 'approved', NOW(), :consent_at, NOW())"
             );
             $stmt->execute([
                 ':title' => $data['title'],
@@ -51,6 +51,7 @@ final class JobPostRepository
                 ':start_date' => $data['start_date'],
                 ':end_date' => $data['end_date'] !== '' ? $data['end_date'] : null,
                 ':ip_hash' => Security::ipHash(),
+                ':consent_at' => $data['consent_at'] ?? null,
             ]);
 
             return true;

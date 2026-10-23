@@ -20,7 +20,8 @@ final class UserRepository
      * মোবাইল আগেই থাকলে 'duplicate', অন্য সমস্যায় 'error', সফল হলে 'ok' ফেরত দেয়।
      *
      * @param array<string,mixed> $data role, name, gender, phone, email, password_hash, address, upazila_id, district_id, division_id,
-     *                                  photo, এবং কর্মীর জন্য service_slug, experience_years, bio / প্রতিনিধির জন্য nid_number
+     *                                  consent_at, photo, এবং কর্মীর জন্য service_slug, experience_years, bio, work_district_id, reference_1/2
+     *                                  / প্রতিনিধির জন্য nid_number
      */
     public static function create(array $data): string
     {
@@ -40,10 +41,10 @@ final class UserRepository
             $stmt = $pdo->prepare(
                 "INSERT INTO users
                     (role, status, name, gender, phone, email, password_hash, service_slug, service_custom, experience_years, bio, nid_number,
-                     address, upazila_id, district_id, division_id, photo, ip_hash, created_at)
+                     address, upazila_id, district_id, division_id, work_district_id, reference_1, reference_2, photo, ip_hash, consent_at, created_at)
                  VALUES
                     (:role, 'pending', :name, :gender, :phone, :email, :hash, :service, :custom, :experience, :bio, :nid,
-                     :address, :upazila, :district, :division, :photo, :ip_hash, NOW())"
+                     :address, :upazila, :district, :division, :work_district, :ref1, :ref2, :photo, :ip_hash, :consent_at, NOW())"
             );
             $stmt->execute([
                 ':role' => $data['role'],
@@ -61,8 +62,12 @@ final class UserRepository
                 ':upazila' => $data['upazila_id'],
                 ':district' => $data['district_id'],
                 ':division' => $data['division_id'],
+                ':work_district' => $data['work_district_id'] ?? null,
+                ':ref1' => ((string) ($data['reference_1'] ?? '')) !== '' ? $data['reference_1'] : null,
+                ':ref2' => ((string) ($data['reference_2'] ?? '')) !== '' ? $data['reference_2'] : null,
                 ':photo' => $data['photo'] ?? null,
                 ':ip_hash' => Security::ipHash(),
+                ':consent_at' => $data['consent_at'] ?? null,
             ]);
 
             return 'ok';
