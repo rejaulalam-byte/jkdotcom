@@ -85,6 +85,25 @@ final class PageController
             'old' => Session::pull('feedback_old', []),
         ]);
     }
+    /**
+     * আইনি লেখার পেইজ: গোপনীয়তা নীতিমালা (/privacy) ও ব্যবহারের শর্তাবলি (/terms)।
+     *
+     * @param array<string,mixed> $meta ['page' => 'privacy'|'terms']
+     */
+    public function legal(array $meta = []): void
+    {
+        $page = ($meta['page'] ?? '') === 'terms' ? 'terms' : 'privacy';
+
+        View::render('pages/legal', [
+            'bodyClass' => 'page-legal',
+            'title' => Content::get("legal.{$page}.crumb") . ' — Jorurikaj.com',
+            'description' => Content::get("legal.{$page}.description"),
+            'heading' => Content::get("legal.{$page}.title"),
+            'crumb' => Content::get("legal.{$page}.crumb"),
+            'bodyHtml' => Content::get("page.{$page}.html", (string) file_get_contents(BASE_PATH . "/app/Content/pages/{$page}.html")),
+        ]);
+    }
+
     /** আমাদের সম্পর্কে পেইজ (/about)। */
     public function about(): void
     {

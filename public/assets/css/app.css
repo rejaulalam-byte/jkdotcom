@@ -2628,10 +2628,20 @@ textarea {
     }
 }
 
-/* ---- About পেইজ (ডেস্কটপ): লেখা ২২px → ২৪px ------------------------------------- */
+/* ---- About ও আইনি পেইজ (ডেস্কটপ): লেখা ২২px → ২৪px ------------------------------- */
 @media (min-width: 1200px) {
-    body.page-about {
+    body.page-about,
+    body.page-legal {
         --fs-body: 1.5rem;
+    }
+    .page-legal .rich h3 {
+        font-size: 2.25rem;
+    }
+    .page-legal .rich h4 {
+        font-size: 1.875rem;
+    }
+    .page-legal .rich {
+        line-height: 1.875;
     }
 }
 
