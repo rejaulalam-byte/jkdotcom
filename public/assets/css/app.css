@@ -3903,7 +3903,7 @@ a.user-menu__item:hover {
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
-    font-size: var(--fs-body);
+    font-size: 1.25rem; /* সারির লেখা ২০px */
 }
 .wk-table th,
 .wk-table td {
@@ -3920,7 +3920,7 @@ a.user-menu__item:hover {
     background: rgba(18, 90, 108, 0.48);
     border-color: var(--white);
     border-width: 0 2px;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     color: var(--ink);
 }
 .wk-table thead .wk-rating {
