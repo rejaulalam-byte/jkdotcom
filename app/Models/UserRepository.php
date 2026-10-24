@@ -25,11 +25,14 @@ final class UserRepository
      */
     public static function create(array $data): string
     {
-        if (self::findByPhone((string) $data['phone'], (string) $data['role']) !== null) {
-            return 'duplicate';
+        // আগে থেকে থাকা সদস্য পুরনো সাইট থেকে আনা হলে (legacy_id) আলাদা বার্তা: তাঁকে হেল্পলাইনে ফোন করতে বলা হয়
+        $byPhone = self::findByPhone((string) $data['phone'], (string) $data['role']);
+        if ($byPhone !== null) {
+            return (string) ($byPhone['legacy_id'] ?? '') !== '' ? 'duplicate_legacy' : 'duplicate';
         }
-        if (self::findByEmail((string) $data['email'], (string) $data['role']) !== null) {
-            return 'duplicate_email';
+        $byEmail = self::findByEmail((string) $data['email'], (string) $data['role']);
+        if ($byEmail !== null) {
+            return (string) ($byEmail['legacy_id'] ?? '') !== '' ? 'duplicate_email_legacy' : 'duplicate_email';
         }
 
         $pdo = Database::connection();
