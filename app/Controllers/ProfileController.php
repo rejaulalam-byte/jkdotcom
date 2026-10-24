@@ -27,6 +27,9 @@ final class ProfileController
         if ($user === null) {
             redirect('/login');
         }
+        if (UserRepository::needsSetup($user)) {
+            redirect('/account/setup');
+        }
         if ((int) ($user['must_change_password'] ?? 0) === 1) {
             redirect('/account/password');
         }
@@ -51,6 +54,7 @@ final class ProfileController
             'done' => Session::pull('profile_done', false) === true,
             'unlocked' => Session::pull('login_unlocked', false) === true,
             'passwordChanged' => Session::pull('password_changed', false) === true,
+            'setupDone' => Session::pull('setup_done', false) === true,
             'errors' => Session::pull('profile_errors', []),
             'geo' => GeoRepository::all(),
             'services' => $user['role'] === 'worker' ? ServiceRepository::all() : [],
@@ -69,6 +73,9 @@ final class ProfileController
         $user = Auth::user();
         if ($user === null) {
             redirect('/login');
+        }
+        if (UserRepository::needsSetup($user)) {
+            redirect('/account/setup');
         }
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
             $this->fail(['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);

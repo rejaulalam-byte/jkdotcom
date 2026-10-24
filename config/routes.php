@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Controllers\AccountSetupController;
 use App\Controllers\AuthController;
 use App\Controllers\FeedbackController;
 use App\Controllers\HomeController;
@@ -54,6 +55,8 @@ return [
     ['GET',  '/welcome',                   [AuthController::class, 'welcome']],
     ['GET',  '/account/password',          [AuthController::class, 'passwordForm']],
     ['POST', '/account/password',          [AuthController::class, 'passwordStore']],
+    ['GET',  '/account/setup',             [AccountSetupController::class, 'form']],
+    ['POST', '/account/setup',             [AccountSetupController::class, 'store']],
     ['GET',  '/photo/{slug}',              [AuthController::class, 'photo']],
     ['GET',  '/profile',                   [ProfileController::class, 'form']],
     ['POST', '/profile',                   [ProfileController::class, 'update']],

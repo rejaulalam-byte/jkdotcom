@@ -8,6 +8,7 @@
  * @var array<string,mixed> $old   ফর্মের শুরুর মান (সংরক্ষিত তথ্য, বা ভুল জমার পর লেখা মান)
  * @var string $role      'worker' | 'agent'
  * @var bool   $passwordChanged  এইমাত্র পাসওয়ার্ড বদলানো হয়েছে
+ * @var bool   $setupDone        এইমাত্র প্রথম লগইনের তথ্য পূর্ণ করা হয়েছে (পুরনো কর্মী)
  * @var bool   $unlocked  ৫ ভুলের লক থাকা সত্ত্বেও সঠিক পাসওয়ার্ডে ঢুকেছেন (বিশেষ বিবেচনার বার্তা)
  * @var bool   $done      এইমাত্র সংরক্ষণ হয়েছে
  * @var list<string> $errors
@@ -31,6 +32,9 @@ $label = static fn (string $for, string $key, bool $required = false): string =>
         <h2 id="pf-title" class="section__title post-job__title"><?= e(content('profile.title')) ?></h2>
         <p class="post-job__intro"><?= e(honorific_name($user['gender'] ?? null, (string) $user['name'])) ?>, <?= e(content('profile.intro')) ?></p>
 
+        <?php if ($setupDone): ?>
+            <p class="notice notice--ok profile__done" role="status"><?= e(content('setup.done')) ?></p>
+        <?php endif; ?>
         <?php if ($passwordChanged): ?>
             <p class="notice notice--ok profile__done" role="status"><?= e(content('password.changed')) ?></p>
         <?php endif; ?>

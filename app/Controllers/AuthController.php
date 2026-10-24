@@ -119,7 +119,7 @@ final class AuthController
         $rehash = password_needs_rehash((string) $user['password_hash'], PASSWORD_DEFAULT) ? password_hash($password, PASSWORD_DEFAULT) : null;
         UserRepository::touchLogin((int) $user['id'], $rehash);
         Auth::login((int) $user['id']);
-        redirect((int) ($user['must_change_password'] ?? 0) === 1 ? '/account/password' : '/profile');
+        redirect(UserRepository::needsSetup($user) ? '/account/setup' : ((int) ($user['must_change_password'] ?? 0) === 1 ? '/account/password' : '/profile'));
     }
 
     /** পাসওয়ার্ড পরিবর্তনের পেইজ (লগইন না থাকলে লগইনে পাঠায়)। */
@@ -128,6 +128,9 @@ final class AuthController
         $user = Auth::user();
         if ($user === null) {
             redirect('/login');
+        }
+        if (UserRepository::needsSetup($user)) {
+            redirect('/account/setup');
         }
 
         View::render('pages/password', [
@@ -214,6 +217,9 @@ final class AuthController
         $user = Auth::user();
         if ($user === null) {
             redirect('/login');
+        }
+        if (UserRepository::needsSetup($user)) {
+            redirect('/account/setup');
         }
         if ((int) ($user['must_change_password'] ?? 0) === 1) {
             redirect('/account/password');

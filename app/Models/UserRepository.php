@@ -455,6 +455,75 @@ final class UserRepository
         }
     }
 
+    /**
+     * পুরনো সাইট থেকে আনা কর্মী (legacy_id আছে) কি প্রথম লগইনের "তথ্য পূর্ণ করুন" ধাপ বাকি রেখেছেন।
+     * নতুন রেজিস্ট্রেশনের সদস্যের ক্ষেত্রে সবসময় false।
+     *
+     * @param array<string,mixed> $user
+     */
+    public static function needsSetup(array $user): bool
+    {
+        return (int) ($user['must_change_password'] ?? 0) === 1 && (string) ($user['legacy_id'] ?? '') !== '';
+    }
+
+    /**
+     * প্রথম লগইনের তথ্য পূর্ণ করা: নতুন পাসওয়ার্ড, ইমেইল, ঠিকানা, সম্মতি (এবং মোবাইল না থাকলে মোবাইল)।
+     * 'ok', 'duplicate' (মোবাইল), 'duplicate_email' বা 'error' ফেরত দেয়।
+     *
+     * @param array<string,mixed> $data password_hash, email, address, এবং ঐচ্ছিক phone
+     */
+    public static function completeSetup(int $id, array $data): string
+    {
+        $user = self::findById($id);
+        if ($user === null) {
+            return 'error';
+        }
+        $role = (string) $user['role'];
+        $other = self::findByEmail((string) $data['email'], $role);
+        if ($other !== null && (int) $other['id'] !== $id) {
+            return 'duplicate_email';
+        }
+        $hasPhone = isset($data['phone']) && $data['phone'] !== '';
+        if ($hasPhone) {
+            $other = self::findByPhone((string) $data['phone'], $role);
+            if ($other !== null && (int) $other['id'] !== $id) {
+                return 'duplicate';
+            }
+        }
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = self::demoRead();
+            foreach ($rows as $i => $row) {
+                if ((int) $row['id'] === $id) {
+                    $rows[$i] = array_merge($row, [
+                        'password_hash' => $data['password_hash'], 'must_change_password' => 0,
+                        'email' => $data['email'], 'address' => $data['address'], 'consent_at' => date('Y-m-d H:i:s'),
+                    ], $hasPhone ? ['phone' => $data['phone'], 'phone_raw' => null] : []);
+                }
+            }
+
+            return self::demoWrite($rows) ? 'ok' : 'error';
+        }
+
+        try {
+            $sets = 'password_hash = :hash, must_change_password = 0, email = :email, address = :address, consent_at = NOW()'
+                . ($hasPhone ? ', phone = :phone, phone_raw = NULL' : '');
+            $args = [':id' => $id, ':hash' => $data['password_hash'], ':email' => $data['email'], ':address' => $data['address']]
+                + ($hasPhone ? [':phone' => $data['phone']] : []);
+            $pdo->prepare("UPDATE users SET $sets WHERE id = :id")->execute($args);
+
+            return 'ok';
+        } catch (Throwable $e) {
+            if ($e instanceof \PDOException && ($e->errorInfo[1] ?? 0) === 1062) {
+                return str_contains($e->getMessage(), 'uq_users_role_email') ? 'duplicate_email' : 'duplicate';
+            }
+            Logger::error('UserRepository::completeSetup failed: ' . $e->getMessage());
+
+            return 'error';
+        }
+    }
+
     /** নতুন পাসওয়ার্ড-হ্যাশ বসায় এবং "পাসওয়ার্ড বদলাতে হবে" চিহ্ন মুছে দেয়। সফল হলে true। */
     public static function changePassword(int $id, string $hash): bool
     {
