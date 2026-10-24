@@ -38,7 +38,7 @@ $fmt = static fn (float $n): string => bn(rtrim(rtrim(number_format($n, 1, '.', 
                 </div>
 
                 <dl class="wk-info">
-                    <div class="wk-info__row wk-info__row--short"><dt><?= e(content('worker.l.name')) ?></dt><dd><?= e($name) ?>।</dd></div>
+                    <div class="wk-info__row wk-info__row--short"><dt><?= e(content('worker.l.name')) ?></dt><dd><?= e($name) ?></dd></div>
                     <div class="wk-info__row wk-info__row--short"><dt><?= e(content('worker.l.profession')) ?></dt><dd><?= $professions !== '' ? e($professions) . '।' : '—' ?></dd></div>
                     <div class="wk-info__row wk-info__row--short"><dt><?= e(content('worker.l.experience')) ?></dt><dd><?= $experience !== null ? e(bn(str_pad((string) $experience, 2, '0', STR_PAD_LEFT))) . ' ' . e(content('worker.experience_unit')) . '।' : '—' ?></dd></div>
                     <div class="wk-info__row"><dt><?= e(content('worker.l.bio')) ?></dt><dd><?= $bio !== '' ? nl2br(e($bio)) : '—' ?></dd></div>
