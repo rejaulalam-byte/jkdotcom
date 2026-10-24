@@ -16,6 +16,20 @@
     font-display: swap;
 }
 
+/* বাংলা অঙ্ক (১ ২ ৩...) ডিভাইসের নিজের স্পষ্ট বাংলা ফন্টে: Hind Siliguri-র "১" অস্পষ্ট দেখায় (পাবলিক সাইটেও একই ব্যবস্থা) */
+@font-face {
+    font-family: "Bangla Digits";
+    font-weight: 100 500;
+    unicode-range: U+09E6-09EF;
+    src: local("Nirmala UI"), local("Noto Sans Bengali"), local("Bangla Sangam MN"), local("Kohinoor Bangla"), local("Siyam Rupali");
+}
+@font-face {
+    font-family: "Bangla Digits";
+    font-weight: 600 900;
+    unicode-range: U+09E6-09EF;
+    src: local("Nirmala UI Bold"), local("NirmalaUI-Bold"), local("Noto Sans Bengali Bold"), local("NotoSansBengali-Bold"), local("Bangla Sangam MN Bold"), local("Kohinoor Bangla Bold"), local("Nirmala UI"), local("Noto Sans Bengali");
+}
+
 :root {
     --teal: #125a6c;
     --teal-dark: #0d4452;
@@ -41,7 +55,7 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--ink);
-    font: 400 17px/1.7 "Hind Siliguri", "Noto Sans Bengali", "Nirmala UI", system-ui, sans-serif;
+    font: 400 21px/1.7 "Bangla Digits", "Hind Siliguri", "Noto Sans Bengali", "Nirmala UI", system-ui, sans-serif;
 }
 h1,
 h2 {
@@ -50,10 +64,10 @@ h2 {
     color: var(--teal);
 }
 h1 {
-    font-size: 28px;
+    font-size: 32px;
 }
 h2 {
-    font-size: 21px;
+    font-size: 25px;
 }
 a {
     color: var(--teal);
@@ -62,7 +76,7 @@ code {
     padding: 2px 6px;
     border-radius: 4px;
     background: var(--teal-10);
-    font-size: 15px;
+    font-size: 19px;
     word-break: break-all;
 }
 .hp {
@@ -86,7 +100,7 @@ select {
     display: block;
     width: 100%;
     max-width: 520px;
-    height: 46px;
+    height: 54px;
     padding: 0 14px;
     border: 1px solid var(--line);
     border-radius: 8px;
@@ -128,7 +142,7 @@ legend {
 .adm-small,
 .adm-user button {
     display: inline-block;
-    min-height: 46px;
+    min-height: 54px;
     margin-top: 18px;
     padding: 8px 22px;
     border: 0;
@@ -136,7 +150,7 @@ legend {
     background: var(--teal);
     color: #fff;
     font-family: inherit;
-    font-size: 17px;
+    font-size: 21px;
     font-weight: 600;
     line-height: 1.4;
     text-decoration: none;
@@ -151,10 +165,10 @@ legend {
     max-width: 520px;
 }
 .adm-small {
-    min-height: 34px;
+    min-height: 42px;
     margin-top: 4px;
-    padding: 2px 12px;
-    font-size: 15px;
+    padding: 2px 14px;
+    font-size: 19px;
 }
 summary.adm-small {
     list-style: none;
@@ -240,18 +254,18 @@ ul.adm-notice {
     box-shadow: 0 4px 22px rgba(18, 90, 108, 0.12);
 }
 .adm-card__title {
-    font-size: 24px;
+    font-size: 28px;
 }
 .adm-brand {
     margin: 0 0 18px;
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 600;
     line-height: 1.2;
     color: var(--teal);
 }
 .adm-brand span {
     display: block;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 400;
     color: var(--muted);
 }
@@ -262,7 +276,7 @@ ul.adm-notice {
 /* ---- প্যানেল: বাঁয়ে মেনু, ডানে কাজ ---- */
 .adm-shell {
     display: grid;
-    grid-template-columns: 250px minmax(0, 1fr);
+    grid-template-columns: 290px minmax(0, 1fr);
     min-height: 100vh;
 }
 .adm-side {
@@ -306,10 +320,10 @@ ul.adm-notice {
     color: var(--gold);
 }
 .adm-user button {
-    min-height: 38px;
+    min-height: 44px;
     margin-top: 6px;
     background: rgba(255, 255, 255, 0.16);
-    font-size: 15px;
+    font-size: 19px;
 }
 .adm-main {
     padding: 28px 32px 48px;
@@ -331,12 +345,12 @@ ul.adm-notice {
 }
 .adm-hero__greet {
     color: var(--muted);
-    font-size: 18px;
+    font-size: 22px;
     letter-spacing: 0.3px;
 }
 .adm-hero__name {
     margin: 2px 0 10px;
-    font-size: 34px;
+    font-size: 40px;
     color: var(--teal-dark);
 }
 .adm-badge {
@@ -345,7 +359,7 @@ ul.adm-notice {
     border-radius: 999px;
     background: var(--gold);
     color: #5a4600;
-    font-size: 15px;
+    font-size: 19px;
     font-weight: 600;
 }
 .adm-hero__date {
@@ -358,7 +372,7 @@ ul.adm-notice {
 }
 .adm-dash {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr) 420px;
     gap: 24px;
     align-items: start;
 }
@@ -383,7 +397,7 @@ ul.adm-notice {
 }
 .adm-panel h3 {
     margin: 0 0 8px;
-    font-size: 18px;
+    font-size: 22px;
     color: var(--teal-dark);
 }
 .adm-panel ul {
@@ -400,7 +414,7 @@ ul.adm-notice {
     border-top: 1px solid var(--line);
 }
 .adm-panel li b {
-    font-size: 18px;
+    font-size: 22px;
     color: var(--teal-dark);
 }
 .adm-pill {
@@ -436,7 +450,7 @@ ul.adm-notice {
 .adm-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 16px;
+    font-size: 20px;
 }
 .adm-table th,
 .adm-table td {
