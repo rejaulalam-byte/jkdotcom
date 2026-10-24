@@ -64,4 +64,4 @@ $otherRole = $role === 'agent' ? 'worker' : 'agent';
 </section>
 
 <?php // "পাসওয়ার্ড মনে নেই" পপ-আপ: ইমেইল → ৬ সংখ্যার কোড → নতুন পাসওয়ার্ড ?>
-<?php $doneLabel = content('forgot.login'); require BASE_PATH . '/app/Views/partials/forgot-dialog.php'; ?>
+<?php $doneLabel = content('forgot.login'); $forgotRole = $role; require BASE_PATH . '/app/Views/partials/forgot-dialog.php'; ?>

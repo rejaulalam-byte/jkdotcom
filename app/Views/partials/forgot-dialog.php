@@ -4,9 +4,10 @@
  * ধাপগুলো app.js-এর "পাসওয়ার্ড মনে নেই" অংশ চালায় (/password/forgot, /verify, /reset)।
  *
  * @var string $doneLabel  সফল-বার্তার বাটনের লেখা (লগইন পেইজে "লগইন করুন", পাসওয়ার্ড পেইজে "ঠিক আছে")
+ * @var string $forgotRole 'worker' | 'agent': কোন পাশের অ্যাকাউন্টের পাসওয়ার্ড বদলানো হবে
  */
 ?>
-<dialog class="lead forgot" id="forgot-dialog" aria-labelledby="forgot-title"
+<dialog class="lead forgot" id="forgot-dialog" aria-labelledby="forgot-title" data-role="<?= e($forgotRole) ?>"
         data-net="<?= e(content('forgot.net')) ?>" data-token="<?= e(\App\Core\Security::csrfToken()) ?>">
     <h3 id="forgot-title"><?= e(content('forgot.title')) ?></h3>
 

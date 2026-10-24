@@ -78,15 +78,24 @@ final class AuthController
         }
         // একই আইডিতে বারবার অনুমান ঠেকাতে আইডি-ভিত্তিক সীমা: ৫ ভুলে "নরম লক" (সঠিক পাসওয়ার্ড তখনও ঢুকতে দেয়,
         // কিন্তু বার্তা দেখায়), ১০ ভুলে "কড়া লক" (সঠিক পাসওয়ার্ডও ঢোকে না)
-        $bucket = 'login_' . $id;
+        $bucket = 'login_' . $role . '_' . $id;
         $fails = RateLimiter::count($bucket, self::WINDOW);
         if ($fails >= self::ID_HARD_LIMIT) {
             $this->fail($back, ['আপনি ১০ বার ভুল চেষ্টা করেছেন। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।'], $id);
         }
 
-        $user = $byEmail ? UserRepository::findByEmail($id) : UserRepository::findByPhone($id);
+        // একই ইমেইল/মোবাইলে দুই পাশেই অ্যাকাউন্ট থাকতে পারে, তাই এই পেইজের পাশেরটাই খোঁজা হয়
+        $find = static fn (?string $r): ?array => $byEmail ? UserRepository::findByEmail($id, $r) : UserRepository::findByPhone($id, $r);
+        $user = $find($role);
         $ok = password_verify($password, $user !== null ? (string) $user['password_hash'] : self::DUMMY_HASH);
         if ($user === null || !$ok) {
+            // এই পাশে নেই কিন্তু অন্য পাশে আছে ও পাসওয়ার্ড ঠিক: ভুল লগইন-পেইজের কথা জানানো নিরাপদ
+            $other = $user === null ? $find($role === 'agent' ? 'worker' : 'agent') : null;
+            if ($other !== null && password_verify($password, (string) $other['password_hash'])) {
+                $this->fail($back, [$role === 'agent'
+                    ? 'এই অ্যাকাউন্টটি পেশাজীবী কর্মীর। পেশাজীবীদের লগইন পেইজ ব্যবহার করুন।'
+                    : 'এই অ্যাকাউন্টটি প্রতিনিধির। প্রতিনিধিদের লগইন পেইজ ব্যবহার করুন।'], $id);
+            }
             RateLimiter::hit('login', self::WINDOW);
             RateLimiter::hit($bucket, self::WINDOW);
             $this->fail($back, [$fails + 1 >= self::ID_SOFT_LIMIT
@@ -94,11 +103,6 @@ final class AuthController
                 : 'লগইন আইডি বা পাসওয়ার্ড সঠিক নয়।'], $id);
         }
         // পাসওয়ার্ড ঠিক আছে: এবার অ্যাকাউন্টের অবস্থা বলা নিরাপদ
-        if ($user['role'] !== $role) {
-            $this->fail($back, [$role === 'agent'
-                ? 'এই অ্যাকাউন্টটি পেশাজীবী কর্মীর। পেশাজীবীদের লগইন পেইজ ব্যবহার করুন।'
-                : 'এই অ্যাকাউন্টটি প্রতিনিধির। প্রতিনিধিদের লগইন পেইজ ব্যবহার করুন।'], $id);
-        }
         if ($user['status'] === 'pending') {
             $this->fail($back, ['আপনার আবেদনটি এখনও অনুমোদনের অপেক্ষায় আছে। অনুমোদন হলে আপনি লগইন করতে পারবেন।'], $id);
         }

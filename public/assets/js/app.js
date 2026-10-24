@@ -1638,6 +1638,7 @@
             var name = form.getAttribute("data-step");
             var body = new FormData(form);
             body.append("_token", token);
+            body.append("role", dialog.getAttribute("data-role") || "");
             var send = form.querySelector('button[type="submit"]');
             send.disabled = true;
             fail(form, "");

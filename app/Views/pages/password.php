@@ -58,4 +58,4 @@ $rows = [
 </section>
 
 <?php // "পাসওয়ার্ড মনে নেই" পপ-আপ: বর্তমান পাসওয়ার্ড মনে না থাকলে ইমেইলের কোড দিয়ে নতুন পাসওয়ার্ড ?>
-<?php $doneLabel = content('forgot.ok'); require BASE_PATH . '/app/Views/partials/forgot-dialog.php'; ?>
+<?php $doneLabel = content('forgot.ok'); $forgotRole = (string) (\App\Core\Auth::user()['role'] ?? 'worker'); require BASE_PATH . '/app/Views/partials/forgot-dialog.php'; ?>

@@ -32,7 +32,9 @@ final class PasswordResetController
             $this->reply(['error' => 'email', 'message' => 'ইমেইল ঠিকানাটি সঠিক নয়। সঠিক ইমেইল লিখুন।'], 422);
         }
 
-        $user = UserRepository::findByEmail($email);
+        // একই ইমেইলে দুই পাশে অ্যাকাউন্ট থাকতে পারে; পপ-আপ যে পেইজ থেকে খুলেছে সেই পাশেরটার পাসওয়ার্ড বদলায়
+        $role = ($_POST['role'] ?? '') === 'agent' ? 'agent' : 'worker';
+        $user = UserRepository::findByEmail($email, $role);
         $uid = $user !== null && $user['status'] === 'approved' ? (int) $user['id'] : 0;
         $code = (string) random_int(100000, 999999);
         $salt = bin2hex(random_bytes(8));

@@ -25,10 +25,10 @@ final class UserRepository
      */
     public static function create(array $data): string
     {
-        if (self::findByPhone((string) $data['phone']) !== null) {
+        if (self::findByPhone((string) $data['phone'], (string) $data['role']) !== null) {
             return 'duplicate';
         }
-        if (self::findByEmail((string) $data['email']) !== null) {
+        if (self::findByEmail((string) $data['email'], (string) $data['role']) !== null) {
             return 'duplicate_email';
         }
 
@@ -73,9 +73,9 @@ final class UserRepository
 
             return 'ok';
         } catch (Throwable $e) {
-            // একই মোবাইলে দুটো আবেদন একসঙ্গে এলে ইউনিক-কী আটকায়
+            // একই পাশে একই মোবাইল/ইমেইলে দুটো আবেদন একসঙ্গে এলে ইউনিক-কী আটকায়
             if ($e instanceof \PDOException && ($e->errorInfo[1] ?? 0) === 1062) {
-                return 'duplicate';
+                return str_contains($e->getMessage(), 'uq_users_role_email') ? 'duplicate_email' : 'duplicate';
             }
             Logger::error('UserRepository::create failed: ' . $e->getMessage());
 
@@ -84,16 +84,16 @@ final class UserRepository
     }
 
     /**
-     * মোবাইল নাম্বার দিয়ে অ্যাকাউন্ট খোঁজে (লগইন ও দ্বিতীয়বার-নিবন্ধন আটকাতে)।
+     * মোবাইল নাম্বার দিয়ে অ্যাকাউন্ট খোঁজে (লগইন ও দ্বিতীয়বার-নিবন্ধন আটকাতে)। $role দিলে শুধু সেই পাশের (worker|agent) অ্যাকাউন্ট।
      *
      * @return array<string,mixed>|null
      */
-    public static function findByPhone(string $phone): ?array
+    public static function findByPhone(string $phone, ?string $role = null): ?array
     {
         $pdo = Database::connection();
         if ($pdo === null) {
             foreach (self::demoRead() as $row) {
-                if ((string) $row['phone'] === $phone) {
+                if ((string) $row['phone'] === $phone && ($role === null || (string) $row['role'] === $role)) {
                     return $row;
                 }
             }
@@ -102,8 +102,8 @@ final class UserRepository
         }
 
         try {
-            $stmt = $pdo->prepare('SELECT * FROM users WHERE phone = :phone LIMIT 1');
-            $stmt->execute([':phone' => $phone]);
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE phone = :phone' . ($role !== null ? ' AND role = :role' : '') . ' LIMIT 1');
+            $stmt->execute([':phone' => $phone] + ($role !== null ? [':role' => $role] : []));
             $row = $stmt->fetch();
 
             return $row === false ? null : $row;
@@ -119,7 +119,7 @@ final class UserRepository
      *
      * @return array<string,mixed>|null
      */
-    public static function findByEmail(string $email): ?array
+    public static function findByEmail(string $email, ?string $role = null): ?array
     {
         $email = mb_strtolower(trim($email));
         if ($email === '') {
@@ -128,7 +128,7 @@ final class UserRepository
         $pdo = Database::connection();
         if ($pdo === null) {
             foreach (self::demoRead() as $row) {
-                if (mb_strtolower((string) ($row['email'] ?? '')) === $email) {
+                if (mb_strtolower((string) ($row['email'] ?? '')) === $email && ($role === null || (string) $row['role'] === $role)) {
                     return $row;
                 }
             }
@@ -137,8 +137,8 @@ final class UserRepository
         }
 
         try {
-            $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email LIMIT 1');
-            $stmt->execute([':email' => $email]);
+            $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email' . ($role !== null ? ' AND role = :role' : '') . ' LIMIT 1');
+            $stmt->execute([':email' => $email] + ($role !== null ? [':role' => $role] : []));
             $row = $stmt->fetch();
 
             return $row === false ? null : $row;
@@ -343,7 +343,8 @@ final class UserRepository
      */
     public static function updateProfile(int $id, array $data): string
     {
-        $other = self::findByPhone((string) $data['phone']);
+        $role = (string) (self::findById($id)['role'] ?? '');
+        $other = self::findByPhone((string) $data['phone'], $role);
         if ($other !== null && (int) $other['id'] !== $id) {
             return 'duplicate';
         }
