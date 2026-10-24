@@ -150,7 +150,7 @@ final class MembersController
             $to = in_array($previous, UserRepository::LISTED_STATUSES, true) ? $previous : 'pending';
         }
 
-        if (!UserRepository::setStatus((int) $member['id'], $to, in_array($action, ['hold', 'reject'], true) ? $note : null)) {
+        if (!UserRepository::setStatus((int) $member['id'], $to, $action === 'reject' ? $note : null)) {
             $this->fail($back, 'সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।');
         }
         AdminRepository::log((int) $admin['id'], $logName, 'member_' . $action, $name . ($note !== '' ? ' — ' . $note : ''));

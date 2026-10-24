@@ -97,30 +97,45 @@ $back = '/admin/members/' . (int) $member['id'];
     <?php if ($daysLeft !== null): ?>
         <p class="adm-muted"><?= $current === 'reserved' ? 'আর ' . e(bn($daysLeft)) . ' দিন পর নিজে ডাস্টবিনে যাবে।' : 'আর ' . e(bn($daysLeft)) . ' দিন পর চিরতরে মুছে যাবে।' ?> (এর মধ্যে "ফিরিয়ে আনুন" চাপলে ফেরত আসবে।)</p>
     <?php endif; ?>
-    <div class="adm-actions adm-actions--row">
-        <?php foreach ($allowed as $action): ?>
-            <?php [$label, $class, $confirm] = $btn[$action]; ?>
-            <form action="/admin/members/action" method="post"<?= $confirm !== '' ? ' data-confirm="' . e($confirm) . '"' : '' ?>>
-                <?= csrf_field() ?>
-                <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
-                <input type="hidden" name="action" value="<?= e($action) ?>">
-                <input type="hidden" name="back" value="<?= e($back) ?>">
-                <?php if (in_array($action, ['hold', 'reject'], true)): ?>
-                    <input class="adm-note" type="text" name="note" maxlength="255" placeholder="কারণ (ঐচ্ছিক)" aria-label="কারণ">
-                <?php endif; ?>
-                <button class="adm-small <?= e($class) ?>" type="submit"><?= e($label) ?></button>
-            </form>
-        <?php endforeach; ?>
-        <?php if ($canPurge): ?>
-            <form action="/admin/members/action" method="post" data-confirm="চিরতরে মুছলে এই সদস্যের সব তথ্য ও ছবি চলে যাবে, আর কখনও ফেরানো যাবে না। সত্যিই মুছবেন?">
-                <?= csrf_field() ?>
-                <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
-                <input type="hidden" name="action" value="purge">
-                <input type="hidden" name="back" value="<?= e($back) ?>">
-                <button class="adm-small adm-small--warn" type="submit">চিরতরে মুছুন</button>
-            </form>
-        <?php endif; ?>
-    </div>
+    <?php
+    // প্রথম লাইন: অনুমোদন / হোল্ড / বাতিল (যেগুলো চলে); দ্বিতীয় লাইন: মোছা, ডাস্টবিন, ফিরিয়ে আনা, চিরতরে মোছা
+    $first = array_values(array_intersect(['approve', 'hold', 'reject'], $allowed));
+    $second = array_values(array_diff($allowed, $first));
+    $form = static function (string $action) use ($btn, $member, $back): void {
+        [$label, $class, $confirm] = $btn[$action];
+        ?>
+        <form action="/admin/members/action" method="post"<?= $confirm !== '' ? ' data-confirm="' . e($confirm) . '"' : '' ?>>
+            <?= csrf_field() ?>
+            <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
+            <input type="hidden" name="action" value="<?= e($action) ?>">
+            <input type="hidden" name="back" value="<?= e($back) ?>">
+            <?php if ($action === 'reject'): ?>
+                <input class="adm-note" type="text" name="note" maxlength="255" placeholder="বাতিলের কারণ (ঐচ্ছিক)" aria-label="বাতিলের কারণ">
+            <?php endif; ?>
+            <button class="adm-small <?= e($class) ?>" type="submit"><?= e($label) ?></button>
+        </form>
+        <?php
+    };
+    ?>
+    <?php if ($first !== []): ?>
+        <div class="adm-actions adm-actions--row">
+            <?php foreach ($first as $action): $form($action); endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <?php if ($second !== [] || $canPurge): ?>
+        <div class="adm-actions adm-actions--row adm-actions--second">
+            <?php foreach ($second as $action): $form($action); endforeach; ?>
+            <?php if ($canPurge): ?>
+                <form action="/admin/members/action" method="post" data-confirm="চিরতরে মুছলে এই সদস্যের সব তথ্য ও ছবি চলে যাবে, আর কখনও ফেরানো যাবে না। সত্যিই মুছবেন?">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
+                    <input type="hidden" name="action" value="purge">
+                    <input type="hidden" name="back" value="<?= e($back) ?>">
+                    <button class="adm-small adm-small--warn" type="submit">চিরতরে মুছুন</button>
+                </form>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
 </section>
 <div class="adm-detail">
     <aside class="adm-detail__photo">

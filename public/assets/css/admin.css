@@ -724,4 +724,16 @@ ul.adm-notice {
 td.adm-actions form {
     display: inline-block;
     margin: 0 0 0 6px;
+}.adm-actions--second {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--line);
+}
+@media (min-width: 801px) {
+    .adm-actions--row {
+        flex-wrap: nowrap;
+    }
+    .adm-actions--row form {
+        flex-wrap: nowrap;
+    }
 }
