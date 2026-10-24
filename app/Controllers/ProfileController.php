@@ -93,6 +93,8 @@ final class ProfileController
             $data['service_custom'] = $data['service_slug'] === null && $data['service_name'] !== '' ? $data['service_name'] : null;
             $data['experience_years'] = trim((string) ($_POST['experience'] ?? '')) === '' ? null : (int) $_POST['experience'];
             $data['bio'] = clean_input($_POST['bio'] ?? '', 2000, true);
+            $data['reference_1'] = clean_input($_POST['reference_1'] ?? '', 300);
+            $data['reference_2'] = clean_input($_POST['reference_2'] ?? '', 300);
             $work = GeoRepository::parseWorkDistricts($_POST['work_districts'] ?? [], $_POST['work_all'] ?? '', $_POST['work_district_pick'] ?? '');
             $data['work_district_ids'] = $work['ids'];
             $data['work_all_districts'] = $work['all'] ? 1 : 0;
@@ -166,6 +168,9 @@ final class ProfileController
             }
             if ($d['experience_years'] !== null && ($d['experience_years'] < 0 || $d['experience_years'] > 70)) {
                 $errors[] = 'কাজের অভিজ্ঞতা ০ থেকে ৭০ বছরের মধ্যে লিখুন।';
+            }
+            if ($d['reference_1'] === '' || $d['reference_2'] === '') {
+                $errors[] = 'দুইজন রেফারেন্সের তথ্যই লিখুন।';
             }
             if ($d['work_error'] !== null) {
                 $errors[] = $d['work_error'];

@@ -38,13 +38,21 @@
 
     <form class="forgot__step" data-step="password" action="/password/reset" hidden novalidate>
         <p><?= e(content('forgot.new_text')) ?></p>
-        <div class="pf">
+        <div class="pf pf--eye">
             <label class="sr-only" for="fg-pass"><?= e(content('forgot.new_ph')) ?></label>
             <input id="fg-pass" type="password" name="password" minlength="8" maxlength="72" required autocomplete="new-password" placeholder="<?= e(content('forgot.new_ph')) ?>">
+            <?php // চোখ-বাটন লুকানো থাকে; app.js দেখায় (JavaScript ছাড়া পাসওয়ার্ড ঢাকাই থাকে) ?>
+            <button class="lg-eye" type="button" hidden aria-pressed="false" aria-controls="fg-pass"
+                    data-show="<?= e(content('login.f.show')) ?>" data-hide="<?= e(content('login.f.hide')) ?>"
+                    aria-label="<?= e(content('login.f.show')) ?>"></button>
         </div>
-        <div class="pf">
+        <div class="pf pf--eye">
             <label class="sr-only" for="fg-pass2"><?= e(content('forgot.new2_ph')) ?></label>
             <input id="fg-pass2" type="password" name="password_confirm" minlength="8" maxlength="72" required autocomplete="new-password" placeholder="<?= e(content('forgot.new2_ph')) ?>">
+            <?php // চোখ-বাটন লুকানো থাকে; app.js দেখায় (JavaScript ছাড়া পাসওয়ার্ড ঢাকাই থাকে) ?>
+            <button class="lg-eye" type="button" hidden aria-pressed="false" aria-controls="fg-pass2"
+                    data-show="<?= e(content('login.f.show')) ?>" data-hide="<?= e(content('login.f.hide')) ?>"
+                    aria-label="<?= e(content('login.f.show')) ?>"></button>
         </div>
         <p class="reg-form__note"><?= e(content('regform.password_note')) ?></p>
         <p class="lead__error" role="alert" hidden></p>

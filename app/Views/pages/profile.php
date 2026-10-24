@@ -164,6 +164,22 @@ $label = static fn (string $for, string $key, bool $required = false): string =>
                     <?= $label('rf-work-district', 'work_district') ?>
                     <?php $wdIds = array_map('intval', (array) ($old['work_district_ids'] ?? [])); $wdAll = !empty($old['work_all_districts']); require BASE_PATH . '/app/Views/partials/work-districts.php'; ?>
                 </div>
+                <?php // দুইজন রেফারেন্স (দুটোই আবশ্যক) ?>
+                <fieldset class="reg-refs">
+                    <legend><?= e(content('regform.f.references')) ?></legend>
+                    <div class="reg-refs__box">
+                        <div class="pf">
+                            <label class="sr-only" for="rf-ref1"><?= e(content('regform.f.ref1')) ?></label>
+                            <textarea id="rf-ref1" data-bn name="reference_1" maxlength="300" required rows="3"
+                                      placeholder="<?= $ph('ref1') ?>"><?= $val('reference_1') ?></textarea>
+                        </div>
+                        <div class="pf">
+                            <label class="sr-only" for="rf-ref2"><?= e(content('regform.f.ref2')) ?></label>
+                            <textarea id="rf-ref2" data-bn name="reference_2" maxlength="300" required rows="3"
+                                      placeholder="<?= $ph('ref2') ?>"><?= $val('reference_2') ?></textarea>
+                        </div>
+                    </div>
+                </fieldset>
                 <?= $label('rf-bio', 'bio') ?>
                 <div class="pf pf--wide">
                     <textarea id="rf-bio" data-bn name="bio" maxlength="2000"

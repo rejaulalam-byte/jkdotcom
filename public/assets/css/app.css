@@ -3811,6 +3811,10 @@ textarea {
 .forgot em {
     color: var(--teal);
 }
+/* পাসওয়ার্ড দেখার চোখ-বাটনের জায়গা ডানে */
+.forgot .pf--eye input {
+    padding-right: 3.75rem;
+}
 .forgot .reg-form__note {
     margin: -0.25rem 0 1rem;
     width: auto;

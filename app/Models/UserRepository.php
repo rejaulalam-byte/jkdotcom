@@ -356,6 +356,7 @@ final class UserRepository
                     $rows[$i] = array_merge($row, array_intersect_key($data, array_flip([
                         'phone', 'address', 'upazila_id', 'district_id', 'division_id', 'photo',
                         'service_slug', 'service_custom', 'experience_years', 'bio', 'work_district_ids', 'work_all_districts',
+                        'reference_1', 'reference_2',
                     ])));
                 }
             }
@@ -374,6 +375,10 @@ final class UserRepository
             $sets[] = 'experience_years = :experience';
             $sets[] = 'bio = :bio';
             $sets[] = 'work_all_districts = :work_all';
+            $sets[] = 'reference_1 = :ref1';
+            $sets[] = 'reference_2 = :ref2';
+            $args[':ref1'] = $data['reference_1'];
+            $args[':ref2'] = $data['reference_2'];
             $args[':work_all'] = (int) ($data['work_all_districts'] ?? 0);
             $args += [
                 ':service' => $data['service_slug'], ':custom' => $data['service_custom'],
