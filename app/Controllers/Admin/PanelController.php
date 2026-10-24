@@ -11,6 +11,7 @@ use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminPermissions;
 use App\Models\AdminRepository;
+use App\Models\AdminStats;
 use App\Models\UserRepository;
 
 /**
@@ -23,7 +24,7 @@ final class PanelController
     {
         $admin = AdminAuth::require();
         $counts = UserRepository::countByRoleStatus();
-        $this->render('admin/dashboard', $admin, 'ড্যাশবোর্ড', ['counts' => $counts]);
+        $this->render('admin/dashboard', $admin, 'ড্যাশবোর্ড', ['counts' => $counts, 'stats' => AdminStats::overview(), 'hideTitle' => true]);
     }
 
     // ---- নিজের অ্যাকাউন্ট ----------------------------------------------------------------------

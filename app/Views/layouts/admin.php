@@ -5,6 +5,7 @@
  *
  * @var string $content
  * @var string|null $title
+ * @var bool|null $hideTitle  true হলে পেইজের ওপরের বড় শিরোনাম দেখানো হয় না (ড্যাশবোর্ডে নিজের ব্যানার আছে)
  * @var array<string,mixed>|null $admin
  * @var list<string> $errors
  * @var string|null $ok
@@ -51,7 +52,9 @@ $nav = [
         </div>
     </aside>
     <main class="adm-main">
-        <h1><?= e((string) ($title ?? '')) ?></h1>
+        <?php if (empty($hideTitle)): ?>
+            <h1><?= e((string) ($title ?? '')) ?></h1>
+        <?php endif; ?>
 <?php else: ?>
     <main class="adm-card">
         <p class="adm-brand adm-brand--center">Jorurikaj.com<span>অ্যাডমিন প্যানেল</span></p>

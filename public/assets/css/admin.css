@@ -316,32 +316,109 @@ ul.adm-notice {
     min-width: 0;
 }
 
-/* ড্যাশবোর্ডের সংখ্যা-কার্ড */
-.adm-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 14px;
-    max-width: 900px;
-}
-.adm-stat {
-    padding: 16px 18px;
+/* ---- ড্যাশবোর্ড: স্বাগতম-ব্যানার (মাঝখানে), বাঁয়ে গ্রাফের জায়গা, ডানে সংখ্যার কার্ড ---- */
+.adm-hero {
+    margin: 0 0 24px;
+    padding: 30px 20px 26px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #e6f1f3 55%, #fbf3d4 100%);
     border: 1px solid var(--line);
-    border-radius: 12px;
-    background: #fff;
+    box-shadow: 0 6px 24px rgba(18, 90, 108, 0.1);
+    text-align: center;
 }
-.adm-stat.is-new {
-    border-color: var(--gold);
-    background: #fffbea;
+.adm-hero p {
+    margin: 0;
 }
-.adm-stat__n {
-    display: block;
-    font-size: 36px;
-    font-weight: 600;
-    line-height: 1.2;
-    color: var(--teal);
-}
-.adm-stat__l {
+.adm-hero__greet {
     color: var(--muted);
+    font-size: 18px;
+    letter-spacing: 0.3px;
+}
+.adm-hero__name {
+    margin: 2px 0 10px;
+    font-size: 34px;
+    color: var(--teal-dark);
+}
+.adm-badge {
+    display: inline-block;
+    padding: 3px 18px;
+    border-radius: 999px;
+    background: var(--gold);
+    color: #5a4600;
+    font-size: 15px;
+    font-weight: 600;
+}
+.adm-hero__date {
+    margin-top: 12px;
+    color: var(--ink);
+}
+.adm-hero__note {
+    margin-top: 4px;
+    color: var(--muted);
+}
+.adm-dash {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 24px;
+    align-items: start;
+}
+.adm-reserved {
+    display: grid;
+    min-height: 260px;
+    place-items: center;
+    border: 2px dashed var(--line);
+    border-radius: 14px;
+    color: var(--muted);
+}
+.adm-dash__side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.adm-panel {
+    padding: 16px 18px 8px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(18, 90, 108, 0.08);
+}
+.adm-panel h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    color: var(--teal-dark);
+}
+.adm-panel ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.adm-panel li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+}
+.adm-panel li b {
+    font-size: 18px;
+    color: var(--teal-dark);
+}
+.adm-pill {
+    min-width: 30px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #c9a227;
+    color: #fff !important;
+    text-align: center;
+}
+
+@media (max-width: 1000px) {
+    .adm-dash {
+        grid-template-columns: 1fr;
+    }
+    .adm-reserved {
+        display: none;
+    }
 }
 
 /* সাজানো বাক্স ও টেবিল */
