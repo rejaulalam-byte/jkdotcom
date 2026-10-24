@@ -147,7 +147,7 @@ $label = static fn (string $for, string $key, bool $required = false): string =>
                 </div>
 
                 <?php // ছবি: নতুন ছবি বাছলে বদলায়, না বাছলে এখনকার ছবিই থাকে; app.js নাম ও প্রিভিউ দেখায় ও বড় ছবি ছোট করে ?>
-                <div class="reg-form__col reg-photo" data-photo
+                <div class="reg-form__col reg-photo" id="photo" data-photo
                      data-max="<?= \App\Core\PhotoUpload::MAX_BYTES ?>"
                      data-none="<?= e(content('profile.photo.none')) ?>" data-chosen="<?= e(content('regform.photo.chosen')) ?>"
                      data-too-big="<?= e(content('regform.photo.too_big')) ?>"
