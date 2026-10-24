@@ -69,7 +69,9 @@ final class UserRepository
                 ':ip_hash' => Security::ipHash(),
                 ':consent_at' => $data['consent_at'] ?? null,
             ]);
-            self::saveWorkDistricts($pdo, (int) $pdo->lastInsertId(), (array) ($data['work_district_ids'] ?? []));
+            $newId = (int) $pdo->lastInsertId();
+            self::saveWorkDistricts($pdo, $newId, (array) ($data['work_district_ids'] ?? []));
+            self::saveExtraServices($pdo, $newId, (array) ($data['extra_services'] ?? []));
 
             return 'ok';
         } catch (Throwable $e) {
@@ -189,16 +191,17 @@ final class UserRepository
             $rows = array_values(array_filter(
                 self::demoRead(),
                 static fn (array $r): bool => ($r['role'] ?? '') === 'worker' && ($r['status'] ?? '') === 'approved'
-                    && (string) ($r['service_slug'] ?? '') === $slug
+                    && ((string) ($r['service_slug'] ?? '') === $slug || in_array($slug, (array) ($r['extra_services'] ?? []), true))
             ));
         } else {
             try {
                 $stmt = $pdo->prepare(
                     "SELECT id, name, phone, address, upazila_id, district_id, division_id, work_all_districts FROM users
-                     WHERE role = 'worker' AND status = 'approved' AND service_slug = :slug
+                     WHERE role = 'worker' AND status = 'approved'
+                       AND (service_slug = :slug OR id IN (SELECT user_id FROM worker_services WHERE service_slug = :slug2))
                      ORDER BY name ASC, id ASC"
                 );
-                $stmt->execute([':slug' => $slug]);
+                $stmt->execute([':slug' => $slug, ':slug2' => $slug]);
                 $rows = $stmt->fetchAll();
             } catch (Throwable $e) {
                 Logger::error('UserRepository::listWorkersByService failed: ' . $e->getMessage());
@@ -282,6 +285,45 @@ final class UserRepository
     }
 
     /**
+     * কর্মীর "আরও পেশা" নতুন করে বসায় (আগেরগুলো মুছে)।
+     *
+     * @param list<string> $slugs
+     */
+    private static function saveExtraServices(\PDO $pdo, int $userId, array $slugs): void
+    {
+        $pdo->prepare('DELETE FROM worker_services WHERE user_id = :u')->execute([':u' => $userId]);
+        $insert = $pdo->prepare('INSERT IGNORE INTO worker_services (user_id, service_slug) VALUES (:u, :s)');
+        foreach (array_slice($slugs, 0, ServiceRepository::MAX_EXTRA) as $slug) {
+            $insert->execute([':u' => $userId, ':s' => (string) $slug]);
+        }
+    }
+
+    /**
+     * একজন কর্মীর "আরও পেশা"-র slug-গুলো (প্রধান পেশা বাদে)।
+     *
+     * @param array<string,mixed> $user users-এর সারি
+     * @return list<string>
+     */
+    public static function extraServices(array $user): array
+    {
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            return array_map('strval', (array) ($user['extra_services'] ?? []));
+        }
+
+        try {
+            $stmt = $pdo->prepare('SELECT service_slug FROM worker_services WHERE user_id = :u ORDER BY service_slug');
+            $stmt->execute([':u' => (int) $user['id']]);
+
+            return array_map('strval', array_column($stmt->fetchAll(), 'service_slug'));
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::extraServices failed: ' . $e->getMessage());
+
+            return [];
+        }
+    }
+
+    /**
      * একজন কর্মীর কাজের জেলার id-গুলো ও "সব জেলা" চিহ্ন।
      *
      * @param array<string,mixed> $user users-এর সারি
@@ -357,7 +399,7 @@ final class UserRepository
                     $rows[$i] = array_merge($row, array_intersect_key($data, array_flip([
                         'phone', 'address', 'upazila_id', 'district_id', 'division_id', 'photo',
                         'service_slug', 'service_custom', 'experience_years', 'bio', 'work_district_ids', 'work_all_districts',
-                        'reference_1', 'reference_2',
+                        'reference_1', 'reference_2', 'extra_services',
                     ])));
                 }
             }
@@ -396,6 +438,9 @@ final class UserRepository
             $stmt->execute($args);
             if (array_key_exists('work_district_ids', $data)) {
                 self::saveWorkDistricts($pdo, $id, (array) $data['work_district_ids']);
+            }
+            if (array_key_exists('extra_services', $data)) {
+                self::saveExtraServices($pdo, $id, (array) $data['extra_services']);
             }
 
             return 'ok';

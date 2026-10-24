@@ -83,6 +83,8 @@ $label = static fn (string $for, string $key, bool $required = false): string =>
                                 <?php endforeach; ?>
                             </datalist>
                         </div>
+                        <?= $label('rf-extra-service', 'extra_service') ?>
+                        <?php $esSlugs = array_map('strval', (array) ($old['extra_services'] ?? [])); require BASE_PATH . '/app/Views/partials/extra-services.php'; ?>
                         <?= $label('rf-exp', 'experience') ?>
                         <div class="pf">
                             <input id="rf-exp" type="number" name="experience" min="0" max="70" inputmode="numeric"

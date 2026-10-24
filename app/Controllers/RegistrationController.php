@@ -87,6 +87,9 @@ final class RegistrationController
             $data['work_district_ids'] = $work['ids'];
             $data['work_all_districts'] = $work['all'] ? 1 : 0;
             $data['work_error'] = $work['error'];
+            $extra = ServiceRepository::parseExtra($_POST['extra_services'] ?? [], $_POST['extra_service_pick'] ?? '', $data['service_slug']);
+            $data['extra_services'] = $extra['slugs'];
+            $data['extra_error'] = $extra['error'];
             $data['reference_1'] = $this->clean($_POST['reference_1'] ?? '', 300);
             $data['reference_2'] = $this->clean($_POST['reference_2'] ?? '', 300);
         } else {
@@ -152,6 +155,8 @@ final class RegistrationController
         ];
         if ($isWorker) {
             $rows['পেশা'] = $service;
+            $extraNames = array_map(static fn (string $s): string => ServiceRepository::findBySlug($s)['name'] ?? $s, (array) $d['extra_services']);
+            $rows['আরও পেশা'] = implode(', ', $extraNames);
             $rows['কাজের অভিজ্ঞতা'] = $d['experience_years'] === null ? '' : bn((int) $d['experience_years']) . ' বছর';
             $rows['কাজ করতে আগ্রহী জেলা'] = GeoRepository::workDistrictsText((array) $d['work_district_ids'], (bool) $d['work_all_districts']);
             $rows['রেফারেন্স-১'] = (string) $d['reference_1'];
@@ -217,6 +222,9 @@ final class RegistrationController
             }
             if ($d['work_error'] !== null) {
                 $errors[] = $d['work_error'];
+            }
+            if ($d['extra_error'] !== null) {
+                $errors[] = $d['extra_error'];
             }
         }
         if (!$d['consent']) {

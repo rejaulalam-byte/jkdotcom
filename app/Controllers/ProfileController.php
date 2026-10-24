@@ -38,6 +38,7 @@ final class ProfileController
             'service_name' => $service['name'] ?? (string) ($user['service_custom'] ?? ''),
             'work_district_ids' => $work['ids'],
             'work_all_districts' => $work['all'] ? 1 : 0,
+            'extra_services' => UserRepository::extraServices($user),
         ];
 
         View::render('pages/profile', [
@@ -99,6 +100,9 @@ final class ProfileController
             $data['work_district_ids'] = $work['ids'];
             $data['work_all_districts'] = $work['all'] ? 1 : 0;
             $data['work_error'] = $work['error'];
+            $extra = ServiceRepository::parseExtra($_POST['extra_services'] ?? [], $_POST['extra_service_pick'] ?? '', $data['service_slug']);
+            $data['extra_services'] = $extra['slugs'];
+            $data['extra_error'] = $extra['error'];
         }
 
         $errors = $this->validate($user, $data, (string) ($_POST['current_password'] ?? ''), $isWorker);
@@ -114,7 +118,7 @@ final class ProfileController
         if ($photo !== null) {
             $data['photo'] = $photo;
         }
-        unset($data['work_error']);
+        unset($data['work_error'], $data['extra_error']);
         $result = UserRepository::updateProfile((int) $user['id'], $data);
         if ($result !== 'ok') {
             $this->discard($photo);
@@ -174,6 +178,9 @@ final class ProfileController
             }
             if ($d['work_error'] !== null) {
                 $errors[] = $d['work_error'];
+            }
+            if ($d['extra_error'] !== null) {
+                $errors[] = $d['extra_error'];
             }
         }
 

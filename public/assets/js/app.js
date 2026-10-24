@@ -1684,12 +1684,13 @@
     });
 })();
 
-/* ---- কাজ করতে আগ্রহী জেলা ([data-work-districts]): সর্বোচ্চ ৫টি জেলা অথবা "সব জেলা" ----------------
+/* ---- বাছাই-ট্যাগ ([data-work-districts] কাজের জেলা, [data-chip-select] আরও পেশা) ---------------------
    খোঁজা-যায় এমন তালিকা (select) থেকে বাছলেই জেলাটা ট্যাগ হয়ে নিচে বসে ও লুকানো ঘরে (work_districts[]) জমা হয়;
    তালিকা আবার ফাঁকা হয়ে যায়। "সব জেলা" বাছলে আলাদা ট্যাগগুলো সরে যায় (work_all)। ৫টি পূর্ণ হলে বার্তা দেয়।
-   ট্যাগের × বাদ দেয়। সার্ভার আবার যাচাই করে (GeoRepository::parseWorkDistricts)। */
+   ট্যাগের × বাদ দেয়। লুকানো ঘরের নাম data-name-এ (না থাকলে work_districts[]); "সব জেলা" শুধু জেলার তালিকায়।
+   সার্ভার আবার যাচাই করে (GeoRepository::parseWorkDistricts, ServiceRepository::parseExtra)। */
 (function () {
-    document.querySelectorAll("[data-work-districts]").forEach(function (box) {
+    document.querySelectorAll("[data-work-districts], [data-chip-select]").forEach(function (box) {
         var select = box.querySelector("select");
         var list = box.querySelector("[data-chips]");
         var hint = box.querySelector("[data-chips-hint]");
@@ -1744,7 +1745,7 @@
                 say(box.getAttribute("data-msg-max"));
                 return;
             }
-            list.appendChild(makeChip(label, "work_districts[]", value, "data-id"));
+            list.appendChild(makeChip(label, box.getAttribute("data-name") || "work_districts[]", value, "data-id"));
         });
 
         list.addEventListener("click", function (e) {

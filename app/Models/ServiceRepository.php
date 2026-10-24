@@ -54,6 +54,37 @@ final class ServiceRepository
         return null;
     }
 
+    /** একজন কর্মী প্রধান পেশার বাইরে আরও কতটি পেশা বাছতে পারেন। */
+    public const MAX_EXTRA = 4;
+
+    /**
+     * ফর্মে আসা "আরও পেশা" (extra_services[] ট্যাগ; JavaScript ছাড়া extra_service_pick) যাচাই করে।
+     * প্রধান পেশা ও পুনরাবৃত্তি বাদ যায়; তালিকায় নেই এমন slug বা সীমার বেশি হলে error থাকে।
+     *
+     * @return array{slugs:list<string>,error:?string}
+     */
+    public static function parseExtra(mixed $slugs, mixed $pick, ?string $mainSlug): array
+    {
+        $list = [];
+        foreach (is_array($slugs) ? $slugs : [] as $slug) {
+            $list[(string) $slug] = (string) $slug;
+        }
+        if ($list === [] && is_string($pick) && $pick !== '') {
+            $list[$pick] = $pick;
+        }
+        unset($list[(string) $mainSlug]);
+        foreach ($list as $slug) {
+            if (self::findBySlug($slug) === null) {
+                return ['slugs' => [], 'error' => 'আরও পেশার একটি নাম সঠিক নয়। আবার নির্বাচন করুন।'];
+            }
+        }
+        if (count($list) > self::MAX_EXTRA) {
+            return ['slugs' => [], 'error' => 'প্রধান পেশার বাইরে আরও সর্বোচ্চ ' . bn(self::MAX_EXTRA) . 'টি পেশা বাছাই করা যাবে।'];
+        }
+
+        return ['slugs' => array_values($list), 'error' => null];
+    }
+
     /** @return array{name:string,slug:string,icon:?string}|null */
     public static function findBySlug(string $slug): ?array
     {

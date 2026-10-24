@@ -40,6 +40,9 @@ final class WorkerController
 
         $service = ServiceRepository::findBySlug((string) ($user['service_slug'] ?? ''));
         $profession = (string) ($user['service_custom'] ?? '') !== '' ? (string) $user['service_custom'] : ($service['name'] ?? '');
+        // প্রধান পেশার পরে আরও পেশাগুলো একই লাইনে
+        $extraNames = array_filter(array_map(static fn (string $s): string => ServiceRepository::findBySlug($s)['name'] ?? '', UserRepository::extraServices($user)));
+        $professions = implode(', ', array_filter([$profession, ...$extraNames]));
         $geo = GeoRepository::names((int) $user['upazila_id'], (int) $user['district_id'], (int) $user['division_id']);
         $address = implode(', ', array_filter(
             [(string) $user['address'], $geo['upazila'], $geo['district'], $geo['division'], 'বাংলাদেশ'],
@@ -57,6 +60,7 @@ final class WorkerController
             'name' => (string) $user['name'],
             'photo' => PhotoUpload::url($user['photo'] !== null ? (string) $user['photo'] : null),
             'profession' => $profession,
+            'professions' => $professions,
             'listUrl' => $listUrl,
             'experience' => $user['experience_years'] !== null ? (int) $user['experience_years'] : null,
             'bio' => (string) ($user['bio'] ?? ''),

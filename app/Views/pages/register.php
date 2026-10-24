@@ -71,6 +71,7 @@ $helpTel = content('today.post.helpline_tel');
                                 <?php endforeach; ?>
                             </datalist>
                         </div>
+                        <?php $esSlugs = array_map('strval', (array) ($old['extra_services'] ?? [])); require BASE_PATH . '/app/Views/partials/extra-services.php'; ?>
                         <div class="pf">
                             <label class="sr-only" for="rf-exp"><?= e(content('regform.f.experience')) ?></label>
                             <input id="rf-exp" type="number" name="experience" min="0" max="70" inputmode="numeric"

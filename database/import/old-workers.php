@@ -14,7 +14,9 @@ declare(strict_types=1);
  * - পুরনো পাসওয়ার্ড (সাদা লেখা) আনা হয় না। সবার পাসওয়ার্ড অব্যবহারযোগ্য (কেউ জানে না); অ্যাডমিন ফোন করে
  *   সক্রিয় করার সময় কমন পাসওয়ার্ড বসাবেন। must_change_password = 1: প্রথম লগইনে নতুন পাসওয়ার্ড দিতে হবে।
  * - ছবি, পুরনো HTML ও কোড আনা হয় না; লেখা প্লেইন টেক্সট করে পরিষ্কার করা হয়।
- * - মোবাইল ১১ সংখ্যা ০১[৩-৯]xxxxxxxx না হলে, বা এক মোবাইলে আগে একজন এসে গেলে বাদ।
+ * - মোবাইল ১১ সংখ্যা ০১[৩-৯]xxxxxxxx না হলে বাদ।
+ * - একই মোবাইলে একাধিক সারি = একজন মানুষ একাধিক পেশায়: প্রথম সারি (পুরনো sl-এর ক্রমে) প্রধান পেশা ও ঠিকানা,
+ *   বাকিদের পেশা worker_services-এ "আরও পেশা" (সর্বোচ্চ ৪টি; বাড়তি পেশা ও একই পেশার পুনরাবৃত্তি বাদ)।
  */
 
 if ($argc < 3) {
@@ -179,10 +181,13 @@ $workers = dump_rows($dump, 'worker_info');
 usort($workers, static fn (array $a, array $b): int => (int) $a['sl'] <=> (int) $b['sl']);
 $unusable = password_hash(bin2hex(random_bytes(32)), PASSWORD_DEFAULT);
 
+$legacyOfPhone = []; // মোবাইল => প্রথম সারির পুরনো id
+$mainSlug = [];     // মোবাইল => প্রধান পেশার slug
+$extraOf = [];      // মোবাইল => আরও পেশার slug-তালিকা
 $seenPhone = [];
 $seenEmail = [];
 $values = [];
-$skip = ['status' => [], 'phone' => [], 'duplicate' => [], 'area' => [], 'service' => [], 'name' => []];
+$skip = ['status' => [], 'phone' => [], 'same_service' => [], 'too_many' => [], 'area' => [], 'service' => [], 'name' => []];
 foreach ($workers as $w) {
     $label = $w['id'] . ' ' . $w['name'] . ' ' . $w['mobile'];
     if ($w['approval'] !== 'Approved' || $w['reg_as'] !== 'w') {
@@ -200,7 +205,14 @@ foreach ($workers as $w) {
         continue;
     }
     if (isset($seenPhone[$phone])) {
-        $skip['duplicate'][] = $label . ' (আগে: ' . $seenPhone[$phone] . ')';
+        $other = $slugByOldId[$w['service_id']] ?? null;
+        if ($other === null || $other === $mainSlug[$phone] || in_array($other, $extraOf[$phone], true)) {
+            $skip['same_service'][] = $label . ' (আগে: ' . $seenPhone[$phone] . ')';
+        } elseif (count($extraOf[$phone]) >= 4) {
+            $skip['too_many'][] = $label . ' (আগে: ' . $seenPhone[$phone] . ')';
+        } else {
+            $extraOf[$phone][] = $other;
+        }
         continue;
     }
     $area = $areaOf[$w['preadd_area']] ?? null;
@@ -214,6 +226,9 @@ foreach ($workers as $w) {
         continue;
     }
     $seenPhone[$phone] = $label;
+    $legacyOfPhone[$phone] = $w['id'];
+    $mainSlug[$phone] = $slug;
+    $extraOf[$phone] = [];
 
     $email = mb_strtolower(trim($w['email']));
     if ($email === '' || filter_var($email, FILTER_VALIDATE_EMAIL) === false || mb_strlen($email) > 150 || isset($seenEmail[$email])) {
@@ -238,6 +253,17 @@ $head = 'INSERT INTO users (legacy_id, role, status, name, phone, email, passwor
 $statements = [];
 foreach (array_chunk($values, 200) as $chunk) {
     $statements[] = $head . implode(",\n", $chunk) . "\n ON DUPLICATE KEY UPDATE legacy_id = legacy_id";
+}
+// আরও পেশা: কর্মী আগের বিবৃতিতে ঢুকে যাওয়ার পর legacy_id ধরে তার users.id খুঁজে worker_services-এ বসে
+$pairs = [];
+foreach ($extraOf as $phone => $slugs) {
+    foreach ($slugs as $extraSlug) {
+        $pairs[] = 'SELECT ' . $quote($legacyOfPhone[$phone]) . ' AS l, ' . $quote($extraSlug) . ' AS s';
+    }
+}
+foreach (array_chunk($pairs, 200) as $chunk) {
+    $statements[] = 'INSERT IGNORE INTO worker_services (user_id, service_slug) SELECT users.id, t.s FROM ('
+        . implode(" UNION ALL ", $chunk) . ') t JOIN users ON users.legacy_id = t.l COLLATE utf8mb4_unicode_ci';
 }
 file_put_contents($outDir . '/workers-import.json', json_encode($statements, JSON_UNESCAPED_UNICODE));
 
