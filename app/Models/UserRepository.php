@@ -527,6 +527,34 @@ final class UserRepository
         }
     }
 
+    /**
+     * ভূমিকা ও অবস্থা অনুযায়ী সদস্যের সংখ্যা (অ্যাডমিন ড্যাশবোর্ডের জন্য)।
+     *
+     * @return array<string,array<string,int>>  ['worker' => ['pending' => 3, 'approved' => 900], 'agent' => [...]]
+     */
+    public static function countByRoleStatus(): array
+    {
+        $out = ['worker' => [], 'agent' => []];
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            foreach (self::demoRead() as $row) {
+                $out[$row['role']][$row['status']] = ($out[$row['role']][$row['status']] ?? 0) + 1;
+            }
+
+            return $out;
+        }
+
+        try {
+            foreach ($pdo->query('SELECT role, status, COUNT(*) AS n FROM users GROUP BY role, status')->fetchAll() as $r) {
+                $out[(string) $r['role']][(string) $r['status']] = (int) $r['n'];
+            }
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::countByRoleStatus failed: ' . $e->getMessage());
+        }
+
+        return $out;
+    }
+
     /** নতুন পাসওয়ার্ড-হ্যাশ বসায় এবং "পাসওয়ার্ড বদলাতে হবে" চিহ্ন মুছে দেয়। সফল হলে true। */
     public static function changePassword(int $id, string $hash): bool
     {

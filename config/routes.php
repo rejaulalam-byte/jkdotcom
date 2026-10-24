@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Controllers\Admin\AccessController as AdminAccess;
+use App\Controllers\Admin\PanelController as AdminPanel;
 use App\Controllers\AccountSetupController;
 use App\Controllers\AuthController;
 use App\Controllers\FeedbackController;
@@ -63,6 +65,32 @@ return [
     ['GET',  '/dashboard',                 [ProfileController::class, 'dashboardRedirect']],
     ['GET',  '/contact',         [PageController::class, 'contact']],
     ['GET',  '/faq',             [PageController::class, 'faq']],
+
+    // ---- অ্যাডমিন প্যানেল (লগইন ও ইমেইল-কোড: AdminAccess; ভেতরের পেইজ: AdminPanel) ----
+    ['GET',  '/admin/setup',               [AdminAccess::class, 'setupForm']],
+    ['POST', '/admin/setup',               [AdminAccess::class, 'setupStore']],
+    ['GET',  '/admin/login',               [AdminAccess::class, 'loginForm']],
+    ['POST', '/admin/login',               [AdminAccess::class, 'loginStore']],
+    ['GET',  '/admin/verify',              [AdminAccess::class, 'verifyForm']],
+    ['POST', '/admin/verify',              [AdminAccess::class, 'verifyStore']],
+    ['POST', '/admin/verify/resend',       [AdminAccess::class, 'verifyResend']],
+    ['POST', '/admin/logout',              [AdminAccess::class, 'logout']],
+    ['GET',  '/admin/forgot',              [AdminAccess::class, 'forgotForm']],
+    ['POST', '/admin/forgot',              [AdminAccess::class, 'forgotStore']],
+    ['GET',  '/admin/set-password/{slug}', [AdminAccess::class, 'setPasswordForm']],
+    ['POST', '/admin/set-password/{slug}', [AdminAccess::class, 'setPasswordStore']],
+    ['GET',  '/admin',                     [AdminPanel::class, 'dashboard']],
+    ['GET',  '/admin/account',             [AdminPanel::class, 'account']],
+    ['POST', '/admin/account/name',        [AdminPanel::class, 'accountName']],
+    ['POST', '/admin/account/password',    [AdminPanel::class, 'accountPassword']],
+    ['POST', '/admin/account/email',       [AdminPanel::class, 'accountEmail']],
+    ['POST', '/admin/account/email-confirm', [AdminPanel::class, 'accountEmailConfirm']],
+    ['GET',  '/admin/admins',              [AdminPanel::class, 'admins']],
+    ['POST', '/admin/admins/create',       [AdminPanel::class, 'adminsCreate']],
+    ['POST', '/admin/admins/invite',       [AdminPanel::class, 'adminsInvite']],
+    ['POST', '/admin/admins/status',       [AdminPanel::class, 'adminsStatus']],
+    ['POST', '/admin/admins/permissions',  [AdminPanel::class, 'adminsPermissions']],
+    ['GET',  '/admin/log',                 [AdminPanel::class, 'log']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],

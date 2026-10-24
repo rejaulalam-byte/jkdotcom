@@ -1,0 +1,417 @@
+/* =====================================================================================================
+   অ্যাডমিন প্যানেলের স্টাইল (পাবলিক সাইটের app.css থেকে আলাদা)। সব মাপ px-এ: পাবলিক সাইটের ১৯২০px-ভিত্তিক rem এখানে নয়।
+   রং সাইটের মতোই: গাঢ় টিল + সোনালি; ফন্ট Poppins + Hind Siliguri (ফোনের নিজের বাংলা অঙ্কসহ)।
+   ===================================================================================================== */
+
+@font-face {
+    font-family: "Hind Siliguri";
+    src: url("../fonts/hind-siliguri-400.woff2") format("woff2");
+    font-weight: 400;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Hind Siliguri";
+    src: url("../fonts/hind-siliguri-600.woff2") format("woff2");
+    font-weight: 600;
+    font-display: swap;
+}
+
+:root {
+    --teal: #125a6c;
+    --teal-dark: #0d4452;
+    --teal-10: rgba(18, 90, 108, 0.1);
+    --gold: #f0d772;
+    --ink: #222;
+    --muted: #5d6b70;
+    --line: #d5e0e3;
+    --bg: #f3f7f8;
+    --red: #870a0a;
+    --green: #1d6b3a;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+html {
+    font-size: 16px;
+}
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 17px/1.7 "Hind Siliguri", "Noto Sans Bengali", "Nirmala UI", system-ui, sans-serif;
+}
+h1,
+h2 {
+    margin: 0 0 14px;
+    line-height: 1.35;
+    color: var(--teal);
+}
+h1 {
+    font-size: 28px;
+}
+h2 {
+    font-size: 21px;
+}
+a {
+    color: var(--teal);
+}
+code {
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--teal-10);
+    font-size: 15px;
+    word-break: break-all;
+}
+.hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+/* ---- ফর্মের উপাদান ---- */
+label {
+    display: block;
+    margin: 14px 0 4px;
+    font-weight: 600;
+}
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+}
+input:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+}
+fieldset {
+    margin: 16px 0 0;
+    padding: 10px 14px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    max-width: 640px;
+}
+legend {
+    padding: 0 6px;
+    font-weight: 600;
+}
+.adm-check {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin: 6px 0;
+    font-weight: 400;
+}
+.adm-check input {
+    margin-top: 8px;
+}
+
+.adm-btn,
+.adm-small,
+.adm-user button {
+    display: inline-block;
+    min-height: 46px;
+    margin-top: 18px;
+    padding: 8px 22px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--teal);
+    color: #fff;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+}
+.adm-btn:hover,
+.adm-small:hover {
+    background: var(--teal-dark);
+}
+.adm-btn--wide {
+    width: 100%;
+    max-width: 520px;
+}
+.adm-small {
+    min-height: 34px;
+    margin-top: 4px;
+    padding: 2px 12px;
+    font-size: 15px;
+}
+summary.adm-small {
+    list-style: none;
+    background: var(--teal-10);
+    color: var(--teal);
+}
+.adm-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--teal);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.adm-inline {
+    margin: 14px 0 0;
+}
+.adm-links {
+    margin: 18px 0 0;
+}
+.adm-muted {
+    margin-top: 22px;
+    color: var(--muted);
+}
+
+/* পাসওয়ার্ডের ঘর + চোখ-বাটন (admin.js দেখায়) */
+.adm-pass {
+    position: relative;
+    max-width: 520px;
+}
+.adm-pass input {
+    max-width: none;
+    padding-right: 52px;
+}
+.adm-eye {
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 50%;
+    background: url("../img/icons/eye.svg") no-repeat center / 22px;
+    cursor: pointer;
+}
+.adm-eye[aria-pressed="true"] {
+    background-image: url("../img/icons/eye-off.svg");
+}
+
+/* বার্তা */
+.adm-notice {
+    max-width: 640px;
+    margin: 0 0 18px;
+    padding: 10px 16px;
+    border-radius: 8px;
+}
+ul.adm-notice {
+    padding-left: 34px;
+}
+.adm-notice--error {
+    background: #fbe6e6;
+    color: var(--red);
+}
+.adm-notice--ok {
+    background: #e3f3e9;
+    color: var(--green);
+}
+
+/* ---- লগইন-জাতীয় পেইজ: মাঝখানে কার্ড ---- */
+.adm-plain {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: 20px 16px;
+}
+.adm-card {
+    width: 100%;
+    max-width: 560px;
+    padding: 28px 28px 32px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 4px 22px rgba(18, 90, 108, 0.12);
+}
+.adm-card__title {
+    font-size: 24px;
+}
+.adm-brand {
+    margin: 0 0 18px;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--teal);
+}
+.adm-brand span {
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--muted);
+}
+.adm-brand--center {
+    text-align: center;
+}
+
+/* ---- প্যানেল: বাঁয়ে মেনু, ডানে কাজ ---- */
+.adm-shell {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    min-height: 100vh;
+}
+.adm-side {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 22px 16px;
+    background: var(--teal);
+    color: #fff;
+}
+.adm-side .adm-brand {
+    color: #fff;
+}
+.adm-side .adm-brand span {
+    color: var(--gold);
+}
+.adm-side nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.adm-side nav a {
+    padding: 8px 14px;
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+}
+.adm-side nav a:hover,
+.adm-side nav a[aria-current="page"] {
+    background: rgba(255, 255, 255, 0.16);
+}
+.adm-user {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+.adm-user p {
+    margin: 0 0 6px;
+}
+.adm-user small {
+    color: var(--gold);
+}
+.adm-user button {
+    min-height: 38px;
+    margin-top: 6px;
+    background: rgba(255, 255, 255, 0.16);
+    font-size: 15px;
+}
+.adm-main {
+    padding: 28px 32px 48px;
+    min-width: 0;
+}
+
+/* ড্যাশবোর্ডের সংখ্যা-কার্ড */
+.adm-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 14px;
+    max-width: 900px;
+}
+.adm-stat {
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+}
+.adm-stat.is-new {
+    border-color: var(--gold);
+    background: #fffbea;
+}
+.adm-stat__n {
+    display: block;
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--teal);
+}
+.adm-stat__l {
+    color: var(--muted);
+}
+
+/* সাজানো বাক্স ও টেবিল */
+.adm-box {
+    max-width: 960px;
+    margin: 0 0 22px;
+    padding: 20px 22px 24px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+}
+.adm-tablewrap {
+    overflow-x: auto;
+}
+.adm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+.adm-table th,
+.adm-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+}
+.adm-table th {
+    background: var(--teal-10);
+    color: var(--teal);
+    white-space: nowrap;
+}
+.adm-actions form,
+.adm-actions details {
+    display: inline-block;
+    margin: 0 6px 6px 0;
+    vertical-align: top;
+}
+.adm-actions details form {
+    display: block;
+    margin-top: 8px;
+}
+
+/* ফোন ও ছোট পর্দা: মেনু ওপরে */
+@media (max-width: 800px) {
+    .adm-shell {
+        display: block;
+    }
+    .adm-side {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 14px;
+        padding: 12px 14px;
+    }
+    .adm-side .adm-brand {
+        margin: 0;
+    }
+    .adm-side nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .adm-user {
+        margin: 0 0 0 auto;
+        padding: 0;
+        border: 0;
+    }
+    .adm-main {
+        padding: 20px 14px 40px;
+    }
+    .adm-card {
+        padding: 22px 18px 26px;
+    }
+}
