@@ -14,7 +14,7 @@ declare(strict_types=1);
  * - পুরনো পাসওয়ার্ড (সাদা লেখা) আনা হয় না। সবার পাসওয়ার্ড অব্যবহারযোগ্য (কেউ জানে না); অ্যাডমিন ফোন করে
  *   সক্রিয় করার সময় কমন পাসওয়ার্ড বসাবেন। must_change_password = 1: প্রথম লগইনে নতুন পাসওয়ার্ড দিতে হবে।
  * - ছবি, পুরনো HTML ও কোড আনা হয় না; লেখা প্লেইন টেক্সট করে পরিষ্কার করা হয়।
- * - মোবাইল ১১ সংখ্যা ০১[৩-৯]xxxxxxxx না হলে বাদ।
+ * - মোবাইল ১১ সংখ্যা ০১[৩-৯]xxxxxxxx না হলে কর্মী মোবাইল-ছাড়া আসে (phone = NULL, লেখাটা phone_raw-এ)।
  * - একই মোবাইলে একাধিক সারি = একজন মানুষ একাধিক পেশায়: প্রথম সারি (পুরনো sl-এর ক্রমে) প্রধান পেশা ও ঠিকানা,
  *   বাকিদের পেশা worker_services-এ "আরও পেশা" (সর্বোচ্চ ৪টি; বাড়তি পেশা ও একই পেশার পুনরাবৃত্তি বাদ)।
  */
@@ -187,7 +187,8 @@ $extraOf = [];      // মোবাইল => আরও পেশার slug-ত�
 $seenPhone = [];
 $seenEmail = [];
 $values = [];
-$skip = ['status' => [], 'phone' => [], 'same_service' => [], 'too_many' => [], 'area' => [], 'service' => [], 'name' => []];
+$noPhone = [];
+$skip = ['status' => [], 'same_service' => [], 'too_many' => [], 'area' => [], 'service' => [], 'name' => []];
 foreach ($workers as $w) {
     $label = $w['id'] . ' ' . $w['name'] . ' ' . $w['mobile'];
     if ($w['approval'] !== 'Approved' || $w['reg_as'] !== 'w') {
@@ -199,10 +200,12 @@ foreach ($workers as $w) {
         $skip['name'][] = $label;
         continue;
     }
-    $phone = clean_phone($w['mobile']);
-    if ($phone === null) {
-        $skip['phone'][] = $label;
-        continue;
+    // মোবাইল ঠিক না হলে (অঙ্ক কম/বেশি) কর্মী মোবাইল ছাড়াই আসে; লেখাটা phone_raw-এ থাকে, অ্যাডমিন ঠিক করবেন।
+    // $phone তখন শুধু একই মানুষের পুনরাবৃত্তি চেনার চাবি (নাম + লেখা অঙ্ক)।
+    $validPhone = clean_phone($w['mobile']);
+    $phone = $validPhone ?? 'x:' . $name . '|' . preg_replace('/[^0-9]/', '', en_digits($w['mobile']));
+    if ($validPhone === null) {
+        $noPhone[] = $label;
     }
     if (isset($seenPhone[$phone])) {
         $other = $slugByOldId[$w['service_id']] ?? null;
@@ -242,14 +245,14 @@ foreach ($workers as $w) {
     $created = preg_match('/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/', $w['entry_date']) === 1 ? $w['entry_date'] : date('Y-m-d H:i:s');
 
     $values[] = '(' . implode(', ', [
-        $quote($w['id']), "'worker'", "'approved'", $quote($name), $quote($phone), $quote($email), $quote($unusable), '1',
+        $quote($w['id']), "'worker'", "'approved'", $quote($name), $validPhone === null ? 'NULL' : $quote($phone), $validPhone === null ? $quote(clean_text($w['mobile'], 40)) : 'NULL', $quote($email), $quote($unusable), '1',
         $quote($slug), $experience, $bio === '' ? 'NULL' : $quote($bio),
         $quote(clean_text($w['preadd_house'], 250)), (string) $area[0], (string) $area[1], (string) $area[2],
         $quote($created), $quote($created),
     ]) . ')';
 }
 
-$head = 'INSERT INTO users (legacy_id, role, status, name, phone, email, password_hash, must_change_password, service_slug, experience_years, bio, address, upazila_id, district_id, division_id, created_at, approved_at) VALUES ';
+$head = 'INSERT INTO users (legacy_id, role, status, name, phone, phone_raw, email, password_hash, must_change_password, service_slug, experience_years, bio, address, upazila_id, district_id, division_id, created_at, approved_at) VALUES ';
 $statements = [];
 foreach (array_chunk($values, 200) as $chunk) {
     $statements[] = $head . implode(",\n", $chunk) . "\n ON DUPLICATE KEY UPDATE legacy_id = legacy_id";

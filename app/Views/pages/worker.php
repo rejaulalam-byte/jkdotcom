@@ -43,7 +43,7 @@ $fmt = static fn (float $n): string => bn(rtrim(rtrim(number_format($n, 1, '.', 
                     <div class="wk-info__row wk-info__row--short"><dt><?= e(content('worker.l.experience')) ?></dt><dd><?= $experience !== null ? e(bn(str_pad((string) $experience, 2, '0', STR_PAD_LEFT))) . ' ' . e(content('worker.experience_unit')) . '।' : '—' ?></dd></div>
                     <div class="wk-info__row"><dt><?= e(content('worker.l.bio')) ?></dt><dd><?= $bio !== '' ? nl2br(e($bio)) : '—' ?></dd></div>
                     <div class="wk-info__row"><dt><?= e(content('worker.l.address')) ?></dt><dd><?= e($address) ?></dd></div>
-                    <div class="wk-info__row wk-info__row--contact"><dt><?= e(content('worker.l.phone')) ?></dt><dd><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="phone"><?= e($phoneMasked) ?></button></dd></div>
+                    <div class="wk-info__row wk-info__row--contact"><dt><?= e(content('worker.l.phone')) ?></dt><dd><?php if ($phoneMasked !== ''): ?><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="phone"><?= e($phoneMasked) ?></button><?php else: ?>—<?php endif; ?></dd></div>
                     <div class="wk-info__row wk-info__row--contact"><dt><?= e(content('worker.l.email')) ?></dt><dd><?php if ($emailMasked !== ''): ?><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="email"><?= e($emailMasked) ?></button><?php else: ?>—<?php endif; ?></dd></div>
                 </dl>
 

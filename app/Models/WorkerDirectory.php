@@ -46,7 +46,7 @@ final class WorkerDirectory
 
         return array_values(array_filter($workers, static function (array $w) use ($needle, $digits, $byPhone, $isDistrict): bool {
             if ($byPhone) {
-                return str_contains($w['phone'], $digits);
+                return (string) $w['phone'] !== '' && str_contains((string) $w['phone'], $digits);
             }
             if ($isDistrict && !empty($w['work_all'])) {
                 return true;
