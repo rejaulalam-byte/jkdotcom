@@ -184,7 +184,7 @@ final class MembersController
         $isWorker = $member['role'] === 'worker';
         $base = AdminAuth::baseUrl();
         $loginId = (string) ($member['phone'] ?? '') !== '' ? format_phone((string) $member['phone']) . ' অথবা ' . $email : $email;
-        $body = $member['name'] . ", অভিনন্দন!\n\nআপনার আবেদনটি অনুমোদিত হয়েছে"
+        $body = 'প্রিয় ' . honorific_name($member['gender'] ?? null, (string) $member['name']) . ", অভিনন্দন!\n\nআপনার আবেদনটি অনুমোদিত হয়েছে"
             . ($isWorker ? ' এবং আপনার নাম jorurikaj.com ওয়েবসাইটে প্রকাশিত হয়েছে।' : '।') . "\n\n"
             . 'লগইন আইডি: ' . $loginId . "\n"
             . 'লগইন করুন: ' . $base . ($isWorker ? '/login' : '/login/agent') . "\n"
@@ -210,7 +210,7 @@ final class MembersController
             return false;
         }
         $helpline = content('today.post.helpline');
-        $body = 'প্রিয় ' . $member['name'] . ",\n\njorurikaj.com-এ আবেদন করার জন্য আপনাকে ধন্যবাদ।\nদুঃখের সাথে জানাচ্ছি, আপাতত আপনার আবেদনটি গ্রহণ করা সম্ভব হয়নি।\n\n"
+        $body = 'প্রিয় ' . honorific_name($member['gender'] ?? null, (string) $member['name']) . ",\n\njorurikaj.com-এ আবেদন করার জন্য আপনাকে ধন্যবাদ।\nদুঃখের সাথে জানাচ্ছি, আপাতত আপনার আবেদনটি গ্রহণ করা সম্ভব হয়নি।\n\n"
             . ($reason !== '' ? 'কারণ: ' . $reason . "\n\nতথ্য ঠিক করে আবার আবেদন করতে পারেন, অথবা হেল্পলাইনে কল করুন: " : "এ বিষয়ে আরও জানতে বা তথ্য ঠিক করে নিতে চাইলে আমাদের হেল্পলাইনে কল করুন: ")
             . $helpline . "।\n\nধন্যবাদান্তে,\njorurikaj.com";
 
