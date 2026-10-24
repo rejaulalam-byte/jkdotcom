@@ -18,9 +18,9 @@ public/uploads/*
 !public/uploads/.htaccess
 
 # Tools / OS / editor
-vendor/
+/vendor/
 node_modules/
-tools/
+/tools/
 .DS_Store
 Thumbs.db
 .claude/
