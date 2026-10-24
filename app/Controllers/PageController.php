@@ -15,7 +15,7 @@ final class PageController
     public function soon(array $meta = []): void
     {
         $title = (string) ($meta['title'] ?? 'শীঘ্রই আসছে');
-        View::render('pages/coming-soon', ['title' => $title, 'heading' => $title]);
+        View::render('pages/coming-soon', ['title' => $title, 'heading' => $title, 'notice' => (string) ($meta['notice'] ?? 'পেজটি তৈরির কাজ চলছে'), 'text' => (string) ($meta['text'] ?? 'এই পেজটি খুব শীঘ্রই চালু হবে। ততক্ষণ হোম পেজ ঘুরে দেখুন।')]);
     }
 
     /** রেজিস্ট্রেশন নিয়মাবলীর ওভারভিউ (/registration): কারা রেজিস্ট্রেশন করতে পারবেন। */

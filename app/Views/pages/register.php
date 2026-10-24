@@ -152,16 +152,24 @@ $helpTel = content('today.post.helpline_tel');
                         </fieldset>
                     <?php endif; ?>
 
-                    <div class="pf">
+                    <div class="pf pf--eye">
                         <label class="sr-only" for="rf-pass"><?= e(content('regform.f.password')) ?></label>
                         <input id="rf-pass" type="password" name="password" minlength="8" maxlength="72" required autocomplete="new-password"
                                placeholder="<?= $ph('password') ?>">
+                        <?php // চোখ-বাটন লুকানো থাকে; app.js দেখায় (JavaScript ছাড়া পাসওয়ার্ড ঢাকাই থাকে) ?>
+                        <button class="lg-eye" type="button" hidden aria-pressed="false" aria-controls="rf-pass"
+                                data-show="<?= e(content('login.f.show')) ?>" data-hide="<?= e(content('login.f.hide')) ?>"
+                                aria-label="<?= e(content('login.f.show')) ?>"></button>
                     </div>
                     <p class="reg-form__note"><?= e(content('regform.password_note')) ?></p>
-                    <div class="pf">
+                    <div class="pf pf--eye">
                         <label class="sr-only" for="rf-pass2"><?= e(content('regform.f.password2')) ?></label>
                         <input id="rf-pass2" type="password" name="password_confirm" minlength="8" maxlength="72" required autocomplete="new-password"
                                placeholder="<?= $ph('password2') ?>">
+                        <?php // চোখ-বাটন লুকানো থাকে; app.js দেখায় (JavaScript ছাড়া পাসওয়ার্ড ঢাকাই থাকে) ?>
+                        <button class="lg-eye" type="button" hidden aria-pressed="false" aria-controls="rf-pass2"
+                                data-show="<?= e(content('login.f.show')) ?>" data-hide="<?= e(content('login.f.hide')) ?>"
+                                aria-label="<?= e(content('login.f.show')) ?>"></button>
                     </div>
                 </div>
 

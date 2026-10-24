@@ -104,8 +104,12 @@ $label = static fn (string $for, string $key, bool $required = false): string =>
                                placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                     </div>
                     <?= $label('pf-current', 'current') ?>
-                    <div class="pf">
+                    <div class="pf pf--eye">
                         <input id="pf-current" type="password" name="current_password" maxlength="72" autocomplete="new-password" data-no-autofill>
+                        <?php // চোখ-বাটন লুকানো থাকে; app.js দেখায় (JavaScript ছাড়া পাসওয়ার্ড ঢাকাই থাকে) ?>
+                        <button class="lg-eye" type="button" hidden aria-pressed="false" aria-controls="pf-current"
+                                data-show="<?= e(content('login.f.show')) ?>" data-hide="<?= e(content('login.f.hide')) ?>"
+                                aria-label="<?= e(content('login.f.show')) ?>"></button>
                     </div>
                     <?= $label('rf-address', 'address', true) ?>
                     <div class="pf">

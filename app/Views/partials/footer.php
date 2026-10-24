@@ -61,6 +61,7 @@ $feedbackToken = Security::csrfToken();
                 <li><a class="footer__links-head" href="/about">আমাদের সম্পর্কে</a></li>
                 <li><a href="/today">আজকের প্রকাশিত কাজ</a></li>
                 <li><a href="/contact">যোগাযোগ</a></li>
+                <li><a href="/stats">এক নজরে আমাদের পরিসংখ্যান</a></li>
             </ul>
         </nav>
 

@@ -3812,7 +3812,7 @@ textarea {
     color: var(--teal);
 }
 /* পাসওয়ার্ড দেখার চোখ-বাটনের জায়গা ডানে */
-.forgot .pf--eye input {
+.pf--eye input {
     padding-right: 3.75rem;
 }
 .forgot .reg-form__note {
@@ -4039,9 +4039,11 @@ a.wk-pages__item:focus-visible {
         font-size: 3.25rem;
     }
     .page-workers .wk-bar__division,
-    .page-workers .wk-bar__division span,
-    .page-workers .wk-bar__per select {
+    .page-workers .wk-bar__division span {
         font-size: 1.75rem;
+    }
+    .page-workers .wk-bar__per select {
+        font-size: 1.625rem; /* প্রতি-পৃষ্ঠার সংখ্যা ২px ছোট */
     }
     .page-workers .svc-search__btn {
         font-size: 2.125rem;
@@ -4235,7 +4237,7 @@ a.wk-pages__item:focus-visible {
 .wk-rate__label {
     min-width: 11.5rem;
     padding-left: 0.4rem;
-    font-size: 1.75rem;
+    font-size: 1.625rem;
     font-weight: 500;
 }
 .wk-rate select {
@@ -4247,7 +4249,7 @@ a.wk-pages__item:focus-visible {
     background: #fbff00;
     color: var(--teal);
     font: inherit;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 500;
     text-align: center;
     cursor: pointer;
@@ -4278,7 +4280,7 @@ a.wk-pages__item:focus-visible {
     align-items: center;
     gap: 0.8rem;
     margin: 0 0 0 auto;
-    font-size: 1.5rem;
+    font-size: 1.375rem;
     font-weight: 600;
 }
 .wk-rate__badge {
