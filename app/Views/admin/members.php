@@ -84,7 +84,7 @@ foreach (MemberStatus::LABELS as $key => $label) {
                 <td class="adm-actions">
                     <a class="adm-small" href="/admin/members/<?= (int) $r['id'] ?>">দেখুন</a>
                     <?php if ($r['status'] === 'pending'): ?>
-                        <form action="/admin/members/action" method="post" data-confirm="অনুমোদন দিলে সদস্যকে এখনই ইমেইল চলে যাবে (ইমেইল থাকলে)<?= $role === 'worker' ? ' এবং নাম সাইটে প্রকাশ হবে' : '' ?>। অনুমোদন দেবেন?">
+                        <form action="/admin/members/action" method="post" data-confirm="<?= $role === 'worker' ? 'অনুমোদন দিলে সদস্যকে এখনই ইমেইল চলে যাবে (ইমেইল থাকলে) এবং নাম সাইটে প্রকাশ হবে। অনুমোদন দেবেন?' : 'তাকে অনুমোদন দেবার আগে দেখে নিন তার অনুমোদন দেবার সকল কাজ সম্পন্ন হয়েছে কিনা। যদি হয়ে থাকে তাহলে হ্যাঁ চাপুন।' ?>">
                             <?= csrf_field() ?>
                             <input type="hidden" name="id" value="<?= (int) $r['id'] ?>">
                             <input type="hidden" name="action" value="approve">

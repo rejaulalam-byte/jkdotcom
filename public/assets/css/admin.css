@@ -737,3 +737,27 @@ td.adm-actions form {
         flex-wrap: nowrap;
     }
 }
+
+/* ---- "হ্যাঁ / না" প্রশ্ন-বাক্স (admin.js) ---- */
+.adm-dialog {
+    width: min(560px, 92vw);
+    padding: 26px 26px 22px;
+    border: 0;
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    font: inherit;
+}
+.adm-dialog::backdrop {
+    background: rgba(13, 68, 82, 0.55);
+}
+.adm-dialog p {
+    margin: 0 0 18px;
+}
+.adm-dialog__row {
+    display: flex;
+    gap: 12px;
+}
+.adm-dialog__row .adm-small {
+    min-width: 96px;
+    margin: 0;
+}
