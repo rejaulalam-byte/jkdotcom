@@ -16,12 +16,14 @@ $admin = $admin ?? null;
 $errors = $errors ?? [];
 $ok = $ok ?? null;
 $pageTitle = ($title ?? 'অ্যাডমিন') . ' — অ্যাডমিন প্যানেল';
-// [লিংক, নাম, শুধু সুপার অ্যাডমিন]
+// [লিংক, নাম, শুধু সুপার অ্যাডমিন, (ঐচ্ছিক) দরকারি অনুমতি]
 $nav = [
-    ['/admin', 'ড্যাশবোর্ড', false],
-    ['/admin/account', 'আমার অ্যাকাউন্ট', false],
-    ['/admin/admins', 'অ্যাডমিন', true],
-    ['/admin/log', 'কার্যলগ', true],
+    ['/admin', 'ড্যাশবোর্ড', false, null],
+    ['/admin/workers', 'কর্মী', false, 'registrations'],
+    ['/admin/agents', 'প্রতিনিধি', false, 'registrations'],
+    ['/admin/account', 'আমার অ্যাকাউন্ট', false, null],
+    ['/admin/admins', 'অ্যাডমিন', true, null],
+    ['/admin/log', 'কার্যলগ', true, null],
 ];
 ?>
 <!doctype html>
@@ -40,8 +42,8 @@ $nav = [
     <aside class="adm-side">
         <p class="adm-brand">Jorurikaj.com<span>অ্যাডমিন প্যানেল</span></p>
         <nav aria-label="প্যানেলের মেনু">
-            <?php foreach ($nav as [$href, $label, $superOnly]): ?>
-                <?php if (!$superOnly || AdminAuth::isSuper($admin)): ?>
+            <?php foreach ($nav as [$href, $label, $superOnly, $need]): ?>
+                <?php if ((!$superOnly || AdminAuth::isSuper($admin)) && ($need === null || AdminAuth::can($admin, $need))): ?>
                     <a href="<?= e($href) ?>"<?= is_current($href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
                 <?php endif; ?>
             <?php endforeach; ?>

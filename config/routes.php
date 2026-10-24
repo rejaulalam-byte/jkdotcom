@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\Admin\AccessController as AdminAccess;
+use App\Controllers\Admin\MembersController as AdminMembers;
 use App\Controllers\Admin\PanelController as AdminPanel;
 use App\Controllers\AccountSetupController;
 use App\Controllers\AuthController;
@@ -91,6 +92,9 @@ return [
     ['POST', '/admin/admins/status',       [AdminPanel::class, 'adminsStatus']],
     ['POST', '/admin/admins/permissions',  [AdminPanel::class, 'adminsPermissions']],
     ['GET',  '/admin/log',                 [AdminPanel::class, 'log']],
+    ['GET',  '/admin/workers',             [AdminMembers::class, 'list', ['role' => 'worker']]],
+    ['GET',  '/admin/agents',              [AdminMembers::class, 'list', ['role' => 'agent']]],
+    ['GET',  '/admin/members/{slug}',      [AdminMembers::class, 'show']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],

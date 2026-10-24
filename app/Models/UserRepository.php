@@ -528,6 +528,77 @@ final class UserRepository
     }
 
     /**
+     * অ্যাডমিনের তালিকা-পেইজ: এক ভূমিকার (worker|agent) সদস্য, নতুন আগে। ফিল্টার:
+     * 'status' (খালি = সব), 'q' (নাম, মোবাইল, ইমেইল বা ঠিকানার অংশ), 'source' ('legacy' = পুরনো সাইট থেকে আনা, 'new' = নতুন),
+     * 'nophone' (true হলে শুধু মোবাইল-ছাড়া)।
+     *
+     * @param array{status?:string,q?:string,source?:string,nophone?:bool} $filter
+     * @return array{rows:list<array<string,mixed>>,total:int}
+     */
+    public static function adminSearch(string $role, array $filter, int $limit, int $offset): array
+    {
+        $status = (string) ($filter['status'] ?? '');
+        $q = trim((string) ($filter['q'] ?? ''));
+        $source = (string) ($filter['source'] ?? '');
+        $noPhone = !empty($filter['nophone']);
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = array_values(array_filter(self::demoRead(), static function (array $r) use ($role, $status, $q, $source, $noPhone): bool {
+                $hay = mb_strtolower(implode(' ', [(string) $r['name'], (string) ($r['phone'] ?? ''), (string) ($r['email'] ?? ''), (string) ($r['address'] ?? '')]));
+
+                return $r['role'] === $role
+                    && ($status === '' || $r['status'] === $status)
+                    && ($q === '' || str_contains($hay, mb_strtolower($q)))
+                    && ($source !== 'legacy' || (string) ($r['legacy_id'] ?? '') !== '')
+                    && ($source !== 'new' || (string) ($r['legacy_id'] ?? '') === '')
+                    && (!$noPhone || (string) ($r['phone'] ?? '') === '');
+            }));
+            usort($rows, static fn (array $a, array $b): int => (int) $b['id'] <=> (int) $a['id']);
+
+            return ['rows' => array_slice($rows, $offset, $limit), 'total' => count($rows)];
+        }
+
+        $where = ['role = :role'];
+        $args = [':role' => $role];
+        if ($status !== '') {
+            $where[] = 'status = :status';
+            $args[':status'] = $status;
+        }
+        if ($q !== '') {
+            // সাধারণ (non-emulated) প্রস্তুতিতে একই নামের প্লেসহোল্ডার বারবার চলে না, তাই চারটা আলাদা
+            $where[] = '(name LIKE :q1 OR phone LIKE :q2 OR email LIKE :q3 OR address LIKE :q4)';
+            $like = '%' . addcslashes($q, '%_\\') . '%';
+            $args += [':q1' => $like, ':q2' => $like, ':q3' => $like, ':q4' => $like];
+        }
+        if ($source === 'legacy') {
+            $where[] = 'legacy_id IS NOT NULL';
+        } elseif ($source === 'new') {
+            $where[] = 'legacy_id IS NULL';
+        }
+        if ($noPhone) {
+            $where[] = 'phone IS NULL';
+        }
+        $sqlWhere = implode(' AND ', $where);
+
+        try {
+            $count = $pdo->prepare("SELECT COUNT(*) FROM users WHERE $sqlWhere");
+            $count->execute($args);
+            $stmt = $pdo->prepare(
+                "SELECT id, role, status, name, phone, phone_raw, email, service_slug, service_custom, address, upazila_id, district_id, division_id,
+                        legacy_id, created_at FROM users WHERE $sqlWhere ORDER BY id DESC LIMIT " . (int) $limit . ' OFFSET ' . (int) $offset
+            );
+            $stmt->execute($args);
+
+            return ['rows' => $stmt->fetchAll(), 'total' => (int) $count->fetchColumn()];
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::adminSearch failed: ' . $e->getMessage());
+
+            return ['rows' => [], 'total' => 0];
+        }
+    }
+
+    /**
      * ভূমিকা ও অবস্থা অনুযায়ী সদস্যের সংখ্যা (অ্যাডমিন ড্যাশবোর্ডের জন্য)।
      *
      * @return array<string,array<string,int>>  ['worker' => ['pending' => 3, 'approved' => 900], 'agent' => [...]]
