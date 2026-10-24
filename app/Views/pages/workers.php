@@ -7,6 +7,7 @@
  * @var array{name:string,slug:string} $service
  * @var string $query     দর্শকের খোঁজা ('' = খোঁজেননি)
  * @var int $perPage      প্রতি পৃষ্ঠায় কয়টা (0 = সব)
+ * @var bool $byRating    true হলে রেটিং অনুযায়ী সাজানো (ডিফল্ট: ঘূর্ণি ক্রম)
  * @var int $total        এই সেবার মোট পেশাজীবী
  * @var int $found        খোঁজার সঙ্গে মেলা পেশাজীবী
  * @var list<string> $divisions  মেলা পেশাজীবীদের বিভাগের নাম
@@ -21,9 +22,10 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
 
 $base = '/services/' . rawurlencode($service['slug']);
 // খোঁজা, প্রতি-পৃষ্ঠার সংখ্যা ও পৃষ্ঠা-নাম্বার মিলিয়ে লিংক; ডিফল্ট মান লিংকে বসে না
-$link = static function (int $p) use ($base, $query, $perPage): string {
+$link = static function (int $p) use ($base, $query, $perPage, $byRating): string {
     $params = array_filter([
         'q' => $query,
+        'o' => $byRating ? 'rating' : '',
         'n' => $perPage === 15 ? '' : ($perPage === 0 ? 'all' : (string) $perPage),
         'p' => $p > 1 ? (string) $p : '',
     ], static fn (string $v): bool => $v !== '');
@@ -43,6 +45,9 @@ $divisionText = count($divisions) > 1
             <?php if ($perPage !== 15): ?>
                 <input type="hidden" name="n" value="<?= $perPage === 0 ? 'all' : e((string) $perPage) ?>">
             <?php endif; ?>
+            <?php if ($byRating): ?>
+                <input type="hidden" name="o" value="rating">
+            <?php endif; ?>
             <button class="svc-search__btn" type="submit">
                 <span><?= e(content('workers.search.button')) ?></span>
                 <img src="<?= e(asset('img/icons/search-white.svg')) ?>" alt="" width="32" height="32">
@@ -60,6 +65,7 @@ $divisionText = count($divisions) > 1
             </p>
             <form class="wk-bar__per" action="<?= e($base) ?>" method="get">
                 <?php if ($query !== ''): ?><input type="hidden" name="q" value="<?= e($query) ?>"><?php endif; ?>
+                <?php if ($byRating): ?><input type="hidden" name="o" value="rating"><?php endif; ?>
                 <label for="wk-per"><?= e(content('workers.per_page')) ?></label>
                 <select id="wk-per" name="n" data-autosubmit>
                     <?php foreach ([15, 25, 50, 0] as $n): ?>
@@ -70,6 +76,20 @@ $divisionText = count($divisions) > 1
                 <noscript><button type="submit">&#10003;</button></noscript>
             </form>
         </div>
+
+        <?php
+        // ক্রমের বদল: ডিফল্ট ঘূর্ণি ক্রম (সবাই সমান সুযোগ), ঐচ্ছিকভাবে রেটিং অনুযায়ী; খোঁজা ও প্রতি-পৃষ্ঠা অক্ষত থাকে
+        $sortParams = array_filter([
+            'q' => $query,
+            'n' => $perPage === 15 ? '' : ($perPage === 0 ? 'all' : (string) $perPage),
+            'o' => $byRating ? '' : 'rating',
+        ], static fn (string $v): bool => $v !== '');
+        $sortUrl = $base . ($sortParams === [] ? '' : '?' . http_build_query($sortParams));
+        ?>
+        <p class="wk-sort">
+            <span><?= e(content($byRating ? 'workers.sort.by_rating' : 'workers.sort.rotate')) ?></span>
+            <a class="wk-sort__btn" href="<?= e($sortUrl) ?>"><?= e(content($byRating ? 'workers.sort.rotate_btn' : 'workers.sort.rating_btn')) ?></a>
+        </p>
 
         <div class="wk-tablewrap">
             <table class="wk-table">
@@ -107,7 +127,7 @@ $divisionText = count($divisions) > 1
                             <td data-label="<?= e(content('workers.col.district')) ?>"><?= $w['district'] !== '' ? e($w['district']) : '—' ?></td>
                             <td class="wk-rating" data-label="<?= e(content('workers.col.rating')) ?>"><?= isset($ratings[$w['id']]) ? e(bn(rtrim(rtrim(number_format($ratings[$w['id']], 1, '.', ''), '0'), '.'))) : e(content('workers.rating_none')) ?></td>
                             <td class="wk-details">
-                                <a class="wk-open" href="/workers/<?= (int) $w['id'] ?>"><?= e(content('workers.details_btn')) ?></a>
+                                <a class="wk-open" href="/workers/<?= (int) $w['id'] ?>?s=<?= e(rawurlencode($service['slug'])) ?>"><?= e(content('workers.details_btn')) ?></a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

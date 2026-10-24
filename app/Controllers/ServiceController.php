@@ -10,6 +10,7 @@ use App\Models\ServiceDirectory;
 use App\Models\ServiceRepository;
 use App\Models\UserRepository;
 use App\Models\WorkerDirectory;
+use App\Models\WorkerRotation;
 
 /** সেবার পেইজ: সব সেবার তালিকা (/services) ও একটা সেবার কর্মী-তালিকা (/services/<slug>)। */
 final class ServiceController
@@ -46,6 +47,14 @@ final class ServiceController
         $perPage = WorkerDirectory::perPage($_GET['n'] ?? null);
 
         $all = UserRepository::listWorkersByService($service['slug']);
+        // ডিফল্ট: ঘূর্ণি ক্রম (কল-পাওয়ারা নিচে); দর্শক চাইলে রেটিং অনুযায়ী (সমান রেটিংয়ে ঘূর্ণি ক্রমই)
+        $all = WorkerRotation::ordered($all, $service['slug']);
+        $byRating = ($_GET['o'] ?? '') === 'rating';
+        if ($byRating) {
+            $avg = RatingRepository::averages(array_column($all, 'id'));
+            $pos = array_flip(array_column($all, 'id'));
+            usort($all, static fn (array $a, array $b): int => [-($avg[$a['id']] ?? 0.0), $pos[$a['id']]] <=> [-($avg[$b['id']] ?? 0.0), $pos[$b['id']]]);
+        }
         $found = WorkerDirectory::filter($all, $query);
         $paged = WorkerDirectory::paginate($found, $perPage, (int) ($_GET['p'] ?? 1));
 
@@ -57,6 +66,7 @@ final class ServiceController
             'service' => $service,
             'query' => $query,
             'perPage' => $perPage,
+            'byRating' => $byRating,
             'total' => count($all),
             'found' => count($found),
             'divisions' => WorkerDirectory::divisions($found),

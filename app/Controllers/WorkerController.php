@@ -17,6 +17,7 @@ use App\Models\GeoRepository;
 use App\Models\RatingRepository;
 use App\Models\ServiceRepository;
 use App\Models\UserRepository;
+use App\Models\WorkerRotation;
 
 /**
  * কর্মীর ব্যক্তিগত পেইজ ও তার পেছনের অনুরোধ:
@@ -38,10 +39,17 @@ final class WorkerController
             return;
         }
 
+        // তালিকা থেকে এলে ?s=<পেশা>: কোন পেশার তালিকা থেকে এসেছেন তা মনে রাখা হয়, যাতে "কল" ওই তালিকার ক্রমে গোনা হয়
+        $extraSlugs = UserRepository::extraServices($user);
+        $mySlugs = array_merge([(string) ($user['service_slug'] ?? '')], $extraSlugs);
+        $from = (string) ($_GET['s'] ?? '');
+        $_SESSION['wk_service'][$id] = in_array($from, $mySlugs, true) ? $from : $mySlugs[0];
+        WorkerRotation::recordVisit($id);
+
         $service = ServiceRepository::findBySlug((string) ($user['service_slug'] ?? ''));
         $profession = (string) ($user['service_custom'] ?? '') !== '' ? (string) $user['service_custom'] : ($service['name'] ?? '');
         // প্রধান পেশার পরে আরও পেশাগুলো একই লাইনে
-        $extraNames = array_filter(array_map(static fn (string $s): string => ServiceRepository::findBySlug($s)['name'] ?? '', UserRepository::extraServices($user)));
+        $extraNames = array_filter(array_map(static fn (string $s): string => ServiceRepository::findBySlug($s)['name'] ?? '', $extraSlugs));
         $professions = implode(', ', array_filter([$profession, ...$extraNames]));
         $geo = GeoRepository::names((int) $user['upazila_id'], (int) $user['district_id'], (int) $user['division_id']);
         $address = implode(', ', array_filter(
@@ -129,6 +137,9 @@ final class WorkerController
 
         if ($step === 'click') {
             ContactTrackingRepository::click('worker', $id, $kind);
+            if (!empty($_SESSION['contact_ok']['worker'][$id])) {
+                $this->countCall($id, $user);
+            }
             $this->reply(!empty($_SESSION['contact_ok']['worker'][$id]) ? $show() : ['need_lead' => true]);
 
             return;
@@ -158,6 +169,7 @@ final class WorkerController
             return;
         }
         $_SESSION['contact_ok']['worker'][$id] = true;
+        $this->countCall($id, $user);
 
         // অ্যাডমিন জানতে পান, যাতে প্রয়োজনে কর্মীকে ফোন করে যাচাই করতে পারেন
         $to = Env::get('MAIL_TO', 'info@jorurikaj.com') ?? 'info@jorurikaj.com';
@@ -170,6 +182,15 @@ final class WorkerController
         }
 
         $this->reply($show());
+    }
+
+    /** "কল" গোনা: ঘূর্ণি ক্রমে কর্মী ওই পেশার তালিকায় নিচে নামেন (পেশা না থাকলে কিছু হয় না)। @param array<string,mixed> $user */
+    private function countCall(int $id, array $user): void
+    {
+        $slug = (string) ($_SESSION['wk_service'][$id] ?? $user['service_slug'] ?? '');
+        if ($slug !== '') {
+            WorkerRotation::recordCall($id, $slug);
+        }
     }
 
     private function jsonHeaders(): void
