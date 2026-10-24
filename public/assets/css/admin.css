@@ -729,14 +729,6 @@ td.adm-actions form {
     padding-top: 12px;
     border-top: 1px dashed var(--line);
 }
-@media (min-width: 801px) {
-    .adm-actions--row {
-        flex-wrap: nowrap;
-    }
-    .adm-actions--row form {
-        flex-wrap: nowrap;
-    }
-}
 
 /* ---- "হ্যাঁ / না" প্রশ্ন-বাক্স (admin.js) ---- */
 .adm-dialog {

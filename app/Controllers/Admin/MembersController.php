@@ -156,6 +156,11 @@ final class MembersController
         AdminRepository::log((int) $admin['id'], $logName, 'member_' . $action, $name . ($note !== '' ? ' — ' . $note : ''));
 
         $message = $name . ' — এখন "' . MemberStatus::label($to) . '"।';
+        if ($action === 'reject') {
+            $message .= $this->sendRejectionMail($member, clean_input($_POST['member_reason'] ?? '', 255))
+                ? ' বাতিলের ইমেইল পাঠানো হয়েছে।'
+                : ((string) ($member['email'] ?? '') === '' ? ' (ইমেইল নেই, তাই ইমেইল যায়নি; ফোনে জানান।)' : ' (ইমেইল পাঠানো যায়নি।)');
+        }
         if ($action === 'approve') {
             $message .= $this->sendApprovalMail($member)
                 ? ' অনুমোদনের ইমেইল পাঠানো হয়েছে।'
@@ -190,6 +195,26 @@ final class MembersController
             . "\nপ্রয়োজনে হেল্পলাইনে কল করুন: " . content('today.post.helpline') . "\n\n— jorurikaj.com";
 
         return AdminAuth::mail($email, 'আপনার আবেদন অনুমোদিত হয়েছে — jorurikaj.com', $body);
+    }
+
+    /**
+     * বাতিলের ভদ্র ইমেইল। $reason (সদস্যকে জানানোর কারণ) ফাঁকা হলে কারণ ছাড়া সংক্ষিপ্ত রূপ যায়।
+     * অ্যাডমিনের নিজের নোট (status_note) কখনও সদস্যকে পাঠানো হয় না। ইমেইল না থাকলে false।
+     *
+     * @param array<string,mixed> $member
+     */
+    private function sendRejectionMail(array $member, string $reason): bool
+    {
+        $email = (string) ($member['email'] ?? '');
+        if ($email === '') {
+            return false;
+        }
+        $helpline = content('today.post.helpline');
+        $body = 'প্রিয় ' . $member['name'] . ",\n\njorurikaj.com-এ আবেদন করার জন্য আপনাকে ধন্যবাদ।\nদুঃখের সাথে জানাচ্ছি, আপাতত আপনার আবেদনটি গ্রহণ করা সম্ভব হয়নি।\n\n"
+            . ($reason !== '' ? 'কারণ: ' . $reason . "\n\nতথ্য ঠিক করে আবার আবেদন করতে পারেন, অথবা হেল্পলাইনে কল করুন: " : "এ বিষয়ে আরও জানতে বা তথ্য ঠিক করে নিতে চাইলে আমাদের হেল্পলাইনে কল করুন: ")
+            . $helpline . "।\n\nধন্যবাদান্তে,\njorurikaj.com";
+
+        return AdminAuth::mail($email, 'আপনার আবেদনের বিষয়ে — jorurikaj.com', $body);
     }
 
     /** কাজ শেষে ফেরার পথ: শুধু /admin/ দিয়ে শুরু হওয়া নিজের পাথ, নইলে কর্মীর তালিকা। */

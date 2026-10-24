@@ -71,7 +71,7 @@ $current = (string) $member['status'];
 $btn = [
     'approve' => [$current === 'suspended' ? 'অনুমতি দিন (অনুমোদন)' : 'অনুমোদন দিন', 'adm-small--go', $isWorker ? 'অনুমোদন দিলে সদস্যকে এখনই ইমেইল চলে যাবে (ইমেইল থাকলে) এবং নাম সাইটে প্রকাশ হবে। অনুমোদন দেবেন?' : 'তাকে অনুমোদন দেবার আগে দেখে নিন তার অনুমোদন দেবার সকল কাজ সম্পন্ন হয়েছে কিনা। যদি হয়ে থাকে তাহলে হ্যাঁ চাপুন।'],
     'hold' => ['হোল্ডে রাখুন', '', 'এই সদস্য সাইটে দেখা যাবে না ও লগইন করতে পারবে না, যতক্ষণ না আপনি আবার অনুমতি দেন। হোল্ডে রাখবেন?'],
-    'reject' => ['বাতিল করুন', 'adm-small--warn', 'আবেদন বাতিল করবেন?'],
+    'reject' => ['বাতিল করুন', 'adm-small--warn', 'আবেদন বাতিল করবেন? সদস্যের ইমেইল থাকলে তাঁকে একটি ভদ্র বাতিলের ইমেইল চলে যাবে।'],
     'reserve' => ['মুছুন (সংরক্ষিতে পাঠান)', 'adm-small--warn', 'সদস্য সাইট থেকে সরে সংরক্ষিতে যাবে (সব তথ্য থাকবে, ফেরানো যাবে)। মুছবেন?'],
     'trash' => ['ডাস্টবিনে পাঠান', 'adm-small--warn', 'সদস্যকে ডাস্টবিনে পাঠাবেন?'],
     'restore' => ['ফিরিয়ে আনুন', 'adm-small--go', ''],
@@ -111,7 +111,8 @@ $back = '/admin/members/' . (int) $member['id'];
             <input type="hidden" name="action" value="<?= e($action) ?>">
             <input type="hidden" name="back" value="<?= e($back) ?>">
             <?php if ($action === 'reject'): ?>
-                <input class="adm-note" type="text" name="note" maxlength="255" placeholder="বাতিলের কারণ (ঐচ্ছিক)" aria-label="বাতিলের কারণ">
+                <input class="adm-note" type="text" name="note" maxlength="255" placeholder="কারণ — নিজের নোট (ঐচ্ছিক)" aria-label="কারণ, নিজের নোট">
+                <input class="adm-note" type="text" name="member_reason" maxlength="255" placeholder="সদস্যকে জানানোর কারণ (ঐচ্ছিক)" aria-label="সদস্যকে জানানোর কারণ">
             <?php endif; ?>
             <button class="adm-small <?= e($class) ?>" type="submit"><?= e($label) ?></button>
         </form>
