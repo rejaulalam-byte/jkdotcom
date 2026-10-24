@@ -54,7 +54,7 @@ if ($isWorker) {
     $rows['প্রতিনিধির তথ্য'] = [['জাতীয় পরিচয়পত্র নম্বর', $val((string) ($member['nid_number'] ?? ''))]];
 }
 $rows['হিসাব'] = [
-    ['আবেদন/নিবন্ধনের সময়', $val((string) $member['created_at'])],
+    ['আবেদন/নিবন্ধনের সময়', $val((string) ($member['created_at'] ?? ''))],
     ['অনুমোদনের সময়', (string) ($member['approved_at'] ?? '') !== '' ? e((string) $member['approved_at']) : '—'],
     ['শেষ লগইন', (string) ($member['last_login_at'] ?? '') !== '' ? e((string) $member['last_login_at']) : '—'],
     ['সম্মতির সময়', (string) ($member['consent_at'] ?? '') !== '' ? e((string) $member['consent_at']) : '—'],
