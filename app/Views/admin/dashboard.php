@@ -57,13 +57,7 @@ $cards = [
     <h2 class="adm-hero__name"><?= e((string) $admin['name']) ?></h2>
     <p><span class="adm-badge"><?= e(AdminAuth::roleLabel((string) $admin['role'])) ?></span></p>
     <p class="adm-hero__date"><?= e($today) ?></p>
-    <p class="adm-hero__note">
-        <?php if ($pendingTotal > 0): ?>
-            <strong><?= e(bn($pendingTotal)) ?>টি</strong> নতুন আবেদন আপনার অপেক্ষায় আছে।
-        <?php else: ?>
-            এখন নতুন কোনো আবেদন অপেক্ষায় নেই।
-        <?php endif; ?>
-    </p>
+
 </section>
 
 <div class="adm-dash">
@@ -72,6 +66,14 @@ $cards = [
         <div class="adm-reserved" aria-hidden="true">এই জায়গায় দুটি গ্রাফ আসবে</div>
     </div>
     <aside class="adm-dash__side" aria-label="সংখ্যার সারাংশ">
+        <?php // নতুন আবেদনের খবর: ডানের কার্ডগুলোর ওপরে আলাদা বাক্সে, যাতে চোখে পড়ে ?>
+        <p class="adm-alert<?= $pendingTotal > 0 ? ' is-new' : '' ?>" role="status">
+            <?php if ($pendingTotal > 0): ?>
+                <strong><?= e(bn($pendingTotal)) ?>টি</strong> নতুন আবেদন আপনার অপেক্ষায় আছে।
+            <?php else: ?>
+                এখন নতুন কোনো আবেদন অপেক্ষায় নেই।
+            <?php endif; ?>
+        </p>
         <?php foreach ($cards as [$title, $rows]): ?>
             <section class="adm-panel">
                 <h3><?= e($title) ?></h3>

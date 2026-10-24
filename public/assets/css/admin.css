@@ -332,8 +332,8 @@ ul.adm-notice {
 
 /* ---- ড্যাশবোর্ড: স্বাগতম-ব্যানার (মাঝখানে), বাঁয়ে গ্রাফের জায়গা, ডানে সংখ্যার কার্ড ---- */
 .adm-hero {
-    margin: 0 0 24px;
-    padding: 30px 20px 26px;
+    margin: 0 0 20px;
+    padding: 18px 20px 16px;
     border-radius: 16px;
     background: linear-gradient(135deg, #ffffff 0%, #e6f1f3 55%, #fbf3d4 100%);
     border: 1px solid var(--line);
@@ -363,12 +363,8 @@ ul.adm-notice {
     font-weight: 600;
 }
 .adm-hero__date {
-    margin-top: 12px;
+    margin-top: 8px;
     color: var(--ink);
-}
-.adm-hero__note {
-    margin-top: 4px;
-    color: var(--muted);
 }
 .adm-dash {
     display: grid;
@@ -388,6 +384,20 @@ ul.adm-notice {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+.adm-alert {
+    margin: 0;
+    padding: 14px 18px;
+    border-radius: 14px;
+    background: #e3f3e9;
+    color: var(--green);
+    text-align: center;
+}
+.adm-alert.is-new {
+    background: #fff3c4;
+    border: 1px solid #c9a227;
+    color: #5a4600;
+    font-weight: 600;
 }
 .adm-panel {
     padding: 16px 18px 8px;
