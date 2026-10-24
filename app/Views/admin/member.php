@@ -99,33 +99,32 @@ $back = '/admin/members/' . (int) $member['id'];
         <p class="adm-muted"><?= $current === 'reserved' ? 'আর ' . e(bn($daysLeft)) . ' দিন পর নিজে ডাস্টবিনে যাবে।' : 'আর ' . e(bn($daysLeft)) . ' দিন পর চিরতরে মুছে যাবে।' ?> (এর মধ্যে "ফিরিয়ে আনুন" চাপলে ফেরত আসবে।)</p>
     <?php endif; ?>
     <?php
-    // প্রথম লাইন: অনুমোদন / হোল্ড / বাতিল (যেগুলো চলে); দ্বিতীয় লাইন: মোছা, ডাস্টবিন, ফিরিয়ে আনা, চিরতরে মোছা
+    // গ্রিড: বাঁ কলামে বোতাম, ডান কলামে দুই লেখার ঘর (দুটোই "বাতিল" ফর্মের অংশ, form="reject-form" দিয়ে জোড়া, তাই একই বরাবর থাকে)।
+    // প্রথম সারি: অনুমোদন / হোল্ড / বাতিল (যেগুলো চলে) + নিজের নোট; দ্বিতীয় সারি: মোছা, ডাস্টবিন, ফিরিয়ে আনা ইত্যাদি + সদস্যকে জানানোর কারণ
     $first = array_values(array_intersect(['approve', 'hold', 'reject'], $allowed));
     $second = array_values(array_diff($allowed, $first));
+    $hasReject = in_array('reject', $allowed, true);
     $form = static function (string $action) use ($btn, $member, $back): void {
         [$label, $class, $confirm] = $btn[$action];
         ?>
-        <form action="/admin/members/action" method="post"<?= $confirm !== '' ? ' data-confirm="' . e($confirm) . '"' : '' ?>>
+        <form<?= $action === 'reject' ? ' id="reject-form"' : '' ?> action="/admin/members/action" method="post"<?= $confirm !== '' ? ' data-confirm="' . e($confirm) . '"' : '' ?>>
             <?= csrf_field() ?>
             <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
             <input type="hidden" name="action" value="<?= e($action) ?>">
             <input type="hidden" name="back" value="<?= e($back) ?>">
-            <?php if ($action === 'reject'): ?>
-                <input class="adm-note" type="text" name="note" maxlength="255" placeholder="কারণ — নিজের নোট (ঐচ্ছিক)" aria-label="কারণ, নিজের নোট">
-                <input class="adm-note" type="text" name="member_reason" maxlength="255" placeholder="সদস্যকে জানানোর কারণ (ঐচ্ছিক)" aria-label="সদস্যকে জানানোর কারণ">
-            <?php endif; ?>
             <button class="adm-small <?= e($class) ?>" type="submit"><?= e($label) ?></button>
         </form>
         <?php
     };
     ?>
-    <?php if ($first !== []): ?>
-        <div class="adm-actions adm-actions--row">
-            <?php foreach ($first as $action): $form($action); endforeach; ?>
+    <div class="adm-ag">
+        <div class="adm-ag__left adm-ag__r1"><?php foreach ($first as $action): $form($action); endforeach; ?></div>
+        <div class="adm-ag__right adm-ag__r1">
+            <?php if ($hasReject): ?>
+                <input class="adm-note" form="reject-form" type="text" name="note" maxlength="255" placeholder="কারণ — নিজের নোট (ঐচ্ছিক)" aria-label="কারণ, নিজের নোট">
+            <?php endif; ?>
         </div>
-    <?php endif; ?>
-    <?php if ($second !== [] || $canPurge): ?>
-        <div class="adm-actions adm-actions--row adm-actions--second">
+        <div class="adm-ag__left adm-ag__r2">
             <?php foreach ($second as $action): $form($action); endforeach; ?>
             <?php if ($canPurge): ?>
                 <form action="/admin/members/action" method="post" data-confirm="চিরতরে মুছলে এই সদস্যের সব তথ্য ও ছবি চলে যাবে, আর কখনও ফেরানো যাবে না। সত্যিই মুছবেন?">
@@ -137,7 +136,12 @@ $back = '/admin/members/' . (int) $member['id'];
                 </form>
             <?php endif; ?>
         </div>
-    <?php endif; ?>
+        <div class="adm-ag__right adm-ag__r2">
+            <?php if ($hasReject): ?>
+                <input class="adm-note" form="reject-form" type="text" name="member_reason" maxlength="255" placeholder="সদস্যকে জানানোর কারণ (ঐচ্ছিক)" aria-label="সদস্যকে জানানোর কারণ">
+            <?php endif; ?>
+        </div>
+    </div>
 </section>
 <div class="adm-detail">
     <aside class="adm-detail__photo">

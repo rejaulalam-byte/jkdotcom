@@ -676,20 +676,6 @@ ul.adm-notice {
     align-items: center;
     gap: 10px;
 }
-.adm-actions--row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 10px 14px;
-    margin-top: 6px;
-}
-.adm-actions--row form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-}
 .adm-note {
     width: 230px;
     max-width: 100%;
@@ -724,10 +710,6 @@ ul.adm-notice {
 td.adm-actions form {
     display: inline-block;
     margin: 0 0 0 6px;
-}.adm-actions--second {
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px dashed var(--line);
 }
 
 /* ---- "হ্যাঁ / না" প্রশ্ন-বাক্স (admin.js) ---- */
@@ -752,4 +734,34 @@ td.adm-actions form {
 .adm-dialog__row .adm-small {
     min-width: 96px;
     margin: 0;
+}
+/* ---- অবস্থার বাক্স: পুরো প্রস্থ, বাঁয়ে বোতাম ডানে লেখার ঘর (দুই সারি, ডান ঘরগুলো একই বরাবর) ---- */
+.adm-actionbox {
+    max-width: none;
+}
+.adm-ag {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 520px);
+    gap: 12px 24px;
+    align-items: center;
+    margin-top: 6px;
+}
+.adm-ag__left {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.adm-ag__left form {
+    margin: 0;
+}
+.adm-ag .adm-note {
+    width: 100%;
+}
+@media (max-width: 800px) {
+    .adm-ag {
+        grid-template-columns: 1fr;
+    }
+    .adm-ag__right:empty {
+        display: none;
+    }
 }
