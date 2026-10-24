@@ -765,3 +765,75 @@ td.adm-actions form {
         display: none;
     }
 }
+/* ---- সম্পাদনার ফর্ম ---- */
+.adm-btn--edit {
+    margin-top: 0;
+    min-height: 46px;
+    padding: 6px 18px;
+    background: var(--gold);
+    color: #3b2f00;
+}
+.adm-btn--edit:hover {
+    background: #e6c85a;
+}
+.adm-formgrid {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 640px);
+    gap: 10px 20px;
+    align-items: start;
+}
+.adm-formgrid > label {
+    margin: 12px 0 0;
+}
+.adm-formgrid input[type="text"],
+.adm-formgrid input[type="email"],
+.adm-formgrid select,
+.adm-formgrid textarea {
+    max-width: none;
+    width: 100%;
+}
+.adm-box textarea {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    resize: vertical;
+}
+.adm-box input[type="file"] {
+    display: block;
+    margin: 6px 0 10px;
+    font: inherit;
+}
+.adm-hint {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 17px;
+}
+.adm-photoedit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 20px;
+}
+.adm-photoedit img {
+    border-radius: 10px;
+    object-fit: cover;
+}
+.adm-detail__nophoto--small {
+    width: 120px;
+    height: 132px;
+    font-size: 16px;
+}
+@media (max-width: 800px) {
+    .adm-formgrid {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+    .adm-formgrid > label {
+        margin-top: 12px;
+    }
+}

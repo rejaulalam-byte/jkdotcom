@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\Admin\AccessController as AdminAccess;
+use App\Controllers\Admin\MemberEditController as AdminMemberEdit;
 use App\Controllers\Admin\MembersController as AdminMembers;
 use App\Controllers\Admin\PanelController as AdminPanel;
 use App\Controllers\AccountSetupController;
@@ -96,6 +97,8 @@ return [
     ['GET',  '/admin/agents',              [AdminMembers::class, 'list', ['role' => 'agent']]],
     ['GET',  '/admin/members/{slug}',      [AdminMembers::class, 'show']],
     ['POST', '/admin/members/action',      [AdminMembers::class, 'action']],
+    ['GET',  '/admin/member-edit/{slug}',  [AdminMemberEdit::class, 'form']],
+    ['POST', '/admin/member-edit',         [AdminMemberEdit::class, 'save']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],

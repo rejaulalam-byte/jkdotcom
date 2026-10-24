@@ -90,3 +90,53 @@
         });
     });
 })();
+
+/* ---- বিভাগ → জেলা → উপজেলা: একটা অন্যটাকে ছাঁকে ([data-geo] সিলেক্ট; সম্পাদনা ফর্মে) ----
+   বিভাগ বাছলে শুধু সেই বিভাগের জেলা দেখায়, জেলা বাছলে শুধু সেই জেলার উপজেলা। উপজেলা বা জেলা আগে বাছলে ওপরেরগুলো নিজে বসে যায়। */
+(function () {
+    var division = document.querySelector('select[data-geo="division"]');
+    var district = document.querySelector('select[data-geo="district"]');
+    var upazila = document.querySelector('select[data-geo="upazila"]');
+    if (!division || !district || !upazila) {
+        return;
+    }
+
+    // $parent-এর মান অনুযায়ী $select-এর বিকল্প দেখায়/লুকায়; বর্তমান বাছাই না মিললে ফাঁকা করে
+    function filter(select, parent) {
+        Array.prototype.forEach.call(select.options, function (option) {
+            var show = option.value === "" || parent === "" || option.getAttribute("data-parent") === parent;
+            option.hidden = !show;
+            option.disabled = !show;
+        });
+        if (select.value !== "" && select.options[select.selectedIndex].disabled) {
+            select.value = "";
+        }
+    }
+    function parentOf(select) {
+        var option = select.options[select.selectedIndex];
+        return option ? option.getAttribute("data-parent") || "" : "";
+    }
+
+    division.addEventListener("change", function () {
+        filter(district, division.value);
+        filter(upazila, district.value);
+    });
+    district.addEventListener("change", function () {
+        if (district.value !== "" && division.value === "") {
+            division.value = parentOf(district);
+            filter(district, division.value);
+        }
+        filter(upazila, district.value);
+    });
+    upazila.addEventListener("change", function () {
+        if (upazila.value !== "" && district.value === "") {
+            district.value = parentOf(upazila);
+            division.value = parentOf(district);
+            filter(district, division.value);
+            filter(upazila, district.value);
+        }
+    });
+
+    filter(district, division.value);
+    filter(upazila, district.value);
+})();

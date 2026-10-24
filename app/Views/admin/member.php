@@ -145,6 +145,7 @@ $back = '/admin/members/' . (int) $member['id'];
 </section>
 <div class="adm-detail">
     <aside class="adm-detail__photo">
+        <p><a class="adm-btn adm-btn--edit" href="/admin/member-edit/<?= (int) $member['id'] ?>">✎ সম্পাদনা করুন</a></p>
         <?php if ($photoUrl !== null): ?>
             <img src="<?= e($photoUrl) ?>" alt="" width="220" height="240">
         <?php else: ?>

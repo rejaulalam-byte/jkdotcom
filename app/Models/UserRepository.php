@@ -527,6 +527,98 @@ final class UserRepository
         }
     }
 
+    /**
+     * অ্যাডমিন একজন কর্মী/প্রতিনিধির তথ্য বদলায়। $data-তে যে কী আছে সেটাই বদলায়:
+     * name, gender, phone, email, address, upazila_id, district_id, division_id, photo (ফাইলের নাম বা null = মুছে ফেলা),
+     * কর্মীর: service_slug, service_custom, experience_years, bio, reference_1/2, work_all_districts, work_district_ids, extra_services;
+     * প্রতিনিধির: nid_number। খালি মোবাইল/ইমেইল/জেন্ডার NULL হয়; মোবাইল বসালে phone_raw মুছে যায়।
+     * 'ok', 'duplicate' (মোবাইল), 'duplicate_email' বা 'error' ফেরত দেয়।
+     *
+     * @param array<string,mixed> $data
+     */
+    public static function adminUpdate(int $id, array $data): string
+    {
+        $member = self::findById($id);
+        if ($member === null) {
+            return 'error';
+        }
+        $role = (string) $member['role'];
+        $phone = (string) ($data['phone'] ?? '');
+        $email = mb_strtolower((string) ($data['email'] ?? ''));
+        if ($phone !== '') {
+            $other = self::findByPhone($phone, $role);
+            if ($other !== null && (int) $other['id'] !== $id) {
+                return 'duplicate';
+            }
+        }
+        if ($email !== '') {
+            $other = self::findByEmail($email, $role);
+            if ($other !== null && (int) $other['id'] !== $id) {
+                return 'duplicate_email';
+            }
+        }
+
+        $columns = [
+            'name' => $data['name'],
+            'gender' => (string) ($data['gender'] ?? '') !== '' ? $data['gender'] : null,
+            'phone' => $phone !== '' ? $phone : null,
+            'email' => $email !== '' ? $email : null,
+            'address' => $data['address'],
+            'upazila_id' => $data['upazila_id'],
+            'district_id' => $data['district_id'],
+            'division_id' => $data['division_id'],
+        ];
+        if ($phone !== '') {
+            $columns['phone_raw'] = null;
+        }
+        if (array_key_exists('photo', $data)) {
+            $columns['photo'] = $data['photo'];
+        }
+        if ($role === 'worker') {
+            $columns += [
+                'service_slug' => $data['service_slug'], 'service_custom' => $data['service_custom'],
+                'experience_years' => $data['experience_years'], 'bio' => (string) ($data['bio'] ?? '') !== '' ? $data['bio'] : null,
+                'reference_1' => (string) ($data['reference_1'] ?? '') !== '' ? $data['reference_1'] : null,
+                'reference_2' => (string) ($data['reference_2'] ?? '') !== '' ? $data['reference_2'] : null,
+                'work_all_districts' => (int) ($data['work_all_districts'] ?? 0),
+            ];
+        } else {
+            $columns['nid_number'] = (string) ($data['nid_number'] ?? '') !== '' ? $data['nid_number'] : null;
+        }
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = self::demoRead();
+            foreach ($rows as $i => $row) {
+                if ((int) $row['id'] === $id) {
+                    $rows[$i] = array_merge($row, $columns, $role === 'worker'
+                        ? ['work_district_ids' => (array) ($data['work_district_ids'] ?? []), 'extra_services' => (array) ($data['extra_services'] ?? [])]
+                        : []);
+                }
+            }
+
+            return self::demoWrite($rows) ? 'ok' : 'error';
+        }
+
+        try {
+            $sets = implode(', ', array_map(static fn (string $c): string => "$c = :$c", array_keys($columns)));
+            $pdo->prepare("UPDATE users SET $sets WHERE id = :id")->execute($columns + ['id' => $id]);
+            if ($role === 'worker') {
+                self::saveWorkDistricts($pdo, $id, (array) ($data['work_district_ids'] ?? []));
+                self::saveExtraServices($pdo, $id, (array) ($data['extra_services'] ?? []));
+            }
+
+            return 'ok';
+        } catch (Throwable $e) {
+            if ($e instanceof \PDOException && ($e->errorInfo[1] ?? 0) === 1062) {
+                return str_contains($e->getMessage(), 'uq_users_role_email') ? 'duplicate_email' : 'duplicate';
+            }
+            Logger::error('UserRepository::adminUpdate failed: ' . $e->getMessage());
+
+            return 'error';
+        }
+    }
+
     /** অ্যাডমিন তালিকার "সব"-এ যে অবস্থাগুলো আসে (সংরক্ষিত ও ডাস্টবিন আলাদা ট্যাবে)। */
     public const LISTED_STATUSES = ['pending', 'approved', 'suspended', 'rejected'];
 
