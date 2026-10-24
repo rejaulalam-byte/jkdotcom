@@ -527,6 +527,138 @@ final class UserRepository
         }
     }
 
+    /** অ্যাডমিন তালিকার "সব"-এ যে অবস্থাগুলো আসে (সংরক্ষিত ও ডাস্টবিন আলাদা ট্যাবে)। */
+    public const LISTED_STATUSES = ['pending', 'approved', 'suspended', 'rejected'];
+
+    /** সংরক্ষিত ও ডাস্টবিনে সদস্য এত দিন (দিন) থাকে, তারপর পরের ধাপে যায়। */
+    public const RESERVE_DAYS = 30;
+
+    /**
+     * সদস্যের অবস্থা বদলায়। 'approved' হলে অনুমোদনের সময় লেখা হয়; 'reserved'/'trashed' হলে আগের অবস্থা মনে রাখা হয় (ফিরিয়ে আনতে)।
+     * $note হোল্ড/বাতিলের কারণ (ঐচ্ছিক)। সফল হলে true।
+     */
+    public static function setStatus(int $id, string $status, ?string $note = null): bool
+    {
+        $member = self::findById($id);
+        if ($member === null) {
+            return false;
+        }
+        $previous = in_array($status, ['reserved', 'trashed'], true) && !in_array($member['status'], ['reserved', 'trashed'], true)
+            ? (string) $member['status']
+            : (string) ($member['previous_status'] ?? '');
+        $note = $note === null || trim($note) === '' ? null : mb_substr(trim($note), 0, 255);
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = self::demoRead();
+            foreach ($rows as $i => $row) {
+                if ((int) $row['id'] === $id) {
+                    $rows[$i]['status'] = $status;
+                    $rows[$i]['status_note'] = $note;
+                    $rows[$i]['previous_status'] = $previous !== '' ? $previous : null;
+                    $rows[$i]['status_changed_at'] = date('Y-m-d H:i:s');
+                    if ($status === 'approved') {
+                        $rows[$i]['approved_at'] = date('Y-m-d H:i:s');
+                    }
+                }
+            }
+
+            return self::demoWrite($rows);
+        }
+
+        try {
+            $pdo->prepare(
+                'UPDATE users SET status = :s, status_note = :n, previous_status = :p, status_changed_at = NOW()'
+                . ($status === 'approved' ? ', approved_at = NOW()' : '') . ' WHERE id = :id'
+            )->execute([':s' => $status, ':n' => $note, ':p' => $previous !== '' ? $previous : null, ':id' => $id]);
+
+            return true;
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::setStatus failed: ' . $e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * ৩০ দিন পুরনো সংরক্ষিতকে ডাস্টবিনে পাঠায়, ৩০ দিন পুরনো ডাস্টবিনের সদস্যকে চিরতরে মোছে।
+     * (আলাদা সময়-ভিত্তিক কাজ নেই; অ্যাডমিন প্যানেলের তালিকা খুললে চলে।)
+     *
+     * @return array{trashed:int,purged:int}
+     */
+    public static function sweep(): array
+    {
+        $out = ['trashed' => 0, 'purged' => 0];
+        $limit = time() - self::RESERVE_DAYS * 86400;
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            foreach (self::demoRead() as $row) {
+                $at = strtotime((string) ($row['status_changed_at'] ?? '')) ?: 0;
+                if ($row['status'] === 'reserved' && $at > 0 && $at < $limit) {
+                    self::setStatus((int) $row['id'], 'trashed');
+                    $out['trashed']++;
+                } elseif ($row['status'] === 'trashed' && $at > 0 && $at < $limit) {
+                    self::purge((int) $row['id']);
+                    $out['purged']++;
+                }
+            }
+
+            return $out;
+        }
+
+        try {
+            $cut = date('Y-m-d H:i:s', $limit);
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE status = 'trashed' AND status_changed_at < :c");
+            $stmt->execute([':c' => $cut]);
+            foreach ($stmt->fetchAll() as $row) {
+                self::purge((int) $row['id']);
+                $out['purged']++;
+            }
+            $upd = $pdo->prepare("UPDATE users SET previous_status = COALESCE(previous_status, 'approved'), status = 'trashed', status_changed_at = NOW() WHERE status = 'reserved' AND status_changed_at < :c");
+            $upd->execute([':c' => $cut]);
+            $out['trashed'] = $upd->rowCount();
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::sweep failed: ' . $e->getMessage());
+        }
+
+        return $out;
+    }
+
+    /**
+     * সদস্যকে চিরতরে মোছে: তার পেশা, কাজের জেলা, রেটিং, ঘূর্ণি ক্রমের ও ভিজিটের সারি এবং ছবির ফাইলসহ। ফেরানো যায় না।
+     * (দর্শকের "আগ্রহী" তালিকা ও ক্লিকের হিসাব থাকে, কারণ ওগুলো দর্শকদের তথ্য।)
+     */
+    public static function purge(int $id): bool
+    {
+        $member = self::findById($id);
+        if ($member === null) {
+            return false;
+        }
+        $photo = (string) ($member['photo'] ?? '');
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $ok = self::demoWrite(array_values(array_filter(self::demoRead(), static fn (array $r): bool => (int) $r['id'] !== $id)));
+        } else {
+            try {
+                foreach (['worker_services' => 'user_id', 'worker_work_districts' => 'user_id', 'worker_rotation' => 'user_id', 'worker_visits' => 'user_id', 'worker_ratings' => 'worker_id'] as $table => $col) {
+                    $pdo->prepare("DELETE FROM $table WHERE $col = :id")->execute([':id' => $id]);
+                }
+                $pdo->prepare('DELETE FROM users WHERE id = :id')->execute([':id' => $id]);
+                $ok = true;
+            } catch (Throwable $e) {
+                Logger::error('UserRepository::purge failed: ' . $e->getMessage());
+                $ok = false;
+            }
+        }
+        if ($ok && $photo !== '' && \App\Core\PhotoUpload::url($photo) !== null) {
+            @unlink(\App\Core\PhotoUpload::directory() . '/' . $photo);
+        }
+
+        return $ok;
+    }
+
     /**
      * অ্যাডমিনের তালিকা-পেইজ: এক ভূমিকার (worker|agent) সদস্য, নতুন আগে। ফিল্টার:
      * 'status' (খালি = সব), 'q' (নাম, মোবাইল, ইমেইল বা ঠিকানার অংশ), 'source' ('legacy' = পুরনো সাইট থেকে আনা, 'new' = নতুন),
@@ -548,7 +680,7 @@ final class UserRepository
                 $hay = mb_strtolower(implode(' ', [(string) $r['name'], (string) ($r['phone'] ?? ''), (string) ($r['email'] ?? ''), (string) ($r['address'] ?? '')]));
 
                 return $r['role'] === $role
-                    && ($status === '' || $r['status'] === $status)
+                    && ($status === '' ? in_array($r['status'], self::LISTED_STATUSES, true) : $r['status'] === $status)
                     && ($q === '' || str_contains($hay, mb_strtolower($q)))
                     && ($source !== 'legacy' || (string) ($r['legacy_id'] ?? '') !== '')
                     && ($source !== 'new' || (string) ($r['legacy_id'] ?? '') === '')
@@ -564,6 +696,8 @@ final class UserRepository
         if ($status !== '') {
             $where[] = 'status = :status';
             $args[':status'] = $status;
+        } else {
+            $where[] = "status IN ('" . implode("','", self::LISTED_STATUSES) . "')";
         }
         if ($q !== '') {
             // সাধারণ (non-emulated) প্রস্তুতিতে একই নামের প্লেসহোল্ডার বারবার চলে না, তাই চারটা আলাদা

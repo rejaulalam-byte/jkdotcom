@@ -669,3 +669,59 @@ ul.adm-notice {
         margin-bottom: 10px;
     }
 }
+/* ---- অবস্থা-বদলের বাক্স ও বোতামের রং ---- */
+.adm-actionbox h2 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.adm-actions--row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px 14px;
+    margin-top: 6px;
+}
+.adm-actions--row form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+.adm-note {
+    width: 230px;
+    max-width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font: inherit;
+}
+.adm-small--go {
+    background: var(--green);
+    color: #fff;
+}
+.adm-small--go:hover {
+    background: #145229;
+}
+.adm-small--warn {
+    background: var(--red);
+    color: #fff;
+}
+.adm-small--warn:hover {
+    background: #5e0707;
+}
+.adm-status.is-reserved {
+    background: #e8e1f3;
+    color: #4a2d7a;
+}
+.adm-status.is-trashed {
+    background: #ececec;
+    color: #444;
+}
+td.adm-actions form {
+    display: inline-block;
+    margin: 0 0 0 6px;
+}

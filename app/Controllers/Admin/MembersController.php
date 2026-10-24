@@ -6,15 +6,19 @@ namespace App\Controllers\Admin;
 
 use App\Core\AdminAuth;
 use App\Core\PhotoUpload;
+use App\Core\Security;
+use App\Core\Session;
 use App\Core\View;
+use App\Models\AdminRepository;
 use App\Models\GeoRepository;
 use App\Models\MemberStatus;
 use App\Models\ServiceRepository;
 use App\Models\UserRepository;
 
 /**
- * অ্যাডমিন প্যানেলে কর্মী ও প্রতিনিধির তালিকা (/admin/workers, /admin/agents) ও বিস্তারিত পেইজ (/admin/members/<id>)।
- * অনুমতি: "registrations"। এই ধাপে শুধু দেখা (অনুমোদন, হোল্ড, মোছা, সম্পাদনা পরের ধাপে)।
+ * অ্যাডমিন প্যানেলে কর্মী ও প্রতিনিধির তালিকা (/admin/workers, /admin/agents), বিস্তারিত পেইজ (/admin/members/<id>)
+ * এবং অবস্থা-বদলের কাজ (অনুমোদন, হোল্ড, বাতিল, মোছা তিন ধাপে, ফিরিয়ে আনা)। অনুমতি: "registrations"।
+ * চিরতরে মোছা শুধু সুপার অ্যাডমিনের। সম্পাদনা, ফোন-টিক ও অসম্পূর্ণ-তথ্য পরের ধাপে।
  */
 final class MembersController
 {
@@ -25,6 +29,11 @@ final class MembersController
     {
         $admin = AdminAuth::require('registrations');
         $role = ($meta['role'] ?? '') === 'agent' ? 'agent' : 'worker';
+        // পুরনো সংরক্ষিত/ডাস্টবিন ঝেড়ে ফেলা (আলাদা সময়-ভিত্তিক কাজ নেই)
+        $swept = UserRepository::sweep();
+        if ($swept['trashed'] + $swept['purged'] > 0) {
+            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'sweep', $swept['trashed'] . ' জন ডাস্টবিনে, ' . $swept['purged'] . ' জন চিরতরে মোছা');
+        }
 
         $status = (string) ($_GET['status'] ?? '');
         $status = isset(MemberStatus::LABELS[$status]) ? $status : '';
@@ -38,7 +47,6 @@ final class MembersController
         $page = max(1, (int) ($_GET['p'] ?? 1));
         $found = UserRepository::adminSearch($role, $filter, self::PER_PAGE, ($page - 1) * self::PER_PAGE);
 
-        $counts = UserRepository::countByRoleStatus()[$role] ?? [];
         $services = [];
         foreach (ServiceRepository::all() as $s) {
             $services[$s['slug']] = $s['name'];
@@ -54,10 +62,10 @@ final class MembersController
             'total' => $found['total'],
             'page' => $page,
             'pages' => max(1, (int) ceil($found['total'] / self::PER_PAGE)),
-            'counts' => $counts,
+            'counts' => UserRepository::countByRoleStatus()[$role] ?? [],
             'services' => $services,
-            'errors' => [],
-            'ok' => null,
+            'errors' => Session::pull('admin_errors', []),
+            'ok' => Session::pull('admin_ok'),
         ], 'layouts/admin');
     }
 
@@ -91,8 +99,114 @@ final class MembersController
             'extraServices' => $extra,
             'workText' => GeoRepository::workDistrictsText($work['ids'], $work['all']),
             'photoUrl' => PhotoUpload::url($member['photo'] ?? null),
-            'errors' => [],
-            'ok' => null,
+            'errors' => Session::pull('admin_errors', []),
+            'ok' => Session::pull('admin_ok'),
         ], 'layouts/admin');
+    }
+
+    /**
+     * POST /admin/members/action: id, action (approve|hold|reject|reserve|trash|restore|purge), note (ঐচ্ছিক), back।
+     * কাজটা সদস্যের এখনকার অবস্থা থেকে চলে কি না দেখে (MemberStatus::ACTIONS); অনুমোদনে সদস্যকে ইমেইল যায়; সবকিছু লগে লেখা হয়।
+     */
+    public function action(): void
+    {
+        $admin = AdminAuth::require('registrations');
+        $back = $this->backPath((string) ($_POST['back'] ?? ''));
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            $this->fail($back, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+
+        $member = UserRepository::findById((int) ($_POST['id'] ?? 0));
+        $action = (string) ($_POST['action'] ?? '');
+        if ($member === null) {
+            $this->fail($back, 'সদস্যকে পাওয়া যায়নি।');
+        }
+        $name = (string) $member['name'];
+        $current = (string) $member['status'];
+        $note = clean_input($_POST['note'] ?? '', 255);
+        $logName = (string) $admin['name'];
+
+        if ($action === 'purge') {
+            if (!AdminAuth::isSuper($admin)) {
+                $this->fail($back, 'চিরতরে মোছা শুধু সুপার অ্যাডমিন পারেন।');
+            }
+            if ($current !== 'trashed') {
+                $this->fail($back, 'চিরতরে মোছা যায় শুধু ডাস্টবিনের সদস্যকে।');
+            }
+            UserRepository::purge((int) $member['id']) ?: $this->fail($back, 'মোছা যায়নি। আবার চেষ্টা করুন।');
+            AdminRepository::log((int) $admin['id'], $logName, 'member_purged', $name);
+            $this->ok('/admin/' . ($member['role'] === 'agent' ? 'agents' : 'workers') . '?status=trashed', $name . ' চিরতরে মুছে গেছে।');
+        }
+
+        if (!isset(MemberStatus::ACTIONS[$action])) {
+            $this->fail($back, 'অজানা কাজ।');
+        }
+        [$from, $to] = MemberStatus::ACTIONS[$action];
+        if (!in_array($current, $from, true)) {
+            $this->fail($back, 'এই অবস্থা (' . MemberStatus::label($current) . ') থেকে এই কাজ চলে না।');
+        }
+        if ($action === 'restore') {
+            $previous = (string) ($member['previous_status'] ?? '');
+            $to = in_array($previous, UserRepository::LISTED_STATUSES, true) ? $previous : 'pending';
+        }
+
+        if (!UserRepository::setStatus((int) $member['id'], $to, in_array($action, ['hold', 'reject'], true) ? $note : null)) {
+            $this->fail($back, 'সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।');
+        }
+        AdminRepository::log((int) $admin['id'], $logName, 'member_' . $action, $name . ($note !== '' ? ' — ' . $note : ''));
+
+        $message = $name . ' — এখন "' . MemberStatus::label($to) . '"।';
+        if ($action === 'approve') {
+            $message .= $this->sendApprovalMail($member)
+                ? ' অনুমোদনের ইমেইল পাঠানো হয়েছে।'
+                : ((string) ($member['email'] ?? '') === '' ? ' (ইমেইল নেই, তাই ইমেইল যায়নি; ফোনে জানান।)' : ' (ইমেইল পাঠানো যায়নি।)');
+        }
+        $this->ok($back, $message);
+    }
+
+    /**
+     * অনুমোদনের ইমেইল: অভিনন্দন, লগইন আইডি, লগইন ও (কর্মীর) নিজের পেইজের লিংক। পাসওয়ার্ড কখনও নয় (আমরা শুধু হ্যাশ রাখি)।
+     * ইমেইল না থাকলে কিছু যায় না, false ফেরে।
+     *
+     * @param array<string,mixed> $member
+     */
+    private function sendApprovalMail(array $member): bool
+    {
+        $email = (string) ($member['email'] ?? '');
+        if ($email === '') {
+            return false;
+        }
+        $isWorker = $member['role'] === 'worker';
+        $base = AdminAuth::baseUrl();
+        $loginId = (string) ($member['phone'] ?? '') !== '' ? format_phone((string) $member['phone']) . ' অথবা ' . $email : $email;
+        $body = $member['name'] . ", অভিনন্দন!\n\nআপনার আবেদনটি অনুমোদিত হয়েছে"
+            . ($isWorker ? ' এবং আপনার নাম jorurikaj.com ওয়েবসাইটে প্রকাশিত হয়েছে।' : '।') . "\n\n"
+            . 'লগইন আইডি: ' . $loginId . "\n"
+            . 'লগইন করুন: ' . $base . ($isWorker ? '/login' : '/login/agent') . "\n"
+            . "পাসওয়ার্ড ভুলে গেলে লগইন পেইজের \"পাসওয়ার্ড মনে নেই\" লিংকে ক্লিক করুন, ইমেইলে কোড যাবে।\n"
+            . "(নিরাপত্তার জন্য আপনার পাসওয়ার্ড আমরা ইমেইলে পাঠাই না, আর আমরা তা জানিও না।)\n\n"
+            . 'আপনার প্রোফাইল: ' . $base . "/profile\n"
+            . ($isWorker ? 'আপনার পাবলিক পেইজ: ' . $base . '/workers/' . (int) $member['id'] . "\n" : '')
+            . "\nপ্রয়োজনে হেল্পলাইনে কল করুন: " . content('today.post.helpline') . "\n\n— jorurikaj.com";
+
+        return AdminAuth::mail($email, 'আপনার আবেদন অনুমোদিত হয়েছে — jorurikaj.com', $body);
+    }
+
+    /** কাজ শেষে ফেরার পথ: শুধু /admin/ দিয়ে শুরু হওয়া নিজের পাথ, নইলে কর্মীর তালিকা। */
+    private function backPath(string $path): string
+    {
+        return preg_match('#^/admin/[A-Za-z0-9/_\-?=&%.]*$#', $path) === 1 ? $path : '/admin/workers';
+    }
+
+    private function fail(string $path, string $message): never
+    {
+        Session::flash('admin_errors', [$message]);
+        redirect($path);
+    }
+
+    private function ok(string $path, string $message): never
+    {
+        Session::flash('admin_ok', $message);
+        redirect($path);
     }
 }

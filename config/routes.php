@@ -95,6 +95,7 @@ return [
     ['GET',  '/admin/workers',             [AdminMembers::class, 'list', ['role' => 'worker']]],
     ['GET',  '/admin/agents',              [AdminMembers::class, 'list', ['role' => 'agent']]],
     ['GET',  '/admin/members/{slug}',      [AdminMembers::class, 'show']],
+    ['POST', '/admin/members/action',      [AdminMembers::class, 'action']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],

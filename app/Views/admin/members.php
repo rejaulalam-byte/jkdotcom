@@ -13,6 +13,7 @@
  */
 use App\Models\GeoRepository;
 use App\Models\MemberStatus;
+use App\Models\UserRepository;
 
 $base = $role === 'agent' ? '/admin/agents' : '/admin/workers';
 // বর্তমান ফিল্টার ধরে রেখে লিংক বানায়; $override-এর মান বদলে যায়, খালি মান বাদ
@@ -22,7 +23,7 @@ $url = static function (array $override = []) use ($base, $filter, $page): strin
 
     return $base . ($params === [] ? '' : '?' . http_build_query($params));
 };
-$allCount = array_sum($counts);
+$allCount = array_sum(array_intersect_key($counts, array_flip(UserRepository::LISTED_STATUSES)));
 $tabs = [['', 'সব', $allCount]];
 foreach (MemberStatus::LABELS as $key => $label) {
     $tabs[] = [$key, $label, (int) ($counts[$key] ?? 0)];
@@ -80,7 +81,18 @@ foreach (MemberStatus::LABELS as $key => $label) {
                 <td><?= e(implode(', ', array_filter([$area['upazila'], $area['district']]))) ?></td>
                 <td><span class="adm-status is-<?= e((string) $r['status']) ?>"><?= e(MemberStatus::label((string) $r['status'])) ?></span></td>
                 <td><?= (string) ($r['legacy_id'] ?? '') !== '' ? 'পুরনো সাইট' : 'নতুন' ?></td>
-                <td><a class="adm-small" href="/admin/members/<?= (int) $r['id'] ?>">দেখুন</a></td>
+                <td class="adm-actions">
+                    <a class="adm-small" href="/admin/members/<?= (int) $r['id'] ?>">দেখুন</a>
+                    <?php if ($r['status'] === 'pending'): ?>
+                        <form action="/admin/members/action" method="post">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="id" value="<?= (int) $r['id'] ?>">
+                            <input type="hidden" name="action" value="approve">
+                            <input type="hidden" name="back" value="<?= e($url()) ?>">
+                            <button class="adm-small adm-small--go" type="submit">অনুমোদন</button>
+                        </form>
+                    <?php endif; ?>
+                </td>
             </tr>
         <?php endforeach; ?>
         <?php if ($rows === []): ?>

@@ -10,7 +10,9 @@
  * @var string $workText     কাজ করতে আগ্রহী জেলা ("ঢাকা, বরিশাল" বা "সব জেলা")
  * @var ?string $photoUrl
  */
+use App\Core\AdminAuth;
 use App\Models\MemberStatus;
+use App\Models\UserRepository;
 
 $isWorker = $member['role'] === 'worker';
 $gender = ['male' => 'পুরুষ', 'female' => 'মহিলা', 'other' => 'অন্যান্য'][(string) ($member['gender'] ?? '')] ?? '';
@@ -63,6 +65,63 @@ $rows['হিসাব'] = [
 ?>
 <p><a class="adm-link" href="<?= e($list) ?>">← <?= $isWorker ? 'কর্মীর' : 'প্রতিনিধির' ?> তালিকায় ফিরুন</a></p>
 
+<?php
+// অবস্থা-বদলের বাক্স: এখনকার অবস্থা থেকে যে কাজগুলো চলে শুধু সেগুলো (MemberStatus::ACTIONS); চিরতরে মোছা শুধু সুপার অ্যাডমিন ও ডাস্টবিনের সদস্যে
+$current = (string) $member['status'];
+$btn = [
+    'approve' => [$current === 'suspended' ? 'অনুমতি দিন (অনুমোদন)' : 'অনুমোদন দিন', 'adm-small--go', ''],
+    'hold' => ['হোল্ডে রাখুন', '', 'এই সদস্য সাইটে দেখা যাবে না ও লগইন করতে পারবে না, যতক্ষণ না আপনি আবার অনুমতি দেন। হোল্ডে রাখবেন?'],
+    'reject' => ['বাতিল করুন', 'adm-small--warn', 'আবেদন বাতিল করবেন?'],
+    'reserve' => ['মুছুন (সংরক্ষিতে পাঠান)', 'adm-small--warn', 'সদস্য সাইট থেকে সরে সংরক্ষিতে যাবে (সব তথ্য থাকবে, ফেরানো যাবে)। মুছবেন?'],
+    'trash' => ['ডাস্টবিনে পাঠান', 'adm-small--warn', 'সদস্যকে ডাস্টবিনে পাঠাবেন?'],
+    'restore' => ['ফিরিয়ে আনুন', 'adm-small--go', ''],
+];
+$allowed = [];
+foreach (MemberStatus::ACTIONS as $key => [$from]) {
+    if (in_array($current, $from, true)) {
+        $allowed[] = $key;
+    }
+}
+$canPurge = $current === 'trashed' && AdminAuth::isSuper($admin);
+$daysLeft = null;
+if (in_array($current, ['reserved', 'trashed'], true) && (string) ($member['status_changed_at'] ?? '') !== '') {
+    $daysLeft = max(0, UserRepository::RESERVE_DAYS - (int) floor((time() - strtotime((string) $member['status_changed_at'])) / 86400));
+}
+$back = '/admin/members/' . (int) $member['id'];
+?>
+<section class="adm-box adm-actionbox">
+    <h2>অবস্থা: <span class="adm-status is-<?= e($current) ?>"><?= e(MemberStatus::label($current)) ?></span></h2>
+    <?php if ((string) ($member['status_note'] ?? '') !== ''): ?>
+        <p class="adm-muted">কারণ/নোট: <?= e((string) $member['status_note']) ?></p>
+    <?php endif; ?>
+    <?php if ($daysLeft !== null): ?>
+        <p class="adm-muted"><?= $current === 'reserved' ? 'আর ' . e(bn($daysLeft)) . ' দিন পর নিজে ডাস্টবিনে যাবে।' : 'আর ' . e(bn($daysLeft)) . ' দিন পর চিরতরে মুছে যাবে।' ?> (এর মধ্যে "ফিরিয়ে আনুন" চাপলে ফেরত আসবে।)</p>
+    <?php endif; ?>
+    <div class="adm-actions adm-actions--row">
+        <?php foreach ($allowed as $action): ?>
+            <?php [$label, $class, $confirm] = $btn[$action]; ?>
+            <form action="/admin/members/action" method="post"<?= $confirm !== '' ? ' data-confirm="' . e($confirm) . '"' : '' ?>>
+                <?= csrf_field() ?>
+                <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
+                <input type="hidden" name="action" value="<?= e($action) ?>">
+                <input type="hidden" name="back" value="<?= e($back) ?>">
+                <?php if (in_array($action, ['hold', 'reject'], true)): ?>
+                    <input class="adm-note" type="text" name="note" maxlength="255" placeholder="কারণ (ঐচ্ছিক)" aria-label="কারণ">
+                <?php endif; ?>
+                <button class="adm-small <?= e($class) ?>" type="submit"><?= e($label) ?></button>
+            </form>
+        <?php endforeach; ?>
+        <?php if ($canPurge): ?>
+            <form action="/admin/members/action" method="post" data-confirm="চিরতরে মুছলে এই সদস্যের সব তথ্য ও ছবি চলে যাবে, আর কখনও ফেরানো যাবে না। সত্যিই মুছবেন?">
+                <?= csrf_field() ?>
+                <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
+                <input type="hidden" name="action" value="purge">
+                <input type="hidden" name="back" value="<?= e($back) ?>">
+                <button class="adm-small adm-small--warn" type="submit">চিরতরে মুছুন</button>
+            </form>
+        <?php endif; ?>
+    </div>
+</section>
 <div class="adm-detail">
     <aside class="adm-detail__photo">
         <?php if ($photoUrl !== null): ?>
