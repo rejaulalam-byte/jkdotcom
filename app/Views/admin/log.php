@@ -9,7 +9,7 @@ $labels = [
     'password_set' => 'পাসওয়ার্ড বসানো', 'password_changed' => 'পাসওয়ার্ড বদল', 'name_changed' => 'নাম বদল', 'email_changed' => 'ইমেইল বদল',
     'admin_created' => 'নতুন অ্যাডমিন', 'admin_disabled' => 'অ্যাডমিন বন্ধ', 'admin_enabled' => 'অ্যাডমিন চালু', 'permissions_changed' => 'অনুমতি বদল',
     'member_approve' => 'অনুমোদন', 'member_hold' => 'হোল্ড', 'member_reject' => 'বাতিল', 'member_reserve' => 'মোছা (সংরক্ষিতে)',
-    'member_trash' => 'ডাস্টবিনে পাঠানো', 'member_restore' => 'ফিরিয়ে আনা', 'member_purged' => 'চিরতরে মোছা', 'sweep' => 'স্বয়ংক্রিয় ঝাড়া',
+    'member_trash' => 'ডাস্টবিনে পাঠানো', 'member_restore' => 'ফিরিয়ে আনা', 'member_reopen' => 'নতুন আবেদনে ফেরানো', 'member_purged' => 'চিরতরে মোছা', 'sweep' => 'স্বয়ংক্রিয় ঝাড়া',
 ];
 ?>
 <div class="adm-tablewrap">

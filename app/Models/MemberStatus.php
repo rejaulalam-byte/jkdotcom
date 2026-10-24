@@ -34,6 +34,7 @@ final class MemberStatus
         'reserve' => [['pending', 'approved', 'suspended', 'rejected'], 'reserved'],
         'trash' => [['reserved'], 'trashed'],
         'restore' => [['reserved', 'trashed'], 'pending'],
+        'reopen' => [['approved', 'suspended', 'rejected'], 'pending'],
     ];
 
     public static function label(string $status): string

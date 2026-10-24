@@ -559,6 +559,8 @@ final class UserRepository
                     $rows[$i]['status_changed_at'] = date('Y-m-d H:i:s');
                     if ($status === 'approved') {
                         $rows[$i]['approved_at'] = date('Y-m-d H:i:s');
+                    } elseif ($status === 'pending') {
+                        $rows[$i]['approved_at'] = null;
                     }
                 }
             }
@@ -569,7 +571,7 @@ final class UserRepository
         try {
             $pdo->prepare(
                 'UPDATE users SET status = :s, status_note = :n, previous_status = :p, status_changed_at = NOW()'
-                . ($status === 'approved' ? ', approved_at = NOW()' : '') . ' WHERE id = :id'
+                . ($status === 'approved' ? ', approved_at = NOW()' : ($status === 'pending' ? ', approved_at = NULL' : '')) . ' WHERE id = :id'
             )->execute([':s' => $status, ':n' => $note, ':p' => $previous !== '' ? $previous : null, ':id' => $id]);
 
             return true;
