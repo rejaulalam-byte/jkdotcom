@@ -11,10 +11,12 @@ use App\Controllers\Admin\LeadsController as AdminLeads;
 use App\Controllers\Admin\LegacyController as AdminLegacy;
 use App\Controllers\Admin\LocksController as AdminLocks;
 use App\Controllers\Admin\MemberEditController as AdminMemberEdit;
+use App\Controllers\Admin\PagesController as AdminPages;
 use App\Controllers\Admin\MembersController as AdminMembers;
 use App\Controllers\Admin\PanelController as AdminPanel;
 use App\Controllers\AccountSetupController;
 use App\Controllers\AdImageController;
+use App\Controllers\PageImageController;
 use App\Controllers\AuthController;
 use App\Controllers\FeedbackController;
 use App\Controllers\HomeController;
@@ -71,6 +73,7 @@ return [
     ['POST', '/account/setup',             [AccountSetupController::class, 'store']],
     ['GET',  '/photo/{slug}',              [AuthController::class, 'photo']],
     ['GET',  '/ad-image/{slug}',           [AdImageController::class, 'show']],
+    ['GET',  '/page-image/{slug}',         [PageImageController::class, 'show']],
     ['GET',  '/profile',                   [ProfileController::class, 'form']],
     ['POST', '/profile',                   [ProfileController::class, 'update']],
     ['GET',  '/dashboard',                 [ProfileController::class, 'dashboardRedirect']],
@@ -125,6 +128,10 @@ return [
     ['POST', admin_base() . '/ads/save',            [AdminAds::class, 'save']],
     ['POST', admin_base() . '/ads/action',          [AdminAds::class, 'action']],
     ['POST', admin_base() . '/ads/show',            [AdminAds::class, 'show']],
+    ['GET',  admin_base() . '/pages',               [AdminPages::class, 'index']],
+    ['GET',  admin_base() . '/pages/edit/{slug}',   [AdminPages::class, 'edit']],
+    ['POST', admin_base() . '/pages/save',          [AdminPages::class, 'save']],
+    ['POST', admin_base() . '/pages/image',         [AdminPages::class, 'image']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],

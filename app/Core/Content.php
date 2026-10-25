@@ -28,6 +28,35 @@ final class Content
         return self::overrides()[$key] ?? self::$defaults[$key] ?? $fallback;
     }
 
+    /** অ্যাডমিন কি এই কী-র লেখা বদলেছেন (ডিফল্ট নয়)? */
+    public static function has(string $key): bool
+    {
+        return array_key_exists($key, self::overrides());
+    }
+
+    /** অ্যাডমিনের বদলানো মান মুছে ডিফল্ট লেখায় ফেরে। সফল হলে true। */
+    public static function forget(string $key): bool
+    {
+        self::$overrides = null;
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $file = BASE_PATH . self::DEMO_FILE;
+            $data = is_file($file) ? json_decode((string) file_get_contents($file), true) : [];
+            $data = is_array($data) ? $data : [];
+            unset($data[$key]);
+
+            return @file_put_contents($file, json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX) !== false;
+        }
+
+        try {
+            return $pdo->prepare('DELETE FROM content_blocks WHERE content_key = :k')->execute([':k' => $key]);
+        } catch (Throwable $e) {
+            Logger::error('Content::forget failed: ' . $e->getMessage());
+
+            return false;
+        }
+    }
+
     /** একটা লেখা/সুইচের মান সংরক্ষণ করে (অ্যাডমিন প্যানেল থেকে)। সফল হলে true। */
     public static function set(string $key, string $value): bool
     {

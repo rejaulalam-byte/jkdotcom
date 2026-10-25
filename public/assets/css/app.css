@@ -2061,6 +2061,31 @@ textarea {
     margin-top: 10px;
 }
 
+/* এডিটরের বাড়তি ছবি-বসানো: ছোট ভাসমান ছবি (চওড়ার ৩০%) ও PNG-এর কিনারা ঘেঁষে লেখা
+   (shape-outside সার্ভারের ছাঁকনি নিজে বসায়, ছবিরই ঠিকানা দিয়ে) */
+.rich .img-right-sm {
+    float: right;
+    width: 30%;
+    margin: 0 0 1.5rem 2.5rem;
+}
+.rich .img-left-sm {
+    float: left;
+    width: 30%;
+    margin: 0 2.5rem 1.5rem 0;
+}
+.rich .img-shape {
+    border-radius: 0;
+}
+@media (max-width: 1199px) {
+    .rich .img-right-sm,
+    .rich .img-left-sm {
+        float: none;
+        display: block;
+        width: auto;
+        margin: 0 auto 1.5rem;
+    }
+}
+
 /* ---- Services page (Figma 2642-54): বর্ণানুক্রমে সব সেবা, তিন কলামে ------------- */
 .section--services-page {
     padding: 9.75rem 0 8rem;

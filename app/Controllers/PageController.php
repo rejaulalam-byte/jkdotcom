@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\Content;
 use App\Core\Session;
 use App\Core\View;
+use App\Models\OpenPages;
 
 /** নকশা-করা কিন্তু এখনও না-বানানো পেইজে একটা ভদ্র "coming soon" পেইজ দেখায়; সঙ্গে সাধারণ লেখার পেইজ। */
 final class PageController
@@ -26,7 +27,7 @@ final class PageController
             'title' => 'রেজিস্ট্রেশন নিয়মাবলী — Jorurikaj.com',
             'description' => 'পেশাজীবী, সেবাগ্রহীতা ও প্রতিনিধি—কারা Jorurikaj.com-এ রেজিস্ট্রেশন করতে পারবেন।',
             'heading' => Content::get('reg.rules.title'),
-            'bodyHtml' => Content::get('page.registration-rules.html', (string) file_get_contents(BASE_PATH . '/app/Content/pages/registration-rules.html')),
+            'bodyHtml' => OpenPages::html('registration-rules'),
         ]);
     }
 
@@ -38,7 +39,7 @@ final class PageController
             'title' => 'পেশাজীবীদের রেজিস্ট্রেশন নির্দেশিকা — Jorurikaj.com',
             'description' => 'পেশাজীবী হিসেবে Jorurikaj.com-এ রেজিস্ট্রেশনের যোগ্যতা, শর্তাবলি ও নিয়মাবলী।',
             'heading' => Content::get('reg.rules.title'),
-            'bodyHtml' => Content::get('page.registration-professional.html', (string) file_get_contents(BASE_PATH . '/app/Content/pages/registration-professional.html')),
+            'bodyHtml' => OpenPages::html('registration-professional'),
         ]);
     }
 
@@ -50,7 +51,7 @@ final class PageController
             'title' => 'প্রতিনিধি রেজিস্ট্রেশনের নিয়মাবলী — Jorurikaj.com',
             'description' => 'এলাকার প্রতিনিধি (এজেন্ট) হিসেবে Jorurikaj.com-এর সঙ্গে কাজ করার যোগ্যতা, দায়িত্ব ও শর্তাবলি।',
             'heading' => Content::get('reg.rules.title'),
-            'bodyHtml' => Content::get('page.registration-agent.html', (string) file_get_contents(BASE_PATH . '/app/Content/pages/registration-agent.html')),
+            'bodyHtml' => OpenPages::html('registration-agent'),
         ]);
     }
 
@@ -100,7 +101,7 @@ final class PageController
             'description' => Content::get("legal.{$page}.description"),
             'heading' => Content::get("legal.{$page}.title"),
             'crumb' => Content::get("legal.{$page}.crumb"),
-            'bodyHtml' => Content::get("page.{$page}.html", (string) file_get_contents(BASE_PATH . "/app/Content/pages/{$page}.html")),
+            'bodyHtml' => OpenPages::html($page),
         ]);
     }
 
@@ -112,7 +113,7 @@ final class PageController
             'title' => 'আমাদের সম্পর্কে — Jorurikaj.com',
             'description' => 'মানুষের প্রয়োজনে, মানুষের পাশে — Jorurikaj.com-এর পরিচয় ও লক্ষ্য।',
             'heading' => 'আমাদের পরিচয়, আমাদের লক্ষ্য',
-            'bodyHtml' => Content::get('page.about.html', (string) file_get_contents(BASE_PATH . '/app/Content/pages/about.html')),
+            'bodyHtml' => OpenPages::html('about'),
         ]);
     }
 }

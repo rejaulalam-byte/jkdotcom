@@ -24,13 +24,29 @@ final class Security
         header('Referrer-Policy: strict-origin-when-cross-origin');
         header('Cross-Origin-Opener-Policy: same-origin');
         header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()');
-        // সবকিছু (স্ক্রিপ্ট, স্টাইল, ফন্ট, ছবি) আমাদের নিজের ডোমেইন থেকেই আসতে হবে।
-        header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; "
-            . "img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; "
-            . "base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
+        self::sendCsp();
         if (self::isHttps()) {
             header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
         }
+    }
+
+    /**
+     * Content-Security-Policy: সবকিছু (স্ক্রিপ্ট, স্টাইল, ফন্ট, ছবি) আমাদের নিজের ডোমেইন থেকেই আসতে হবে।
+     * $styleHashes: এডিটরের লেখার ছাঁকনি-পেরোনো style-মানগুলোর হ্যাশ (RichText::styleHashes()); শুধু সেগুলোই চলে।
+     * $editor: অ্যাডমিনের এডিটর-পেইজ (TinyMCE নিজের ভেতরে style ব্যবহার করে, আর আপলোডের আগে ছবি blob: হিসেবে দেখায়);
+     * স্ক্রিপ্টের নিয়ম তখনও একই কড়া।
+     *
+     * @param list<string> $styleHashes
+     */
+    public static function sendCsp(array $styleHashes = [], bool $editor = false): void
+    {
+        if (headers_sent()) {
+            return;
+        }
+        $style = $editor ? "'self' 'unsafe-inline'" : ($styleHashes === [] ? "'self'" : "'self' 'unsafe-hashes' " . implode(' ', $styleHashes));
+        header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src {$style}; "
+            . 'img-src \'self\' data:' . ($editor ? ' blob:' : '') . "; font-src 'self'; connect-src 'self'; object-src 'none'; "
+            . "base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
     }
 
     public static function csrfToken(): string

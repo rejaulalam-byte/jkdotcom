@@ -11,7 +11,13 @@ final class View
     public static function render(string $view, array $data = [], string $layout = 'layouts/main'): void
     {
         $content = self::boldBrand(self::capture($view, $data));
-        echo self::capture($layout, $data + ['content' => $content]);
+        $page = self::capture($layout, $data + ['content' => $content]);
+        // এডিটরের লেখায় style থাকলে শুধু সেই মানগুলো CSP-তে অনুমতি পায় (RichText)
+        $hashes = RichText::styleHashes();
+        if ($hashes !== []) {
+            Security::sendCsp($hashes);
+        }
+        echo $page;
     }
 
     /** @param array<string,mixed> $data */

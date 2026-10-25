@@ -1,0 +1,38 @@
+/* =====================================================================================================
+   অ্যাডমিন-এডিটরের (TinyMCE) ভেতরের লেখার চেহারা: সাইটের খোলা পেইজের (.rich, app.css) কাছাকাছি, তবে পিক্সেলে
+   (এডিটরের ঘর পর্দার চেয়ে সরু, app.css-এর পর্দা-ভিত্তিক মাপ এখানে খাটে না)। শুধু দেখার জন্য; সাইটের মাপ app.css-এ।
+   ===================================================================================================== */
+@font-face { font-family: "Hind Siliguri"; font-weight: 400; src: url("../fonts/hind-siliguri-400.woff2") format("woff2"); }
+@font-face { font-family: "Hind Siliguri"; font-weight: 500; src: url("../fonts/hind-siliguri-500.woff2") format("woff2"); }
+@font-face { font-family: "Hind Siliguri"; font-weight: 600; src: url("../fonts/hind-siliguri-600.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-weight: 400; src: url("../fonts/poppins-400.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-weight: 500; src: url("../fonts/poppins-500.woff2") format("woff2"); }
+@font-face { font-family: "Poppins"; font-weight: 600; src: url("../fonts/poppins-600.woff2") format("woff2"); }
+
+body.rich {
+    margin: 24px 32px;
+    font-family: "Hind Siliguri", "Poppins", sans-serif;
+    font-size: 20px;
+    line-height: 2;
+    color: #000;
+    display: flow-root;
+}
+.rich h2 { margin: 0 0 28px; font-size: 32px; font-weight: 500; line-height: 1.35; color: #125a6c; }
+.rich h3 { margin: 28px 0 6px; font-size: 28px; font-weight: 600; line-height: 1.3; }
+.rich h4 { margin: 20px 0 6px; font-size: 24px; font-weight: 600; }
+.rich p { margin: 0 0 16px; }
+.rich ul, .rich ol { margin: 0 0 16px; padding-left: 34px; }
+.rich table { width: 100%; margin: 0 0 16px; border-collapse: collapse; }
+.rich th, .rich td { padding: 8px 12px; border: 1px solid rgba(18, 90, 108, 0.2); }
+.rich img { max-width: 100%; height: auto; border-radius: 8px; }
+.rich .img-right { float: right; margin: 0 0 20px 36px; }
+.rich .img-left { float: left; margin: 0 36px 20px 0; }
+.rich .img-right-sm { float: right; width: 30%; margin: 0 0 16px 28px; }
+.rich .img-left-sm { float: left; width: 30%; margin: 0 28px 16px 0; }
+.rich .img-center { display: block; margin: 0 auto 20px; }
+.rich .img-shape { border-radius: 0; }
+.rich .indent { margin-left: 56px; }
+.rich .legal-meta { line-height: 1.6; }
+.ta-center { text-align: center; }
+.ta-right { text-align: right; }
+.ta-justify { text-align: justify; }
