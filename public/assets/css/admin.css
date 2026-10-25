@@ -837,3 +837,32 @@ td.adm-actions form {
         margin-top: 12px;
     }
 }
+
+/* ---- পুরনো কর্মী সক্রিয় করা ---- */
+/* কমন পাসওয়ার্ডের ঘর বাক্সের ৬০% চওড়া, ডানে বাটন: সব এক লাইনে */
+.adm-commonrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+}
+.adm-commonrow .adm-pass {
+    flex: 0 1 60%;
+    max-width: none;
+}
+.adm-commonrow .adm-btn {
+    margin-top: 0;
+}
+/* অবস্থার ট্যাব বাঁয়ে, খোঁজার ঘর একই লাইনের ডানে */
+.adm-toprow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 20px;
+    margin: 0 0 16px;
+}
+.adm-toprow .adm-tabs,
+.adm-toprow .adm-filter {
+    margin: 0;
+}

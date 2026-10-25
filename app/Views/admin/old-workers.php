@@ -44,25 +44,28 @@ $statusClass = ['todo' => 'is-pending', 'called' => 'is-suspended', 'expired' =>
     <form action="<?= e($base) ?>/password" method="post" data-confirm="<?= $common !== null ? 'নতুন পাসওয়ার্ড বসালে আগেরটা আর কাজ করবে না। বদলাবেন?' : 'এই পাসওয়ার্ড বসাবেন?' ?>" novalidate>
         <?= csrf_field() ?>
         <label for="common-password"><?= $common !== null ? 'নতুন কমন পাসওয়ার্ড' : 'কমন পাসওয়ার্ড' ?> (কমপক্ষে <?= e(bn($minPassword)) ?> অক্ষর)</label>
-        <input type="password" id="common-password" name="common_password" minlength="<?= (int) $minPassword ?>" maxlength="72" autocomplete="new-password" required>
-        <button class="adm-btn" type="submit"><?= $common !== null ? 'পাসওয়ার্ড বদলান' : 'পাসওয়ার্ড বসান' ?></button>
+        <div class="adm-commonrow">
+            <div class="adm-pass"><input type="password" id="common-password" name="common_password" minlength="<?= (int) $minPassword ?>" maxlength="72" autocomplete="new-password" required><button class="adm-eye" type="button" hidden aria-pressed="false" aria-controls="common-password" aria-label="পাসওয়ার্ড দেখুন" data-show="পাসওয়ার্ড দেখুন" data-hide="পাসওয়ার্ড লুকান"></button></div>
+            <button class="adm-btn" type="submit"><?= $common !== null ? 'পাসওয়ার্ড বদলান' : 'পাসওয়ার্ড বসান' ?></button>
+        </div>
     </form>
 </div>
 
-<nav class="adm-tabs" aria-label="অবস্থা">
-    <?php foreach ($tabs as [$key, $label, $count]): ?>
-        <a href="<?= e($url(['state' => $key, 'p' => ''])) ?>"<?= $filter['state'] === $key ? ' aria-current="true"' : '' ?>><?= e($label) ?> <b><?= e(bn($count)) ?></b></a>
-    <?php endforeach; ?>
-</nav>
-
-<form class="adm-filter" action="<?= e($base) ?>" method="get">
-    <?php if ($filter['state'] !== ''): ?><input type="hidden" name="state" value="<?= e($filter['state']) ?>"><?php endif; ?>
-    <input type="search" name="q" value="<?= e($filter['q']) ?>" placeholder="নাম, মোবাইল বা ইমেইল" maxlength="100">
-    <button class="adm-small" type="submit">খুঁজুন</button>
-    <?php if ($filter['q'] !== '' || $filter['state'] !== ''): ?>
-        <a class="adm-link" href="<?= e($base) ?>">সব ফিল্টার মুছুন</a>
-    <?php endif; ?>
-</form>
+<div class="adm-toprow">
+    <nav class="adm-tabs" aria-label="অবস্থা">
+        <?php foreach ($tabs as [$key, $label, $count]): ?>
+            <a href="<?= e($url(['state' => $key, 'p' => ''])) ?>"<?= $filter['state'] === $key ? ' aria-current="true"' : '' ?>><?= e($label) ?> <b><?= e(bn($count)) ?></b></a>
+        <?php endforeach; ?>
+    </nav>
+    <form class="adm-filter" action="<?= e($base) ?>" method="get">
+        <?php if ($filter['state'] !== ''): ?><input type="hidden" name="state" value="<?= e($filter['state']) ?>"><?php endif; ?>
+        <input type="search" name="q" value="<?= e($filter['q']) ?>" placeholder="নাম, মোবাইল বা ইমেইল" maxlength="100">
+        <button class="adm-small" type="submit">খুঁজুন</button>
+        <?php if ($filter['q'] !== '' || $filter['state'] !== ''): ?>
+            <a class="adm-link" href="<?= e($base) ?>">সব ফিল্টার মুছুন</a>
+        <?php endif; ?>
+    </form>
+</div>
 
 <p class="adm-muted adm-count"><?= e(bn($total)) ?> জন পাওয়া গেছে</p>
 
