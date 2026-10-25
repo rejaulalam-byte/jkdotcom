@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\Admin\AccessController as AdminAccess;
+use App\Controllers\Admin\LegacyController as AdminLegacy;
 use App\Controllers\Admin\MemberEditController as AdminMemberEdit;
 use App\Controllers\Admin\MembersController as AdminMembers;
 use App\Controllers\Admin\PanelController as AdminPanel;
@@ -99,6 +100,9 @@ return [
     ['POST', admin_base() . '/members/action',      [AdminMembers::class, 'action']],
     ['GET',  admin_base() . '/member-edit/{slug}',  [AdminMemberEdit::class, 'form']],
     ['POST', admin_base() . '/member-edit',         [AdminMemberEdit::class, 'save']],
+    ['GET',  admin_base() . '/old-workers',         [AdminLegacy::class, 'index']],
+    ['POST', admin_base() . '/old-workers/call',    [AdminLegacy::class, 'call']],
+    ['POST', admin_base() . '/old-workers/password', [AdminLegacy::class, 'password']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],

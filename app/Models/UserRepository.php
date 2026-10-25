@@ -854,6 +854,141 @@ final class UserRepository
         return $out;
     }
 
+    /**
+     * "ফোন করা হয়েছে" টিক দেয় (মেয়াদ এখন থেকে LegacyActivation::DAYS দিন) বা তুলে নেয়।
+     * শুধু পুরনো সাইটের কর্মী, যিনি এখনও নিজের পাসওয়ার্ড বসাননি। সফল হলে true।
+     */
+    public static function markCalled(int $id, bool $called): bool
+    {
+        $now = date('Y-m-d H:i:s');
+        $deadline = date('Y-m-d H:i:s', time() + LegacyActivation::DAYS * 86400);
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = self::demoRead();
+            $done = false;
+            foreach ($rows as $i => $row) {
+                if ((int) $row['id'] === $id && (string) ($row['legacy_id'] ?? '') !== '' && (int) ($row['must_change_password'] ?? 0) === 1) {
+                    $rows[$i]['phone_called_at'] = $called ? $now : null;
+                    $rows[$i]['activation_deadline'] = $called ? $deadline : null;
+                    $done = true;
+                }
+            }
+
+            return $done && self::demoWrite($rows);
+        }
+
+        try {
+            $stmt = $pdo->prepare(
+                'UPDATE users SET phone_called_at = :at, activation_deadline = :dl
+                 WHERE id = :id AND legacy_id IS NOT NULL AND must_change_password = 1'
+            );
+            $stmt->execute([':at' => $called ? $now : null, ':dl' => $called ? $deadline : null, ':id' => $id]);
+
+            return $stmt->rowCount() > 0;
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::markCalled failed: ' . $e->getMessage());
+
+            return false;
+        }
+    }
+
+    /** সক্রিয় করার অবস্থা (LegacyActivation::STATES-এর কী) অনুযায়ী SQL-এর শর্ত। */
+    private static function legacyStateSql(string $state): string
+    {
+        return match ($state) {
+            'todo' => 'must_change_password = 1 AND activation_deadline IS NULL',
+            'called' => 'must_change_password = 1 AND activation_deadline >= NOW()',
+            'expired' => 'must_change_password = 1 AND activation_deadline < NOW()',
+            'active' => 'must_change_password = 0',
+            default => '1 = 1',
+        };
+    }
+
+    /**
+     * পুরনো সাইট থেকে আনা কর্মীর তালিকা (সংরক্ষিত/ডাস্টবিনের বাইরে), নাম অনুযায়ী। ফিল্টার: 'state' (খালি = সব), 'q' (নাম, মোবাইল বা ইমেইল)।
+     *
+     * @param array{state?:string,q?:string} $filter
+     * @return array{rows:list<array<string,mixed>>,total:int}
+     */
+    public static function legacyList(array $filter, int $limit, int $offset): array
+    {
+        $state = isset(LegacyActivation::STATES[$filter['state'] ?? '']) ? (string) $filter['state'] : '';
+        $q = trim((string) ($filter['q'] ?? ''));
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = array_values(array_filter(self::demoRead(), static function (array $r) use ($state, $q): bool {
+                $hay = mb_strtolower(implode(' ', [(string) $r['name'], (string) ($r['phone'] ?? ''), (string) ($r['email'] ?? '')]));
+
+                return (string) ($r['legacy_id'] ?? '') !== '' && in_array($r['status'], self::LISTED_STATUSES, true)
+                    && ($state === '' || LegacyActivation::state($r) === $state)
+                    && ($q === '' || str_contains($hay, mb_strtolower($q)));
+            }));
+            usort($rows, static fn (array $a, array $b): int => strcmp((string) $a['name'], (string) $b['name']));
+
+            return ['rows' => array_slice($rows, $offset, $limit), 'total' => count($rows)];
+        }
+
+        $where = ['legacy_id IS NOT NULL', "status IN ('" . implode("','", self::LISTED_STATUSES) . "')", self::legacyStateSql($state)];
+        $args = [];
+        if ($q !== '') {
+            $where[] = '(name LIKE :q1 OR phone LIKE :q2 OR email LIKE :q3)';
+            $like = '%' . addcslashes($q, '%_\\') . '%';
+            $args = [':q1' => $like, ':q2' => $like, ':q3' => $like];
+        }
+        $sqlWhere = implode(' AND ', $where);
+
+        try {
+            $count = $pdo->prepare("SELECT COUNT(*) FROM users WHERE $sqlWhere");
+            $count->execute($args);
+            $stmt = $pdo->prepare(
+                "SELECT id, status, name, phone, phone_raw, email, legacy_id, must_change_password, phone_called_at, activation_deadline
+                 FROM users WHERE $sqlWhere ORDER BY name, id LIMIT " . (int) $limit . ' OFFSET ' . (int) $offset
+            );
+            $stmt->execute($args);
+
+            return ['rows' => $stmt->fetchAll(), 'total' => (int) $count->fetchColumn()];
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::legacyList failed: ' . $e->getMessage());
+
+            return ['rows' => [], 'total' => 0];
+        }
+    }
+
+    /**
+     * পুরনো সাইটের কর্মী অবস্থা অনুযায়ী কত জন (সংরক্ষিত/ডাস্টবিনের বাইরে)।
+     *
+     * @return array<string,int> todo|called|expired|active => সংখ্যা
+     */
+    public static function legacyCounts(): array
+    {
+        $out = array_fill_keys(array_keys(LegacyActivation::STATES), 0);
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            foreach (self::demoRead() as $row) {
+                $state = LegacyActivation::state($row);
+                if ($state !== '' && in_array($row['status'], self::LISTED_STATUSES, true)) {
+                    $out[$state]++;
+                }
+            }
+
+            return $out;
+        }
+
+        try {
+            foreach (array_keys($out) as $state) {
+                $stmt = $pdo->query(
+                    "SELECT COUNT(*) FROM users WHERE legacy_id IS NOT NULL AND status IN ('" . implode("','", self::LISTED_STATUSES) . "') AND "
+                    . self::legacyStateSql($state)
+                );
+                $out[$state] = $stmt === false ? 0 : (int) $stmt->fetchColumn();
+            }
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::legacyCounts failed: ' . $e->getMessage());
+        }
+
+        return $out;
+    }
     /** নতুন পাসওয়ার্ড-হ্যাশ বসায় এবং "পাসওয়ার্ড বদলাতে হবে" চিহ্ন মুছে দেয়। সফল হলে true। */
     public static function changePassword(int $id, string $hash): bool
     {

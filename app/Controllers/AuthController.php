@@ -10,6 +10,7 @@ use App\Core\RateLimiter;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
+use App\Models\LegacyActivation;
 use App\Models\UserRepository;
 
 /**
@@ -88,6 +89,11 @@ final class AuthController
         $find = static fn (?string $r): ?array => $byEmail ? UserRepository::findByEmail($id, $r) : UserRepository::findByPhone($id, $r);
         $user = $find($role);
         $ok = password_verify($password, $user !== null ? (string) $user['password_hash'] : self::DUMMY_HASH);
+        // পুরনো সাইটের কর্মী: অ্যাডমিন ফোন করে টিক দিলে ১৫ দিন কমন প্রাথমিক পাসওয়ার্ডে ঢোকা যায় (তারপর /account/setup-এ নিজের পাসওয়ার্ড)
+        $viaCommon = false;
+        if ($user !== null && !$ok && LegacyActivation::accepts($user, $password)) {
+            $ok = $viaCommon = true;
+        }
         if ($user === null || !$ok) {
             // এই পাশে নেই কিন্তু অন্য পাশে আছে ও পাসওয়ার্ড ঠিক: ভুল লগইন-পেইজের কথা জানানো নিরাপদ
             $other = $user === null ? $find($role === 'agent' ? 'worker' : 'agent') : null;
@@ -116,7 +122,8 @@ final class AuthController
         }
         RateLimiter::clear($bucket);
 
-        $rehash = password_needs_rehash((string) $user['password_hash'], PASSWORD_DEFAULT) ? password_hash($password, PASSWORD_DEFAULT) : null;
+        // কমন পাসওয়ার্ডে ঢুকলে সেটা কর্মীর নিজের হ্যাশ হিসেবে কখনও রাখা হয় না
+        $rehash = !$viaCommon && password_needs_rehash((string) $user['password_hash'], PASSWORD_DEFAULT) ? password_hash($password, PASSWORD_DEFAULT) : null;
         UserRepository::touchLogin((int) $user['id'], $rehash);
         Auth::login((int) $user['id']);
         redirect(UserRepository::needsSetup($user) ? '/account/setup' : ((int) ($user['must_change_password'] ?? 0) === 1 ? '/account/password' : '/profile'));
