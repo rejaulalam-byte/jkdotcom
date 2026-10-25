@@ -473,7 +473,7 @@ final class UserRepository
      * প্রথম লগইনের তথ্য পূর্ণ করা: নতুন পাসওয়ার্ড, ইমেইল, ঠিকানা, সম্মতি (এবং মোবাইল না থাকলে মোবাইল)।
      * 'ok', 'duplicate' (মোবাইল), 'duplicate_email' বা 'error' ফেরত দেয়।
      *
-     * @param array<string,mixed> $data password_hash, email, address, এবং ঐচ্ছিক phone
+     * @param array<string,mixed> $data password_hash, email, address, gender, upazila_id, district_id, division_id, reference_1, reference_2, এবং ঐচ্ছিক phone
      */
     public static function completeSetup(int $id, array $data): string
     {
@@ -502,6 +502,8 @@ final class UserRepository
                     $rows[$i] = array_merge($row, [
                         'password_hash' => $data['password_hash'], 'must_change_password' => 0,
                         'email' => $data['email'], 'address' => $data['address'], 'consent_at' => date('Y-m-d H:i:s'),
+                        'gender' => $data['gender'], 'upazila_id' => $data['upazila_id'], 'district_id' => $data['district_id'],
+                        'division_id' => $data['division_id'], 'reference_1' => $data['reference_1'], 'reference_2' => $data['reference_2'],
                     ], $hasPhone ? ['phone' => $data['phone'], 'phone_raw' => null] : []);
                 }
             }
@@ -510,9 +512,12 @@ final class UserRepository
         }
 
         try {
-            $sets = 'password_hash = :hash, must_change_password = 0, email = :email, address = :address, consent_at = NOW()'
+            $sets = 'password_hash = :hash, must_change_password = 0, email = :email, address = :address, consent_at = NOW(),
+                gender = :gender, upazila_id = :upz, district_id = :dist, division_id = :div, reference_1 = :ref1, reference_2 = :ref2'
                 . ($hasPhone ? ', phone = :phone, phone_raw = NULL' : '');
-            $args = [':id' => $id, ':hash' => $data['password_hash'], ':email' => $data['email'], ':address' => $data['address']]
+            $args = [':id' => $id, ':hash' => $data['password_hash'], ':email' => $data['email'], ':address' => $data['address'],
+                ':gender' => $data['gender'], ':upz' => $data['upazila_id'], ':dist' => $data['district_id'], ':div' => $data['division_id'],
+                ':ref1' => $data['reference_1'], ':ref2' => $data['reference_2']]
                 + ($hasPhone ? [':phone' => $data['phone']] : []);
             $pdo->prepare("UPDATE users SET $sets WHERE id = :id")->execute($args);
 
