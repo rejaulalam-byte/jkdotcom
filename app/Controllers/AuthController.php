@@ -20,10 +20,11 @@ use App\Models\UserRepository;
 final class AuthController
 {
     /** ব্যর্থ-চেষ্টার হিসাবের মেয়াদ (১৫ মিনিট) ও সীমা: আইডি-প্রতি নরম ৫, কড়া ১০; ডিভাইস-প্রতি কড়া ২০। */
-    private const WINDOW = 900;
-    private const ID_SOFT_LIMIT = 5;
-    private const ID_HARD_LIMIT = 10;
-    private const DEVICE_HARD_LIMIT = 20;
+    /** লগইনের ভুল-চেষ্টার সীমা (অ্যাডমিনের "আটকানো লগইন" পেইজও এগুলো ব্যবহার করে)। */
+    public const WINDOW = 900;
+    public const ID_SOFT_LIMIT = 5;
+    public const ID_HARD_LIMIT = 10;
+    public const DEVICE_HARD_LIMIT = 20;
 
     /** আসল ব্যবহারকারী না মিললেও একই সময় লাগানোর জন্য নকল হ্যাশ: ফলে মোবাইল-নাম্বার আছে কি না সময় মেপে জানা যায় না। */
     private const DUMMY_HASH = '$2y$10$jAX9q737WKgze0Ox2Hg28OtOoPWtS0.WFdEf2wUrFQMl73taY7U3e';
