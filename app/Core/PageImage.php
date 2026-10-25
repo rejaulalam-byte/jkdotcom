@@ -61,4 +61,38 @@ final class PageImage
     {
         return BASE_PATH . '/storage/uploads/pages';
     }
+
+    /** /page-image/<নাম> ঠিকানার আসল ফাইল (না থাকলে null)। */
+    private static function file(string $url): ?string
+    {
+        if (preg_match('#^/page-image/([a-f0-9]{32})$#', $url, $m) !== 1) {
+            return null;
+        }
+        foreach (['jpg', 'png', 'webp'] as $ext) {
+            $file = self::directory() . '/' . $m[1] . '.' . $ext;
+            if (is_file($file)) {
+                return $file;
+            }
+        }
+
+        return null;
+    }
+
+    /** ছবির মাপ [চওড়া, উচ্চতা] (না পেলে [0, 0])। @return array{0:int,1:int} */
+    public static function dimensions(string $url): array
+    {
+        $file = self::file($url);
+        $info = $file !== null ? @getimagesize($file) : false;
+
+        return $info === false ? [0, 0] : [(int) $info[0], (int) $info[1]];
+    }
+
+    /** ছবির ফাইল মোছে (আর দরকার না হলে)। */
+    public static function remove(string $url): void
+    {
+        $file = self::file($url);
+        if ($file !== null) {
+            @unlink($file);
+        }
+    }
 }

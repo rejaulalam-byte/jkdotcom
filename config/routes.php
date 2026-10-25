@@ -128,6 +128,7 @@ return [
     ['POST', admin_base() . '/ads/save',            [AdminAds::class, 'save']],
     ['POST', admin_base() . '/ads/action',          [AdminAds::class, 'action']],
     ['POST', admin_base() . '/ads/show',            [AdminAds::class, 'show']],
+    ['POST', admin_base() . '/ads/popup',           [AdminAds::class, 'popup']],
     ['GET',  admin_base() . '/studio',              [AdminStudio::class, 'index']],
     ['POST', admin_base() . '/studio/save',         [AdminStudio::class, 'save']],
     ['POST', admin_base() . '/studio/image',        [AdminStudio::class, 'image']],

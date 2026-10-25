@@ -5088,3 +5088,62 @@ a.wk-pages__item:focus-visible {
         height: 3.5rem;
     }
 }
+
+/* ---- পপ-আপ বিজ্ঞাপন: মেনুর ঠিক নিচে, পেইজের মাঝখানে, ছবির নিজের মাপে (ছোট পর্দায় অনুপাত রেখে ছোট) ---- */
+#main {
+    position: relative;
+}
+.popup-ad {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 50; /* লেখার ওপরে, কিন্তু আটকে-থাকা মেনুর নিচে */
+    width: fit-content;
+    max-width: calc(100% - 2rem);
+    margin: 0 auto;
+    box-shadow: 0 0.75rem 2.5rem rgba(0, 0, 0, 0.35);
+    background: var(--white);
+    animation: popup-ad-in 0.4s ease-out;
+}
+.popup-ad[hidden] {
+    display: none;
+}
+.popup-ad img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+.popup-ad__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 2px solid var(--white);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.65);
+    color: var(--white);
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+}
+.popup-ad__close:hover,
+.popup-ad__close:focus-visible {
+    background: var(--red, #c0392b);
+    outline: none;
+}
+@keyframes popup-ad-in {
+    from { opacity: 0; transform: translateY(-1.5rem); }
+    to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .popup-ad { animation: none; }
+}
+@media (max-width: 1199px) {
+    .popup-ad__close {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.5rem;
+    }
+}

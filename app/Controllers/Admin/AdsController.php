@@ -7,15 +7,17 @@ namespace App\Controllers\Admin;
 use App\Core\AdImage;
 use App\Core\AdminAuth;
 use App\Core\Content;
+use App\Core\PageImage;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\AdRepository;
 use App\Models\AdminRepository;
+use App\Models\PopupAd;
 
 /**
  * হোমের বিজ্ঞাপন-স্ট্রিপ (/admin/ads): নতুন বিজ্ঞাপন (ছবি + ঐচ্ছিক লিংক ও তারিখ), বদলানো, চালু/বন্ধ, ক্রম, মোছা এবং
- * "স্ট্রিপ দেখাও" সুইচ (home.ads.show)। ছবির নিয়ম AdImage-এ। অনুমতি: "ads"।
+ * "স্ট্রিপ দেখাও" সুইচ (home.ads.show), আর পপ-আপ বিজ্ঞাপন (PopupAd)। স্ট্রিপের ছবির নিয়ম AdImage-এ। অনুমতি: "ads"।
  */
 final class AdsController
 {
@@ -29,6 +31,7 @@ final class AdsController
             'title' => 'বিজ্ঞাপন',
             'ads' => AdRepository::all(),
             'stripOn' => Content::get('home.ads.show', '1') !== '0',
+            'popup' => PopupAd::settings(),
             'errors' => Session::pull('admin_errors', []),
             'ok' => Session::pull('admin_ok'),
             'old' => Session::pull('admin_old', []),
@@ -159,6 +162,48 @@ final class AdsController
         }
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], $on ? 'ads_strip_on' : 'ads_strip_off', 'হোমের বিজ্ঞাপন-স্ট্রিপ');
         $this->ok($on ? 'হোমে বিজ্ঞাপন-স্ট্রিপ দেখানো হবে।' : 'হোমে বিজ্ঞাপন-স্ট্রিপ লুকানো হলো (বিজ্ঞাপনগুলো থাকছে)।');
+    }
+
+    /** POST: active, pages[], link, title, image (নতুন ছবি, ঐচ্ছিক), remove_image — পপ-আপ বিজ্ঞাপন। */
+    public function popup(): void
+    {
+        $admin = AdminAuth::require('ads');
+        $this->checkCsrf();
+
+        $linkRaw = clean_input($_POST['link'] ?? '', 500);
+        $link = $linkRaw === '' ? '' : (string) Security::safeUrl($linkRaw);
+        if ($linkRaw !== '' && $link === '') {
+            $this->fail('লিংক শুধু http:// বা https:// দিয়ে শুরু হওয়া সঠিক ওয়েব-ঠিকানা হতে পারে।');
+        }
+        $pages = array_map('strval', is_array($_POST['pages'] ?? null) ? $_POST['pages'] : []);
+        $active = !empty($_POST['active']);
+
+        $image = null;
+        if (!empty($_FILES['image']) && ($_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+            [$url, $error] = PageImage::store($_FILES['image']);
+            if ($url === null) {
+                $this->fail((string) $error);
+            }
+            [$w, $h] = PageImage::dimensions($url);
+            $image = ['url' => $url, 'width' => $w, 'height' => $h];
+        } elseif (!empty($_POST['remove_image'])) {
+            $image = '';
+        }
+        if ($active && $image === '') {
+            $active = false;
+        }
+        if ($active && $image === null && PopupAd::settings()['image'] === '') {
+            $this->fail('চালু করার আগে একটা ছবি দিন।');
+        }
+        if ($active && $pages === []) {
+            $this->fail('কোন পেইজে দেখাবে, অন্তত একটায় টিক দিন।');
+        }
+
+        if (!PopupAd::save($active, $pages, $link, clean_input($_POST['title'] ?? '', 150), $image)) {
+            $this->fail('সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।');
+        }
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'popup_save', ($active ? 'চালু' : 'বন্ধ') . ' — ' . implode(', ', $pages));
+        $this->ok($active ? 'পপ-আপ বিজ্ঞাপন চালু; বাছা পেইজগুলো খুললেই দেখাবে।' : 'পপ-আপ বিজ্ঞাপন সংরক্ষিত (বন্ধ আছে)।');
     }
 
     /** "Y-m-d" তারিখ; ফাঁকা হলে null, ভুল হলে false। */

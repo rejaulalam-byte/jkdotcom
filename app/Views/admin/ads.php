@@ -4,6 +4,7 @@
  *
  * @var list<array<string,mixed>> $ads
  * @var bool $stripOn
+ * @var array{active:bool,image:string,width:int,height:int,link:string,title:string,pages:list<string>} $popup
  * @var array<string,mixed> $old   জমা ব্যর্থ হলে আগের লেখা (id, title, link, start, end)
  */
 use App\Core\AdImage;
@@ -23,6 +24,42 @@ $rules = static function (): string {
 // তারিখের ঘরের মান: "Y-m-d H:i:s" থেকে "Y-m-d"
 $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 0, 10) : '';
 ?>
+<div class="adm-box">
+    <h2 class="adm-card__title">পপ-আপ বিজ্ঞাপন</h2>
+    <p>
+        অবস্থা: <b><?= $popup['active'] && $popup['image'] !== '' ? 'চালু' : 'বন্ধ' ?></b>
+        <span class="adm-muted">— বাছা পেইজ খুললেই (প্রতিবার, রিফ্রেশেও) মেনুর ঠিক নিচে পেইজের মাঝখানে দেখায়; ওপরের ডান কোনার (×) চাপলে বা <?= e(bn(App\Models\PopupAd::SECONDS)) ?> সেকেন্ড পরে নিজে সরে যায়।</span>
+    </p>
+    <form action="<?= $post('popup') ?>" method="post" enctype="multipart/form-data" novalidate>
+        <?= csrf_field() ?>
+        <?php if ($popup['image'] !== ''): ?>
+            <p><img class="adm-ad__thumb" src="<?= e($popup['image']) ?>" alt="" height="90"> <span class="adm-muted">এখনকার ছবি: <?= e(bn($popup['width'])) ?>×<?= e(bn($popup['height'])) ?> পিক্সেল</span></p>
+            <label class="adm-check"><input type="checkbox" name="remove_image" value="1"> ছবিটা সরিয়ে দিন</label>
+        <?php endif; ?>
+        <label for="pp-image"><?= $popup['image'] !== '' ? 'ছবি বদলাতে নতুন ছবি দিন (না দিলে এখনকারটাই থাকবে)' : 'ছবি' ?></label>
+        <input id="pp-image" type="file" name="image" accept="image/jpeg,image/png,image/webp">
+        <ul class="adm-rules">
+            <li><b>মাপ:</b> ছবি যত বড়, পেইজে ঠিক তত বড়ই দেখায় (মেনুর নিচ থেকে নিচের দিকে)। হোমের ওপরের বড় অংশ (হিরো) ১৯২০ পিক্সেল চওড়া পর্দায় প্রায় ৯৫০ পিক্সেল উঁচু, তাই ছবির উচ্চতা তার চেয়ে কম রাখুন। পরামর্শ: চওড়া ৬০০–১২০০, উচ্চতা ৪০০–৮৫০ পিক্সেল।</li>
+            <li><b>ছোট পর্দা:</b> পর্দার চেয়ে চওড়া হলে ছবি অনুপাত ঠিক রেখে নিজে ছোট হয়।</li>
+            <li><b>ফরমেট:</b> JPG, PNG বা WebP। ফাইল সাইজ সর্বোচ্চ ২ MB।</li>
+        </ul>
+
+        <label for="pp-title">বিজ্ঞাপনের নাম (বিজ্ঞাপনদাতার নাম; ছবির বিকল্প লেখা হিসেবেও যায়)</label>
+        <input id="pp-title" type="text" name="title" maxlength="150" value="<?= e($popup['title']) ?>">
+        <label for="pp-link">লিংক (ঐচ্ছিক — ছবিতে ক্লিক করলে বিজ্ঞাপনদাতার ওয়েবসাইট নতুন ট্যাবে খোলে)</label>
+        <input id="pp-link" type="text" name="link" maxlength="500" placeholder="https://" value="<?= e($popup['link']) ?>">
+
+        <fieldset>
+            <legend>কোন পেইজে দেখাবে</legend>
+            <?php foreach (App\Models\PopupAd::PAGES as $id => [$label]): ?>
+                <label class="adm-check"><input type="checkbox" name="pages[]" value="<?= e($id) ?>"<?= in_array($id, $popup['pages'], true) ? ' checked' : '' ?>> <?= e($label) ?></label>
+            <?php endforeach; ?>
+        </fieldset>
+        <label class="adm-check"><input type="checkbox" name="active" value="1"<?= $popup['active'] ? ' checked' : '' ?>> চালু (টিক তুলে দিলে বন্ধ; ছবি ও পছন্দগুলো থাকে)</label>
+        <button class="adm-btn" type="submit">পপ-আপ বিজ্ঞাপন সংরক্ষণ করুন</button>
+    </form>
+</div>
+
 <div class="adm-box">
     <h2 class="adm-card__title">হোমের বিজ্ঞাপন-স্ট্রিপ</h2>
     <p>

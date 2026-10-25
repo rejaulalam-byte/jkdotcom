@@ -33,6 +33,7 @@ $pageDescription = $description ?? content('site.description');
 <?php require BASE_PATH . '/app/Views/partials/header.php'; ?>
 
 <main id="main">
+<?php require BASE_PATH . '/app/Views/partials/popup-ad.php'; ?>
 <?= $content ?>
 </main>
 

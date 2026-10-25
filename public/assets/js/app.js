@@ -5,7 +5,7 @@
      মেনু (মোবাইল মেনু, সাব-মেনু) · বার্তা-বক্স · তারিখ ঘর · Hero অক্ষরের অ্যানিমেশন
      ওপরে-যাওয়ার বাটন · FAQ · আজকের কাজের তালিকা · Marquee · Services সারি
      Advertisement strip · কাজের ধরন ড্রপডাউন · এলাকার তিন ড্রপডাউন
-     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ · কর্মী-তালিকা · কাজের জেলার ট্যাগ · পাসওয়ার্ড দেখা/লুকানো · রেজিস্ট্রেশনের ছবি · ফর্মের ভুল-বার্তা
+     Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ · কর্মী-তালিকা · কাজের জেলার ট্যাগ · পাসওয়ার্ড দেখা/লুকানো · রেজিস্ট্রেশনের ছবি · ফর্মের ভুল-বার্তা · পপ-আপ বিজ্ঞাপন
 
    প্রতিটি অংশ নিজের মতো স্বাধীন: ওই অংশের উপাদান পেইজে না থাকলে সে চুপচাপ বাদ পড়ে।
    ========================================================================== */
@@ -1756,4 +1756,29 @@
             }
         });
     });
+})();
+
+/* ---- পপ-আপ বিজ্ঞাপন ([data-popup-ad], partials/popup-ad.php) ---------------------------
+   পেইজ খুললেই দেখায়; (×) চাপলে, Esc চাপলে বা data-seconds সেকেন্ড পরে সরে যায়। প্রতিবার খুললে আবার দেখায়। */
+(function () {
+    "use strict";
+    var box = document.querySelector("[data-popup-ad]");
+    if (!box) {
+        return;
+    }
+    var timer = null;
+    function close() {
+        box.hidden = true;
+        window.clearTimeout(timer);
+        document.removeEventListener("keydown", onKey);
+    }
+    function onKey(e) {
+        if (e.key === "Escape") {
+            close();
+        }
+    }
+    box.hidden = false;
+    box.querySelector("[data-popup-close]").addEventListener("click", close);
+    document.addEventListener("keydown", onKey);
+    timer = window.setTimeout(close, (parseInt(box.getAttribute("data-seconds"), 10) || 20) * 1000);
 })();
