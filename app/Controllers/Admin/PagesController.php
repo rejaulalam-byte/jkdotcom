@@ -34,7 +34,7 @@ final class PagesController
         header('Cache-Control: no-store');
         View::render('admin/pages', [
             'admin' => $admin,
-            'title' => 'পেইজের লেখা',
+            'title' => 'সাইটের লেখা',
             'pages' => $pages,
             'errors' => Session::pull('admin_errors', []),
             'ok' => Session::pull('admin_ok'),

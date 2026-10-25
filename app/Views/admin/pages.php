@@ -4,6 +4,8 @@
  *
  * @var list<array{slug:string,title:string,url:string,changed:bool}> $pages
  */
+$activeTab = 'open';
+require __DIR__ . '/text-tabs.php';
 ?>
 <p class="adm-muted">
     এই পেইজগুলোর মূল লেখা একটাই খোলা লেখার জায়গা। "সম্পাদনা" চাপলে পূর্ণ ফরম্যাটিং এডিটর খোলে: শিরোনাম, রং, ফন্ট ও আকার,

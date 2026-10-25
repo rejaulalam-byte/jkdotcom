@@ -1,3 +1,4 @@
+## 2026-10-26: admin 5b built (one menu "সাইটের লেখা": open pages / short page texts / messages). Next: 5c coloured texts to full editor + job-notice details editor; then step 6.
 ## 2026-10-26: admin step 5a (rich editor for the 6 open pages, TinyMCE 6.8.6 MIT, sanitiser + CSP style hashes) built. Next: 5b other site texts.
 ## 2026-10-25 night: admin step 4 (ads) built, no migration. Next (owner order): step 5 = texts + full rich editor; ... Also pending: second admin door ADMIN_PATH_STAFF.
 ## 2026-10-25 night: admin step 3 complete (3a feedback, 3b leads + job notices, 3c lock release). Next: step 4 ads + images (migration none yet). Reminder: second admin door ADMIN_PATH_STAFF later.
