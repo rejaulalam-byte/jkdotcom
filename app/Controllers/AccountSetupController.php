@@ -14,7 +14,7 @@ use App\Models\UserRepository;
 
 /**
  * পুরনো সাইট থেকে আনা কর্মীর প্রথম লগইনের "তথ্য পূর্ণ করুন" ধাপ (/account/setup):
- * নতুন পাসওয়ার্ড, জেন্ডার, ইমেইল, ঠিকানা ও এলাকা, দুই রেফারেন্স (মোবাইল না থাকলে মোবাইলও) ও সম্মতি — সবই আবশ্যক;
+ * নতুন পাসওয়ার্ড, জেন্ডার, ইমেইল, ঠিকানা ও এলাকা (মোবাইল না থাকলে মোবাইলও) ও সম্মতি — সবই আবশ্যক; দুই রেফারেন্স ঐচ্ছিক;
  * কোনটা বাকি থাকলে তার নাম ধরে জানানো হয়, তাই অ্যাডমিনের আলাদা যাচাই লাগে না। শেষ না হওয়া পর্যন্ত অন্য পেইজে যাওয়া যায় না
  * (লগইন ও প্রোফাইল এখানে পাঠায়)। সাধারণ নতুন সদস্যের জন্য এই ধাপ নেই।
  */
@@ -100,11 +100,6 @@ final class AccountSetupController
         if ($data['upazila_id'] > 0 && $data['district_id'] > 0 && $data['division_id'] > 0
             && !GeoRepository::isConsistent($data['division_id'], $data['district_id'], $data['upazila_id'])) {
             $errors[] = 'উপজেলা/থানা, জেলা ও বিভাগ একটার সঙ্গে আরেকটা মেলেনি। আবার বাছাই করুন।';
-        }
-        foreach (['reference_1' => 'setup.f.ref1', 'reference_2' => 'setup.f.ref2'] as $field => $labelKey) {
-            if ($data[$field] === '') {
-                $errors[] = '"' . content($labelKey) . '" ' . $missing;
-            }
         }
         if (empty($_POST['consent'])) {
             $errors[] = content('consent.error');

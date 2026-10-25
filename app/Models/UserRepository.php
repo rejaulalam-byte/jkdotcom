@@ -517,7 +517,7 @@ final class UserRepository
                 . ($hasPhone ? ', phone = :phone, phone_raw = NULL' : '');
             $args = [':id' => $id, ':hash' => $data['password_hash'], ':email' => $data['email'], ':address' => $data['address'],
                 ':gender' => $data['gender'], ':upz' => $data['upazila_id'], ':dist' => $data['district_id'], ':div' => $data['division_id'],
-                ':ref1' => $data['reference_1'], ':ref2' => $data['reference_2']]
+                ':ref1' => $data['reference_1'] !== '' ? $data['reference_1'] : null, ':ref2' => $data['reference_2'] !== '' ? $data['reference_2'] : null]
                 + ($hasPhone ? [':phone' => $data['phone']] : []);
             $pdo->prepare("UPDATE users SET $sets WHERE id = :id")->execute($args);
 

@@ -1,8 +1,8 @@
 <?php
 /**
  * পুরনো সাইট থেকে আনা কর্মীর প্রথম লগইনের "তথ্য পূর্ণ করুন" পেইজ (Figma-তে নকশা নেই; লগইন কার্ডের বিন্যাসই)।
- * নতুন পাসওয়ার্ড (চোখ-বাটনসহ), জেন্ডার, ইমেইল, মোবাইল (না থাকলে), ঠিকানা, উপজেলা/জেলা/বিভাগ, দুই রেফারেন্স ও সম্মতির টিক:
- * সবই আবশ্যক (লাল *); যে তথ্য বাকি থাকে সার্ভার সেটার নাম ধরে জানায়।
+ * নতুন পাসওয়ার্ড (চোখ-বাটনসহ), জেন্ডার, ইমেইল, মোবাইল (না থাকলে), ঠিকানা, উপজেলা/জেলা/বিভাগ, সম্মতির টিক আবশ্যক (লাল *); দুই রেফারেন্স ঐচ্ছিক:
+ * যে তথ্য বাকি থাকে সার্ভার সেটার নাম ধরে জানায়।
  *
  * @var string $heading
  * @var array<string,mixed> $user
@@ -125,9 +125,9 @@ $pwRows = [
             </div>
             <?php foreach ([['st-ref1', 'reference_1', 'setup.f.ref1'], ['st-ref2', 'reference_2', 'setup.f.ref2']] as [$id, $name, $labelKey]): ?>
                 <div class="login-card__row">
-                    <label for="<?= e($id) ?>"><?= e(content($labelKey)) ?><?= $star ?></label>
+                    <label for="<?= e($id) ?>"><?= e(content($labelKey)) ?></label>
                     <div class="lg-field lg-field--area">
-                        <textarea id="<?= e($id) ?>" data-bn name="<?= e($name) ?>" maxlength="300" required rows="3"><?= $val($name, (string) ($user[$name] ?? '')) ?></textarea>
+                        <textarea id="<?= e($id) ?>" data-bn name="<?= e($name) ?>" maxlength="300" rows="3" placeholder="<?= e(content('setup.f.ref_hint')) ?>"><?= $val($name, (string) ($user[$name] ?? '')) ?></textarea>
                     </div>
                 </div>
             <?php endforeach; ?>
