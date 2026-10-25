@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\Admin\AccessController as AdminAccess;
+use App\Controllers\Admin\IncompleteController as AdminIncomplete;
 use App\Controllers\Admin\LegacyController as AdminLegacy;
 use App\Controllers\Admin\MemberEditController as AdminMemberEdit;
 use App\Controllers\Admin\MembersController as AdminMembers;
@@ -103,6 +104,9 @@ return [
     ['GET',  admin_base() . '/old-workers',         [AdminLegacy::class, 'index']],
     ['POST', admin_base() . '/old-workers/call',    [AdminLegacy::class, 'call']],
     ['POST', admin_base() . '/old-workers/password', [AdminLegacy::class, 'password']],
+    ['GET',  admin_base() . '/incomplete',          [AdminIncomplete::class, 'index']],
+    ['POST', admin_base() . '/incomplete/save',     [AdminIncomplete::class, 'save']],
+    ['POST', admin_base() . '/incomplete/mail',     [AdminIncomplete::class, 'mail']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],

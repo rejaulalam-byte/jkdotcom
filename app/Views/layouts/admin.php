@@ -22,6 +22,7 @@ $nav = [
     [admin_base() . '/workers', 'কর্মী', false, 'registrations'],
     [admin_base() . '/agents', 'প্রতিনিধি', false, 'registrations'],
     [admin_base() . '/old-workers', 'পুরনো কর্মী সক্রিয় করা', false, 'registrations'],
+    [admin_base() . '/incomplete', 'অসম্পূর্ণ তথ্য', false, 'registrations'],
     [admin_base() . '/account', 'আমার অ্যাকাউন্ট', false, null],
     [admin_base() . '/admins', 'অ্যাডমিন', true, null],
     [admin_base() . '/log', 'কার্যলগ', true, null],

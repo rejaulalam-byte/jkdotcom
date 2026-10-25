@@ -866,3 +866,23 @@ td.adm-actions form {
 .adm-toprow .adm-filter {
     margin: 0;
 }
+
+/* ---- অসম্পূর্ণ তথ্য ---- */
+/* খালি ঘর লাল ধারে; টেবিলের ঘরে ছোট করে বসে */
+.adm-missing {
+    width: 100%;
+    min-width: 150px;
+    max-width: 260px;
+    height: 46px;
+    border-color: var(--red);
+}
+.adm-chip {
+    display: inline-block;
+    margin: 0 4px 4px 0;
+    white-space: nowrap;
+}
+.adm-table--incomplete .adm-actions form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}

@@ -994,6 +994,161 @@ final class UserRepository
 
         return $out;
     }
+    /**
+     * অনুমোদিত কর্মীদের মধ্যে যাদের তথ্য বাকি (IncompleteInfo): $filter খালি = মূল চারটার (মোবাইল, ইমেইল, ঠিকানা, এলাকা) যেকোনোটা,
+     * নইলে একটা কী। $q = নাম, মোবাইল বা ইমেইলের অংশ। নাম অনুযায়ী সাজানো।
+     *
+     * @return array{rows:list<array<string,mixed>>,total:int}
+     */
+    public static function incompleteList(string $filter, string $q, int $limit, int $offset): array
+    {
+        $filter = isset(IncompleteInfo::LABELS[$filter]) ? $filter : '';
+        $q = trim($q);
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = array_values(array_filter(self::demoRead(), static function (array $r) use ($filter, $q): bool {
+                if ($r['role'] !== 'worker' || $r['status'] !== 'approved') {
+                    return false;
+                }
+                $missing = IncompleteInfo::missing($r);
+                $hay = mb_strtolower(implode(' ', [(string) $r['name'], (string) ($r['phone'] ?? ''), (string) ($r['email'] ?? '')]));
+
+                return ($filter === '' ? array_intersect($missing, IncompleteInfo::CORE) !== [] : in_array($filter, $missing, true))
+                    && ($q === '' || str_contains($hay, mb_strtolower($q)));
+            }));
+            usort($rows, static fn (array $a, array $b): int => strcmp((string) $a['name'], (string) $b['name']));
+
+            return ['rows' => array_slice($rows, $offset, $limit), 'total' => count($rows)];
+        }
+
+        $where = ["role = 'worker'", "status = 'approved'", IncompleteInfo::sqlFor($filter)];
+        $args = [];
+        if ($q !== '') {
+            $where[] = '(name LIKE :q1 OR phone LIKE :q2 OR email LIKE :q3)';
+            $like = '%' . addcslashes($q, '%_\\') . '%';
+            $args = [':q1' => $like, ':q2' => $like, ':q3' => $like];
+        }
+        $sqlWhere = implode(' AND ', $where);
+
+        try {
+            $count = $pdo->prepare("SELECT COUNT(*) FROM users WHERE $sqlWhere");
+            $count->execute($args);
+            $stmt = $pdo->prepare(
+                "SELECT id, name, phone, phone_raw, email, address, upazila_id, experience_years, bio, legacy_id
+                 FROM users WHERE $sqlWhere ORDER BY name, id LIMIT " . (int) $limit . ' OFFSET ' . (int) $offset
+            );
+            $stmt->execute($args);
+
+            return ['rows' => $stmt->fetchAll(), 'total' => (int) $count->fetchColumn()];
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::incompleteList failed: ' . $e->getMessage());
+
+            return ['rows' => [], 'total' => 0];
+        }
+    }
+
+    /**
+     * অনুমোদিত কর্মীদের মধ্যে কোন তথ্য কত জনের বাকি। কী '' = মূল চারটার যেকোনোটা বাকি এমন কর্মী (ট্যাব "সব")।
+     *
+     * @return array<string,int>
+     */
+    public static function incompleteCounts(): array
+    {
+        $out = array_fill_keys(array_merge([''], array_keys(IncompleteInfo::LABELS)), 0);
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            foreach (self::demoRead() as $row) {
+                if ($row['role'] !== 'worker' || $row['status'] !== 'approved') {
+                    continue;
+                }
+                $missing = IncompleteInfo::missing($row);
+                foreach ($missing as $key) {
+                    $out[$key]++;
+                }
+                if (array_intersect($missing, IncompleteInfo::CORE) !== []) {
+                    $out['']++;
+                }
+            }
+
+            return $out;
+        }
+
+        try {
+            foreach (array_keys($out) as $key) {
+                $stmt = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'worker' AND status = 'approved' AND " . IncompleteInfo::sqlFor((string) $key));
+                $out[$key] = $stmt === false ? 0 : (int) $stmt->fetchColumn();
+            }
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::incompleteCounts failed: ' . $e->getMessage());
+        }
+
+        return $out;
+    }
+
+    /**
+     * অ্যাডমিন একজন কর্মীর খালি থাকা মোবাইল/ইমেইল/ঠিকানা বসায় (যে কী-তে মান আছে শুধু সেটাই বদলায়, বাকি যেমন আছে)।
+     * মোবাইল বসলে phone_raw মুছে যায়। 'ok', 'duplicate' (মোবাইল), 'duplicate_email' বা 'error' ফেরত দেয়।
+     *
+     * @param array{phone?:string,email?:string,address?:string} $fields
+     */
+    public static function fillMissing(int $id, array $fields): string
+    {
+        $member = self::findById($id);
+        if ($member === null) {
+            return 'error';
+        }
+        $role = (string) $member['role'];
+        $columns = [];
+        foreach (IncompleteInfo::INLINE as $key) {
+            if ((string) ($fields[$key] ?? '') !== '') {
+                $columns[$key] = (string) $fields[$key];
+            }
+        }
+        if ($columns === []) {
+            return 'error';
+        }
+        if (isset($columns['phone'])) {
+            $other = self::findByPhone($columns['phone'], $role);
+            if ($other !== null && (int) $other['id'] !== $id) {
+                return 'duplicate';
+            }
+            $columns['phone_raw'] = null;
+        }
+        if (isset($columns['email'])) {
+            $other = self::findByEmail($columns['email'], $role);
+            if ($other !== null && (int) $other['id'] !== $id) {
+                return 'duplicate_email';
+            }
+        }
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = self::demoRead();
+            foreach ($rows as $i => $row) {
+                if ((int) $row['id'] === $id) {
+                    $rows[$i] = array_merge($row, $columns);
+                }
+            }
+
+            return self::demoWrite($rows) ? 'ok' : 'error';
+        }
+
+        try {
+            $sets = implode(', ', array_map(static fn (string $c): string => "$c = :$c", array_keys($columns)));
+            $pdo->prepare("UPDATE users SET $sets WHERE id = :id")->execute($columns + ['id' => $id]);
+
+            return 'ok';
+        } catch (Throwable $e) {
+            if ($e instanceof \PDOException && ($e->errorInfo[1] ?? 0) === 1062) {
+                return str_contains($e->getMessage(), 'uq_users_role_email') ? 'duplicate_email' : 'duplicate';
+            }
+            Logger::error('UserRepository::fillMissing failed: ' . $e->getMessage());
+
+            return 'error';
+        }
+    }
+
     /** নতুন পাসওয়ার্ড-হ্যাশ বসায় এবং "পাসওয়ার্ড বদলাতে হবে" চিহ্ন মুছে দেয়। সফল হলে true। */
     public static function changePassword(int $id, string $hash): bool
     {

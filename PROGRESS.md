@@ -1,3 +1,4 @@
+## 2026-10-25 night: admin 2e built (incomplete info page). Next (owner order): step 3 = inboxes (feedback, contact leads, job notices) + lock release; reports last.
 ## 2026-10-25 night: admin step 2d BUILT (old-worker phone tick + 15-day window + common password, migration 020). Next: 2e "অসম্পূর্ণ তথ্য" page. Staging needs migration 020 run (phpMyAdmin) + Update from Remote.
 ## LATER (owner 2026-10-25): second admin door `ADMIN_PATH_STAFF` (.env) for administrators so they never learn the super-admin path (`ADMIN_PATH`); links/mails follow the door used (session); super admins only via the first, administrators only via the second. Do it BEFORE the first administrator is invited. Owner will say when.
 ## 2026-10-25 night: admin door moved to `ADMIN_PATH` (.env) — staging needs `ADMIN_PATH=self-pakundi` added to the server `.env` BEFORE the admin is reachable (until then /admin works as fallback only if the line is absent). Next: step 2d.
