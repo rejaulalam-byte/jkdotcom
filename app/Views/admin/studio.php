@@ -1,0 +1,109 @@
+<?php
+/**
+ * "সাইটের লেখা": বাঁয়ে সাইটের পেইজের তালিকা (ভেতরের পেইজ একটু ভেতরে), ডানে বাছা পেইজের সব লেখা পেইজের ক্রমে
+ * (খোলা পেইজে পূর্ণ এডিটরসহ), সবশেষে ওই পেইজের বার্তা। একটা "সংরক্ষণ করুন" সব জমা দেয়।
+ *
+ * @var list<array<string,mixed>> $tree
+ * @var array<string,mixed> $node
+ * @var string $q
+ * @var list<array{title:string,keys:list<string>,messages:bool}> $parts
+ * @var array<int,list<array<string,mixed>>> $rows
+ * @var string|null $open        খোলা পেইজের slug
+ * @var int $openAfter           পূর্ণ এডিটরের আগে কয়টি অংশ
+ * @var string $openHtml
+ * @var bool $openChanged
+ */
+$base = admin_base() . '/studio';
+$here = $base . '?' . http_build_query(array_filter(['p' => (string) $node['id'], 'q' => $q], static fn ($v): bool => $v !== ''));
+
+// বাঁয়ের তালিকা (ভেতরের পেইজ একটু ভেতরে)
+$menu = static function (array $nodes, int $depth) use (&$menu, $base, $node, $q): string {
+    $html = '';
+    foreach ($nodes as $n) {
+        $current = $q === '' && $n['id'] === $node['id'];
+        $html .= '<a class="adm-studio__page adm-studio__page--d' . $depth . '" href="' . e($base . '?p=' . $n['id']) . '"' . ($current ? ' aria-current="page"' : '') . '>'
+            . e((string) $n['title']) . '</a>';
+        $html .= $menu($n['children'] ?? [], $depth + 1);
+    }
+
+    return $html;
+};
+
+// একটা অংশের সব লেখার ঘর
+$fields = static function (array $list) use ($base): string {
+    $html = '';
+    foreach ($list as $r) {
+        static $n = 0;
+        $n++;
+        $id = 'st-' . $n;
+        $html .= '<div class="adm-text"><label for="' . $id . '">'
+            . ($r['label'] !== '' ? '<b>' . e($r['label']) . '</b> · ' : '')
+            . '<span class="adm-text__orig">' . e(mb_strimwidth((string) $r['original'], 0, 90, '…')) . '</span>'
+            . ($r['changed'] ? ' <span class="adm-status is-approved">বদলানো</span>' : '')
+            . ($r['owner'] !== null ? ' <a class="adm-text__owner" href="' . e($base . '?p=' . $r['owner'][0]) . '">' . e($r['owner'][1]) . '</a>' : '')
+            . '</label>'
+            . '<textarea id="' . $id . '" name="text[' . e((string) $r['key']) . ']" rows="' . (mb_strlen((string) $r['value']) > 120 ? 4 : 2) . '" maxlength="3000">' . e((string) $r['value']) . '</textarea>'
+            . '<p class="adm-text__meta">';
+        foreach ($r['placeholders'] as $p) {
+            $html .= '<b class="adm-red">' . e($p) . '</b> রেখে দিন (এখানে সাইট নাম/এলাকা বসায়) ';
+        }
+        if ($r['markup']) {
+            $html .= 'রং: <code>[[color:gold|শব্দ]]</code> (gold, amber, white, red), মোটা: <code>{শব্দ}</code> ';
+        }
+        if ($r['changed']) {
+            $html .= '<button class="adm-link-button" type="submit" form="studio-reset" name="reset" value="' . e((string) $r['key']) . '">শুরুর লেখায় ফিরুন</button>';
+        }
+        $html .= '</p></div>';
+    }
+
+    return $html;
+};
+?>
+<div class="adm-studio__layout">
+    <nav class="adm-studio__pages" aria-label="সাইটের পেইজ">
+        <form class="adm-studio__search" action="<?= e($base) ?>" method="get">
+            <input type="search" name="q" value="<?= e($q) ?>" placeholder="লেখা খুঁজুন" maxlength="100" aria-label="লেখা খুঁজুন">
+        </form>
+        <?= $menu($tree, 0) ?>
+    </nav>
+
+    <section class="adm-studio__main">
+        <div class="adm-studio__head">
+            <h1><?= e((string) $node['title']) ?></h1>
+            <?php if (!empty($node['url'])): ?>
+                <a class="adm-link" href="<?= e((string) $node['url']) ?>" target="_blank" rel="noopener">সাইটে এই পেইজটি দেখুন (নতুন ট্যাবে)</a>
+            <?php endif; ?>
+        </div>
+
+        <?php if ($parts === [] && $open === null): ?>
+            <p class="adm-muted">এই নামের নিচের পেইজগুলো বাঁয়ের তালিকা থেকে বাছুন।</p>
+        <?php else: ?>
+            <form id="studio-form" class="adm-editor" action="<?= e($base) ?>/save" method="post">
+                <?= csrf_field() ?>
+                <input type="hidden" name="back" value="<?= e($here) ?>">
+                <?php foreach ($parts as $i => $part): ?>
+                    <?php if ($open !== null && $i === $openAfter): ?>
+                        <?php require __DIR__ . '/studio-open.php'; ?>
+                    <?php endif; ?>
+                    <fieldset class="adm-part<?= $part['messages'] ? ' adm-part--msg' : '' ?>">
+                        <legend><?= e($part['title']) ?></legend>
+                        <?= $fields($rows[$i] ?? []) ?>
+                    </fieldset>
+                <?php endforeach; ?>
+                <?php if ($open !== null && $openAfter >= count($parts)): ?>
+                    <?php require __DIR__ . '/studio-open.php'; ?>
+                <?php endif; ?>
+                <p class="adm-texts__save"><button class="adm-btn" type="submit">সংরক্ষণ করুন</button></p>
+            </form>
+            <?php // "শুরুর লেখায় ফিরুন" আলাদা ফর্মে, যাতে অন্য ঘরের অর্ধেক বদল একসঙ্গে জমা না পড়ে ?>
+            <form id="studio-reset" action="<?= e($base) ?>/save" method="post" data-confirm="এই লেখাটি শুরুর রূপে ফিরবে। ফেরাবেন?">
+                <?= csrf_field() ?>
+                <input type="hidden" name="back" value="<?= e($here) ?>">
+            </form>
+        <?php endif; ?>
+    </section>
+</div>
+<?php if ($open !== null): ?>
+    <script src="<?= e(asset('vendor/tinymce/tinymce.min.js')) ?>"></script>
+    <script src="<?= e(asset('js/admin-editor.js')) ?>"></script>
+<?php endif; ?>

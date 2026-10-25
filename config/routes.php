@@ -11,8 +11,7 @@ use App\Controllers\Admin\LeadsController as AdminLeads;
 use App\Controllers\Admin\LegacyController as AdminLegacy;
 use App\Controllers\Admin\LocksController as AdminLocks;
 use App\Controllers\Admin\MemberEditController as AdminMemberEdit;
-use App\Controllers\Admin\PagesController as AdminPages;
-use App\Controllers\Admin\TextsController as AdminTexts;
+use App\Controllers\Admin\StudioController as AdminStudio;
 use App\Controllers\Admin\MembersController as AdminMembers;
 use App\Controllers\Admin\PanelController as AdminPanel;
 use App\Controllers\AccountSetupController;
@@ -129,12 +128,9 @@ return [
     ['POST', admin_base() . '/ads/save',            [AdminAds::class, 'save']],
     ['POST', admin_base() . '/ads/action',          [AdminAds::class, 'action']],
     ['POST', admin_base() . '/ads/show',            [AdminAds::class, 'show']],
-    ['GET',  admin_base() . '/pages',               [AdminPages::class, 'index']],
-    ['GET',  admin_base() . '/pages/edit/{slug}',   [AdminPages::class, 'edit']],
-    ['POST', admin_base() . '/pages/save',          [AdminPages::class, 'save']],
-    ['POST', admin_base() . '/pages/image',         [AdminPages::class, 'image']],
-    ['GET',  admin_base() . '/texts',               [AdminTexts::class, 'index']],
-    ['POST', admin_base() . '/texts/save',          [AdminTexts::class, 'save']],
+    ['GET',  admin_base() . '/studio',              [AdminStudio::class, 'index']],
+    ['POST', admin_base() . '/studio/save',         [AdminStudio::class, 'save']],
+    ['POST', admin_base() . '/studio/image',        [AdminStudio::class, 'image']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],

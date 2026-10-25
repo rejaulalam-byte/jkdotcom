@@ -159,8 +159,22 @@
         }
     });
 
-    /* ---- সংরক্ষণের আগে এডিটরের লেখা ঘরে তুলে দেওয়া (TinyMCE নিজেও করে; নিশ্চিত হতে) ---- */
+    /* ---- সংরক্ষণের আগে এডিটরের লেখা ঘরে তুলে দেওয়া এবং সার্ভারকে জানানো লেখা বদলেছে কি না
+       (না বদলালে পুরো লেখা আবার সংরক্ষণ হয় না; JavaScript না থাকলে সার্ভার ঘরের লেখা সবসময় নেয়) ---- */
+    function flag(name, value) {
+        var input = form.querySelector('input[name="' + name + '"]');
+        if (!input) {
+            input = document.createElement("input");
+            input.type = "hidden";
+            input.name = name;
+            form.appendChild(input);
+        }
+        input.value = value;
+    }
     form.addEventListener("submit", function () {
+        var editor = tinymce.get(area.id);
+        flag("html_js", "1");
+        flag("html_dirty", editor && editor.isDirty() ? "1" : "0");
         tinymce.triggerSave();
     });
 })();

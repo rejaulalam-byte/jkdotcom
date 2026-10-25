@@ -1,3 +1,4 @@
+## 2026-10-26: studio "সাইটের লেখা" (own full screen, page tree, texts in page order) built. Next: marquee/coloured texts in full editor, then MENU editing inside the studio (owner reminder), then step 6.
 ## 2026-10-26: admin 5b built (one menu "সাইটের লেখা": open pages / short page texts / messages). Next: 5c coloured texts to full editor + job-notice details editor; then step 6.
 ## 2026-10-26: admin step 5a (rich editor for the 6 open pages, TinyMCE 6.8.6 MIT, sanitiser + CSP style hashes) built. Next: 5b other site texts.
 ## 2026-10-25 night: admin step 4 (ads) built, no migration. Next (owner order): step 5 = texts + full rich editor; ... Also pending: second admin door ADMIN_PATH_STAFF.

@@ -7,112 +7,65 @@ namespace App\Models;
 use App\Core\Content;
 
 /**
- * সাইটের ছোট লেখা ও বার্তা (app/Content/defaults.php-এর কী-গুলো) অ্যাডমিনে বদলানোর জন্য সাজানো তালিকা।
- * ভাগগুলো defaults.php-এর "// ---- নাম ----" মন্তব্য থেকেই আসে, তাই নতুন লেখা সেখানে যোগ করলে অ্যাডমিনেও নিজে আসে।
- * প্রতিটি কী হয় "পেইজের লেখা" ('page') নয়তো "বার্তা" ('msg') ট্যাবে (MESSAGE নিয়ম)। সুইচ/সেটিং ও খোলা পেইজের
- * পুরো লেখা (page.*.html) এখানে নেই।
+ * সাইটের ছোট লেখা ও বার্তা (app/Content/defaults.php-এর কী) অ্যাডমিনে বদলানোর নিয়ম: কোন কী বদলানো যায়, শুরুর লেখা,
+ * জায়গা-ধারক ({name}), বার্তা কি না, আর ঘরের সহজ বাংলা নাম। পেইজ ধরে সাজানো PageMap-এ।
  */
 final class SiteTexts
 {
-    /** যে কী-গুলো লেখা নয় (সুইচ বা সেটিং) — এখানে দেখানো হয় না। */
+    /** যে কী-গুলো লেখা নয় (সুইচ বা সেটিং) বা অন্য জায়গায় বদলায় (খোলা পেইজের পুরো লেখা)। */
     private const SKIP = '/^(settings\.|page\.|home\.ads\.show$)/';
 
-    /** "বার্তা" ট্যাবে যায়: সফলতা/ভুলের বার্তা, পপ-আপ, আগ্রহীর পপ-আপ, ফাঁকা-তালিকার লেখা। */
+    /** বার্তা-ধরনের কী: সফলতা/ভুলের বার্তা, পপ-আপ, আগ্রহীর পপ-আপ, ফাঁকা-তালিকার লেখা (পেইজের শেষে আলাদা অংশে দেখায়)। */
     private const MESSAGE = '/(\.done(\.|_|$)|^form\.msg\.|\.lead\.|^consent\.error$|\.empty$|\.none$|^worker\.rate\.(thanks|invalid|limit|error)$'
         . '|^(login\.unlocked|password\.changed|setup\.done|setup\.missing|profile\.done|forgot\.(ok|done_title|done_1|done_2))$)/';
+
+    /** কী-র শেষ অংশ => ঘরের সহজ নাম (না মিললে নাম ছাড়া শুধু শুরুর লেখা দেখায়)। */
+    private const LABELS = [
+        'badge' => 'ছোট শিরোনাম (ব্যাজ)', 'title' => 'শিরোনাম', 'title_1' => 'বড় শিরোনাম — প্রথম লাইন', 'title_2' => 'বড় শিরোনাম — দ্বিতীয় লাইন',
+        'heading' => 'শিরোনাম', 'text' => 'লেখা', 'text_1' => 'লেখা (প্রথম অংশ)', 'text_2' => 'লেখা (দ্বিতীয় অংশ)', 'text_3' => 'লেখা (তৃতীয় অংশ)',
+        'button' => 'বাটনের লেখা', 'submit' => 'জমা দেওয়ার বাটন', 'banner' => 'ব্যানারের শিরোনাম', 'crumb' => 'পথ-নির্দেশে পেইজের নাম',
+        'intro' => 'ভূমিকার লেখা', 'description' => 'সার্চ ইঞ্জিনের জন্য ছোট বর্ণনা', 'placeholder' => 'ঘরের ভেতরের হালকা লেখা',
+        'q' => 'প্রশ্ন', 'a' => 'উত্তর', 'alt' => 'ছবির বিকল্প লেখা', 'map_alt' => 'ছবির বিকল্প লেখা', 'label' => 'লেবেল', 'note' => 'নোট',
+        'empty' => 'কিছু না থাকলে দেখানো লেখা', 'link' => 'লিংকের লেখা',
+    ];
 
     /** একটা লেখার সর্বোচ্চ দৈর্ঘ্য। */
     public const MAX_LENGTH = 3000;
 
-    /** @var list<array{title:string,keys:list<string>}>|null */
-    private static ?array $sections = null;
+    /** @var list<string>|null */
+    private static ?array $keys = null;
 
     /**
-     * defaults.php পড়ে ভাগ ও প্রতিটি ভাগের কী (ফাইলের ক্রমে)।
-     *
-     * @return list<array{title:string,keys:list<string>}>
-     */
-    public static function sections(): array
-    {
-        if (self::$sections !== null) {
-            return self::$sections;
-        }
-        $lines = file(BASE_PATH . '/app/Content/defaults.php', FILE_IGNORE_NEW_LINES) ?: [];
-        $out = [];
-        $current = ['title' => 'সাধারণ', 'keys' => []];
-        foreach ($lines as $line) {
-            if (preg_match('#^\s*//\s*-{3,}\s*(.+?)\s*-{3,}\s*$#u', $line, $m) === 1) {
-                if ($current['keys'] !== []) {
-                    $out[] = $current;
-                }
-                // কারিগরি অংশ (ঠিকানা, Figma নম্বর) অ্যাডমিনের তালিকায় দরকার নেই
-                $title = trim((string) preg_replace('/\s*\([^)]*(\/|Figma|\d{3,})[^)]*\)|;.*$/u', '', $m[1]));
-                $current = ['title' => $title !== '' ? $title : $m[1], 'keys' => []];
-            } elseif (preg_match("/^\s*'([a-z0-9_.-]+)'\s*=>/", $line, $m) === 1 && preg_match(self::SKIP, $m[1]) !== 1) {
-                $current['keys'][] = $m[1];
-            }
-        }
-        if ($current['keys'] !== []) {
-            $out[] = $current;
-        }
-
-        return self::$sections = $out;
-    }
-
-    /** কী-টা কোন ট্যাবের: 'msg' (বার্তা) বা 'page' (পেইজের লেখা)। */
-    public static function tabOf(string $key): string
-    {
-        return preg_match(self::MESSAGE, $key) === 1 ? 'msg' : 'page';
-    }
-
-    /**
-     * এক ট্যাবের ভাগগুলো (খালি ভাগ বাদ), প্রতিটিতে শুধু সেই ট্যাবের কী।
-     *
-     * @return list<array{title:string,keys:list<string>}>
-     */
-    public static function sectionsFor(string $tab): array
-    {
-        $out = [];
-        foreach (self::sections() as $section) {
-            $keys = array_values(array_filter($section['keys'], static fn (string $k): bool => self::tabOf($k) === $tab));
-            if ($keys !== []) {
-                $out[] = ['title' => $section['title'], 'keys' => $keys];
-            }
-        }
-
-        return $out;
-    }
-
-    /** কী-টা কি এখানে বদলানো যায়? */
-    public static function editable(string $key): bool
-    {
-        foreach (self::sections() as $section) {
-            if (in_array($key, $section['keys'], true)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * লেখা বা কী-র নামে খোঁজা (এক ট্যাবের ভেতরে)।
+     * বদলানো যায় এমন সব কী, defaults.php-এর ক্রমে।
      *
      * @return list<string>
      */
-    public static function search(string $tab, string $q): array
+    public static function keys(): array
     {
-        $q = mb_strtolower(trim($q));
-        $out = [];
-        foreach (self::sectionsFor($tab) as $section) {
-            foreach ($section['keys'] as $key) {
-                if (str_contains($key, $q) || str_contains(mb_strtolower(Content::get($key)), $q) || str_contains(mb_strtolower(self::original($key)), $q)) {
-                    $out[] = $key;
-                }
-            }
+        if (self::$keys === null) {
+            $defaults = require BASE_PATH . '/app/Content/defaults.php';
+            self::$keys = array_values(array_filter(array_keys($defaults), static fn (string $k): bool => preg_match(self::SKIP, $k) !== 1));
         }
 
-        return $out;
+        return self::$keys;
+    }
+
+    public static function editable(string $key): bool
+    {
+        return in_array($key, self::keys(), true);
+    }
+
+    public static function isMessage(string $key): bool
+    {
+        return preg_match(self::MESSAGE, $key) === 1;
+    }
+
+    /** ঘরের সহজ নাম, না থাকলে খালি লেখা। */
+    public static function label(string $key): string
+    {
+        $last = substr($key, (int) strrpos($key, '.') + 1);
+
+        return self::LABELS[$last] ?? '';
     }
 
     /** সাইটের সঙ্গে আসা শুরুর লেখা। */
@@ -125,7 +78,7 @@ final class SiteTexts
     }
 
     /**
-     * শুরুর লেখার "{name}"-ধাঁচের জায়গা-ধারক (এগুলো নতুন লেখাতেও থাকতে হবে, নইলে নাম/এলাকা বসবে না)।
+     * শুরুর লেখার "{name}"-ধাঁচের জায়গা-ধারক (নতুন লেখাতেও থাকতে হবে, নইলে নাম/এলাকা বসবে না)।
      *
      * @return list<string>
      */
@@ -140,5 +93,18 @@ final class SiteTexts
     public static function usesColorMarkup(string $key): bool
     {
         return in_array($key, ['home.rep.text', 'worker.note.text', 'contact.holiday'], true);
+    }
+
+    /**
+     * লেখা বা কী-র নামে খোঁজা (সব কী-র মধ্যে)।
+     *
+     * @return list<string>
+     */
+    public static function search(string $q): array
+    {
+        $q = mb_strtolower(trim($q));
+
+        return array_values(array_filter(self::keys(), static fn (string $k): bool => str_contains($k, $q)
+            || str_contains(mb_strtolower(Content::get($k)), $q) || str_contains(mb_strtolower(self::original($k)), $q)));
     }
 }

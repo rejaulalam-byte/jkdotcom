@@ -1004,7 +1004,7 @@ td.adm-actions form {
     border: 0;
 }
 /* JavaScript না থাকলে সাধারণ ঘর (HTML সরাসরি লেখা যায়) */
-.adm-editor textarea {
+.adm-editor textarea[name="html"] {
     display: block;
     width: 100%;
     min-height: 500px;
@@ -1020,33 +1020,7 @@ td.adm-actions form {
     margin: 16px 0;
 }
 
-/* ---- সাইটের লেখা: বাঁয়ে ভাগের তালিকা, ডানে লেখার ঘর ---- */
-.adm-texts {
-    display: grid;
-    grid-template-columns: 260px minmax(0, 1fr);
-    gap: 24px;
-    margin-top: 16px;
-}
-.adm-texts__sections {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    align-self: start;
-    position: sticky;
-    top: 12px;
-}
-.adm-texts__sections a {
-    padding: 6px 10px;
-    border-radius: 6px;
-    color: var(--teal-dark);
-    text-decoration: none;
-    line-height: 1.4;
-}
-.adm-texts__sections a:hover,
-.adm-texts__sections a[aria-current] {
-    background: var(--teal);
-    color: #fff;
-}
+/* ---- সাইটের লেখা: লেখার ঘর ---- */
 .adm-text {
     margin: 0 0 18px;
     padding: 12px 14px;
@@ -1088,13 +1062,142 @@ td.adm-actions form {
     padding: 12px 0;
     background: var(--bg, #f4f8f9);
 }
+
+/* ---- "সাইটের লেখা"-র নিজস্ব পুরো পর্দা: ওপরে নাম ও "বাহির হোন", বাঁয়ে পেইজের তালিকা, ডানে লেখা ---- */
+.adm-studio {
+    margin: 0;
+    background: var(--bg, #f4f8f9);
+    animation: adm-studio-in 0.35s ease-out; /* পর্দাটা ওপর থেকে নেমে আসে */
+}
+@keyframes adm-studio-in {
+    from { transform: translateY(-40px); opacity: 0; }
+    to { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .adm-studio { animation: none; }
+}
+.adm-studio__bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 24px;
+    background: var(--teal);
+    color: #fff;
+}
+.adm-studio__name {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 600;
+}
+.adm-studio__exit {
+    padding: 8px 20px;
+    border-radius: 8px;
+    background: var(--gold, #f0d772);
+    color: var(--teal-dark, #0d4250);
+    font-weight: 600;
+    text-decoration: none;
+}
+.adm-studio__exit:hover,
+.adm-studio__exit:focus-visible {
+    background: #fff;
+}
+.adm-studio__body {
+    padding: 16px 24px 40px;
+}
+.adm-studio__layout {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 24px;
+}
+.adm-studio__pages {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-self: start;
+    position: sticky;
+    top: 76px;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+}
+.adm-studio__search input {
+    width: 100%;
+    height: 44px;
+    margin: 0 0 8px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font: inherit;
+}
+.adm-studio__page {
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: var(--teal-dark, #0d4250);
+    text-decoration: none;
+    line-height: 1.4;
+}
+.adm-studio__page--d1 {
+    margin-left: 18px;
+    font-size: 19px;
+}
+.adm-studio__page--d1::before {
+    content: "– ";
+    color: var(--muted);
+}
+.adm-studio__page:hover,
+.adm-studio__page[aria-current] {
+    background: var(--teal);
+    color: #fff;
+}
+.adm-studio__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 20px;
+    margin: 0 0 12px;
+}
+.adm-studio__head h1 {
+    margin: 0;
+}
+.adm-part {
+    max-width: none;
+    margin: 0 0 22px;
+    padding: 6px 18px 4px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fbfdfd;
+}
+.adm-part legend {
+    padding: 0 8px;
+    font-size: 23px;
+    font-weight: 600;
+    color: var(--teal);
+}
+.adm-part--msg {
+    border-color: var(--gold, #f0d772);
+    background: #fffdf3;
+}
+.adm-text__orig {
+    font-weight: 400;
+    color: var(--muted);
+}
+.adm-text__owner {
+    font-weight: 400;
+    font-size: 17px;
+}
 @media (max-width: 900px) {
-    .adm-texts {
+    .adm-studio__layout {
         grid-template-columns: 1fr;
     }
-    .adm-texts__sections {
+    .adm-studio__pages {
         position: static;
-        flex-direction: row;
-        flex-wrap: wrap;
+        max-height: none;
     }
 }
