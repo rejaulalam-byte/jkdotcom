@@ -984,3 +984,9 @@ td.adm-actions form {
 .adm-gap-top + .adm-muted {
     margin-top: 8px; /* শিরোনাম ও তার নিচের লাইনের ফাঁক কম; লাইন ও টেবিলের ফাঁক আগের মতোই */
 }
+/* নিয়মের ধাপ-তালিকা (বাক্সের ভেতর, ফর্মের ঠিক ওপরে) */
+.adm-steps {
+    margin: 8px 0 12px;
+    padding-left: 28px;
+    line-height: 1.8;
+}

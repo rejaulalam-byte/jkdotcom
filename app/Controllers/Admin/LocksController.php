@@ -71,13 +71,30 @@ final class LocksController
         ], 'layouts/admin');
     }
 
-    /** POST: bucket (একটা লগইন-আইডির হিসাব সব ডিভাইস থেকে) অথবা file (একটা ডিভাইসের হিসাব)। */
+    /** POST: login_id (হাতে লেখা মোবাইল/ইমেইল), অথবা bucket (তালিকার একটা লগইন-আইডি, সব ডিভাইস থেকে), অথবা file (একটা ডিভাইসের হিসাব)। */
     public function release(): void
     {
         $admin = AdminAuth::require('locks');
         $back = admin_base() . '/locks';
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
             Session::flash('admin_errors', ['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+            redirect($back);
+        }
+
+        // হাতে লেখা মোবাইল/ইমেইল: দুই পাশের (কর্মী ও প্রতিনিধি) লগইন-আইডির হিসাবই মোছা হয়; তালিকায় না থাকলেও চলে
+        $typed = trim((string) ($_POST['login_id'] ?? ''));
+        if ($typed !== '') {
+            $id = str_contains($typed, '@') ? mb_strtolower(mb_substr($typed, 0, 150)) : normalize_phone($typed);
+            $valid = str_contains($typed, '@') ? filter_var($id, FILTER_VALIDATE_EMAIL) !== false : preg_match('/^01[3-9][0-9]{8}$/', $id) === 1;
+            if (!$valid) {
+                Session::flash('admin_errors', ['মোবাইল (১১ সংখ্যা, যেমন 01712345678) বা সঠিক ইমেইল লিখুন।']);
+                redirect($back);
+            }
+            $removed = RateLimiter::clearAll('login_worker_' . $id) + RateLimiter::clearAll('login_agent_' . $id);
+            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'lock_release_typed', $id);
+            Session::flash('admin_ok', $removed > 0
+                ? $id . ' — আটকানো খুলে দেওয়া হয়েছে; এখন আবার লগইন করতে পারবেন।'
+                : $id . ' — এখন কোনো আটকানো হিসাব নেই (আগেই খুলে গেছে বা কখনও আটকায়নি), তাই লগইনে কোনো বাধা নেই।');
             redirect($back);
         }
 

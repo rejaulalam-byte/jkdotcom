@@ -21,6 +21,24 @@ $release = static function (string $name, string $value, string $label) use ($id
     সবই ১৫ মিনিটে নিজে খোলে; কেউ জরুরি হলে এখানে "আটকানো খুলুন" চাপুন। ভুল চেষ্টার হিসাব শুধু শেষ ১৫ মিনিটের।
 </p>
 
+<div class="adm-box">
+    <h2 class="adm-card__title">মোবাইল বা ইমেইল লিখে আটকানো খুলুন</h2>
+    <ol class="adm-steps">
+        <li>যিনি লগইন করতে পারছেন না তাঁর <b>লগইনের মোবাইল নাম্বার বা ইমেইল</b> জেনে নিন (যা দিয়ে তিনি লগইন করেন)।</li>
+        <li>নিচের ঘরে সেটা লিখে "আটকানো খুলুন" চাপুন।</li>
+        <li>বার্তা আসবে: খোলা হয়েছে, অথবা "এখন কোনো আটকানো হিসাব নেই" (তখন আটকানো কারণ নয়; ভুল পাসওয়ার্ড বা অনুমোদন বাকি কি না দেখুন, সম্ভব হলে "পাসওয়ার্ড মনে নেই" বলে নতুন পাসওয়ার্ড বসাতে বলুন)।</li>
+        <li>খুললে তিনি সঙ্গে সঙ্গে আবার চেষ্টা করতে পারবেন। তালিকায় তাঁকে খুঁজে পাওয়ার দরকার নেই।</li>
+    </ol>
+    <form action="<?= e(admin_base()) ?>/locks/release" method="post" data-confirm="আটকানো খুলে দেবেন?" novalidate>
+        <?= csrf_field() ?>
+        <label for="lk-id">লগইন আইডি (মোবাইল বা ইমেইল)</label>
+        <div class="adm-commonrow">
+            <input id="lk-id" type="text" name="login_id" maxlength="150" required autocomplete="off" placeholder="01712345678">
+            <button class="adm-btn" type="submit">আটকানো খুলুন</button>
+        </div>
+    </form>
+</div>
+
 <h2 class="adm-card__title">লগইন-আইডি অনুযায়ী</h2>
 <div class="adm-tablewrap">
     <table class="adm-table">
