@@ -40,67 +40,67 @@ final class PanelController
 
     public function accountName(): void
     {
-        $admin = $this->post('/admin/account');
+        $admin = $this->post(admin_base() . '/account');
         $name = clean_input($_POST['name'] ?? '', 100);
         if (mb_strlen($name) < 2) {
-            $this->back('/admin/account', ['নাম লিখুন।']);
+            $this->back(admin_base() . '/account', ['নাম লিখুন।']);
         }
         AdminRepository::update((int) $admin['id'], ['name' => $name]);
         AdminRepository::log((int) $admin['id'], $name, 'name_changed', (string) $admin['name'] . ' → ' . $name);
-        $this->ok('/admin/account', 'নাম বদলানো হয়েছে।');
+        $this->ok(admin_base() . '/account', 'নাম বদলানো হয়েছে।');
     }
 
     public function accountPassword(): void
     {
-        $admin = $this->post('/admin/account');
-        $this->checkCurrentPassword($admin, '/admin/account');
+        $admin = $this->post(admin_base() . '/account');
+        $this->checkCurrentPassword($admin, admin_base() . '/account');
         $new = (string) ($_POST['password'] ?? '');
         if (($error = AdminAuth::passwordError($new, (string) ($_POST['password_confirm'] ?? ''), (string) $admin['email'])) !== null) {
-            $this->back('/admin/account', [$error]);
+            $this->back(admin_base() . '/account', [$error]);
         }
         AdminRepository::update((int) $admin['id'], ['password_hash' => password_hash($new, PASSWORD_DEFAULT)]);
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'password_changed');
         session_regenerate_id(true);
-        $this->ok('/admin/account', 'পাসওয়ার্ড বদলানো হয়েছে।');
+        $this->ok(admin_base() . '/account', 'পাসওয়ার্ড বদলানো হয়েছে।');
     }
 
     /** নতুন ইমেইল চাওয়া: এখনকার পাসওয়ার্ড লাগে, কোড যায় নতুন ইমেইলে (ভুল ঠিকানায় লক হয়ে যাওয়া ঠেকাতে)। */
     public function accountEmail(): void
     {
-        $admin = $this->post('/admin/account');
-        $this->checkCurrentPassword($admin, '/admin/account');
+        $admin = $this->post(admin_base() . '/account');
+        $this->checkCurrentPassword($admin, admin_base() . '/account');
         $email = mb_strtolower(clean_input($_POST['email'] ?? '', 150));
         if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-            $this->back('/admin/account', ['ইমেইল ঠিকানাটি সঠিক নয়।']);
+            $this->back(admin_base() . '/account', ['ইমেইল ঠিকানাটি সঠিক নয়।']);
         }
         $other = AdminRepository::findByEmail($email);
         if ($other !== null && (int) $other['id'] !== (int) $admin['id']) {
-            $this->back('/admin/account', ['এই ইমেইলে আরেকজন অ্যাডমিন আছেন।']);
+            $this->back(admin_base() . '/account', ['এই ইমেইলে আরেকজন অ্যাডমিন আছেন।']);
         }
         if (RateLimiter::tooMany('adm_code_' . $admin['id'], 5, 3600)) {
-            $this->back('/admin/account', ['অনেকবার কোড চাওয়া হয়েছে। এক ঘণ্টা পরে আবার চেষ্টা করুন।']);
+            $this->back(admin_base() . '/account', ['অনেকবার কোড চাওয়া হয়েছে। এক ঘণ্টা পরে আবার চেষ্টা করুন।']);
         }
         if (!AdminAuth::issueCode('email-change', $email, ['email' => $email])) {
-            $this->back('/admin/account', ['ইমেইল পাঠানো যায়নি।']);
+            $this->back(admin_base() . '/account', ['ইমেইল পাঠানো যায়নি।']);
         }
-        $this->ok('/admin/account', 'নতুন ইমেইলে একটি কোড পাঠানো হয়েছে। নিচে কোডটি লিখুন।');
+        $this->ok(admin_base() . '/account', 'নতুন ইমেইলে একটি কোড পাঠানো হয়েছে। নিচে কোডটি লিখুন।');
     }
 
     public function accountEmailConfirm(): void
     {
-        $admin = $this->post('/admin/account');
+        $admin = $this->post(admin_base() . '/account');
         $result = AdminAuth::checkCode('email-change', (string) ($_POST['code'] ?? ''));
         if (!$result['ok']) {
-            $this->back('/admin/account', [(string) $result['message']]);
+            $this->back(admin_base() . '/account', [(string) $result['message']]);
         }
         $email = (string) ($result['payload']['email'] ?? '');
         $other = AdminRepository::findByEmail($email);
         if ($email === '' || ($other !== null && (int) $other['id'] !== (int) $admin['id'])) {
-            $this->back('/admin/account', ['এই ইমেইল ব্যবহার করা যাচ্ছে না।']);
+            $this->back(admin_base() . '/account', ['এই ইমেইল ব্যবহার করা যাচ্ছে না।']);
         }
         AdminRepository::update((int) $admin['id'], ['email' => $email]);
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'email_changed', (string) $admin['email'] . ' → ' . $email);
-        $this->ok('/admin/account', 'ইমেইল বদলানো হয়েছে।');
+        $this->ok(admin_base() . '/account', 'ইমেইল বদলানো হয়েছে।');
     }
 
     // ---- অ্যাডমিনদের তালিকা (শুধু সুপার অ্যাডমিন) ----------------------------------------------
@@ -113,74 +113,74 @@ final class PanelController
 
     public function adminsCreate(): void
     {
-        $admin = $this->post('/admin/admins', true);
+        $admin = $this->post(admin_base() . '/admins', true);
         $name = clean_input($_POST['name'] ?? '', 100);
         $email = mb_strtolower(clean_input($_POST['email'] ?? '', 150));
         $role = ($_POST['role'] ?? '') === 'super' ? 'super' : 'admin';
         $permissions = AdminPermissions::clean($_POST['permissions'] ?? []);
         if (mb_strlen($name) < 2 || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-            $this->back('/admin/admins', ['নাম ও সঠিক ইমেইল দিন।']);
+            $this->back(admin_base() . '/admins', ['নাম ও সঠিক ইমেইল দিন।']);
         }
         if ($role === 'admin' && $permissions === []) {
-            $this->back('/admin/admins', ['অ্যাডমিনিস্ট্রেটরের জন্য অন্তত একটি অনুমতি বাছুন।']);
+            $this->back(admin_base() . '/admins', ['অ্যাডমিনিস্ট্রেটরের জন্য অন্তত একটি অনুমতি বাছুন।']);
         }
         $id = AdminRepository::create($name, $email, $role, $permissions, null);
         if ($id === null) {
-            $this->back('/admin/admins', ['এই ইমেইলে আগেই একজন আছেন, অথবা সংরক্ষণ করা যায়নি।']);
+            $this->back(admin_base() . '/admins', ['এই ইমেইলে আগেই একজন আছেন, অথবা সংরক্ষণ করা যায়নি।']);
         }
         $sent = $this->sendInvite($id, $name, $email);
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'admin_created', $name . ' (' . AdminAuth::roleLabel($role) . ')');
         $sent
-            ? $this->ok('/admin/admins', 'তৈরি হয়েছে। ' . $email . '-এ পাসওয়ার্ড বসানোর লিংক পাঠানো হয়েছে (৩ দিন কাজ করবে)।')
-            : $this->back('/admin/admins', ['অ্যাকাউন্ট তৈরি হয়েছে, কিন্তু ইমেইল যায়নি। "আমন্ত্রণ আবার পাঠান" চাপুন।']);
+            ? $this->ok(admin_base() . '/admins', 'তৈরি হয়েছে। ' . $email . '-এ পাসওয়ার্ড বসানোর লিংক পাঠানো হয়েছে (৩ দিন কাজ করবে)।')
+            : $this->back(admin_base() . '/admins', ['অ্যাকাউন্ট তৈরি হয়েছে, কিন্তু ইমেইল যায়নি। "আমন্ত্রণ আবার পাঠান" চাপুন।']);
     }
 
     /** পাসওয়ার্ড বসানোর লিংক আবার পাঠানো (যিনি এখনও লিংক ব্যবহার করেননি বা হারিয়ে ফেলেছেন)। */
     public function adminsInvite(): void
     {
-        $admin = $this->post('/admin/admins', true);
+        $admin = $this->post(admin_base() . '/admins', true);
         $target = AdminRepository::findById((int) ($_POST['id'] ?? 0));
         if ($target === null || $target['status'] !== 'active') {
-            $this->back('/admin/admins', ['অ্যাকাউন্টটি পাওয়া যায়নি বা বন্ধ আছে।']);
+            $this->back(admin_base() . '/admins', ['অ্যাকাউন্টটি পাওয়া যায়নি বা বন্ধ আছে।']);
         }
         $this->sendInvite((int) $target['id'], (string) $target['name'], (string) $target['email'])
-            ? $this->ok('/admin/admins', 'লিংক আবার পাঠানো হয়েছে।')
-            : $this->back('/admin/admins', ['ইমেইল পাঠানো যায়নি।']);
+            ? $this->ok(admin_base() . '/admins', 'লিংক আবার পাঠানো হয়েছে।')
+            : $this->back(admin_base() . '/admins', ['ইমেইল পাঠানো যায়নি।']);
     }
 
     public function adminsStatus(): void
     {
-        $admin = $this->post('/admin/admins', true);
+        $admin = $this->post(admin_base() . '/admins', true);
         $target = AdminRepository::findById((int) ($_POST['id'] ?? 0));
         $disable = ($_POST['action'] ?? '') === 'disable';
         if ($target === null) {
-            $this->back('/admin/admins', ['অ্যাকাউন্টটি পাওয়া যায়নি।']);
+            $this->back(admin_base() . '/admins', ['অ্যাকাউন্টটি পাওয়া যায়নি।']);
         }
         if ($disable && (int) $target['id'] === (int) $admin['id']) {
-            $this->back('/admin/admins', ['নিজের অ্যাকাউন্ট নিজে বন্ধ করা যায় না। অন্য সুপার অ্যাডমিনকে দিয়ে বন্ধ করান।']);
+            $this->back(admin_base() . '/admins', ['নিজের অ্যাকাউন্ট নিজে বন্ধ করা যায় না। অন্য সুপার অ্যাডমিনকে দিয়ে বন্ধ করান।']);
         }
         if ($disable && $target['role'] === 'super' && AdminRepository::activeSuperCount() <= 1) {
-            $this->back('/admin/admins', ['শেষ চালু সুপার অ্যাডমিনকে বন্ধ করা যাবে না।']);
+            $this->back(admin_base() . '/admins', ['শেষ চালু সুপার অ্যাডমিনকে বন্ধ করা যাবে না।']);
         }
         AdminRepository::update((int) $target['id'], ['status' => $disable ? 'disabled' : 'active']);
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], $disable ? 'admin_disabled' : 'admin_enabled', (string) $target['name']);
-        $this->ok('/admin/admins', $disable ? 'অ্যাকাউন্ট বন্ধ করা হয়েছে।' : 'অ্যাকাউন্ট আবার চালু হয়েছে।');
+        $this->ok(admin_base() . '/admins', $disable ? 'অ্যাকাউন্ট বন্ধ করা হয়েছে।' : 'অ্যাকাউন্ট আবার চালু হয়েছে।');
     }
 
     public function adminsPermissions(): void
     {
-        $admin = $this->post('/admin/admins', true);
+        $admin = $this->post(admin_base() . '/admins', true);
         $target = AdminRepository::findById((int) ($_POST['id'] ?? 0));
         $permissions = AdminPermissions::clean($_POST['permissions'] ?? []);
         if ($target === null || $target['role'] !== 'admin') {
-            $this->back('/admin/admins', ['শুধু অ্যাডমিনিস্ট্রেটরের অনুমতি বদলানো যায়।']);
+            $this->back(admin_base() . '/admins', ['শুধু অ্যাডমিনিস্ট্রেটরের অনুমতি বদলানো যায়।']);
         }
         if ($permissions === []) {
-            $this->back('/admin/admins', ['অন্তত একটি অনুমতি রাখুন। কাউকে একেবারে আটকাতে চাইলে অ্যাকাউন্ট বন্ধ করুন।']);
+            $this->back(admin_base() . '/admins', ['অন্তত একটি অনুমতি রাখুন। কাউকে একেবারে আটকাতে চাইলে অ্যাকাউন্ট বন্ধ করুন।']);
         }
         AdminRepository::update((int) $target['id'], ['permissions' => json_encode($permissions)]);
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'permissions_changed', (string) $target['name'] . ': ' . implode(', ', $permissions));
-        $this->ok('/admin/admins', 'অনুমতি বদলানো হয়েছে।');
+        $this->ok(admin_base() . '/admins', 'অনুমতি বদলানো হয়েছে।');
     }
 
     // ---- কার্যলগ (শুধু সুপার অ্যাডমিন) ---------------------------------------------------------
@@ -243,7 +243,7 @@ final class PanelController
     {
         $token = AdminAuth::newToken($id, 3 * 86400);
 
-        return AdminAuth::mail($email, 'অ্যাডমিন প্যানেলে আপনাকে আমন্ত্রণ — jorurikaj.com', "{$name}, jorurikaj.com-এর অ্যাডমিন প্যানেলে আপনার অ্যাকাউন্ট খোলা হয়েছে।\nআপনার পাসওয়ার্ড বসাতে এই লিংকে যান (৩ দিন কাজ করবে, একবারই):\n\n" . AdminAuth::baseUrl() . '/admin/set-password/' . $token . "\n\nতারপর " . AdminAuth::baseUrl() . "/admin থেকে লগইন করবেন। লগইনে ইমেইলে একটি ৬ সংখ্যার কোড আসবে।\n\n— jorurikaj.com");
+        return AdminAuth::mail($email, 'অ্যাডমিন প্যানেলে আপনাকে আমন্ত্রণ — jorurikaj.com', "{$name}, jorurikaj.com-এর অ্যাডমিন প্যানেলে আপনার অ্যাকাউন্ট খোলা হয়েছে।\nআপনার পাসওয়ার্ড বসাতে এই লিংকে যান (৩ দিন কাজ করবে, একবারই):\n\n" . AdminAuth::baseUrl() . admin_base() . '/set-password/' . $token . "\n\nতারপর " . AdminAuth::baseUrl() . admin_base() . " থেকে লগইন করবেন। লগইনে ইমেইলে একটি ৬ সংখ্যার কোড আসবে।\n\n— jorurikaj.com");
     }
 
     /** @param list<string> $errors */

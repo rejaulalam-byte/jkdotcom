@@ -15,7 +15,7 @@ use App\Models\GeoRepository;
 use App\Models\MemberStatus;
 use App\Models\UserRepository;
 
-$base = $role === 'agent' ? '/admin/agents' : '/admin/workers';
+$base = $role === 'agent' ? admin_base() . '/agents' : admin_base() . '/workers';
 // বর্তমান ফিল্টার ধরে রেখে লিংক বানায়; $override-এর মান বদলে যায়, খালি মান বাদ
 $url = static function (array $override = []) use ($base, $filter, $page): string {
     $params = array_merge(['status' => $filter['status'], 'q' => $filter['q'], 'source' => $filter['source'], 'nophone' => $filter['nophone'] ? '1' : '', 'p' => $page > 1 ? (string) $page : ''], $override);
@@ -68,7 +68,7 @@ foreach (MemberStatus::LABELS as $key => $label) {
             $profession = (string) ($r['service_custom'] ?? '') !== '' ? $r['service_custom'] . ' (নিজের লেখা)' : ($services[(string) ($r['service_slug'] ?? '')] ?? '—');
             ?>
             <tr>
-                <td><a href="/admin/members/<?= (int) $r['id'] ?>"><?= e((string) $r['name']) ?></a></td>
+                <td><a href="<?= admin_base() ?>/members/<?= (int) $r['id'] ?>"><?= e((string) $r['name']) ?></a></td>
                 <td>
                     <?php if ((string) ($r['phone'] ?? '') !== ''): ?>
                         <?= e((string) $r['phone']) ?>
@@ -82,9 +82,9 @@ foreach (MemberStatus::LABELS as $key => $label) {
                 <td><span class="adm-status is-<?= e((string) $r['status']) ?>"><?= e(MemberStatus::label((string) $r['status'])) ?></span></td>
                 <td><?= (string) ($r['legacy_id'] ?? '') !== '' ? 'পুরনো সাইট' : 'নতুন' ?></td>
                 <td class="adm-actions">
-                    <a class="adm-small" href="/admin/members/<?= (int) $r['id'] ?>">দেখুন</a>
+                    <a class="adm-small" href="<?= admin_base() ?>/members/<?= (int) $r['id'] ?>">দেখুন</a>
                     <?php if ($r['status'] === 'pending'): ?>
-                        <form action="/admin/members/action" method="post" data-confirm="<?= $role === 'worker' ? 'অনুমোদন দিলে সদস্যকে এখনই ইমেইল চলে যাবে (ইমেইল থাকলে) এবং নাম সাইটে প্রকাশ হবে। অনুমোদন দেবেন?' : 'তাকে অনুমোদন দেবার আগে দেখে নিন তার অনুমোদন দেবার সকল কাজ সম্পন্ন হয়েছে কিনা। যদি হয়ে থাকে তাহলে হ্যাঁ চাপুন।' ?>">
+                        <form action="<?= admin_base() ?>/members/action" method="post" data-confirm="<?= $role === 'worker' ? 'অনুমোদন দিলে সদস্যকে এখনই ইমেইল চলে যাবে (ইমেইল থাকলে) এবং নাম সাইটে প্রকাশ হবে। অনুমোদন দেবেন?' : 'তাকে অনুমোদন দেবার আগে দেখে নিন তার অনুমোদন দেবার সকল কাজ সম্পন্ন হয়েছে কিনা। যদি হয়ে থাকে তাহলে হ্যাঁ চাপুন।' ?>">
                             <?= csrf_field() ?>
                             <input type="hidden" name="id" value="<?= (int) $r['id'] ?>">
                             <input type="hidden" name="action" value="approve">

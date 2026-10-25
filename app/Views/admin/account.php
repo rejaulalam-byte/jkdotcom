@@ -15,7 +15,7 @@ $eye = static fn (string $id): string => '<button class="adm-eye" type="button" 
 
 <section class="adm-box">
     <h2>নাম বদলান</h2>
-    <form action="/admin/account/name" method="post" novalidate>
+    <form action="<?= admin_base() ?>/account/name" method="post" novalidate>
         <?= csrf_field() ?>
         <label for="ac-name">নাম</label>
         <input id="ac-name" type="text" name="name" value="<?= e((string) $admin['name']) ?>" required maxlength="100">
@@ -25,7 +25,7 @@ $eye = static fn (string $id): string => '<button class="adm-eye" type="button" 
 
 <section class="adm-box">
     <h2>পাসওয়ার্ড বদলান</h2>
-    <form action="/admin/account/password" method="post" novalidate>
+    <form action="<?= admin_base() ?>/account/password" method="post" novalidate>
         <?= csrf_field() ?>
         <?php foreach ([['ac-cur', 'current_password', 'এখনকার পাসওয়ার্ড', 'current-password'], ['ac-new', 'password', 'নতুন পাসওয়ার্ড (কমপক্ষে ১০ অক্ষর)', 'new-password'], ['ac-new2', 'password_confirm', 'নতুন পাসওয়ার্ড আবার', 'new-password']] as [$id, $name, $label, $auto]): ?>
             <label for="<?= $id ?>"><?= e($label) ?></label>
@@ -39,7 +39,7 @@ $eye = static fn (string $id): string => '<button class="adm-eye" type="button" 
     <h2>ইমেইল বদলান</h2>
     <?php if ($emailCodePending): ?>
         <p><strong><?= e($newEmail) ?></strong> ঠিকানায় পাঠানো ৬ সংখ্যার কোডটি লিখুন।</p>
-        <form action="/admin/account/email-confirm" method="post" novalidate>
+        <form action="<?= admin_base() ?>/account/email-confirm" method="post" novalidate>
             <?= csrf_field() ?>
             <label for="ac-code">কোড</label>
             <input id="ac-code" type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="8" required>
@@ -47,7 +47,7 @@ $eye = static fn (string $id): string => '<button class="adm-eye" type="button" 
         </form>
     <?php else: ?>
         <p>নতুন ইমেইলে একটি কোড যাবে; কোড লিখলে তবেই ইমেইল বদলাবে। (ভুল ঠিকানা দিয়ে নিজেকে আটকানো ঠেকাতে।)</p>
-        <form action="/admin/account/email" method="post" novalidate>
+        <form action="<?= admin_base() ?>/account/email" method="post" novalidate>
             <?= csrf_field() ?>
             <label for="ac-email">নতুন ইমেইল</label>
             <input id="ac-email" type="email" name="email" required autocapitalize="none" maxlength="150">

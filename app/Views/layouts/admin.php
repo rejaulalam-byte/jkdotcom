@@ -18,12 +18,12 @@ $ok = $ok ?? null;
 $pageTitle = ($title ?? 'অ্যাডমিন') . ' — অ্যাডমিন প্যানেল';
 // [লিংক, নাম, শুধু সুপার অ্যাডমিন, (ঐচ্ছিক) দরকারি অনুমতি]
 $nav = [
-    ['/admin', 'ড্যাশবোর্ড', false, null],
-    ['/admin/workers', 'কর্মী', false, 'registrations'],
-    ['/admin/agents', 'প্রতিনিধি', false, 'registrations'],
-    ['/admin/account', 'আমার অ্যাকাউন্ট', false, null],
-    ['/admin/admins', 'অ্যাডমিন', true, null],
-    ['/admin/log', 'কার্যলগ', true, null],
+    [admin_base(), 'ড্যাশবোর্ড', false, null],
+    [admin_base() . '/workers', 'কর্মী', false, 'registrations'],
+    [admin_base() . '/agents', 'প্রতিনিধি', false, 'registrations'],
+    [admin_base() . '/account', 'আমার অ্যাকাউন্ট', false, null],
+    [admin_base() . '/admins', 'অ্যাডমিন', true, null],
+    [admin_base() . '/log', 'কার্যলগ', true, null],
 ];
 ?>
 <!doctype html>
@@ -50,7 +50,7 @@ $nav = [
         </nav>
         <div class="adm-user">
             <p><strong><?= e((string) $admin['name']) ?></strong><br><small><?= e(AdminAuth::roleLabel((string) $admin['role'])) ?></small></p>
-            <form action="/admin/logout" method="post"><?= csrf_field() ?><button type="submit">লগআউট</button></form>
+            <form action="<?= admin_base() ?>/logout" method="post"><?= csrf_field() ?><button type="submit">লগআউট</button></form>
         </div>
     </aside>
     <main class="adm-main">

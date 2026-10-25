@@ -13,7 +13,7 @@
     <p>তারপর এই পেইজ রিফ্রেশ করুন। কী-টি শুধু আপনি জানবেন; অ্যাডমিন তৈরি হলে পেইজটি চিরতরে বন্ধ হয়ে যাবে।</p>
 <?php else: ?>
     <p>সেটআপ-কী (সার্ভারের <code>.env</code>-এ যা রেখেছেন) ও নিজের তথ্য দিন। এটা একবারই চলবে।</p>
-    <form action="/admin/setup" method="post" novalidate>
+    <form action="<?= admin_base() ?>/setup" method="post" novalidate>
         <?= csrf_field() ?>
         <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <label for="su-key">সেটআপ-কী</label>

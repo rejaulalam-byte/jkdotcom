@@ -10,10 +10,10 @@
 <h1 class="adm-card__title">পাসওয়ার্ড বসান</h1>
 <?php if (!$valid): ?>
     <p>এই লিংকটির মেয়াদ শেষ হয়ে গেছে বা আগেই ব্যবহার হয়েছে।</p>
-    <p class="adm-links"><a href="/admin/forgot">নতুন লিংক চান</a></p>
+    <p class="adm-links"><a href="<?= admin_base() ?>/forgot">নতুন লিংক চান</a></p>
 <?php else: ?>
     <p><?= e($adminName) ?>, আপনার নতুন পাসওয়ার্ড দিন (কমপক্ষে ১০ অক্ষর)।</p>
-    <form action="/admin/set-password/<?= e($token) ?>" method="post" novalidate>
+    <form action="<?= admin_base() ?>/set-password/<?= e($token) ?>" method="post" novalidate>
         <?= csrf_field() ?>
         <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <?php foreach ([['sp-pass', 'password', 'নতুন পাসওয়ার্ড'], ['sp-pass2', 'password_confirm', 'পাসওয়ার্ড আবার']] as [$id, $name, $label]): ?>

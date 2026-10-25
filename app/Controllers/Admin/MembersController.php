@@ -135,7 +135,7 @@ final class MembersController
             }
             UserRepository::purge((int) $member['id']) ?: $this->fail($back, 'মোছা যায়নি। আবার চেষ্টা করুন।');
             AdminRepository::log((int) $admin['id'], $logName, 'member_purged', $name);
-            $this->ok('/admin/' . ($member['role'] === 'agent' ? 'agents' : 'workers') . '?status=trashed', $name . ' চিরতরে মুছে গেছে।');
+            $this->ok(admin_base() . '/' . ($member['role'] === 'agent' ? 'agents' : 'workers') . '?status=trashed', $name . ' চিরতরে মুছে গেছে।');
         }
 
         if (!isset(MemberStatus::ACTIONS[$action])) {
@@ -220,7 +220,7 @@ final class MembersController
     /** কাজ শেষে ফেরার পথ: শুধু /admin/ দিয়ে শুরু হওয়া নিজের পাথ, নইলে কর্মীর তালিকা। */
     private function backPath(string $path): string
     {
-        return preg_match('#^/admin/[A-Za-z0-9/_\-?=&%.]*$#', $path) === 1 ? $path : '/admin/workers';
+        return preg_match('#^' . preg_quote(admin_base(), '#') . '/[A-Za-z0-9\/_\-?=&%.]*$#', $path) === 1 ? $path : admin_base() . '/workers';
     }
 
     private function fail(string $path, string $message): never

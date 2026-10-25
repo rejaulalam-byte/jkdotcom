@@ -45,7 +45,7 @@ final class AccessController
         if (AdminRepository::count() > 0 || $this->setupKey() === '') {
             $this->notFound();
         }
-        $this->guardPost('adm_setup', 10, '/admin/setup');
+        $this->guardPost('adm_setup', 10, admin_base() . '/setup');
 
         $key = (string) ($_POST['setup_key'] ?? '');
         $name = clean_input($_POST['name'] ?? '', 100);
@@ -65,16 +65,16 @@ final class AccessController
             $errors[] = $error;
         }
         if ($errors !== []) {
-            $this->back('/admin/setup', $errors, ['name' => $name, 'email' => $email]);
+            $this->back(admin_base() . '/setup', $errors, ['name' => $name, 'email' => $email]);
         }
 
         $id = AdminRepository::create($name, $email, 'super', [], password_hash($password, PASSWORD_DEFAULT));
         if ($id === null) {
-            $this->back('/admin/setup', ['সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।']);
+            $this->back(admin_base() . '/setup', ['সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।']);
         }
         AdminRepository::log($id, $name, 'setup', 'প্রথম সুপার অ্যাডমিন তৈরি');
         Session::flash('admin_ok', 'সুপার অ্যাডমিন তৈরি হয়েছে। এখন লগইন করুন।');
-        redirect('/admin/login');
+        redirect(admin_base() . '/login');
     }
 
     // ---- লগইন + ইমেইলের কোড --------------------------------------------------------------------
@@ -83,7 +83,7 @@ final class AccessController
     {
         $this->plainHeaders();
         if (AdminAuth::current() !== null) {
-            redirect('/admin');
+            redirect(admin_base());
         }
         View::render('admin/login', [
             'title' => 'অ্যাডমিন লগইন',
@@ -96,16 +96,16 @@ final class AccessController
     public function loginStore(): void
     {
         $this->plainHeaders();
-        $this->checkPost('/admin/login');
+        $this->checkPost(admin_base() . '/login');
         if (RateLimiter::count('adm_login_ip', self::WINDOW) >= 20) {
-            $this->back('/admin/login', ['অনেকবার ভুল চেষ্টা হয়েছে। ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
+            $this->back(admin_base() . '/login', ['অনেকবার ভুল চেষ্টা হয়েছে। ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
         }
 
         $email = mb_strtolower(clean_input($_POST['email'] ?? '', 150));
         $password = (string) ($_POST['password'] ?? '');
         $bucket = 'adm_login_' . hash('sha256', $email);
         if (RateLimiter::count($bucket, self::WINDOW) >= 5) {
-            $this->back('/admin/login', ['এই ইমেইলে ৫ বার ভুল চেষ্টা হয়েছে। ১৫ মিনিট পরে আবার চেষ্টা করুন।'], ['email' => $email]);
+            $this->back(admin_base() . '/login', ['এই ইমেইলে ৫ বার ভুল চেষ্টা হয়েছে। ১৫ মিনিট পরে আবার চেষ্টা করুন।'], ['email' => $email]);
         }
 
         $admin = $email !== '' && strlen($password) <= 200 ? AdminRepository::findByEmail($email) : null;
@@ -114,27 +114,27 @@ final class AccessController
         if (!$ok) {
             RateLimiter::hit('adm_login_ip', self::WINDOW);
             RateLimiter::hit($bucket, self::WINDOW);
-            $this->back('/admin/login', ['ইমেইল বা পাসওয়ার্ড সঠিক নয়।'], ['email' => $email]);
+            $this->back(admin_base() . '/login', ['ইমেইল বা পাসওয়ার্ড সঠিক নয়।'], ['email' => $email]);
         }
         if ($admin['status'] !== 'active') {
-            $this->back('/admin/login', ['এই অ্যাকাউন্টটি বন্ধ আছে। সুপার অ্যাডমিনের সঙ্গে যোগাযোগ করুন।'], ['email' => $email]);
+            $this->back(admin_base() . '/login', ['এই অ্যাকাউন্টটি বন্ধ আছে। সুপার অ্যাডমিনের সঙ্গে যোগাযোগ করুন।'], ['email' => $email]);
         }
         RateLimiter::clear($bucket);
 
         if (RateLimiter::tooMany('adm_code_' . $admin['id'], 5, 3600)) {
-            $this->back('/admin/login', ['অনেকবার কোড চাওয়া হয়েছে। এক ঘণ্টা পরে আবার চেষ্টা করুন।']);
+            $this->back(admin_base() . '/login', ['অনেকবার কোড চাওয়া হয়েছে। এক ঘণ্টা পরে আবার চেষ্টা করুন।']);
         }
         if (!AdminAuth::issueCode('login', (string) $admin['email'], ['admin_id' => (int) $admin['id']])) {
-            $this->back('/admin/login', ['ইমেইল পাঠানো যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
+            $this->back(admin_base() . '/login', ['ইমেইল পাঠানো যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
         }
-        redirect('/admin/verify');
+        redirect(admin_base() . '/verify');
     }
 
     public function verifyForm(): void
     {
         $this->plainHeaders();
         if (!AdminAuth::codePending('login')) {
-            redirect('/admin/login');
+            redirect(admin_base() . '/login');
         }
         $admin = AdminRepository::findById((int) ($_SESSION['admin_code']['login']['payload']['admin_id'] ?? 0));
         View::render('admin/verify', [
@@ -148,36 +148,36 @@ final class AccessController
     public function verifyStore(): void
     {
         $this->plainHeaders();
-        $this->checkPost('/admin/login');
+        $this->checkPost(admin_base() . '/login');
         $result = AdminAuth::checkCode('login', (string) ($_POST['code'] ?? ''));
         if (!$result['ok']) {
-            $this->back(AdminAuth::codePending('login') ? '/admin/verify' : '/admin/login', [(string) $result['message']]);
+            $this->back(AdminAuth::codePending('login') ? admin_base() . '/verify' : admin_base() . '/login', [(string) $result['message']]);
         }
         $admin = AdminRepository::findById((int) ($result['payload']['admin_id'] ?? 0));
         if ($admin === null || $admin['status'] !== 'active') {
-            $this->back('/admin/login', ['এই অ্যাকাউন্টটি এখন চালু নেই।']);
+            $this->back(admin_base() . '/login', ['এই অ্যাকাউন্টটি এখন চালু নেই।']);
         }
         AdminAuth::login($admin);
-        redirect('/admin');
+        redirect(admin_base());
     }
 
     /** কোড আবার পাঠানো (ঘণ্টায় ৫টির বেশি নয়)। */
     public function verifyResend(): void
     {
         $this->plainHeaders();
-        $this->checkPost('/admin/login');
+        $this->checkPost(admin_base() . '/login');
         $admin = AdminRepository::findById((int) ($_SESSION['admin_code']['login']['payload']['admin_id'] ?? 0));
         if ($admin === null || $admin['status'] !== 'active') {
-            redirect('/admin/login');
+            redirect(admin_base() . '/login');
         }
         if (RateLimiter::tooMany('adm_code_' . $admin['id'], 5, 3600)) {
-            $this->back('/admin/verify', ['অনেকবার কোড চাওয়া হয়েছে। এক ঘণ্টা পরে আবার চেষ্টা করুন।']);
+            $this->back(admin_base() . '/verify', ['অনেকবার কোড চাওয়া হয়েছে। এক ঘণ্টা পরে আবার চেষ্টা করুন।']);
         }
         if (!AdminAuth::issueCode('login', (string) $admin['email'], ['admin_id' => (int) $admin['id']])) {
-            $this->back('/admin/verify', ['ইমেইল পাঠানো যায়নি।']);
+            $this->back(admin_base() . '/verify', ['ইমেইল পাঠানো যায়নি।']);
         }
         Session::flash('admin_ok', 'নতুন কোড পাঠানো হয়েছে।');
-        redirect('/admin/verify');
+        redirect(admin_base() . '/verify');
     }
 
     public function logout(): void
@@ -185,7 +185,7 @@ final class AccessController
         if (Security::verifyCsrf($_POST['_token'] ?? null)) {
             AdminAuth::logout();
         }
-        redirect('/admin/login');
+        redirect(admin_base() . '/login');
     }
 
     // ---- পাসওয়ার্ড ভুলে যাওয়া ও এককালীন লিংক ------------------------------------------------
@@ -204,16 +204,16 @@ final class AccessController
     public function forgotStore(): void
     {
         $this->plainHeaders();
-        $this->guardPost('adm_forgot', 6, '/admin/forgot');
+        $this->guardPost('adm_forgot', 6, admin_base() . '/forgot');
         $email = mb_strtolower(clean_input($_POST['email'] ?? '', 150));
         $admin = filter_var($email, FILTER_VALIDATE_EMAIL) !== false ? AdminRepository::findByEmail($email) : null;
         if ($admin !== null && $admin['status'] === 'active' && !RateLimiter::tooMany('adm_forgot_' . $admin['id'], 3, 3600)) {
             $token = AdminAuth::newToken((int) $admin['id'], 3600);
-            AdminAuth::mail((string) $admin['email'], 'পাসওয়ার্ড বদলের লিংক — jorurikaj.com', "অ্যাডমিন প্যানেলের পাসওয়ার্ড বদলাতে এই লিংকে যান (১ ঘণ্টা কাজ করবে, একবারই):\n\n" . AdminAuth::baseUrl() . '/admin/set-password/' . $token . "\n\nআপনি চেয়ে না থাকলে এই ইমেইল উপেক্ষা করুন।\n\n— jorurikaj.com");
+            AdminAuth::mail((string) $admin['email'], 'পাসওয়ার্ড বদলের লিংক — jorurikaj.com', "অ্যাডমিন প্যানেলের পাসওয়ার্ড বদলাতে এই লিংকে যান (১ ঘণ্টা কাজ করবে, একবারই):\n\n" . AdminAuth::baseUrl() . admin_base() . '/set-password/' . $token . "\n\nআপনি চেয়ে না থাকলে এই ইমেইল উপেক্ষা করুন।\n\n— jorurikaj.com");
             AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'forgot_password');
         }
         Session::flash('admin_ok', 'ইমেইলটি নিবন্ধিত থাকলে পাসওয়ার্ড বদলের লিংক পাঠানো হয়েছে। ইনবক্স (ও স্প্যাম) দেখুন।');
-        redirect('/admin/forgot');
+        redirect(admin_base() . '/forgot');
     }
 
     /** @param array<string,mixed> $meta slug = ইমেইলের লিংকের টোকেন */
@@ -235,21 +235,21 @@ final class AccessController
     {
         $this->plainHeaders();
         $token = (string) ($meta['slug'] ?? '');
-        $this->guardPost('adm_setpw', 20, '/admin/set-password/' . $token);
+        $this->guardPost('adm_setpw', 20, admin_base() . '/set-password/' . $token);
         $admin = $this->adminOfToken($token);
         if ($admin === null) {
-            $this->back('/admin/set-password/' . $token, ['লিংকটির মেয়াদ শেষ বা ব্যবহার হয়ে গেছে।']);
+            $this->back(admin_base() . '/set-password/' . $token, ['লিংকটির মেয়াদ শেষ বা ব্যবহার হয়ে গেছে।']);
         }
         $password = (string) ($_POST['password'] ?? '');
         if (($error = AdminAuth::passwordError($password, (string) ($_POST['password_confirm'] ?? ''), (string) $admin['email'])) !== null) {
-            $this->back('/admin/set-password/' . $token, [$error]);
+            $this->back(admin_base() . '/set-password/' . $token, [$error]);
         }
         AdminRepository::update((int) $admin['id'], [
             'password_hash' => password_hash($password, PASSWORD_DEFAULT), 'token_hash' => null, 'token_expires' => null,
         ]);
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'password_set');
         Session::flash('admin_ok', 'পাসওয়ার্ড বসানো হয়েছে। এখন লগইন করুন।');
-        redirect('/admin/login');
+        redirect(admin_base() . '/login');
     }
 
     // ---- ভেতরের সহায়ক -------------------------------------------------------------------------

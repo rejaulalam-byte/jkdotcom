@@ -16,7 +16,7 @@ use App\Models\UserRepository;
 
 $isWorker = $member['role'] === 'worker';
 $gender = ['male' => 'পুরুষ', 'female' => 'মহিলা', 'other' => 'অন্যান্য'][(string) ($member['gender'] ?? '')] ?? '';
-$list = $isWorker ? '/admin/workers' : '/admin/agents';
+$list = $isWorker ? admin_base() . '/workers' : admin_base() . '/agents';
 $missing = '<span class="adm-red">নেই</span>';
 // [নাম, মান (HTML, escape করা), খালি কি না]
 $val = static fn (string $v): string => $v === '' ? '' : e($v);
@@ -88,7 +88,7 @@ $daysLeft = null;
 if (in_array($current, ['reserved', 'trashed'], true) && (string) ($member['status_changed_at'] ?? '') !== '') {
     $daysLeft = max(0, UserRepository::RESERVE_DAYS - (int) floor((time() - strtotime((string) $member['status_changed_at'])) / 86400));
 }
-$back = '/admin/members/' . (int) $member['id'];
+$back = admin_base() . '/members/' . (int) $member['id'];
 ?>
 <section class="adm-box adm-actionbox">
     <h2>অবস্থা: <span class="adm-status is-<?= e($current) ?>"><?= e(MemberStatus::label($current)) ?></span></h2>
@@ -107,7 +107,7 @@ $back = '/admin/members/' . (int) $member['id'];
     $form = static function (string $action) use ($btn, $member, $back): void {
         [$label, $class, $confirm] = $btn[$action];
         ?>
-        <form<?= $action === 'reject' ? ' id="reject-form"' : '' ?> action="/admin/members/action" method="post"<?= $confirm !== '' ? ' data-confirm="' . e($confirm) . '"' : '' ?>>
+        <form<?= $action === 'reject' ? ' id="reject-form"' : '' ?> action="<?= admin_base() ?>/members/action" method="post"<?= $confirm !== '' ? ' data-confirm="' . e($confirm) . '"' : '' ?>>
             <?= csrf_field() ?>
             <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
             <input type="hidden" name="action" value="<?= e($action) ?>">
@@ -127,7 +127,7 @@ $back = '/admin/members/' . (int) $member['id'];
         <div class="adm-ag__left adm-ag__r2">
             <?php foreach ($second as $action): $form($action); endforeach; ?>
             <?php if ($canPurge): ?>
-                <form action="/admin/members/action" method="post" data-confirm="চিরতরে মুছলে এই সদস্যের সব তথ্য ও ছবি চলে যাবে, আর কখনও ফেরানো যাবে না। সত্যিই মুছবেন?">
+                <form action="<?= admin_base() ?>/members/action" method="post" data-confirm="চিরতরে মুছলে এই সদস্যের সব তথ্য ও ছবি চলে যাবে, আর কখনও ফেরানো যাবে না। সত্যিই মুছবেন?">
                     <?= csrf_field() ?>
                     <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
                     <input type="hidden" name="action" value="purge">
@@ -145,7 +145,7 @@ $back = '/admin/members/' . (int) $member['id'];
 </section>
 <div class="adm-detail">
     <aside class="adm-detail__photo">
-        <p><a class="adm-btn adm-btn--edit" href="/admin/member-edit/<?= (int) $member['id'] ?>">✎ সম্পাদনা করুন</a></p>
+        <p><a class="adm-btn adm-btn--edit" href="<?= admin_base() ?>/member-edit/<?= (int) $member['id'] ?>">✎ সম্পাদনা করুন</a></p>
         <?php if ($photoUrl !== null): ?>
             <img src="<?= e($photoUrl) ?>" alt="" width="220" height="240">
         <?php else: ?>

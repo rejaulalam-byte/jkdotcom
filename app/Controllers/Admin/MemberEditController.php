@@ -66,9 +66,9 @@ final class MemberEditController
         $admin = AdminAuth::require('registrations');
         $member = $this->member($_POST['id'] ?? '');
         if ($member === null) {
-            redirect('/admin/workers');
+            redirect(admin_base() . '/workers');
         }
-        $back = '/admin/member-edit/' . (int) $member['id'];
+        $back = admin_base() . '/member-edit/' . (int) $member['id'];
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
             $this->fail($back, ['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
         }
@@ -176,7 +176,7 @@ final class MemberEditController
         $changed = $this->changedLabels($member, $data);
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'member_edit', (string) $member['name'] . ($changed !== [] ? ' — ' . implode(', ', $changed) : ' — কিছু বদলায়নি'));
         Session::flash('admin_ok', $changed !== [] ? 'সংরক্ষণ হয়েছে। বদলেছে: ' . implode(', ', $changed) . '।' : 'সংরক্ষণ হয়েছে (কিছু বদলায়নি)।');
-        redirect('/admin/members/' . (int) $member['id']);
+        redirect(admin_base() . '/members/' . (int) $member['id']);
     }
 
     /** @return array<string,mixed>|null */

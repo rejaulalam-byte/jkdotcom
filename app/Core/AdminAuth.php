@@ -78,7 +78,7 @@ final class AdminAuth
         header('X-Robots-Tag: noindex, nofollow');
         $admin = self::current();
         if ($admin === null) {
-            redirect('/admin/login');
+            redirect(admin_base() . '/login');
         }
         if (($superOnly && !self::isSuper($admin)) || ($permission !== null && !self::can($admin, $permission))) {
             http_response_code(403);

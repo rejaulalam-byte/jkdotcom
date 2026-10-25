@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Core\Content;
+use App\Core\Env;
 use App\Core\Router;
 use App\Core\Security;
 
@@ -19,6 +20,17 @@ function bn(int|string $number): string
         '0' => '০', '1' => '১', '2' => '২', '3' => '৩', '4' => '৪',
         '5' => '৫', '6' => '৬', '7' => '৭', '8' => '৮', '9' => '৯',
     ]);
+}
+
+/**
+ * অ্যাডমিন প্যানেলের গোপন প্রবেশপথ (যেমন "/self-pakundi")। সার্ভারের .env-এর ADMIN_PATH থেকে আসে, যাতে সাধারণ
+ * "/admin" দিয়ে কেউ খুঁজে না পায়। .env-এ না থাকলে বা ভুল ধাঁচের হলে "/admin" (শুধু লোকাল পরীক্ষার জন্য)।
+ */
+function admin_base(): string
+{
+    $path = trim((string) Env::get('ADMIN_PATH', ''), " \t/");
+
+    return preg_match('/^[a-z0-9][a-z0-9_-]{2,60}$/i', $path) === 1 ? '/' . $path : '/admin';
 }
 
 /** public/assets-এর ভেতরের ফাইলের URL; ফাইল বদলালে ব্রাউজার যেন নতুনটা নেয় সেজন্য ভার্সন-সহ। */

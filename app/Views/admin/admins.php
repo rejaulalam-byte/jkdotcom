@@ -25,7 +25,7 @@ use App\Models\AdminPermissions;
                     <td><?= $a['last_login_at'] ? e((string) $a['last_login_at']) : '—' ?></td>
                     <td class="adm-actions">
                         <?php if (!$self): ?>
-                            <form action="/admin/admins/status" method="post" data-confirm="<?= $a['status'] === 'active' ? 'এই অ্যাকাউন্ট বন্ধ করবেন? তিনি আর ঢুকতে পারবেন না।' : 'অ্যাকাউন্ট আবার চালু করবেন?' ?>">
+                            <form action="<?= admin_base() ?>/admins/status" method="post" data-confirm="<?= $a['status'] === 'active' ? 'এই অ্যাকাউন্ট বন্ধ করবেন? তিনি আর ঢুকতে পারবেন না।' : 'অ্যাকাউন্ট আবার চালু করবেন?' ?>">
                                 <?= csrf_field() ?>
                                 <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
                                 <input type="hidden" name="action" value="<?= $a['status'] === 'active' ? 'disable' : 'enable' ?>">
@@ -33,7 +33,7 @@ use App\Models\AdminPermissions;
                             </form>
                         <?php endif; ?>
                         <?php if ($a['status'] === 'active'): ?>
-                            <form action="/admin/admins/invite" method="post">
+                            <form action="<?= admin_base() ?>/admins/invite" method="post">
                                 <?= csrf_field() ?>
                                 <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
                                 <button class="adm-small" type="submit">পাসওয়ার্ডের লিংক পাঠান</button>
@@ -42,7 +42,7 @@ use App\Models\AdminPermissions;
                         <?php if ($a['role'] === 'admin'): ?>
                             <details>
                                 <summary class="adm-small">অনুমতি</summary>
-                                <form action="/admin/admins/permissions" method="post">
+                                <form action="<?= admin_base() ?>/admins/permissions" method="post">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
                                     <?php foreach (AdminPermissions::ALL as $key => $label): ?>
@@ -63,7 +63,7 @@ use App\Models\AdminPermissions;
 <section class="adm-box">
     <h2>নতুন অ্যাডমিন যোগ করুন</h2>
     <p>নতুন ব্যক্তির ইমেইলে পাসওয়ার্ড বসানোর লিংক যাবে (৩ দিন কাজ করবে)। পাসওয়ার্ড তিনি নিজে বসাবেন; আপনি জানবেন না।</p>
-    <form action="/admin/admins/create" method="post" novalidate>
+    <form action="<?= admin_base() ?>/admins/create" method="post" novalidate>
         <?= csrf_field() ?>
         <label for="na-name">নাম</label>
         <input id="na-name" type="text" name="name" required maxlength="100">

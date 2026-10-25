@@ -16,12 +16,12 @@ $val = static fn (string $k): string => e((string) ($v[$k] ?? ''));
 $selected = static fn (mixed $current, mixed $value): string => (string) $current === (string) $value ? ' selected' : '';
 $extra = array_values((array) ($v['extra_services'] ?? []));
 $workIds = array_values((array) ($v['work_district_ids'] ?? []));
-$list = $isWorker ? '/admin/workers' : '/admin/agents';
+$list = $isWorker ? admin_base() . '/workers' : admin_base() . '/agents';
 $gender = (string) ($v['gender'] ?? '');
 ?>
-<p><a class="adm-link" href="/admin/members/<?= (int) $member['id'] ?>">← বিস্তারিত পেইজে ফিরুন (কিছু না বদলে)</a></p>
+<p><a class="adm-link" href="<?= admin_base() ?>/members/<?= (int) $member['id'] ?>">← বিস্তারিত পেইজে ফিরুন (কিছু না বদলে)</a></p>
 
-<form class="adm-editform" action="/admin/member-edit" method="post" enctype="multipart/form-data" novalidate>
+<form class="adm-editform" action="<?= admin_base() ?>/member-edit" method="post" enctype="multipart/form-data" novalidate>
     <?= csrf_field() ?>
     <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
 
@@ -171,6 +171,6 @@ $gender = (string) ($v['gender'] ?? '');
 
     <p>
         <button class="adm-btn" type="submit">সংরক্ষণ করুন</button>
-        <a class="adm-link" href="/admin/members/<?= (int) $member['id'] ?>">বাতিল (কিছু বদলাবেন না)</a>
+        <a class="adm-link" href="<?= admin_base() ?>/members/<?= (int) $member['id'] ?>">বাতিল (কিছু বদলাবেন না)</a>
     </p>
 </form>
