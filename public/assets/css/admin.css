@@ -886,3 +886,45 @@ td.adm-actions form {
     flex-wrap: wrap;
     gap: 6px;
 }
+
+/* ---- মতামতের ইনবক্স ---- */
+/* প্রতিটি মতামত একটা খোলা-বন্ধ বাক্স; না-পড়াটা বাঁ ধারে রঙিন */
+.adm-msg {
+    margin: 0 0 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+}
+.adm-msg.is-unread {
+    border-left: 6px solid var(--teal);
+}
+.adm-msg summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    padding: 12px 18px;
+    cursor: pointer;
+}
+.adm-msg__subject {
+    font-weight: 600;
+}
+.adm-msg.is-unread .adm-msg__subject {
+    color: var(--teal-dark);
+}
+.adm-msg__meta {
+    color: var(--muted, #5b6b70);
+}
+.adm-msg__body {
+    padding: 4px 18px 16px;
+    border-top: 1px solid var(--line);
+}
+.adm-msg__text {
+    margin: 10px 0 14px;
+    line-height: 1.8;
+}
+.adm-msg .adm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}

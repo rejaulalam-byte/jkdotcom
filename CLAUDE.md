@@ -279,3 +279,6 @@ Build ONE thing at a time (owner's wish), explain, wait for his OK. Ask him when
 
 ## Owner decisions (2026-10-25) — admin step 2e: "অসম্পূর্ণ তথ্য" (built)
 - Page `<admin>/incomplete` (permission "registrations"): approved workers whose data is missing, rules in `App\Models\IncompleteInfo` (mobile, e-mail, address, area; experience and bio are optional so they only have their own tabs). Tabs with counts, search, per row red inputs for the missing mobile/e-mail/address that save in place ("সংরক্ষণ", a new mobile clears `phone_raw`, unique per role), red chips for the rest + "সম্পাদনা" link, and a "তথ্য পূর্ণ করুন ইমেইল" button (only when the worker has an e-mail; lists what is missing, never a password). All logged.
+
+## Owner decisions (2026-10-25) — admin step 3a: feedback inbox (built)
+- Page `<admin>/feedback` (permission "inbox"): the visitors' feedback (home / contact / FAQ forms), tabs সব / নতুন (না-পড়া) / রাখা with counts, search, each message opens in place; buttons পড়া হয়েছে ↔ আবার নতুন, রাখুন ↔ "রাখা" তুলুন, চিরতরে মুছুন (asks yes/no). All logged. Migration 021 (`feedback.is_kept`). Step 3 is split: 3a feedback (done), 3b contact leads + job notices inbox, 3c lock release.
