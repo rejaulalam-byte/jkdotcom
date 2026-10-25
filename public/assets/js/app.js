@@ -1774,7 +1774,7 @@
 })();
 
 /* ---- পপ-আপ বিজ্ঞাপন ([data-popup-ad], partials/popup-ad.php) ---------------------------
-   পেইজ খুললেই দেখায়: পর্দা ঘোলা, ছবি মেনুর মাঝামাঝি উচ্চতা থেকে। (×), Esc বা data-seconds সেকেন্ড পরে সরে যায়,
+   পেইজ খুললেই দেখায়: পর্দা ঘোলা, ছবি মেনু-পট্টির ওপরের কিনারার ১০px নিচ থেকে। (×), Esc বা data-seconds সেকেন্ড পরে সরে যায়,
    তারপর "jk:popup-closed" ঘটনা পাঠায় — হিরোর অ্যানিমেশন ও আজকের কাজের তালিকা তখনই শুরু হয় (ওপরের অংশ)।
    প্রতিবার খুললে আবার দেখায়। */
 (function () {
@@ -1806,7 +1806,7 @@
     var header = document.querySelector(".site-header");
     if (header) {
         var r = header.getBoundingClientRect();
-        box.style.setProperty("--popup-top", Math.max(0, Math.round(r.top + r.height / 2)) + "px");
+        box.style.setProperty("--popup-top", Math.max(0, Math.round(r.top + 10)) + "px"); // মেনু-পট্টির ওপরের কিনারা থেকে ১০px নিচে
     }
     if (hero) {
         hero.classList.add("is-waiting");
