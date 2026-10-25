@@ -164,7 +164,7 @@ final class AdsController
         $this->ok($on ? 'হোমে বিজ্ঞাপন-স্ট্রিপ দেখানো হবে।' : 'হোমে বিজ্ঞাপন-স্ট্রিপ লুকানো হলো (বিজ্ঞাপনগুলো থাকছে)।');
     }
 
-    /** POST: active, pages[], link, title, image (নতুন ছবি, ঐচ্ছিক), remove_image — পপ-আপ বিজ্ঞাপন। */
+    /** POST: active, pages[], link, title, seconds, image (নতুন ছবি, ঐচ্ছিক), remove_image — পপ-আপ বিজ্ঞাপন। */
     public function popup(): void
     {
         $admin = AdminAuth::require('ads');
@@ -177,6 +177,10 @@ final class AdsController
         }
         $pages = array_map('strval', is_array($_POST['pages'] ?? null) ? $_POST['pages'] : []);
         $active = !empty($_POST['active']);
+        $seconds = (int) ($_POST['seconds'] ?? PopupAd::SECONDS);
+        if ($seconds < PopupAd::MIN_SECONDS || $seconds > PopupAd::MAX_SECONDS) {
+            $this->fail('দেখানোর সময় ' . bn(PopupAd::MIN_SECONDS) . ' থেকে ' . bn(PopupAd::MAX_SECONDS) . ' সেকেন্ডের মধ্যে দিন।');
+        }
 
         $image = null;
         if (!empty($_FILES['image']) && ($_FILES['image']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
@@ -199,10 +203,10 @@ final class AdsController
             $this->fail('কোন পেইজে দেখাবে, অন্তত একটায় টিক দিন।');
         }
 
-        if (!PopupAd::save($active, $pages, $link, clean_input($_POST['title'] ?? '', 150), $image)) {
+        if (!PopupAd::save($active, $pages, $link, clean_input($_POST['title'] ?? '', 150), $seconds, $image)) {
             $this->fail('সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।');
         }
-        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'popup_save', ($active ? 'চালু' : 'বন্ধ') . ' — ' . implode(', ', $pages));
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'popup_save', ($active ? 'চালু' : 'বন্ধ') . ' — ' . implode(', ', $pages) . ' — ' . $seconds . ' সেকেন্ড');
         $this->ok($active ? 'পপ-আপ বিজ্ঞাপন চালু; বাছা পেইজগুলো খুললেই দেখাবে।' : 'পপ-আপ বিজ্ঞাপন সংরক্ষিত (বন্ধ আছে)।');
     }
 

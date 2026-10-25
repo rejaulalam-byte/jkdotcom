@@ -4,7 +4,7 @@
  *
  * @var list<array<string,mixed>> $ads
  * @var bool $stripOn
- * @var array{active:bool,image:string,width:int,height:int,link:string,title:string,pages:list<string>} $popup
+ * @var array{active:bool,image:string,width:int,height:int,link:string,title:string,pages:list<string>,seconds:int} $popup
  * @var array<string,mixed> $old   জমা ব্যর্থ হলে আগের লেখা (id, title, link, start, end)
  */
 use App\Core\AdImage;
@@ -28,7 +28,7 @@ $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 
     <h2 class="adm-card__title">পপ-আপ বিজ্ঞাপন</h2>
     <p>
         অবস্থা: <b><?= $popup['active'] && $popup['image'] !== '' ? 'চালু' : 'বন্ধ' ?></b>
-        <span class="adm-muted">— বাছা পেইজ খুললেই (প্রতিবার, রিফ্রেশেও) মেনুর ঠিক নিচে পেইজের মাঝখানে দেখায়; ওপরের ডান কোনার (×) চাপলে বা <?= e(bn(App\Models\PopupAd::SECONDS)) ?> সেকেন্ড পরে নিজে সরে যায়।</span>
+        <span class="adm-muted">— বাছা পেইজ খুললেই (প্রতিবার, রিফ্রেশেও) মেনুর ঠিক নিচে পেইজের মাঝখানে দেখায়; ওপরের ডান কোনার (×) চাপলে বা নিচে দেওয়া সময় (এখন <?= e(bn($popup['seconds'])) ?> সেকেন্ড) পরে নিজে সরে যায়।</span>
     </p>
     <form action="<?= $post('popup') ?>" method="post" enctype="multipart/form-data" novalidate>
         <?= csrf_field() ?>
@@ -55,6 +55,8 @@ $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 
                 <label class="adm-check"><input type="checkbox" name="pages[]" value="<?= e($id) ?>"<?= in_array($id, $popup['pages'], true) ? ' checked' : '' ?>> <?= e($label) ?></label>
             <?php endforeach; ?>
         </fieldset>
+        <label for="pp-seconds">কত সেকেন্ড দেখাবে (কেউ বন্ধ না করলে; <?= e(bn(App\Models\PopupAd::MIN_SECONDS)) ?> থেকে <?= e(bn(App\Models\PopupAd::MAX_SECONDS)) ?>)</label>
+        <input id="pp-seconds" class="adm-short" type="number" name="seconds" min="<?= (int) App\Models\PopupAd::MIN_SECONDS ?>" max="<?= (int) App\Models\PopupAd::MAX_SECONDS ?>" value="<?= (int) $popup['seconds'] ?>" required>
         <label class="adm-check"><input type="checkbox" name="active" value="1"<?= $popup['active'] ? ' checked' : '' ?>> চালু (টিক তুলে দিলে বন্ধ; ছবি ও পছন্দগুলো থাকে)</label>
         <button class="adm-btn" type="submit">পপ-আপ বিজ্ঞাপন সংরক্ষণ করুন</button>
     </form>

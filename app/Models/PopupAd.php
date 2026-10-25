@@ -11,7 +11,7 @@ use App\Core\Security;
 
 /**
  * পপ-আপ বিজ্ঞাপন: একটাই ছবি, বাছা পেইজগুলো খুললেই (প্রতিবার, রিফ্রেশেও) মেনুর ঠিক নিচে পেইজের মাঝখানে নিজের মাপে দেখায়;
- * (×) চাপলে বা ২০ সেকেন্ড পরে নিজে সরে যায় (app.js)। ছবি ছোট পর্দায় অনুপাত ঠিক রেখে ছোট হয়।
+ * (×) চাপলে বা অ্যাডমিনের দেওয়া সময় (সেকেন্ড) পরে নিজে সরে যায় (app.js)। ছবি ছোট পর্দায় অনুপাত ঠিক রেখে ছোট হয়।
  * সেটিংগুলো content_blocks-এ "popup.*" কী হিসেবে থাকে (আলাদা টেবিল লাগে না); ছবি PageImage দিয়ে রাখা।
  */
 final class PopupAd
@@ -24,13 +24,15 @@ final class PopupAd
         'services' => ['সেবাসমূহ পেইজ', '/services'],
     ];
 
-    /** না বন্ধ করলে কত সেকেন্ড দেখায়। */
+    /** না বন্ধ করলে কত সেকেন্ড দেখায়: শুরুর মান ও অ্যাডমিন যে সীমার মধ্যে বদলাতে পারেন। */
     public const SECONDS = 20;
+    public const MIN_SECONDS = 3;
+    public const MAX_SECONDS = 300;
 
     /**
      * অ্যাডমিনের জন্য এখনকার সব সেটিং।
      *
-     * @return array{active:bool,image:string,width:int,height:int,link:string,title:string,pages:list<string>}
+     * @return array{active:bool,image:string,width:int,height:int,link:string,title:string,pages:list<string>,seconds:int}
      */
     public static function settings(): array
     {
@@ -42,13 +44,14 @@ final class PopupAd
             'link' => Content::get('popup.link', ''),
             'title' => Content::get('popup.title', ''),
             'pages' => array_values(array_intersect(explode(',', Content::get('popup.pages', '')), array_keys(self::PAGES))),
+            'seconds' => self::clampSeconds((int) Content::get('popup.seconds', (string) self::SECONDS)),
         ];
     }
 
     /**
      * এই পেইজে দেখানোর বিজ্ঞাপন (চালু, ছবি আছে, পেইজ বাছা), নইলে null।
      *
-     * @return array{image:string,width:int,height:int,link:?string,title:string}|null
+     * @return array{image:string,width:int,height:int,link:?string,title:string,seconds:int}|null
      */
     public static function forCurrentPage(): ?array
     {
@@ -65,6 +68,7 @@ final class PopupAd
                     'height' => max(1, $s['height']),
                     'link' => $s['link'] !== '' ? Security::safeUrl($s['link']) : null,
                     'title' => $s['title'] !== '' ? $s['title'] : 'বিজ্ঞাপন',
+                    'seconds' => $s['seconds'],
                 ];
             }
         }
@@ -78,7 +82,7 @@ final class PopupAd
      * @param list<string> $pages
      * @param array{url:string,width:int,height:int}|''|null $image
      */
-    public static function save(bool $active, array $pages, string $link, string $title, array|string|null $image): bool
+    public static function save(bool $active, array $pages, string $link, string $title, int $seconds, array|string|null $image): bool
     {
         $old = Content::get('popup.image', '');
         $values = [
@@ -86,6 +90,7 @@ final class PopupAd
             'popup.pages' => implode(',', array_values(array_intersect($pages, array_keys(self::PAGES)))),
             'popup.link' => $link,
             'popup.title' => $title,
+            'popup.seconds' => (string) self::clampSeconds($seconds),
         ];
         if (is_array($image)) {
             $values += ['popup.image' => $image['url'], 'popup.width' => (string) $image['width'], 'popup.height' => (string) $image['height']];
@@ -102,5 +107,11 @@ final class PopupAd
         }
 
         return true;
+    }
+
+    /** দেখানোর সময় অনুমোদিত সীমার মধ্যে আনে। */
+    public static function clampSeconds(int $seconds): int
+    {
+        return max(self::MIN_SECONDS, min(self::MAX_SECONDS, $seconds));
     }
 }

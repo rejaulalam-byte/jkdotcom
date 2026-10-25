@@ -1201,3 +1201,7 @@ td.adm-actions form {
         max-height: none;
     }
 }
+/* ছোট সংখ্যার ঘর (যেমন সেকেন্ড) */
+input.adm-short {
+    max-width: 160px;
+}
