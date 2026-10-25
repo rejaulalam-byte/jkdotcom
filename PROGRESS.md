@@ -1,3 +1,4 @@
+## 2026-10-25 night: admin step 4 (ads) built, no migration. Next (owner order): step 5 = texts + full rich editor; ... Also pending: second admin door ADMIN_PATH_STAFF.
 ## 2026-10-25 night: admin step 3 complete (3a feedback, 3b leads + job notices, 3c lock release). Next: step 4 ads + images (migration none yet). Reminder: second admin door ADMIN_PATH_STAFF later.
 ## 2026-10-25 night: admin 3b built (leads + job notices; no migration). Next: 3c lock release, then 4 ads/images.
 ## 2026-10-25 night: admin 3a feedback inbox built (migration 021 must be run on staging). Next: 3b leads + job notices, 3c lock release.

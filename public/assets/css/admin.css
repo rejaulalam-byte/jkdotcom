@@ -928,3 +928,50 @@ td.adm-actions form {
     flex-wrap: wrap;
     gap: 8px;
 }
+
+/* ---- বিজ্ঞাপন ---- */
+/* ছবির নিয়ম: ছবি-ঘরের নিচে ছোট তালিকা */
+.adm-rules {
+    margin: 8px 0 0;
+    padding: 10px 14px 10px 34px;
+    border-left: 4px solid var(--gold, #f0d772);
+    border-radius: 4px;
+    background: #f6f9fa;
+    line-height: 1.7;
+}
+.adm-ad {
+    margin: 0 0 12px;
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+}
+.adm-ad__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 18px;
+}
+.adm-ad__thumb {
+    height: 90px;
+    width: auto;
+    max-width: 260px;
+    border-radius: 6px;
+    background: #eef3f4;
+    object-fit: cover;
+}
+.adm-ad__info {
+    flex: 1 1 260px;
+}
+.adm-ad__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.adm-ad__edit {
+    margin-top: 12px;
+}
+.adm-ad__edit summary {
+    display: inline-block;
+    cursor: pointer;
+}

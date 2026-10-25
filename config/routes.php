@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\Admin\AccessController as AdminAccess;
+use App\Controllers\Admin\AdsController as AdminAds;
 use App\Controllers\Admin\FeedbackInboxController as AdminFeedback;
 use App\Controllers\Admin\IncompleteController as AdminIncomplete;
 use App\Controllers\Admin\JobsController as AdminJobs;
@@ -13,6 +14,7 @@ use App\Controllers\Admin\MemberEditController as AdminMemberEdit;
 use App\Controllers\Admin\MembersController as AdminMembers;
 use App\Controllers\Admin\PanelController as AdminPanel;
 use App\Controllers\AccountSetupController;
+use App\Controllers\AdImageController;
 use App\Controllers\AuthController;
 use App\Controllers\FeedbackController;
 use App\Controllers\HomeController;
@@ -68,6 +70,7 @@ return [
     ['GET',  '/account/setup',             [AccountSetupController::class, 'form']],
     ['POST', '/account/setup',             [AccountSetupController::class, 'store']],
     ['GET',  '/photo/{slug}',              [AuthController::class, 'photo']],
+    ['GET',  '/ad-image/{slug}',           [AdImageController::class, 'show']],
     ['GET',  '/profile',                   [ProfileController::class, 'form']],
     ['POST', '/profile',                   [ProfileController::class, 'update']],
     ['GET',  '/dashboard',                 [ProfileController::class, 'dashboardRedirect']],
@@ -118,6 +121,10 @@ return [
     ['POST', admin_base() . '/jobs/action',         [AdminJobs::class, 'action']],
     ['GET',  admin_base() . '/locks',               [AdminLocks::class, 'index']],
     ['POST', admin_base() . '/locks/release',       [AdminLocks::class, 'release']],
+    ['GET',  admin_base() . '/ads',                 [AdminAds::class, 'index']],
+    ['POST', admin_base() . '/ads/save',            [AdminAds::class, 'save']],
+    ['POST', admin_base() . '/ads/action',          [AdminAds::class, 'action']],
+    ['POST', admin_base() . '/ads/show',            [AdminAds::class, 'show']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],
