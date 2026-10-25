@@ -154,7 +154,9 @@ final class JobPostRepository
     {
         $pdo = Database::connection();
         if ($pdo === null) {
-            return array_slice(array_merge(array_reverse(self::demoRead()), DemoData::jobPosts()), 0, $limit);
+            $shown = array_filter(self::demoRead(), static fn (array $r): bool => (string) ($r['status'] ?? 'approved') === 'approved');
+
+            return array_slice(array_merge(array_reverse(array_values($shown)), DemoData::jobPosts()), 0, $limit);
         }
 
         try {
@@ -222,5 +224,191 @@ final class JobPostRepository
         }
 
         return true;
+    }
+
+    /** অ্যাডমিনের তালিকার ট্যাব: কী => নাম। */
+    public const TABS = ['' => 'সব', 'approved' => 'প্রকাশিত', 'pending' => 'লুকানো', 'custom' => 'নিজের লেখা ধরন (বানান দেখুন)'];
+
+    /**
+     * অ্যাডমিনের তালিকা, নতুন আগে। $tab: '' সব, 'approved' প্রকাশিত, 'pending' লুকানো, 'custom' নিজের লেখা "কাজের ধরন"।
+     * $q = ধরন, নাম, মোবাইল বা বিবরণের অংশ।
+     *
+     * @return array{rows:list<array<string,mixed>>,total:int}
+     */
+    public static function adminList(string $tab, string $q, int $limit, int $offset): array
+    {
+        $q = trim($q);
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = array_values(array_filter(self::demoRead(), static function (array $r) use ($tab, $q): bool {
+                $status = (string) ($r['status'] ?? 'approved');
+                $hay = mb_strtolower(implode(' ', [$r['title'], $r['contact_name'], $r['phone'], $r['details']]));
+
+                return ($tab === '' || ($tab === 'custom' ? (int) ($r['title_custom'] ?? 0) === 1 : $status === $tab))
+                    && ($q === '' || str_contains($hay, mb_strtolower($q)));
+            }));
+            usort($rows, static fn (array $a, array $b): int => (int) $b['id'] <=> (int) $a['id']);
+
+            return ['rows' => array_slice($rows, $offset, $limit), 'total' => count($rows)];
+        }
+
+        $where = ['1 = 1'];
+        $args = [];
+        if ($tab === 'custom') {
+            $where[] = 'title_custom = 1';
+        } elseif ($tab === 'approved' || $tab === 'pending') {
+            $where[] = 'status = :status';
+            $args[':status'] = $tab;
+        }
+        if ($q !== '') {
+            $where[] = '(title LIKE :q1 OR contact_name LIKE :q2 OR phone LIKE :q3 OR details LIKE :q4)';
+            $like = '%' . addcslashes($q, '%_\\') . '%';
+            $args += [':q1' => $like, ':q2' => $like, ':q3' => $like, ':q4' => $like];
+        }
+        $sqlWhere = implode(' AND ', $where);
+
+        try {
+            $count = $pdo->prepare("SELECT COUNT(*) FROM job_posts WHERE $sqlWhere");
+            $count->execute($args);
+            $stmt = $pdo->prepare(
+                "SELECT id, title, title_custom, details, contact_name, phone, email, address, upazila_id, district_id, division_id,
+                        start_date, end_date, status, created_at FROM job_posts WHERE $sqlWhere
+                 ORDER BY id DESC LIMIT " . (int) $limit . ' OFFSET ' . (int) $offset
+            );
+            $stmt->execute($args);
+
+            return ['rows' => $stmt->fetchAll(), 'total' => (int) $count->fetchColumn()];
+        } catch (Throwable $e) {
+            Logger::error('JobPostRepository::adminList failed: ' . $e->getMessage());
+
+            return ['rows' => [], 'total' => 0];
+        }
+    }
+
+    /** @return array{'':int,approved:int,pending:int,custom:int} ট্যাবের সংখ্যা */
+    public static function adminCounts(): array
+    {
+        $out = ['' => 0, 'approved' => 0, 'pending' => 0, 'custom' => 0];
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            foreach (self::demoRead() as $r) {
+                $status = (string) ($r['status'] ?? 'approved');
+                $out['']++;
+                $out[$status === 'pending' ? 'pending' : 'approved']++;
+                $out['custom'] += (int) ($r['title_custom'] ?? 0) === 1 ? 1 : 0;
+            }
+
+            return $out;
+        }
+
+        try {
+            $row = $pdo->query("SELECT COUNT(*) AS n, SUM(status = 'approved') AS a, SUM(status = 'pending') AS p, SUM(title_custom = 1) AS c FROM job_posts")->fetch();
+            $out = ['' => (int) ($row['n'] ?? 0), 'approved' => (int) ($row['a'] ?? 0), 'pending' => (int) ($row['p'] ?? 0), 'custom' => (int) ($row['c'] ?? 0)];
+        } catch (Throwable $e) {
+            Logger::error('JobPostRepository::adminCounts failed: ' . $e->getMessage());
+        }
+
+        return $out;
+    }
+
+    /** @return array<string,mixed>|null */
+    public static function adminFind(int $id): ?array
+    {
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            foreach (self::demoRead() as $r) {
+                if ((int) $r['id'] === $id) {
+                    return $r;
+                }
+            }
+
+            return null;
+        }
+
+        try {
+            $stmt = $pdo->prepare('SELECT * FROM job_posts WHERE id = :id');
+            $stmt->execute([':id' => $id]);
+            $row = $stmt->fetch();
+
+            return is_array($row) ? $row : null;
+        } catch (Throwable $e) {
+            Logger::error('JobPostRepository::adminFind failed: ' . $e->getMessage());
+
+            return null;
+        }
+    }
+
+    /** বিজ্ঞপ্তি প্রকাশ ('approved') বা লুকানো ('pending') করে। সফল হলে true। */
+    public static function setStatus(int $id, string $status): bool
+    {
+        if (!in_array($status, ['approved', 'pending'], true)) {
+            return false;
+        }
+
+        return self::update($id, ['status' => $status] + ($status === 'approved' ? ['published_at' => date('Y-m-d H:i:s')] : []));
+    }
+
+    /** "কাজের ধরন" ঠিক করে; অ্যাডমিন দেখে নেওয়ায় "নিজের লেখা" চিহ্ন (title_custom) উঠে যায়। */
+    public static function setTitle(int $id, string $title): bool
+    {
+        return self::update($id, ['title' => $title, 'title_custom' => 0]);
+    }
+
+    /** বিজ্ঞপ্তি চিরতরে মোছে। সফল হলে true। */
+    public static function delete(int $id): bool
+    {
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            return self::demoWrite(array_values(array_filter(self::demoRead(), static fn (array $r): bool => (int) $r['id'] !== $id)));
+        }
+
+        try {
+            return $pdo->prepare('DELETE FROM job_posts WHERE id = :id')->execute([':id' => $id]);
+        } catch (Throwable $e) {
+            Logger::error('JobPostRepository::delete failed: ' . $e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * এক সারির কয়েকটা ঘর বদলায়। কলামের নাম শুধু এই ফাইলের ভেতর থেকে আসে (ব্যবহারকারীর লেখা নয়)।
+     *
+     * @param array<string,mixed> $columns
+     */
+    private static function update(int $id, array $columns): bool
+    {
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = self::demoRead();
+            foreach ($rows as $i => $r) {
+                if ((int) $r['id'] === $id) {
+                    $rows[$i] = array_merge($r, $columns);
+                }
+            }
+
+            return self::demoWrite($rows);
+        }
+
+        try {
+            $sets = implode(', ', array_map(static fn (string $c): string => "$c = :$c", array_keys($columns)));
+
+            return $pdo->prepare("UPDATE job_posts SET $sets WHERE id = :id")->execute($columns + ['id' => $id]);
+        } catch (Throwable $e) {
+            Logger::error('JobPostRepository::update failed: ' . $e->getMessage());
+
+            return false;
+        }
+    }
+
+    /** @param list<array<string,mixed>> $rows */
+    private static function demoWrite(array $rows): bool
+    {
+        $file = BASE_PATH . self::DEMO_FILE;
+        if (!is_dir(dirname($file))) {
+            @mkdir(dirname($file), 0700, true);
+        }
+
+        return @file_put_contents($file, json_encode($rows, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX) !== false;
     }
 }

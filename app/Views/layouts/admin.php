@@ -24,6 +24,8 @@ $nav = [
     [admin_base() . '/old-workers', 'পুরনো কর্মী সক্রিয় করা', false, 'registrations'],
     [admin_base() . '/incomplete', 'অসম্পূর্ণ তথ্য', false, 'registrations'],
     [admin_base() . '/feedback', 'মতামত', false, 'inbox'],
+    [admin_base() . '/leads', 'আগ্রহীর তালিকা', false, 'inbox'],
+    [admin_base() . '/jobs', 'কাজের বিজ্ঞপ্তি', false, 'inbox'],
     [admin_base() . '/account', 'আমার অ্যাকাউন্ট', false, null],
     [admin_base() . '/admins', 'অ্যাডমিন', true, null],
     [admin_base() . '/log', 'কার্যলগ', true, null],

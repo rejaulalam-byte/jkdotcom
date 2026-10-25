@@ -63,6 +63,102 @@ final class ContactTrackingRepository
         }
     }
 
+    /**
+     * অ্যাডমিনের আগ্রহীর তালিকা, নতুন আগে। $type: '' সব, 'job' বা 'worker'; $q = আগ্রহীর নাম বা মোবাইলের অংশ।
+     * প্রতিটি সারিতে target_title (বিজ্ঞপ্তির ধরন বা কর্মীর নাম, না পেলে খালি)।
+     *
+     * @return array{rows:list<array<string,mixed>>,total:int}
+     */
+    public static function leadsList(string $type, string $q, int $limit, int $offset): array
+    {
+        $type = in_array($type, ['job', 'worker'], true) ? $type : '';
+        $q = trim($q);
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $file = BASE_PATH . self::DEMO_FILE;
+            $data = is_file($file) ? json_decode((string) file_get_contents($file), true) : [];
+            $rows = [];
+            foreach (array_reverse((array) ($data['leads'] ?? [])) as $i => $l) {
+                $hay = mb_strtolower(($l['name'] ?? '') . ' ' . ($l['phone'] ?? ''));
+                if (($type !== '' && $l['type'] !== $type) || ($q !== '' && !str_contains($hay, mb_strtolower($q)))) {
+                    continue;
+                }
+                $title = '';
+                if ($l['type'] === 'worker') {
+                    $title = (string) (UserRepository::findById((int) $l['target_id'])['name'] ?? '');
+                }
+                $rows[] = [
+                    'id' => $i + 1, 'target_type' => $l['type'], 'target_id' => (int) $l['target_id'], 'kind' => $l['kind'],
+                    'visitor_name' => $l['name'], 'visitor_phone' => $l['phone'], 'created_at' => $l['at'], 'target_title' => $title,
+                ];
+            }
+
+            return ['rows' => array_slice($rows, $offset, $limit), 'total' => count($rows)];
+        }
+
+        $where = ['1 = 1'];
+        $args = [];
+        if ($type !== '') {
+            $where[] = 'l.target_type = :type';
+            $args[':type'] = $type;
+        }
+        if ($q !== '') {
+            $where[] = '(l.visitor_name LIKE :q1 OR l.visitor_phone LIKE :q2)';
+            $like = '%' . addcslashes($q, '%_\\') . '%';
+            $args += [':q1' => $like, ':q2' => $like];
+        }
+        $sqlWhere = implode(' AND ', $where);
+
+        try {
+            $count = $pdo->prepare("SELECT COUNT(*) FROM contact_leads l WHERE $sqlWhere");
+            $count->execute($args);
+            $stmt = $pdo->prepare(
+                "SELECT l.id, l.target_type, l.target_id, l.kind, l.visitor_name, l.visitor_phone, l.created_at,
+                        COALESCE(j.title, u.name, '') AS target_title
+                 FROM contact_leads l
+                 LEFT JOIN job_posts j ON l.target_type = 'job' AND j.id = l.target_id
+                 LEFT JOIN users u ON l.target_type = 'worker' AND u.id = l.target_id
+                 WHERE $sqlWhere ORDER BY l.id DESC LIMIT " . (int) $limit . ' OFFSET ' . (int) $offset
+            );
+            $stmt->execute($args);
+
+            return ['rows' => $stmt->fetchAll(), 'total' => (int) $count->fetchColumn()];
+        } catch (Throwable $e) {
+            Logger::error('ContactTrackingRepository::leadsList failed: ' . $e->getMessage());
+
+            return ['rows' => [], 'total' => 0];
+        }
+    }
+
+    /** @return array{'':int,job:int,worker:int} ধরন অনুযায়ী আগ্রহীর সংখ্যা */
+    public static function leadsCounts(): array
+    {
+        $out = ['' => 0, 'job' => 0, 'worker' => 0];
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $file = BASE_PATH . self::DEMO_FILE;
+            $data = is_file($file) ? json_decode((string) file_get_contents($file), true) : [];
+            foreach ((array) ($data['leads'] ?? []) as $l) {
+                $out['']++;
+                $out[$l['type'] === 'worker' ? 'worker' : 'job']++;
+            }
+
+            return $out;
+        }
+
+        try {
+            foreach ($pdo->query('SELECT target_type, COUNT(*) AS n FROM contact_leads GROUP BY target_type')->fetchAll() as $r) {
+                $out[(string) $r['target_type']] = (int) $r['n'];
+                $out[''] += (int) $r['n'];
+            }
+        } catch (Throwable $e) {
+            Logger::error('ContactTrackingRepository::leadsCounts failed: ' . $e->getMessage());
+        }
+
+        return $out;
+    }
+
     /** @param array<string,mixed> $row */
     private static function demoAppend(string $list, array $row): bool
     {

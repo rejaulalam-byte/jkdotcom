@@ -1,3 +1,4 @@
+## 2026-10-25 night: admin 3b built (leads + job notices; no migration). Next: 3c lock release, then 4 ads/images.
 ## 2026-10-25 night: admin 3a feedback inbox built (migration 021 must be run on staging). Next: 3b leads + job notices, 3c lock release.
 ## 2026-10-25 night: admin 2e built (incomplete info page). Next (owner order): step 3 = inboxes (feedback, contact leads, job notices) + lock release; reports last.
 ## 2026-10-25 night: admin step 2d BUILT (old-worker phone tick + 15-day window + common password, migration 020). Next: 2e "অসম্পূর্ণ তথ্য" page. Staging needs migration 020 run (phpMyAdmin) + Update from Remote.

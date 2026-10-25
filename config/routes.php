@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Controllers\Admin\AccessController as AdminAccess;
 use App\Controllers\Admin\FeedbackInboxController as AdminFeedback;
 use App\Controllers\Admin\IncompleteController as AdminIncomplete;
+use App\Controllers\Admin\JobsController as AdminJobs;
+use App\Controllers\Admin\LeadsController as AdminLeads;
 use App\Controllers\Admin\LegacyController as AdminLegacy;
 use App\Controllers\Admin\MemberEditController as AdminMemberEdit;
 use App\Controllers\Admin\MembersController as AdminMembers;
@@ -110,6 +112,9 @@ return [
     ['POST', admin_base() . '/incomplete/mail',     [AdminIncomplete::class, 'mail']],
     ['GET',  admin_base() . '/feedback',            [AdminFeedback::class, 'index']],
     ['POST', admin_base() . '/feedback/action',     [AdminFeedback::class, 'action']],
+    ['GET',  admin_base() . '/leads',               [AdminLeads::class, 'index']],
+    ['GET',  admin_base() . '/jobs',                [AdminJobs::class, 'index']],
+    ['POST', admin_base() . '/jobs/action',         [AdminJobs::class, 'action']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],
