@@ -54,7 +54,7 @@ $release = static function (string $name, string $value, string $label) use ($id
     </table>
 </div>
 
-<h2 class="adm-card__title">ডিভাইস অনুযায়ী</h2>
+<h2 class="adm-card__title adm-gap-top">ডিভাইস অনুযায়ী</h2>
 <p class="adm-muted">ডিভাইসের পরিচয় গোপন (আইপি দেখানো হয় না); শুধু কতবার ভুল হয়েছে দেখা যায়।</p>
 <div class="adm-tablewrap">
     <table class="adm-table">

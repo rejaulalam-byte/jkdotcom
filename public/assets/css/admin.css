@@ -975,3 +975,12 @@ td.adm-actions form {
     display: inline-block;
     cursor: pointer;
 }
+
+/* ---- আটকানো লগইন: দ্বিতীয় অংশের শিরোনাম ওপরের টেবিল থেকে আলাদা, নিচের লাইনের কাছে ---- */
+.adm-gap-top {
+    margin-top: 70px;
+    margin-bottom: 0;
+}
+.adm-gap-top + .adm-muted {
+    margin-top: 8px; /* শিরোনাম ও তার নিচের লাইনের ফাঁক কম; লাইন ও টেবিলের ফাঁক আগের মতোই */
+}
