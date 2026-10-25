@@ -5089,25 +5089,29 @@ a.wk-pages__item:focus-visible {
     }
 }
 
-/* ---- পপ-আপ বিজ্ঞাপন: মেনুর ঠিক নিচে, পেইজের মাঝখানে, ছবির নিজের মাপে (ছোট পর্দায় অনুপাত রেখে ছোট) ---- */
-#main {
-    position: relative;
-}
+/* ---- পপ-আপ বিজ্ঞাপন: পুরো পর্দা হালকা ঘোলা হয়ে ঢাকে (পেছনের লেখা আবছা বোঝা যায়), ছবি মেনুর মাঝামাঝি উচ্চতা
+   (--popup-top, app.js মাপে) থেকে নিচে নামে, মাঝখানে নিজের মাপে; ছোট পর্দায় অনুপাত রেখে ছোট ---- */
 .popup-ad {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: 50; /* লেখার ওপরে, কিন্তু আটকে-থাকা মেনুর নিচে */
-    width: fit-content;
-    max-width: calc(100% - 2rem);
-    margin: 0 auto;
-    box-shadow: 0 0.75rem 2.5rem rgba(0, 0, 0, 0.35);
-    background: var(--white);
-    animation: popup-ad-in 0.4s ease-out;
+    position: fixed;
+    inset: 0;
+    z-index: 100; /* আটকে-থাকা মেনুরও ওপরে */
+    overflow-y: auto;
+    background: rgba(18, 40, 46, 0.35);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    animation: popup-ad-fade 0.3s ease-out;
 }
 .popup-ad[hidden] {
     display: none;
+}
+.popup-ad__box {
+    position: relative;
+    width: fit-content;
+    max-width: calc(100% - 2rem);
+    margin: var(--popup-top, 4rem) auto 2rem;
+    box-shadow: 0 0.75rem 2.5rem rgba(0, 0, 0, 0.4);
+    background: var(--white);
+    animation: popup-ad-in 0.45s ease-out;
 }
 .popup-ad img {
     display: block;
@@ -5133,12 +5137,26 @@ a.wk-pages__item:focus-visible {
     background: var(--red, #c0392b);
     outline: none;
 }
+/* পপ-আপ খোলা থাকলে পেছনের পেইজ স্ক্রল হয় না */
+html.popup-lock {
+    overflow: hidden;
+}
+/* পপ-আপ বন্ধ না হওয়া পর্যন্ত হিরোর শুরুর অ্যানিমেশন থেমে থাকে (app.js ক্লাস দেয়-নেয়) */
+.hero.is-waiting .fly-letter,
+.hero.is-waiting .hero__copy .btn,
+.hero.is-waiting .today {
+    animation-play-state: paused;
+}
+@keyframes popup-ad-fade {
+    from { opacity: 0; }
+}
 @keyframes popup-ad-in {
-    from { opacity: 0; transform: translateY(-1.5rem); }
+    from { opacity: 0; transform: translateY(-2rem); }
     to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .popup-ad { animation: none; }
+    .popup-ad,
+    .popup-ad__box { animation: none; }
 }
 @media (max-width: 1199px) {
     .popup-ad__close {

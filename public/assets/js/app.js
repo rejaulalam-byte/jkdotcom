@@ -108,6 +108,20 @@
         });
     });
 
+    /* ---- পপ-আপ বিজ্ঞাপন থাকলে হিরোর অ্যানিমেশন ও আজকের কাজের তালিকা তার বন্ধ হওয়ার পর শুরু হয়।
+       পপ-আপের অংশ (ফাইলের শেষে) বন্ধ হলে "jk:popup-closed" পাঠায়; কোনো কারণে না এলে নির্দিষ্ট সময় পরে নিজেই শুরু। ---- */
+    var popupBox = document.querySelector("[data-popup-ad]");
+    function afterPopup() {
+        return new Promise(function (resolve) {
+            if (!popupBox) {
+                resolve();
+                return;
+            }
+            document.addEventListener("jk:popup-closed", resolve, { once: true });
+            window.setTimeout(resolve, ((parseInt(popupBox.getAttribute("data-seconds"), 10) || 20) + 2) * 1000);
+        });
+    }
+
     /* ---- Hero: প্রতিটি অক্ষর নিজের দিক থেকে উড়ে আসে (স্টাইল: CSS-এর "Hero entrance") ---- */
     var heroEl = document.querySelector(".hero");
     if (heroEl && !reduceMotion) {
@@ -302,6 +316,7 @@
             // ছোট শেষ পাতা (যেমন ৮-এর মধ্যে ৪ সারি) শুধু নিজের সারির দৈর্ঘ্যটুকু পথ চলে,
             // তাই আগে বেরিয়ে যায় — খালি জায়গার জন্য কেউ অপেক্ষা করে না।
             (async function loop() {
+                await afterPopup();
                 var index = 0;
                 for (;;) {
                     var current = pages[index];
@@ -1759,24 +1774,44 @@
 })();
 
 /* ---- পপ-আপ বিজ্ঞাপন ([data-popup-ad], partials/popup-ad.php) ---------------------------
-   পেইজ খুললেই দেখায়; (×) চাপলে, Esc চাপলে বা data-seconds সেকেন্ড পরে সরে যায়। প্রতিবার খুললে আবার দেখায়। */
+   পেইজ খুললেই দেখায়: পর্দা ঘোলা, ছবি মেনুর মাঝামাঝি উচ্চতা থেকে। (×), Esc বা data-seconds সেকেন্ড পরে সরে যায়,
+   তারপর "jk:popup-closed" ঘটনা পাঠায় — হিরোর অ্যানিমেশন ও আজকের কাজের তালিকা তখনই শুরু হয় (ওপরের অংশ)।
+   প্রতিবার খুললে আবার দেখায়। */
 (function () {
     "use strict";
     var box = document.querySelector("[data-popup-ad]");
     if (!box) {
         return;
     }
+    var hero = document.querySelector(".hero");
     var timer = null;
     function close() {
+        if (box.hidden) {
+            return;
+        }
         box.hidden = true;
         window.clearTimeout(timer);
         document.removeEventListener("keydown", onKey);
+        document.documentElement.classList.remove("popup-lock");
+        if (hero) {
+            hero.classList.remove("is-waiting");
+        }
+        document.dispatchEvent(new CustomEvent("jk:popup-closed"));
     }
     function onKey(e) {
         if (e.key === "Escape") {
             close();
         }
     }
+    var header = document.querySelector(".site-header");
+    if (header) {
+        var r = header.getBoundingClientRect();
+        box.style.setProperty("--popup-top", Math.max(0, Math.round(r.top + r.height / 2)) + "px");
+    }
+    if (hero) {
+        hero.classList.add("is-waiting");
+    }
+    document.documentElement.classList.add("popup-lock");
     box.hidden = false;
     box.querySelector("[data-popup-close]").addEventListener("click", close);
     document.addEventListener("keydown", onKey);
