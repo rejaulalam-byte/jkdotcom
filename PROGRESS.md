@@ -1,3 +1,4 @@
+## 2026-10-28: form fields part B built (box colour per field, super admin). Next: C add fields (needs migration + Reja's answers), D delete.
 ## 2026-10-28: form fields part A built (hide/show in live page edit, super admin). Next: B colour, C add fields, D delete, or what Reja chooses.
 ## 2026-10-28: live page edit step 4 built (long texts of open pages: click → full editor dialog over the live page). Next: Reja decides (services management, form fields hide/add, menu editing).
 ## 2026-10-28: admin top menu; LIVE PAGE EDIT steps 1, 2, 3a-3d built and on staging (pickers + live frame, click-to-edit, B/I/U/colour, section icons + page images, pill colours). Staging updates now by direct file upload (cPanel git fetch broken since the host move). Next: step 4 = long texts in the full editor inside the live frame (see CLAUDE.md 2026-10-28).
