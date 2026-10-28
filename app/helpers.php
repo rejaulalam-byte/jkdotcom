@@ -365,3 +365,29 @@ function pill_attrs(string $slot, string $extraClass = ''): string
 
     return $attrs;
 }
+
+/**
+ * ফর্মের লুকানো-যায় এমন ঘর (App\Models\FormFields): সাধারণ দর্শকের জন্য লুকানো ঘর একদম আসে না।
+ * লাইভ পেইজ এডিটের ফ্রেমে সব ঘর আসে, ঘিরে রাখা ঘরে (field_open/field_close) — লুকানোগুলো ঝাপসা,
+ * আর প্রতিটির কোণে "ঘর" চিহ্ন, যাতে সুপার অ্যাডমিন লুকাতে বা দেখাতে পারেন।
+ */
+function field_on(string $form, string $field): bool
+{
+    return live_preview() || !\App\Models\FormFields::hidden($form, $field);
+}
+
+function field_open(string $form, string $field): string
+{
+    if (!live_preview()) {
+        return '';
+    }
+    \App\Core\LiveEdit::field($form, $field);
+    $hidden = \App\Models\FormFields::hidden($form, $field);
+
+    return '<div class="jk-field' . ($hidden ? ' is-jk-hidden' : '') . '" data-jk-field="' . e($form . '.' . $field) . '">';
+}
+
+function field_close(): string
+{
+    return live_preview() ? '</div>' : '';
+}

@@ -12,6 +12,7 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminRepository;
+use App\Models\FormFields;
 use App\Models\LivePages;
 use App\Models\OpenPages;
 use App\Models\PageMap;
@@ -301,6 +302,41 @@ final class StudioController
             $answer(false, 'সংরক্ষণ করা যায়নি।');
         }
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'box_color', $slot . ' = ' . ($color !== '' ? $color : 'শুরুর রং'));
+        $answer(true);
+    }
+
+    /**
+     * POST (লাইভ পেইজ এডিট, ফর্মের ঘর): _token, field = "<ফর্ম>.<ঘর>", hidden = 1 (লুকান) | 0 (দেখান)।
+     * ফর্মের কাঠামোর কাজ, তাই শুধু সুপার অ্যাডমিন। উত্তর JSON: {ok: true} অথবা {ok: false, error}।
+     */
+    public function liveField(): void
+    {
+        $admin = AdminAuth::require('pages');
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+        $answer = static function (bool $ok, ?string $error = null): never {
+            echo json_encode($ok ? ['ok' => true] : ['ok' => false, 'error' => $error], JSON_UNESCAPED_UNICODE);
+            exit;
+        };
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            http_response_code(403);
+            $answer(false, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। অ্যাডমিন পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+        if (!AdminAuth::isSuper($admin)) {
+            http_response_code(403);
+            $answer(false, 'ফর্মের ঘর লুকানো বা দেখানো শুধু সুপার অ্যাডমিন পারেন।');
+        }
+        [$form, $field] = array_pad(explode('.', (string) ($_POST['field'] ?? ''), 2), 2, '');
+        if (!FormFields::exists($form, $field)) {
+            http_response_code(422);
+            $answer(false, 'এই ঘর লুকানো যায় না।');
+        }
+        $hide = ($_POST['hidden'] ?? '') === '1';
+        $key = 'form.' . $form . '.hide.' . $field;
+        if (!($hide ? Content::set($key, '1') : Content::forget($key))) {
+            $answer(false, 'সংরক্ষণ করা যায়নি।');
+        }
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], $hide ? 'field_hide' : 'field_show', $form . '.' . $field);
         $answer(true);
     }
 

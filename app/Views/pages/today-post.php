@@ -63,21 +63,25 @@ $helpTel = content('today.post.helpline_tel');
                             <input id="pj-name" data-bn type="text" name="contact_name" maxlength="100" required autocomplete="name"
                                    placeholder="<?= $ph('name') ?>" value="<?= $val('contact_name') ?>">
                         </div>
+                        <?php if (field_on('post', 'gender')): ?><?= field_open('post', 'gender') ?>
                         <?php
                         $genderId = 'pj-gender'; $genderName = 'contact_gender'; $genderLabel = content('today.post.f.gender'); $genderValue = (string) ($old['contact_gender'] ?? '');
                         require BASE_PATH . '/app/Views/partials/gender-field.php';
                         ?>
+                        <?= field_close() ?><?php endif; ?>
                         <div class="pf pf--phone">
                             <label class="sr-only" for="pj-phone"><?= t('today.post.f.phone') ?></label>
                             <span class="pf__code" aria-hidden="true">+৮৮</span>
                             <input id="pj-phone" type="tel" name="phone" maxlength="14" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
                                    placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                         </div>
+                        <?php if (field_on('post', 'email')): ?><?= field_open('post', 'email') ?>
                         <div class="pf">
                             <label class="sr-only" for="pj-email"><?= t('today.post.f.email') ?></label>
                             <input id="pj-email" type="email" name="email" maxlength="150" autocomplete="email"
                                    placeholder="<?= $ph('email', false) ?>" value="<?= $val('email') ?>">
                         </div>
+                        <?= field_close() ?><?php endif; ?>
                         <div class="pf pf--date">
                             <label for="pj-start"><?= $ph('start') ?></label>
                             <input id="pj-start" type="date" name="start_date" required min="<?= e(date('Y-m-d')) ?>" value="<?= $val('start_date') ?>">
@@ -85,11 +89,13 @@ $helpTel = content('today.post.helpline_tel');
                     </div>
 
                     <div class="post-form__col">
+                        <?php if (field_on('post', 'address')): ?><?= field_open('post', 'address') ?>
                         <div class="pf">
                             <label class="sr-only" for="pj-address"><?= t('today.post.f.address') ?></label>
                             <input id="pj-address" data-bn type="text" name="address" maxlength="250" required autocomplete="street-address"
                                    placeholder="<?= $ph('address') ?>" value="<?= $val('address') ?>">
                         </div>
+                        <?= field_close() ?><?php endif; ?>
                         <?php // Figma-র ক্রম: উপজেলা, জেলা, বিভাগ। app.js-এ তিনটির যেকোনোটা আগে বাছা যায়। ?>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-upazila"><?= t('today.post.f.upazila') ?></label>
@@ -118,10 +124,12 @@ $helpTel = content('today.post.helpline_tel');
                                 <?php endforeach; ?>
                             </select>
                         </div>
+                        <?php if (field_on('post', 'end_date')): ?><?= field_open('post', 'end_date') ?>
                         <div class="pf pf--date">
                             <label for="pj-end"><?= $ph('end', false) ?></label>
                             <input id="pj-end" type="date" name="end_date" min="<?= e(date('Y-m-d')) ?>" value="<?= $val('end_date') ?>">
                         </div>
+                        <?= field_close() ?><?php endif; ?>
                     </div>
                 </div>
 

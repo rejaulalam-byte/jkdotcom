@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Models\FormFields;
 use App\Models\SiteBoxes;
 use App\Models\SiteImages;
 use App\Models\SiteTexts;
@@ -40,6 +41,14 @@ final class LiveEdit
     public static function box(string $slot): void
     {
         self::$boxes[$slot] = true;
+    }
+
+    /** @var array<string,array{0:string,1:string}> এই পেইজের লুকানো-যায় এমন ফর্মের ঘর (field_open()) */
+    private static array $fields = [];
+
+    public static function field(string $form, string $field): void
+    {
+        self::$fields[$form . '.' . $field] = [$form, $field];
     }
 
     public static function image(string $slot): void
@@ -97,6 +106,10 @@ final class LiveEdit
         foreach (array_keys(self::$boxes) as $slot) {
             $boxes[$slot] = ['label' => SiteBoxes::label($slot), 'color' => SiteBoxes::color($slot), 'original' => SiteBoxes::original($slot)];
         }
+        $fields = [];
+        foreach (self::$fields as $id => [$form, $field]) {
+            $fields[$id] = ['label' => FormFields::label($form, $field), 'form' => FormFields::FORMS[$form] ?? '', 'hidden' => FormFields::hidden($form, $field)];
+        }
         $admin = AdminAuth::current();
 
         return [
@@ -106,6 +119,8 @@ final class LiveEdit
             'boxes' => $boxes,
             'boxColors' => array_map(static fn (array $c): string => $c[0], SiteBoxes::COLORS),
             'boxSave' => admin_base() . '/studio/live-box',
+            'fields' => $fields,
+            'fieldSave' => admin_base() . '/studio/live-field',
             // লুকানো/দেখানো কাঠামোর কাজ: শুধু সুপার অ্যাডমিন
             'super' => $admin !== null && AdminAuth::isSuper($admin),
             'save' => admin_base() . '/studio/live-save',

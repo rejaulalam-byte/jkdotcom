@@ -236,3 +236,32 @@
     outline: 2px dashed #e08a1e;
     outline-offset: 6px;
 }
+
+/* ফর্মের লুকানো-যায় এমন ঘর: হালকা ড্যাশ-দাগে ঘেরা, কোণে "ঘর" চিহ্ন (ক্লিক = লুকান/দেখান); লুকানোটা ঝাপসা */
+.jk-field {
+    position: relative;
+    outline: 1px dashed #8fa5ab;
+    outline-offset: 4px;
+}
+.jk-field__tag {
+    position: absolute;
+    z-index: 5;
+    top: -14px;
+    right: 4px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 999px;
+    background: #125a6c;
+    color: #fff;
+    font: 600 13px/22px "Hind Siliguri", "Nirmala UI", system-ui, sans-serif;
+    cursor: pointer;
+}
+.jk-field.is-jk-hidden .jk-field__tag {
+    background: #870a0a;
+}
+.jk-field.is-jk-hidden > :not(.jk-field__tag) {
+    opacity: 0.35;
+}
+.jk-field.is-jk-hidden {
+    opacity: 1;
+}

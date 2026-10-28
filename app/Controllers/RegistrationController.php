@@ -12,6 +12,7 @@ use App\Core\RateLimiter;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
+use App\Models\FormFields;
 use App\Models\GeoRepository;
 use App\Models\ServiceRepository;
 use App\Models\UserRepository;
@@ -98,8 +99,36 @@ final class RegistrationController
         $password = (string) ($_POST['password'] ?? '');
         $confirm = (string) ($_POST['password_confirm'] ?? '');
 
+        // সুপার অ্যাডমিনের লুকানো ঘর (FormFields): খালি জমা হয়, validate()-ও আবশ্যক ধরে না
+        $hidden = static fn (string $field): bool => FormFields::hidden($role, $field);
+        if ($hidden('gender')) {
+            $data['gender'] = '';
+        }
+        if ($hidden('address')) {
+            $data['address'] = '';
+        }
+        if ($role === 'worker') {
+            if ($hidden('experience')) {
+                $data['experience_years'] = null;
+            }
+            if ($hidden('bio')) {
+                $data['bio'] = '';
+            }
+            if ($hidden('work_districts')) {
+                [$data['work_district_ids'], $data['work_all_districts'], $data['work_error']] = [[], 0, null];
+            }
+            if ($hidden('extra_services')) {
+                [$data['extra_services'], $data['extra_error']] = [[], null];
+            }
+            if ($hidden('references')) {
+                [$data['reference_1'], $data['reference_2']] = ['', ''];
+            }
+        } elseif ($hidden('nid')) {
+            $data['nid_number'] = '';
+        }
+
         $errors = $this->validate($data, $password, $confirm);
-        [$photo, $photoError] = PhotoUpload::store($_FILES['photo'] ?? null);
+        [$photo, $photoError] = $hidden('photo') ? [null, null] : PhotoUpload::store($_FILES['photo'] ?? null);
         if ($photoError !== null) {
             $errors[] = $photoError;
         }
@@ -212,14 +241,14 @@ final class RegistrationController
             if ($d['experience_years'] !== null && ($d['experience_years'] < 0 || $d['experience_years'] > 70)) {
                 $errors[] = 'কাজের অভিজ্ঞতা ০ থেকে ৭০ বছরের মধ্যে লিখুন।';
             }
-        } elseif (!preg_match('/^([0-9]{10}|[0-9]{13}|[0-9]{17})$/', (string) $d['nid_number'])) {
+        } elseif (!FormFields::hidden('agent', 'nid') && !preg_match('/^([0-9]{10}|[0-9]{13}|[0-9]{17})$/', (string) $d['nid_number'])) {
             $errors[] = 'জাতীয় পরিচয়পত্র নম্বর সঠিক নয়। ১০, ১৩ বা ১৭ সংখ্যার নম্বর দিন।';
         }
-        if ($d['gender'] === '') {
+        if ($d['gender'] === '' && !FormFields::hidden($d['role'], 'gender')) {
             $errors[] = 'জেন্ডার বাছাই করুন।';
         }
         if ($d['role'] === 'worker') {
-            if ($d['reference_1'] === '' || $d['reference_2'] === '') {
+            if (($d['reference_1'] === '' || $d['reference_2'] === '') && !FormFields::hidden('worker', 'references')) {
                 $errors[] = 'দুইজন রেফারেন্সের নাম, পেশা, মোবাইল নাম্বার ও ঠিকানা লিখুন।';
             }
             if ($d['work_error'] !== null) {
@@ -242,7 +271,7 @@ final class RegistrationController
         } elseif (!preg_match('/^01[3-9][0-9]{8}$/', (string) $d['phone'])) {
             $errors[] = 'মোবাইল নম্বরটি সঠিক নয়। ১১ সংখ্যার নম্বর দিন, যেমন 01712345678।';
         }
-        if ($d['address'] === '') {
+        if ($d['address'] === '' && !FormFields::hidden($d['role'], 'address')) {
             $errors[] = 'বর্তমান ঠিকানা লিখুন।';
         }
         if ($d['division_id'] === 0 || $d['district_id'] === 0 || $d['upazila_id'] === 0) {

@@ -7,6 +7,7 @@
    ৪) পেইজের ছবি ও ছোট আইকনে (data-jk-img) ক্লিক: নতুন ছবি দেওয়া, শুরুর ছবিতে ফেরা, লুকানো/দেখানো (শেষ দুটি সুপার অ্যাডমিন)।
    ৫) ছোট হেডিংয়ের বক্সে (data-jk-box) থাকা লেখায় ক্লিক: লেখার বাক্সে "বক্সের রং" সারি (শুধু সুপার অ্যাডমিন)।
    ৬) খোলা পেইজের মূল লেখায় (data-jk-rich) ক্লিক: অ্যাডমিনের পর্দাকে জানানো হয়, সেখানে পূর্ণ এডিটরের বড় বাক্স খোলে।
+   ৭) ফর্মের লুকানো-যায় এমন ঘর (data-jk-field): সুপার অ্যাডমিনের জন্য কোণে "ঘর" চিহ্ন, ক্লিকে লুকান/দেখান।
    ===================================================================================================== */
 (function () {
     var dataEl = document.getElementById("jk-live-data");
@@ -552,9 +553,122 @@
         box.style.top = (below + h > window.innerHeight && r.top - h - 8 > 0 ? r.top - h - 8 : Math.max(12, Math.min(below, window.innerHeight - h - 12))) + "px";
     }
 
+    /* ---- ৭. ফর্মের ঘর লুকানো/দেখানো (শুধু সুপার অ্যাডমিন; অন্যদের কাছে চিহ্নই আসে না) ---- */
+    var fieldPanel = null;
+    var fieldCurrent = null;
+
+    function buildField() {
+        fieldPanel = document.createElement("div");
+        fieldPanel.className = "jk-live-panel jk-live-panel--field";
+        fieldPanel.setAttribute("role", "dialog");
+        fieldPanel.setAttribute("aria-label", "ফর্মের ঘর");
+        fieldPanel.innerHTML =
+            '<p class="jk-live-panel__title"></p>' +
+            '<p class="jk-live-panel__hint"></p>' +
+            '<p class="jk-live-panel__msg" role="status"></p>' +
+            '<div class="jk-live-panel__row">' +
+            '<button type="button" class="jk-live-panel__save" data-field-act="1">এই ঘর লুকান</button>' +
+            '<button type="button" class="jk-live-panel__save" data-field-act="0">এই ঘর দেখান</button>' +
+            '<button type="button" class="jk-live-field__cancel">বাতিল</button>' +
+            "</div>";
+        document.body.appendChild(fieldPanel);
+        fieldPanel.querySelector(".jk-live-field__cancel").addEventListener("click", closeField);
+        fieldPanel.querySelector(".jk-live-panel__row").addEventListener("click", function (e) {
+            var b = e.target.closest("[data-field-act]");
+            if (b) {
+                sendField(b.getAttribute("data-field-act"));
+            }
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") {
+                closeField();
+            }
+        });
+    }
+
+    function openField(box) {
+        var id = box.getAttribute("data-jk-field");
+        var info = (data.fields || {})[id];
+        if (!info) {
+            return;
+        }
+        close();
+        closeIcon();
+        if (!fieldPanel) {
+            buildField();
+        }
+        closeField();
+        fieldCurrent = { box: box, id: id };
+        box.classList.add("is-jk-editing");
+        fieldPanel.querySelector(".jk-live-panel__title").textContent = "ঘর: " + info.label + " (" + info.form + ")";
+        fieldPanel.querySelector(".jk-live-panel__hint").textContent = info.hidden
+            ? "এখন লুকানো: দর্শক ঘরটি দেখেন না, তাই এটা পূরণ করতেও হয় না।"
+            : "এখন দেখা যাচ্ছে। লুকালে দর্শক ঘরটি দেখবেন না, আর এটা আবশ্যকও থাকবে না (খালি জমা হবে)।";
+        fieldPanel.querySelector(".jk-live-panel__msg").textContent = "";
+        fieldPanel.querySelector('[data-field-act="1"]').hidden = info.hidden;
+        fieldPanel.querySelector('[data-field-act="0"]').hidden = !info.hidden;
+        place(fieldPanel, box);
+    }
+
+    function closeField() {
+        if (fieldPanel) {
+            fieldPanel.hidden = true;
+        }
+        if (fieldCurrent) {
+            fieldCurrent.box.classList.remove("is-jk-editing");
+            fieldCurrent = null;
+        }
+    }
+
+    function sendField(hidden) {
+        if (!fieldCurrent) {
+            return;
+        }
+        var msg = fieldPanel.querySelector(".jk-live-panel__msg");
+        var body = new FormData();
+        body.append("_token", data.token);
+        body.append("field", fieldCurrent.id);
+        body.append("hidden", hidden);
+        msg.textContent = "সংরক্ষণ হচ্ছে…";
+        fetch(data.fieldSave, { method: "POST", body: body, credentials: "same-origin" })
+            .then(function (res) {
+                return res.json();
+            })
+            .then(function (res) {
+                if (res.ok) {
+                    window.location.reload();
+                    return;
+                }
+                msg.textContent = res.error || "সংরক্ষণ করা যায়নি।";
+            })
+            .catch(function () {
+                msg.textContent = "সংরক্ষণ করা যায়নি। লগইনের মেয়াদ শেষ হয়ে থাকতে পারে; অ্যাডমিন পেইজটি রিফ্রেশ করুন।";
+            });
+    }
+
+    // প্রতিটি ঘরের কোণে চিহ্ন-বাটন
+    if (data.super) {
+        document.querySelectorAll("[data-jk-field]").forEach(function (box) {
+            var info = (data.fields || {})[box.getAttribute("data-jk-field")];
+            if (!info) {
+                return;
+            }
+            var tag = document.createElement("button");
+            tag.type = "button";
+            tag.className = "jk-field__tag";
+            tag.textContent = (info.hidden ? "লুকানো ঘর: " : "ঘর: ") + info.label;
+            tag.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openField(box);
+            });
+            box.appendChild(tag);
+        });
+    }
+
     // চিহ্নিত লেখায় ক্লিক = বদলানোর বাক্স (লিংকের পেইজে যাওয়া বা বাটনের কাজ হয় না)
     document.addEventListener("click", function (e) {
-        if ((panel && panel.contains(e.target)) || (iconPanel && iconPanel.contains(e.target))) {
+        if ((panel && panel.contains(e.target)) || (iconPanel && iconPanel.contains(e.target)) || (fieldPanel && fieldPanel.contains(e.target))) {
             return;
         }
         var ic = e.target.closest("[data-jk-img]");

@@ -12,6 +12,7 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\ContactTrackingRepository;
+use App\Models\FormFields;
 use App\Models\GeoRepository;
 use App\Models\JobPostRepository;
 use App\Models\ServiceRepository;
@@ -203,6 +204,13 @@ final class TodayController
         $known = array_column(ServiceRepository::all(), 'name');
         $data['title_custom'] = in_array($data['title'], $known, true) ? 0 : 1;
 
+        // সুপার অ্যাডমিনের লুকানো ঘর (FormFields): খালি জমা হয়, validate()-ও আবশ্যক ধরে না
+        foreach (['gender' => 'contact_gender', 'email' => 'email', 'address' => 'address', 'end_date' => 'end_date'] as $field => $column) {
+            if (FormFields::hidden('post', $field)) {
+                $data[$column] = '';
+            }
+        }
+
         $errors = $this->validate($data);
         if ($errors !== []) {
             $this->fail($errors, $data);
@@ -247,7 +255,7 @@ final class TodayController
         if ($d['contact_name'] === '') {
             $errors[] = 'আপনার নাম লিখুন।';
         }
-        if ($d['contact_gender'] === '') {
+        if ($d['contact_gender'] === '' && !FormFields::hidden('post', 'gender')) {
             $errors[] = 'জেন্ডার বাছাই করুন।';
         }
         if ($d['phone'] === '') {
@@ -258,7 +266,7 @@ final class TodayController
         if ($d['email'] !== '' && !filter_var($d['email'], FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'ইমেইল ঠিকানাটি সঠিক নয়।';
         }
-        if ($d['address'] === '') {
+        if ($d['address'] === '' && !FormFields::hidden('post', 'address')) {
             $errors[] = 'কাজের ঠিকানা লিখুন।';
         }
         if ($d['division_id'] === 0 || $d['district_id'] === 0 || $d['upazila_id'] === 0) {

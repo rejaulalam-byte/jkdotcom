@@ -54,10 +54,12 @@ $helpTel = content('today.post.helpline_tel');
                         <input id="rf-name" data-bn type="text" name="name" maxlength="100" required autocomplete="name"
                                placeholder="<?= $ph('name') ?>" value="<?= $val('name') ?>">
                     </div>
+                    <?php if (field_on($role, 'gender')): ?><?= field_open($role, 'gender') ?>
                     <?php
                     $genderId = 'rf-gender'; $genderName = 'gender'; $genderLabel = content('regform.f.gender'); $genderValue = (string) ($old['gender'] ?? '');
                     require BASE_PATH . '/app/Views/partials/gender-field.php';
                     ?>
+                    <?= field_close() ?><?php endif; ?>
 
                     <?php if ($role === 'worker'): ?>
                         <?php // JavaScript ছাড়া পরামর্শসহ সাধারণ লেখার ঘর (datalist); app.js একে "যেকোনো অংশ মিললেই" খোঁজা-যায় এমন তালিকা বানায় ?>
@@ -71,18 +73,24 @@ $helpTel = content('today.post.helpline_tel');
                                 <?php endforeach; ?>
                             </datalist>
                         </div>
+                        <?php if (field_on($role, 'extra_services')): ?><?= field_open($role, 'extra_services') ?>
                         <?php $esSlugs = array_map('strval', (array) ($old['extra_services'] ?? [])); require BASE_PATH . '/app/Views/partials/extra-services.php'; ?>
+                        <?= field_close() ?><?php endif; ?>
+                        <?php if (field_on($role, 'experience')): ?><?= field_open($role, 'experience') ?>
                         <div class="pf">
                             <label class="sr-only" for="rf-exp"><?= t('regform.f.experience') ?></label>
                             <input id="rf-exp" type="number" name="experience" min="0" max="70" inputmode="numeric"
                                    placeholder="<?= $ph('experience', false) ?>" value="<?= $val('experience_years') ?>">
                         </div>
+                        <?= field_close() ?><?php endif; ?>
                     <?php else: ?>
+                        <?php if (field_on($role, 'nid')): ?><?= field_open($role, 'nid') ?>
                         <div class="pf">
                             <label class="sr-only" for="rf-nid"><?= t('regform.f.nid') ?></label>
                             <input id="rf-nid" type="text" name="nid" maxlength="30" required inputmode="numeric" autocomplete="off"
                                    placeholder="<?= $ph('nid') ?>" value="<?= $val('nid_number') ?>">
                         </div>
+                        <?= field_close() ?><?php endif; ?>
                     <?php endif; ?>
 
                     <div class="pf">
@@ -96,11 +104,13 @@ $helpTel = content('today.post.helpline_tel');
                         <input id="rf-phone" type="tel" name="phone" maxlength="14" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
                                placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                     </div>
+                    <?php if (field_on($role, 'address')): ?><?= field_open($role, 'address') ?>
                     <div class="pf">
                         <label class="sr-only" for="rf-address"><?= t('regform.f.address') ?></label>
                         <input id="rf-address" data-bn type="text" name="address" maxlength="250" required autocomplete="street-address"
                                placeholder="<?= $ph('address') ?>" value="<?= $val('address') ?>">
                     </div>
+                    <?= field_close() ?><?php endif; ?>
                     <?php // এলাকার তিন ড্রপডাউন: id-গুলো "কাজ সম্পর্কে জানান"-এর মতোই, app.js একই কোডে চালায় ?>
                     <div class="pf pf--select">
                         <label class="sr-only" for="pj-upazila"><?= t('regform.f.upazila') ?></label>
@@ -132,9 +142,12 @@ $helpTel = content('today.post.helpline_tel');
 
                     <?php if ($role === 'worker'): ?>
                         <?php // কোন জেলায় কাজ করতে আগ্রহী (ঐচ্ছিক): সর্বোচ্চ ৫টি জেলা বা "সব জেলা", ট্যাগ হয়ে বসে; ঠিকানার তিন ঘরের সঙ্গে জোড়া নয় ?>
+                        <?php if (field_on($role, 'work_districts')): ?><?= field_open($role, 'work_districts') ?>
                         <?php $wdIds = array_map('intval', (array) ($old['work_district_ids'] ?? [])); $wdAll = !empty($old['work_all_districts']); require BASE_PATH . '/app/Views/partials/work-districts.php'; ?>
+                        <?= field_close() ?><?php endif; ?>
 
                         <?php // দুইজন রেফারেন্স (দুটোই আবশ্যক) ?>
+                        <?php if (field_on($role, 'references')): ?><?= field_open($role, 'references') ?>
                         <fieldset class="reg-refs">
                             <legend><?= t('regform.f.references') ?></legend>
                             <div class="reg-refs__box">
@@ -150,6 +163,7 @@ $helpTel = content('today.post.helpline_tel');
                             </div>
                             </div>
                         </fieldset>
+                        <?= field_close() ?><?php endif; ?>
                     <?php endif; ?>
 
                     <div class="pf pf--eye">
@@ -174,6 +188,7 @@ $helpTel = content('today.post.helpline_tel');
                 </div>
 
                 <?php // ছবি: ঘরটা ক্লিকে ফাইল-বাছাই খোলে; app.js নাম ও প্রিভিউ দেখায় এবং ১৫০ KB / ধরন যাচাই করে ?>
+                <?php if (field_on($role, 'photo')): ?><?= field_open($role, 'photo') ?>
                 <div class="reg-form__col reg-photo" data-photo
                      data-max="<?= \App\Core\PhotoUpload::MAX_BYTES ?>"
                      data-none="<?= e(content('regform.photo.none')) ?>" data-chosen="<?= e(content('regform.photo.chosen')) ?>"
@@ -189,14 +204,17 @@ $helpTel = content('today.post.helpline_tel');
                     <p class="reg-photo__note"><?= t('regform.photo.note_1') ?><br><span data-photo-size><?= t('regform.photo.note_2') ?></span></p>
                     <p class="reg-photo__error" data-photo-error role="alert" hidden></p>
                 </div>
+                <?= field_close() ?><?php endif; ?>
             </div>
 
             <?php if ($role === 'worker'): ?>
+                <?php if (field_on($role, 'bio')): ?><?= field_open($role, 'bio') ?>
                 <div class="pf pf--wide">
                     <label class="sr-only" for="rf-bio"><?= t('regform.f.bio') ?></label>
                     <textarea id="rf-bio" data-bn name="bio" maxlength="2000"
                               placeholder="<?= $ph('bio', false) ?>"><?= $val('bio') ?></textarea>
                 </div>
+                <?= field_close() ?><?php endif; ?>
             <?php endif; ?>
 
             <?php $consentKey = $role; $consentChecked = !empty($old['consent']); require BASE_PATH . '/app/Views/partials/consent.php'; ?>
