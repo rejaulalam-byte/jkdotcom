@@ -1,10 +1,11 @@
 <?php
 /**
  * লোগো + প্রধান মেনু। খোলা পেইজ হাইলাইট থাকে।
- * মেনুর আইটেম app/Content/menu.php-তে (অ্যাডমিনের "লাইভ পেইজ এডিট"-ও সেখান থেকে নেয়)।
+ * মেনুর আইটেম App\Models\SiteMenus থেকে (সুপার অ্যাডমিন "লাইভ পেইজ এডিট"-এর "মেনু সম্পাদনা" থেকে বদলান;
+ * বদল না থাকলে app/Content/menu.php)।
  * সাব-মেনু আছে এমন আইটেমের নামে ক্লিকে পেইজ খোলে না, শুধু সাব-মেনু দেখায় (app.js)।
  */
-$menu = require BASE_PATH . '/app/Content/menu.php';
+$menu = \App\Models\SiteMenus::header();
 $current = \App\Core\Router::currentPath();
 $member = \App\Core\Auth::user();
 // লগইন-করা সদস্যের নিজের ভূমিকার লগইন-আইটেম মেনুতে থাকে না (পেশাজীবী -> শুধু প্রতিনিধি লগইন, উল্টোটাও); লগআউটে ফিরে আসে
@@ -30,7 +31,7 @@ $registrationPaths = ['/login', '/welcome'];
             <span class="nav-toggle__bars" aria-hidden="true"></span>
         </button>
 
-        <nav id="site-nav" class="nav" aria-label="প্রধান মেনু">
+        <nav id="site-nav" class="nav" aria-label="প্রধান মেনু"<?= live_preview() ? ' data-jk-menu' : '' ?>>
             <ul class="nav__list">
                 <?php foreach ($menu as [$href, $label, $children]):
                     $active = $current === $href || ($href !== '/' && str_starts_with($current, $href . '/'))

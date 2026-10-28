@@ -321,3 +321,9 @@
     align-items: center;
     margin: 0 0 8px;
 }
+
+/* মেনু ও ফুটারের লিংক (সুপার অ্যাডমিন: ক্লিক = মেনু সম্পাদনা) */
+[data-jk-menu] a:hover {
+    outline: 2px dashed #e08a1e;
+    outline-offset: 2px;
+}

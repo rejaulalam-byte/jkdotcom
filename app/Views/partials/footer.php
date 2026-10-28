@@ -50,19 +50,15 @@ $feedbackToken = Security::csrfToken();
             </div>
         </div>
 
-        <nav class="footer__links" aria-label="ফুটার মেনু">
-            <ul>
-                <li><a class="footer__links-head" href="/">হোম</a></li>
-                <li><a href="/services">আমাদের সেবা সমূহ</a></li>
-                <li><a href="/registration">রেজিস্ট্রেশন</a></li>
-                <li><a href="/faq">আপনার জিজ্ঞাসা আমাদের উত্তর</a></li>
-            </ul>
-            <ul>
-                <li><a class="footer__links-head" href="/about">আমাদের সম্পর্কে</a></li>
-                <li><a href="/today">আজকের প্রকাশিত কাজ</a></li>
-                <li><a href="/contact">যোগাযোগ</a></li>
-                <li><a href="/stats">এক নজরে আমাদের পরিসংখ্যান</a></li>
-            </ul>
+        <?php // লিংকের কলাম (App\Models\SiteMenus::footer(); প্রতিটির প্রথম লিংক মোটা শিরোনাম) ?>
+        <nav class="footer__links" aria-label="ফুটার মেনু"<?= live_preview() ? ' data-jk-menu' : '' ?>>
+            <?php foreach (\App\Models\SiteMenus::footer() as $column): ?>
+                <ul>
+                    <?php foreach ($column as $i => [$href, $label]): ?>
+                        <li><a<?= $i === 0 ? ' class="footer__links-head"' : '' ?> href="<?= e($href) ?>"><?= e($label) ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endforeach; ?>
         </nav>
 
         <div class="footer__side">

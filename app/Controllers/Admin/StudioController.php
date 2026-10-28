@@ -18,6 +18,7 @@ use App\Models\LivePages;
 use App\Models\OpenPages;
 use App\Models\PageMap;
 use App\Models\SiteBoxes;
+use App\Models\SiteMenus;
 use App\Models\SiteImages;
 use App\Models\SiteTexts;
 
@@ -442,6 +443,35 @@ final class StudioController
         }
 
         return [false, $short . ' সংরক্ষণ করা যায়নি।'];
+    }
+
+    /**
+     * POST: মেনু সম্পাদনার ফর্ম (SiteMenus::save) অথবা reset = 1 (সাইটের সঙ্গে আসা মেনু ও ফুটারে ফেরা); back।
+     * মেনু সাইটের কাঠামো, তাই শুধু সুপার অ্যাডমিন।
+     */
+    public function menu(): void
+    {
+        $admin = AdminAuth::require('pages', true);
+        $back = $this->backPath((string) ($_POST['back'] ?? ''));
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            $this->fail($back, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। কিছু সংরক্ষণ হয়নি; পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+        if (($_POST['reset'] ?? '') === '1') {
+            if (!SiteMenus::reset()) {
+                $this->fail($back, 'ফেরানো যায়নি।');
+            }
+            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'menu_reset', 'ওপরের মেনু ও ফুটার');
+            Session::flash('admin_ok', 'ওপরের মেনু ও ফুটারের কলাম সাইটের সঙ্গে আসা রূপে ফিরেছে।');
+            redirect($back);
+        }
+        $errors = SiteMenus::save($_POST);
+        if ($errors !== []) {
+            Session::flash('admin_errors', array_merge(['মেনু সংরক্ষণ হয়নি:'], $errors));
+            redirect($back);
+        }
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'menu_save', 'ওপরের মেনু, ফুটার ও সামাজিক মাধ্যম');
+        Session::flash('admin_ok', 'মেনু সংরক্ষণ হয়েছে; সাইটে এখনই দেখা যাচ্ছে।');
+        redirect($back);
     }
 
     /** POST (এডিটর থেকে): file, _token। উত্তর JSON: {location} অথবা {error}। */

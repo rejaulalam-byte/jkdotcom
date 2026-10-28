@@ -16,6 +16,7 @@
  * @var array<string,mixed> $live      LivePages::menus()
  * @var array<string,mixed>|null $page  বাছা পেইজ (id, title, url, note)
  * @var bool $listView
+ * @var array<string,mixed> $admin
  */
 $base = admin_base() . '/studio';
 $here = $base . '?' . http_build_query(array_filter(['p' => (string) $node['id'], 'q' => $q, 'view' => $listView ? 'list' : ''], static fn ($v): bool => $v !== ''));
@@ -72,6 +73,9 @@ $fields = static function (array $list) use ($base): string {
             <h1><?= e((string) $page['title']) ?></h1>
             <a class="adm-link" href="<?= e((string) $page['url']) ?>" target="_blank" rel="noopener">সাইটে নতুন ট্যাবে খুলুন</a>
             <a class="adm-link" href="<?= e($base . '?p=' . $page['id'] . '&view=list') ?>">এই পেইজের লেখার তালিকা</a>
+            <?php if (\App\Core\AdminAuth::isSuper($admin)): ?>
+                <button class="adm-small" type="button" data-menu-open>মেনু সম্পাদনা</button>
+            <?php endif; ?>
         </div>
         <p class="adm-live__note">যে লেখার ওপর মাউস রাখলে কমলা দাগ আসে, সেটায় ক্লিক করুন: সেখানেই বাক্স খুলবে, বদলে "সংরক্ষণ করুন" চাপুন। লিংক ও বাটন এখানে কাজ করে না; অন্য পেইজ ওপরের ড্রপডাউন থেকে খুলুন।</p>
         <?php if ($open !== null): ?>
@@ -79,6 +83,9 @@ $fields = static function (array $list) use ($base): string {
         <?php endif; ?>
         <iframe class="adm-live__frame" src="<?= e($frame) ?>" title="<?= e((string) $page['title']) ?> — সাইটে যেমন দেখায়" sandbox="allow-same-origin allow-scripts"></iframe>
     </section>
+    <?php if (\App\Core\AdminAuth::isSuper($admin)): ?>
+        <?php require __DIR__ . '/studio-menu.php'; ?>
+    <?php endif; ?>
     <?php if ($open !== null): ?>
         <?php // পেইজের মূল লেখার পূর্ণ এডিটর: ফ্রেমের লেখায় ক্লিক করলে admin.js বাক্সটা খোলে ?>
         <dialog class="adm-rich-dialog" id="rich-dialog" aria-label="পেইজের মূল লেখা বদলান">

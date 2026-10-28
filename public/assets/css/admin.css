@@ -1358,3 +1358,76 @@ input.adm-short {
 .adm-services td .adm-small {
     margin-top: 0;
 }
+
+/* ---- "লাইভ পেইজ এডিট": মেনু সম্পাদনার বাক্স ---- */
+.adm-menu__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin: 0 0 6px;
+}
+.adm-menu__row input {
+    flex: 1 1 220px;
+    min-height: 40px;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font: inherit;
+    font-size: 18px;
+}
+.adm-menu__tools {
+    display: inline-flex;
+    gap: 4px;
+}
+.adm-menu__tools[hidden],
+.adm-menu__adders[hidden] {
+    display: none;
+}
+.adm-menu__tools .adm-small,
+.adm-menu__adders .adm-small {
+    margin-top: 0;
+}
+.adm-menu__item {
+    margin: 0 0 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fbfdfd;
+}
+.adm-menu__sub {
+    margin: 4px 0 0 28px;
+    padding-left: 10px;
+    border-left: 3px solid var(--teal-10);
+}
+.adm-menu__item > .adm-menu__adders {
+    margin: 4px 0 0 28px;
+}
+.adm-menu__cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+}
+.adm-menu__col h3 {
+    margin: 0 0 6px;
+    font-size: 19px;
+}
+.adm-menu__social {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 8px 16px;
+    margin: 0 0 8px;
+}
+.adm-menu__social label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+}
+.adm-menu__social input {
+    min-height: 40px;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font: inherit;
+    font-weight: 400;
+}

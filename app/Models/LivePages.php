@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 /**
- * "লাইভ পেইজ এডিট"-এর ওপরের ড্রপডাউনগুলো: "সকল পেইজ", সাইটের মেনুর প্রতিটি আইটেম (app/Content/menu.php)
+ * "লাইভ পেইজ এডিট"-এর ওপরের ড্রপডাউনগুলো: "সকল পেইজ", সাইটের মেনুর প্রতিটি আইটেম (SiteMenus::header())
  * এবং "অন্যান্য"। পেইজের নাম ও ঠিকানা আসে পেইজ-মানচিত্র (PageMap) থেকে; মেনুর কোন আইটেমের নিচে কোন পেইজ,
  * তা ঠিকানা মিলিয়ে নিজে নিজে ঠিক হয়। মেনুতে না-থাকা পেইজ (নতুন পেইজসহ) "অন্যান্য"-তে যায়।
  */
@@ -18,7 +18,7 @@ final class LivePages
      */
     public static function menus(): array
     {
-        $menu = require BASE_PATH . '/app/Content/menu.php';
+        $menu = SiteMenus::header();
         $groups = [];
         foreach ($menu as [$href, $label, $children]) {
             $groups[] = ['label' => $label, 'hrefs' => array_merge([$href], array_column($children, 0)), 'pages' => []];

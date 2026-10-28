@@ -9,6 +9,7 @@
    ৬) খোলা পেইজের মূল লেখায় (data-jk-rich) ক্লিক: অ্যাডমিনের পর্দাকে জানানো হয়, সেখানে পূর্ণ এডিটরের বড় বাক্স খোলে।
    ৭) ফর্মের ঘর (data-jk-field): সুপার অ্যাডমিনের জন্য কোণে "ঘর" চিহ্ন, ক্লিকে বাক্সের রং ও (যেখানে চলে) লুকান/দেখান।
    ৮) ফর্মে অ্যাডমিনের যোগ করা ঘর (data-jk-custom): যোগ, বদল, ক্রম ও মোছা (শুধু সুপার অ্যাডমিন)।
+   ৯) ওপরের মেনু বা ফুটারের লিংকের কলামে (data-jk-menu) ক্লিক: অ্যাডমিনের পর্দায় "মেনু সম্পাদনা" বাক্স (শুধু সুপার অ্যাডমিন)।
    ===================================================================================================== */
 (function () {
     var dataEl = document.getElementById("jk-live-data");
@@ -858,6 +859,14 @@
             e.preventDefault();
             e.stopPropagation();
             openIcon(ic);
+            return;
+        }
+        // মেনুর লিংক (লেখা নয়, মেনু-আইটেম): সুপার অ্যাডমিনের জন্য মেনু সম্পাদনার বাক্স
+        if (data.super && e.target.closest("[data-jk-menu] a")) {
+            e.preventDefault();
+            e.stopPropagation();
+            close();
+            window.parent.postMessage({ jk: "open-menu" }, window.location.origin);
             return;
         }
         var el = e.target.closest("[data-jk-key]");

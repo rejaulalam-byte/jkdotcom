@@ -176,3 +176,133 @@
         dialog.close();
     });
 })();
+
+/* ---- "লাইভ পেইজ এডিট": মেনু সম্পাদনার বাক্স (studio-menu.php; শুধু সুপার অ্যাডমিন) ----
+   খোলে "মেনু সম্পাদনা" বাটনে বা ফ্রেমের মেনু/ফুটারের লিংকে ক্লিকে (live-edit.js পাঠায় {jk: "open-menu"})।
+   সারি যোগ / মোছা / ওপরে-নিচে; জমার আগে প্রতিটি ঘরের নাম পর্দার ক্রমে নতুন করে নম্বর পায়
+   (header[i][label|href], header[i][sub][j][...], footer[c][j][...]), তাই সার্ভার যে ক্রমে পায় সেটাই সাইটের ক্রম। ---- */
+(function () {
+    var dialog = document.getElementById("menu-dialog");
+    if (!dialog || typeof dialog.showModal !== "function") {
+        return;
+    }
+    var form = dialog.querySelector("[data-menu-form]");
+    var template = document.getElementById("menu-row-template");
+    var dirty = false;
+
+    function open() {
+        if (!dialog.open) {
+            dialog.showModal();
+        }
+    }
+    document.querySelectorAll("[data-menu-open]").forEach(function (b) {
+        b.addEventListener("click", open);
+    });
+    window.addEventListener("message", function (e) {
+        if (e.origin === window.location.origin && e.data && e.data.jk === "open-menu") {
+            open();
+        }
+    });
+    dialog.querySelector("[data-menu-close]").addEventListener("click", function () {
+        if (dirty && !window.confirm("মেনুর বদল সংরক্ষণ হয়নি। তবুও বন্ধ করবেন?")) {
+            return;
+        }
+        dialog.close();
+    });
+    form.addEventListener("input", function () {
+        dirty = true;
+    });
+
+    // JavaScript থাকলে বাটনগুলো দেখা যায়
+    dialog.querySelectorAll(".adm-menu__tools, .adm-menu__adders").forEach(function (el) {
+        el.hidden = false;
+    });
+
+    function newRow(kind) {
+        var row = template.content.firstElementChild.cloneNode(true);
+        row.setAttribute("data-menu-row", kind);
+        row.querySelector(".adm-menu__tools").hidden = false;
+        return row;
+    }
+
+    // প্রতিটি মেনু-আইটেমের সাব-মেনুর নিচে "+ সাব-মেনু যোগ"
+    function addSubAdder(item) {
+        var p = document.createElement("p");
+        p.className = "adm-menu__adders";
+        var b = document.createElement("button");
+        b.className = "adm-small";
+        b.type = "button";
+        b.setAttribute("data-menu-add", "sub");
+        b.textContent = "+ সাব-মেনু যোগ করুন";
+        p.appendChild(b);
+        item.appendChild(p);
+    }
+    dialog.querySelectorAll("[data-menu-item]").forEach(addSubAdder);
+
+    dialog.addEventListener("click", function (e) {
+        var add = e.target.closest("[data-menu-add]");
+        if (add) {
+            var kind = add.getAttribute("data-menu-add");
+            dirty = true;
+            if (kind === "top") {
+                var item = document.createElement("div");
+                item.className = "adm-menu__item";
+                item.setAttribute("data-menu-item", "");
+                item.appendChild(newRow("top"));
+                var sub = document.createElement("div");
+                sub.className = "adm-menu__sub";
+                sub.setAttribute("data-menu-list", "sub");
+                item.appendChild(sub);
+                addSubAdder(item);
+                dialog.querySelector('[data-menu-list="top"]').appendChild(item);
+                item.querySelector("input").focus();
+            } else if (kind === "sub") {
+                var list = add.closest("[data-menu-item]").querySelector('[data-menu-list="sub"]');
+                list.appendChild(newRow("sub"));
+                list.lastElementChild.querySelector("input").focus();
+            } else {
+                var col = dialog.querySelector('[data-menu-list="' + kind + '"]');
+                col.appendChild(newRow(kind));
+                col.lastElementChild.querySelector("input").focus();
+            }
+            return;
+        }
+        var act = e.target.closest("[data-menu-act]");
+        if (!act) {
+            return;
+        }
+        dirty = true;
+        var row = act.closest("[data-menu-row]");
+        // ওপরের মেনুর সারি মানে পুরো আইটেম (তার সাব-মেনুসহ)
+        var unit = row.getAttribute("data-menu-row") === "top" ? row.closest("[data-menu-item]") : row;
+        var what = act.getAttribute("data-menu-act");
+        if (what === "remove") {
+            unit.remove();
+        } else if (what === "up" && unit.previousElementSibling) {
+            unit.parentNode.insertBefore(unit, unit.previousElementSibling);
+        } else if (what === "down" && unit.nextElementSibling) {
+            unit.parentNode.insertBefore(unit.nextElementSibling, unit);
+        }
+    });
+
+    form.addEventListener("submit", function () {
+        function name(row, prefix) {
+            var inputs = row.querySelectorAll("input");
+            inputs[0].name = prefix + "[label]";
+            inputs[1].name = prefix + "[href]";
+        }
+        dialog.querySelectorAll('[data-menu-list="top"] > [data-menu-item]').forEach(function (item, i) {
+            name(item.querySelector('[data-menu-row="top"]'), "header[" + i + "]");
+            item.querySelectorAll('[data-menu-list="sub"] > [data-menu-row]').forEach(function (row, j) {
+                name(row, "header[" + i + "][sub][" + j + "]");
+            });
+        });
+        dialog.querySelectorAll('[data-menu-list^="footer-"]').forEach(function (list) {
+            var c = list.getAttribute("data-menu-list").slice(7);
+            list.querySelectorAll("[data-menu-row]").forEach(function (row, j) {
+                name(row, "footer[" + c + "][" + j + "]");
+            });
+        });
+        dirty = false;
+    });
+})();
