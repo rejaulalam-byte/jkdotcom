@@ -49,11 +49,13 @@ $helpTel = content('today.post.helpline_tel');
 
             <div class="reg-form__grid">
                 <div class="reg-form__col">
+                    <?= field_open($role, 'name') ?>
                     <div class="pf">
                         <label class="sr-only" for="rf-name"><?= t('regform.f.name') ?></label>
                         <input id="rf-name" data-bn type="text" name="name" maxlength="100" required autocomplete="name"
                                placeholder="<?= $ph('name') ?>" value="<?= $val('name') ?>">
                     </div>
+                    <?= field_close() ?>
                     <?php if (field_on($role, 'gender')): ?><?= field_open($role, 'gender') ?>
                     <?php
                     $genderId = 'rf-gender'; $genderName = 'gender'; $genderLabel = content('regform.f.gender'); $genderValue = (string) ($old['gender'] ?? '');
@@ -63,6 +65,7 @@ $helpTel = content('today.post.helpline_tel');
 
                     <?php if ($role === 'worker'): ?>
                         <?php // JavaScript ছাড়া পরামর্শসহ সাধারণ লেখার ঘর (datalist); app.js একে "যেকোনো অংশ মিললেই" খোঁজা-যায় এমন তালিকা বানায় ?>
+                        <?= field_open($role, 'service') ?>
                         <div class="pf pf--combo" data-combo data-none="<?= e(content('regform.service.none')) ?>" data-use="<?= e(content('regform.service.use')) ?>" data-hint="<?= e(content('regform.service.hint')) ?>">
                             <label class="sr-only" for="rf-service"><?= t('regform.f.service') ?></label>
                             <input id="rf-service" data-bn type="text" name="service_name" list="rf-services" maxlength="100" required autocomplete="off"
@@ -73,6 +76,7 @@ $helpTel = content('today.post.helpline_tel');
                                 <?php endforeach; ?>
                             </datalist>
                         </div>
+                        <?= field_close() ?>
                         <?php if (field_on($role, 'extra_services')): ?><?= field_open($role, 'extra_services') ?>
                         <?php $esSlugs = array_map('strval', (array) ($old['extra_services'] ?? [])); require BASE_PATH . '/app/Views/partials/extra-services.php'; ?>
                         <?= field_close() ?><?php endif; ?>
@@ -93,17 +97,21 @@ $helpTel = content('today.post.helpline_tel');
                         <?= field_close() ?><?php endif; ?>
                     <?php endif; ?>
 
+                    <?= field_open($role, 'email') ?>
                     <div class="pf">
                         <label class="sr-only" for="rf-email"><?= t('regform.f.email') ?></label>
                         <input id="rf-email" type="email" name="email" maxlength="150" required autocomplete="email" inputmode="email"
                                placeholder="<?= $ph('email') ?>" value="<?= $val('email') ?>">
                     </div>
+                    <?= field_close() ?>
+                    <?= field_open($role, 'phone') ?>
                     <div class="pf pf--phone">
                         <label class="sr-only" for="rf-phone"><?= t('regform.f.phone') ?></label>
                         <span class="pf__code" aria-hidden="true">+৮৮</span>
                         <input id="rf-phone" type="tel" name="phone" maxlength="14" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
                                placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                     </div>
+                    <?= field_close() ?>
                     <?php if (field_on($role, 'address')): ?><?= field_open($role, 'address') ?>
                     <div class="pf">
                         <label class="sr-only" for="rf-address"><?= t('regform.f.address') ?></label>
@@ -112,6 +120,7 @@ $helpTel = content('today.post.helpline_tel');
                     </div>
                     <?= field_close() ?><?php endif; ?>
                     <?php // এলাকার তিন ড্রপডাউন: id-গুলো "কাজ সম্পর্কে জানান"-এর মতোই, app.js একই কোডে চালায় ?>
+                    <?= field_open($role, 'upazila') ?>
                     <div class="pf pf--select">
                         <label class="sr-only" for="pj-upazila"><?= t('regform.f.upazila') ?></label>
                         <select id="pj-upazila" name="upazila_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.upazila')) ?>">
@@ -121,6 +130,8 @@ $helpTel = content('today.post.helpline_tel');
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <?= field_close() ?>
+                    <?= field_open($role, 'district') ?>
                     <div class="pf pf--select">
                         <label class="sr-only" for="pj-district"><?= t('regform.f.district') ?></label>
                         <select id="pj-district" name="district_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.district')) ?>">
@@ -130,6 +141,8 @@ $helpTel = content('today.post.helpline_tel');
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <?= field_close() ?>
+                    <?= field_open($role, 'division') ?>
                     <div class="pf pf--select">
                         <label class="sr-only" for="pj-division"><?= t('regform.f.division') ?></label>
                         <select id="pj-division" name="division_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.division')) ?>">
@@ -139,6 +152,7 @@ $helpTel = content('today.post.helpline_tel');
                             <?php endforeach; ?>
                         </select>
                     </div>
+                    <?= field_close() ?>
 
                     <?php if ($role === 'worker'): ?>
                         <?php // কোন জেলায় কাজ করতে আগ্রহী (ঐচ্ছিক): সর্বোচ্চ ৫টি জেলা বা "সব জেলা", ট্যাগ হয়ে বসে; ঠিকানার তিন ঘরের সঙ্গে জোড়া নয় ?>
@@ -166,6 +180,7 @@ $helpTel = content('today.post.helpline_tel');
                         <?= field_close() ?><?php endif; ?>
                     <?php endif; ?>
 
+                    <?= field_open($role, 'password') ?>
                     <div class="pf pf--eye">
                         <label class="sr-only" for="rf-pass"><?= t('regform.f.password') ?></label>
                         <input id="rf-pass" type="password" name="password" minlength="8" maxlength="72" required autocomplete="new-password"
@@ -175,7 +190,9 @@ $helpTel = content('today.post.helpline_tel');
                                 data-show="<?= e(content('login.f.show')) ?>" data-hide="<?= e(content('login.f.hide')) ?>"
                                 aria-label="<?= e(content('login.f.show')) ?>"></button>
                     </div>
+                    <?= field_close() ?>
                     <p class="reg-form__note"><?= t('regform.password_note') ?></p>
+                    <?= field_open($role, 'password2') ?>
                     <div class="pf pf--eye">
                         <label class="sr-only" for="rf-pass2"><?= t('regform.f.password2') ?></label>
                         <input id="rf-pass2" type="password" name="password_confirm" minlength="8" maxlength="72" required autocomplete="new-password"
@@ -185,6 +202,7 @@ $helpTel = content('today.post.helpline_tel');
                                 data-show="<?= e(content('login.f.show')) ?>" data-hide="<?= e(content('login.f.hide')) ?>"
                                 aria-label="<?= e(content('login.f.show')) ?>"></button>
                     </div>
+                    <?= field_close() ?>
                 </div>
 
                 <?php // ছবি: ঘরটা ক্লিকে ফাইল-বাছাই খোলে; app.js নাম ও প্রিভিউ দেখায় এবং ১৫০ KB / ধরন যাচাই করে ?>

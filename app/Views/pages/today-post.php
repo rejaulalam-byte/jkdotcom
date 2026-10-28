@@ -46,6 +46,7 @@ $helpTel = content('today.post.helpline_tel');
                 <div class="post-form__grid">
                     <div class="post-form__col">
                         <?php // JavaScript ছাড়া এটা পরামর্শসহ সাধারণ লেখার ঘর (datalist); app.js একে খোঁজা-যায় এমন ড্রপডাউন বানায় ?>
+                        <?= field_open('post', 'title') ?>
                         <div class="pf pf--combo" data-combo data-none="<?= e(content('today.post.combo.none')) ?>" data-use="<?= e(content('today.post.combo.use')) ?>" data-hint="<?= e(content('today.post.combo.hint')) ?>">
                             <label class="sr-only" for="pj-title"><?= t('today.post.f.title') ?></label>
                             <input id="pj-title" data-bn type="text" name="title" list="pj-types" maxlength="120" required autocomplete="off"
@@ -58,23 +59,28 @@ $helpTel = content('today.post.helpline_tel');
                                 <?php endforeach; ?>
                             </datalist>
                         </div>
+                        <?= field_close() ?>
+                        <?= field_open('post', 'name') ?>
                         <div class="pf">
                             <label class="sr-only" for="pj-name"><?= t('today.post.f.name') ?></label>
                             <input id="pj-name" data-bn type="text" name="contact_name" maxlength="100" required autocomplete="name"
                                    placeholder="<?= $ph('name') ?>" value="<?= $val('contact_name') ?>">
                         </div>
+                        <?= field_close() ?>
                         <?php if (field_on('post', 'gender')): ?><?= field_open('post', 'gender') ?>
                         <?php
                         $genderId = 'pj-gender'; $genderName = 'contact_gender'; $genderLabel = content('today.post.f.gender'); $genderValue = (string) ($old['contact_gender'] ?? '');
                         require BASE_PATH . '/app/Views/partials/gender-field.php';
                         ?>
                         <?= field_close() ?><?php endif; ?>
+                        <?= field_open('post', 'phone') ?>
                         <div class="pf pf--phone">
                             <label class="sr-only" for="pj-phone"><?= t('today.post.f.phone') ?></label>
                             <span class="pf__code" aria-hidden="true">+৮৮</span>
                             <input id="pj-phone" type="tel" name="phone" maxlength="14" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
                                    placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                         </div>
+                        <?= field_close() ?>
                         <?php if (field_on('post', 'email')): ?><?= field_open('post', 'email') ?>
                         <div class="pf">
                             <label class="sr-only" for="pj-email"><?= t('today.post.f.email') ?></label>
@@ -82,10 +88,12 @@ $helpTel = content('today.post.helpline_tel');
                                    placeholder="<?= $ph('email', false) ?>" value="<?= $val('email') ?>">
                         </div>
                         <?= field_close() ?><?php endif; ?>
+                        <?= field_open('post', 'start') ?>
                         <div class="pf pf--date">
                             <label for="pj-start"><?= $ph('start') ?></label>
                             <input id="pj-start" type="date" name="start_date" required min="<?= e(date('Y-m-d')) ?>" value="<?= $val('start_date') ?>">
                         </div>
+                        <?= field_close() ?>
                     </div>
 
                     <div class="post-form__col">
@@ -97,6 +105,7 @@ $helpTel = content('today.post.helpline_tel');
                         </div>
                         <?= field_close() ?><?php endif; ?>
                         <?php // Figma-র ক্রম: উপজেলা, জেলা, বিভাগ। app.js-এ তিনটির যেকোনোটা আগে বাছা যায়। ?>
+                        <?= field_open('post', 'upazila') ?>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-upazila"><?= t('today.post.f.upazila') ?></label>
                             <select id="pj-upazila" name="upazila_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.upazila')) ?>">
@@ -106,6 +115,8 @@ $helpTel = content('today.post.helpline_tel');
                                 <?php endforeach; ?>
                             </select>
                         </div>
+                        <?= field_close() ?>
+                        <?= field_open('post', 'district') ?>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-district"><?= t('today.post.f.district') ?></label>
                             <select id="pj-district" name="district_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.district')) ?>">
@@ -115,6 +126,8 @@ $helpTel = content('today.post.helpline_tel');
                                 <?php endforeach; ?>
                             </select>
                         </div>
+                        <?= field_close() ?>
+                        <?= field_open('post', 'division') ?>
                         <div class="pf pf--select">
                             <label class="sr-only" for="pj-division"><?= t('today.post.f.division') ?></label>
                             <select id="pj-division" name="division_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.division')) ?>">
@@ -124,6 +137,7 @@ $helpTel = content('today.post.helpline_tel');
                                 <?php endforeach; ?>
                             </select>
                         </div>
+                        <?= field_close() ?>
                         <?php if (field_on('post', 'end_date')): ?><?= field_open('post', 'end_date') ?>
                         <div class="pf pf--date">
                             <label for="pj-end"><?= $ph('end', false) ?></label>
@@ -133,11 +147,13 @@ $helpTel = content('today.post.helpline_tel');
                     </div>
                 </div>
 
+                <?= field_open('post', 'details') ?>
                 <div class="pf pf--wide">
                     <label class="sr-only" for="pj-details"><?= t('today.post.f.details') ?></label>
                     <textarea id="pj-details" data-bn name="details" maxlength="3000" required
                               placeholder="<?= $ph('details') ?>"><?= $val('details') ?></textarea>
                 </div>
+                <?= field_close() ?>
 
                 <?php $consentKey = 'post'; $consentChecked = !empty($old['consent']); require BASE_PATH . '/app/Views/partials/consent.php'; ?>
 

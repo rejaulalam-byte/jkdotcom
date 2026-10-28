@@ -367,9 +367,9 @@ function pill_attrs(string $slot, string $extraClass = ''): string
 }
 
 /**
- * ফর্মের লুকানো-যায় এমন ঘর (App\Models\FormFields): সাধারণ দর্শকের জন্য লুকানো ঘর একদম আসে না।
- * লাইভ পেইজ এডিটের ফ্রেমে সব ঘর আসে, ঘিরে রাখা ঘরে (field_open/field_close) — লুকানোগুলো ঝাপসা,
- * আর প্রতিটির কোণে "ঘর" চিহ্ন, যাতে সুপার অ্যাডমিন লুকাতে বা দেখাতে পারেন।
+ * ফর্মের ঘর (App\Models\FormFields)। field_on(): লুকানো ঘর সাধারণ দর্শকের জন্য একদম আসে না।
+ * field_open()/field_close(): ঘরের অংশ ঘিরে রাখে — বাছা রং থাকলে রঙের ক্লাসে (.fc--নাম), আর লাইভ পেইজ এডিটের
+ * ফ্রেমে চিহ্নসহ (data-jk-field; লুকানোগুলো ঝাপসা, কোণে "ঘর" চিহ্ন)। রং না থাকলে সাধারণ দর্শক কোনো বাড়তি ঘর পান না।
  */
 function field_on(string $form, string $field): bool
 {
@@ -378,16 +378,23 @@ function field_on(string $form, string $field): bool
 
 function field_open(string $form, string $field): string
 {
-    if (!live_preview()) {
-        return '';
+    $color = \App\Models\FormFields::color($form, $field);
+    $live = live_preview();
+    \App\Models\FormFields::pushOpened($live || $color !== '');
+    $classes = $color !== '' ? ['fc', 'fc--' . $color] : [];
+    if (!$live) {
+        return $classes === [] ? '' : '<div class="' . e(implode(' ', $classes)) . '">';
     }
     \App\Core\LiveEdit::field($form, $field);
-    $hidden = \App\Models\FormFields::hidden($form, $field);
+    $classes[] = 'jk-field';
+    if (\App\Models\FormFields::hidden($form, $field)) {
+        $classes[] = 'is-jk-hidden';
+    }
 
-    return '<div class="jk-field' . ($hidden ? ' is-jk-hidden' : '') . '" data-jk-field="' . e($form . '.' . $field) . '">';
+    return '<div class="' . e(implode(' ', $classes)) . '" data-jk-field="' . e($form . '.' . $field) . '">';
 }
 
 function field_close(): string
 {
-    return live_preview() ? '</div>' : '';
+    return \App\Models\FormFields::popOpened() ? '</div>' : '';
 }

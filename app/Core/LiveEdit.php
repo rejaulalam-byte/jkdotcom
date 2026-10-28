@@ -108,7 +108,13 @@ final class LiveEdit
         }
         $fields = [];
         foreach (self::$fields as $id => [$form, $field]) {
-            $fields[$id] = ['label' => FormFields::label($form, $field), 'form' => FormFields::FORMS[$form] ?? '', 'hidden' => FormFields::hidden($form, $field)];
+            $fields[$id] = [
+                'label' => FormFields::label($form, $field),
+                'form' => FormFields::FORMS[$form] ?? '',
+                'hideable' => FormFields::hideable($form, $field),
+                'hidden' => FormFields::hidden($form, $field),
+                'color' => FormFields::color($form, $field),
+            ];
         }
         $admin = AdminAuth::current();
 
@@ -121,6 +127,7 @@ final class LiveEdit
             'boxSave' => admin_base() . '/studio/live-box',
             'fields' => $fields,
             'fieldSave' => admin_base() . '/studio/live-field',
+            'fieldColors' => FormFields::COLORS,
             // লুকানো/দেখানো কাঠামোর কাজ: শুধু সুপার অ্যাডমিন
             'super' => $admin !== null && AdminAuth::isSuper($admin),
             'save' => admin_base() . '/studio/live-save',

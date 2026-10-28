@@ -7,7 +7,7 @@
    ৪) পেইজের ছবি ও ছোট আইকনে (data-jk-img) ক্লিক: নতুন ছবি দেওয়া, শুরুর ছবিতে ফেরা, লুকানো/দেখানো (শেষ দুটি সুপার অ্যাডমিন)।
    ৫) ছোট হেডিংয়ের বক্সে (data-jk-box) থাকা লেখায় ক্লিক: লেখার বাক্সে "বক্সের রং" সারি (শুধু সুপার অ্যাডমিন)।
    ৬) খোলা পেইজের মূল লেখায় (data-jk-rich) ক্লিক: অ্যাডমিনের পর্দাকে জানানো হয়, সেখানে পূর্ণ এডিটরের বড় বাক্স খোলে।
-   ৭) ফর্মের লুকানো-যায় এমন ঘর (data-jk-field): সুপার অ্যাডমিনের জন্য কোণে "ঘর" চিহ্ন, ক্লিকে লুকান/দেখান।
+   ৭) ফর্মের ঘর (data-jk-field): সুপার অ্যাডমিনের জন্য কোণে "ঘর" চিহ্ন, ক্লিকে বাক্সের রং ও (যেখানে চলে) লুকান/দেখান।
    ===================================================================================================== */
 (function () {
     var dataEl = document.getElementById("jk-live-data");
@@ -553,7 +553,7 @@
         box.style.top = (below + h > window.innerHeight && r.top - h - 8 > 0 ? r.top - h - 8 : Math.max(12, Math.min(below, window.innerHeight - h - 12))) + "px";
     }
 
-    /* ---- ৭. ফর্মের ঘর লুকানো/দেখানো (শুধু সুপার অ্যাডমিন; অন্যদের কাছে চিহ্নই আসে না) ---- */
+    /* ---- ৭. ফর্মের ঘর: রং ও লুকানো/দেখানো (শুধু সুপার অ্যাডমিন; অন্যদের কাছে চিহ্নই আসে না) ---- */
     var fieldPanel = null;
     var fieldCurrent = null;
 
@@ -564,6 +564,9 @@
         fieldPanel.setAttribute("aria-label", "ফর্মের ঘর");
         fieldPanel.innerHTML =
             '<p class="jk-live-panel__title"></p>' +
+            '<div class="jk-live-panel__box"><span class="jk-live-panel__boxlabel">ঘরের রং:</span>' +
+            '<span class="jk-live-field__colors"></span>' +
+            '<button type="button" class="jk-live-field__colorreset" data-field-color="">সাধারণ রং</button></div>' +
             '<p class="jk-live-panel__hint"></p>' +
             '<p class="jk-live-panel__msg" role="status"></p>' +
             '<div class="jk-live-panel__row">' +
@@ -572,11 +575,27 @@
             '<button type="button" class="jk-live-field__cancel">বাতিল</button>' +
             "</div>";
         document.body.appendChild(fieldPanel);
+        var colors = fieldPanel.querySelector(".jk-live-field__colors");
+        Object.keys(data.fieldColors || {}).forEach(function (name) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "jk-bsw jk-fsw--" + name;
+            b.setAttribute("data-field-color", name);
+            b.title = data.fieldColors[name];
+            b.setAttribute("aria-label", "ঘরের রং: " + data.fieldColors[name]);
+            colors.appendChild(b);
+        });
+        fieldPanel.querySelector(".jk-live-panel__box").addEventListener("click", function (e) {
+            var b = e.target.closest("[data-field-color]");
+            if (b) {
+                sendField({ color: b.getAttribute("data-field-color") });
+            }
+        });
         fieldPanel.querySelector(".jk-live-field__cancel").addEventListener("click", closeField);
         fieldPanel.querySelector(".jk-live-panel__row").addEventListener("click", function (e) {
             var b = e.target.closest("[data-field-act]");
             if (b) {
-                sendField(b.getAttribute("data-field-act"));
+                sendField({ hidden: b.getAttribute("data-field-act") });
             }
         });
         document.addEventListener("keydown", function (e) {
@@ -601,12 +620,18 @@
         fieldCurrent = { box: box, id: id };
         box.classList.add("is-jk-editing");
         fieldPanel.querySelector(".jk-live-panel__title").textContent = "ঘর: " + info.label + " (" + info.form + ")";
-        fieldPanel.querySelector(".jk-live-panel__hint").textContent = info.hidden
-            ? "এখন লুকানো: দর্শক ঘরটি দেখেন না, তাই এটা পূরণ করতেও হয় না।"
-            : "এখন দেখা যাচ্ছে। লুকালে দর্শক ঘরটি দেখবেন না, আর এটা আবশ্যকও থাকবে না (খালি জমা হবে)।";
+        fieldPanel.querySelector(".jk-live-panel__hint").textContent = !info.hideable
+            ? "এই ঘর লুকানো যায় না (এটা ছাড়া লগইন, তালিকা বা খোঁজা চলে না); শুধু রং বদলানো যায়।"
+            : info.hidden
+                ? "এখন লুকানো: দর্শক ঘরটি দেখেন না, তাই এটা পূরণ করতেও হয় না।"
+                : "এখন দেখা যাচ্ছে। লুকালে দর্শক ঘরটি দেখবেন না, আর এটা আবশ্যকও থাকবে না (খালি জমা হবে)।";
+        fieldPanel.querySelectorAll(".jk-live-field__colors .jk-bsw").forEach(function (b) {
+            b.classList.toggle("is-on", b.getAttribute("data-field-color") === info.color);
+        });
+        fieldPanel.querySelector(".jk-live-field__colorreset").hidden = info.color === "";
         fieldPanel.querySelector(".jk-live-panel__msg").textContent = "";
-        fieldPanel.querySelector('[data-field-act="1"]').hidden = info.hidden;
-        fieldPanel.querySelector('[data-field-act="0"]').hidden = !info.hidden;
+        fieldPanel.querySelector('[data-field-act="1"]').hidden = !info.hideable || info.hidden;
+        fieldPanel.querySelector('[data-field-act="0"]').hidden = !info.hideable || !info.hidden;
         place(fieldPanel, box);
     }
 
@@ -620,7 +645,8 @@
         }
     }
 
-    function sendField(hidden) {
+    // change = {hidden: "1"/"0"} অথবা {color: নাম বা ""}
+    function sendField(change) {
         if (!fieldCurrent) {
             return;
         }
@@ -628,7 +654,9 @@
         var body = new FormData();
         body.append("_token", data.token);
         body.append("field", fieldCurrent.id);
-        body.append("hidden", hidden);
+        Object.keys(change).forEach(function (k) {
+            body.append(k, change[k]);
+        });
         msg.textContent = "সংরক্ষণ হচ্ছে…";
         fetch(data.fieldSave, { method: "POST", body: body, credentials: "same-origin" })
             .then(function (res) {

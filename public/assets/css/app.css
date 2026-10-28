@@ -5215,3 +5215,13 @@ html.popup-lock {
         font-size: 1.5rem;
     }
 }
+
+/* ---- ফর্মের ঘরের রং: সুপার অ্যাডমিন লাইভ পেইজ এডিট থেকে বাছেন (App\Models\FormFields::COLORS) -------- */
+.fc--white .pf :is(input, select, textarea) { background-color: #fff; }
+.fc--cream .pf :is(input, select, textarea) { background-color: #fff8e6; }
+.fc--gold .pf :is(input, select, textarea) { background-color: #fbf1c7; }
+.fc--green .pf :is(input, select, textarea) { background-color: #e6f4ea; }
+.fc--blue .pf :is(input, select, textarea) { background-color: #e7f0fb; }
+.fc--pink .pf :is(input, select, textarea) { background-color: #fbe9ee; }
+.fc--grey .pf :is(input, select, textarea) { background-color: #eef0f1; }
+.fc--teal .pf :is(input, select, textarea) { background-color: #d7e7eb; }

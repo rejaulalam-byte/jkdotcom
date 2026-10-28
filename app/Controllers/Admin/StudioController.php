@@ -306,7 +306,8 @@ final class StudioController
     }
 
     /**
-     * POST (লাইভ পেইজ এডিট, ফর্মের ঘর): _token, field = "<ফর্ম>.<ঘর>", hidden = 1 (লুকান) | 0 (দেখান)।
+     * POST (লাইভ পেইজ এডিট, ফর্মের ঘর): _token, field = "<ফর্ম>.<ঘর>", আর হয় hidden = 1 (লুকান) | 0 (দেখান),
+     * নয়তো color = FormFields::COLORS-এর একটা নাম বা খালি (সাইটের সাধারণ রং)।
      * ফর্মের কাঠামোর কাজ, তাই শুধু সুপার অ্যাডমিন। উত্তর JSON: {ok: true} অথবা {ok: false, error}।
      */
     public function liveField(): void
@@ -324,10 +325,29 @@ final class StudioController
         }
         if (!AdminAuth::isSuper($admin)) {
             http_response_code(403);
-            $answer(false, 'ফর্মের ঘর লুকানো বা দেখানো শুধু সুপার অ্যাডমিন পারেন।');
+            $answer(false, 'ফর্মের ঘর সাজানো (রং, লুকানো/দেখানো) শুধু সুপার অ্যাডমিন পারেন।');
         }
         [$form, $field] = array_pad(explode('.', (string) ($_POST['field'] ?? ''), 2), 2, '');
         if (!FormFields::exists($form, $field)) {
+            http_response_code(422);
+            $answer(false, 'এই ঘর এখানে বদলানো যায় না।');
+        }
+
+        if (isset($_POST['color'])) {
+            $color = (string) $_POST['color'];
+            if ($color !== '' && !isset(FormFields::COLORS[$color])) {
+                http_response_code(422);
+                $answer(false, 'এই রং বাছা যায় না।');
+            }
+            $key = 'form.' . $form . '.color.' . $field;
+            if (!($color === '' ? Content::forget($key) : Content::set($key, $color))) {
+                $answer(false, 'সংরক্ষণ করা যায়নি।');
+            }
+            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'field_color', $form . '.' . $field . ' = ' . ($color !== '' ? $color : 'সাধারণ'));
+            $answer(true);
+        }
+
+        if (!FormFields::hideable($form, $field)) {
             http_response_code(422);
             $answer(false, 'এই ঘর লুকানো যায় না।');
         }

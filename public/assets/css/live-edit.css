@@ -265,3 +265,13 @@
 .jk-field.is-jk-hidden {
     opacity: 1;
 }
+
+/* ঘরের রঙের সারির বাটন (রং = app.css-এর .fc--*) */
+.jk-live-panel__box .jk-fsw--white { background: #fff; }
+.jk-live-panel__box .jk-fsw--cream { background: #fff8e6; }
+.jk-live-panel__box .jk-fsw--gold { background: #fbf1c7; }
+.jk-live-panel__box .jk-fsw--green { background: #e6f4ea; }
+.jk-live-panel__box .jk-fsw--blue { background: #e7f0fb; }
+.jk-live-panel__box .jk-fsw--pink { background: #fbe9ee; }
+.jk-live-panel__box .jk-fsw--grey { background: #eef0f1; }
+.jk-live-panel__box .jk-fsw--teal { background: #d7e7eb; }
