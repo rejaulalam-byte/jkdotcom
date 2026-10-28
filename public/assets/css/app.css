@@ -227,9 +227,40 @@ textarea {
     background: var(--olive-10);
     color: var(--teal);
 }
+/* অ্যাডমিন যে রংগুলো বাছতে পারেন (App\Models\SiteBoxes::COLORS); প্রতিটির সঙ্গে পড়া যায় এমন লেখার রং */
 .pill--social {
     background: rgba(192, 122, 0, 0.5);
     color: var(--white);
+}
+.pill--tealsoft {
+    background: var(--teal-10);
+    color: var(--teal);
+}
+.pill--teal {
+    background: var(--teal);
+    color: var(--white);
+}
+.pill--gold {
+    background: var(--gold);
+    color: #4a3b00;
+}
+.pill--orange {
+    background: #c96a00;
+    color: var(--white);
+}
+.pill--maroon {
+    background: var(--maroon);
+    color: var(--white);
+}
+.pill--white {
+    background: var(--white);
+    color: var(--teal);
+}
+.pill--none {
+    background: transparent;
+}
+/* ফুটারের "সামাজিক যোগাযোগ মাধ্যম" ক্যাপসুলের মাপ (রং আলাদা ক্লাসে, অ্যাডমিন বদলাতে পারেন) */
+.pill--footer-social {
     font-size: 1.375rem;
     letter-spacing: 0.069rem;
     min-height: 3.9375rem;
@@ -1301,7 +1332,7 @@ textarea {
     width: 2.1875rem;
     height: 2.1875rem;
 }
-.footer__side .pill--social {
+.footer__side .pill--footer-social {
     grid-column: 4;
     grid-row: 2;
     width: 100%;
@@ -1804,7 +1835,7 @@ textarea {
         grid-column: 1;
     }
     .newsletter,
-    .footer__side .pill--social,
+    .footer__side .pill--footer-social,
     .footer__side .social--footer {
         grid-column: auto;
         grid-row: auto;
@@ -1825,7 +1856,7 @@ textarea {
         width: 1.5rem;
         height: 1.5rem;
     }
-    .footer__side .pill--social {
+    .footer__side .pill--footer-social {
         justify-self: start;
         width: auto;
         padding: 0.4rem 1.5rem;

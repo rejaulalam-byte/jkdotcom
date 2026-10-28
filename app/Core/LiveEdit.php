@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Models\SiteBoxes;
 use App\Models\SiteIcons;
 use App\Models\SiteTexts;
 
@@ -32,6 +33,14 @@ final class LiveEdit
 
     /** @var array<string,bool> এই পেইজে দেখানো সেকশন-আইকন (section_icon()) */
     private static array $icons = [];
+
+    /** @var array<string,bool> এই পেইজে দেখানো ক্যাপসুল-বক্স (pill_attrs()) */
+    private static array $boxes = [];
+
+    public static function box(string $slot): void
+    {
+        self::$boxes[$slot] = true;
+    }
 
     public static function icon(string $slot): void
     {
@@ -84,12 +93,19 @@ final class LiveEdit
                 'original' => SiteIcons::original($slot),
             ];
         }
+        $boxes = [];
+        foreach (array_keys(self::$boxes) as $slot) {
+            $boxes[$slot] = ['label' => SiteBoxes::label($slot), 'color' => SiteBoxes::color($slot), 'original' => SiteBoxes::original($slot)];
+        }
         $admin = AdminAuth::current();
 
         return [
             'texts' => $texts,
             'icons' => $icons,
             'iconSave' => admin_base() . '/studio/live-icon',
+            'boxes' => $boxes,
+            'boxColors' => array_map(static fn (array $c): string => $c[0], SiteBoxes::COLORS),
+            'boxSave' => admin_base() . '/studio/live-box',
             // লুকানো/দেখানো কাঠামোর কাজ: শুধু সুপার অ্যাডমিন
             'super' => $admin !== null && AdminAuth::isSuper($admin),
             'save' => admin_base() . '/studio/live-save',

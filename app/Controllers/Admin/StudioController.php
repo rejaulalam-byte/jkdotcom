@@ -15,6 +15,7 @@ use App\Models\AdminRepository;
 use App\Models\LivePages;
 use App\Models\OpenPages;
 use App\Models\PageMap;
+use App\Models\SiteBoxes;
 use App\Models\SiteIcons;
 use App\Models\SiteTexts;
 
@@ -264,6 +265,42 @@ final class StudioController
             PageImage::remove($old);
         }
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'icon_' . $action, $slot);
+        $answer(true);
+    }
+
+    /**
+     * POST (লাইভ পেইজ এডিট, ক্যাপসুলের রং): _token, slot, color = SiteBoxes::COLORS-এর একটা নাম, অথবা খালি (শুরুর রং)।
+     * রং বদলানো নকশার কাজ, তাই শুধু সুপার অ্যাডমিন। উত্তর JSON: {ok: true} অথবা {ok: false, error}।
+     */
+    public function liveBox(): void
+    {
+        $admin = AdminAuth::require('pages');
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+        $answer = static function (bool $ok, ?string $error = null): never {
+            echo json_encode($ok ? ['ok' => true] : ['ok' => false, 'error' => $error], JSON_UNESCAPED_UNICODE);
+            exit;
+        };
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            http_response_code(403);
+            $answer(false, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। অ্যাডমিন পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+        if (!AdminAuth::isSuper($admin)) {
+            http_response_code(403);
+            $answer(false, 'বক্সের রং শুধু সুপার অ্যাডমিন বদলাতে পারেন।');
+        }
+        $slot = (string) ($_POST['slot'] ?? '');
+        $color = (string) ($_POST['color'] ?? '');
+        if (!SiteBoxes::exists($slot) || ($color !== '' && !isset(SiteBoxes::COLORS[$color]))) {
+            http_response_code(422);
+            $answer(false, 'এই বক্সের রং এখানে বদলানো যায় না।');
+        }
+        // শুরুর রঙের সমান হলে আলাদা করে রাখার দরকার নেই
+        $ok = $color === '' || $color === SiteBoxes::original($slot) ? Content::forget('box.' . $slot) : Content::set('box.' . $slot, $color);
+        if (!$ok) {
+            $answer(false, 'সংরক্ষণ করা যায়নি।');
+        }
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'box_color', $slot . ' = ' . ($color !== '' ? $color : 'শুরুর রং'));
         $answer(true);
     }
 

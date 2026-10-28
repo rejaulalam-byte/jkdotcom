@@ -5,6 +5,7 @@
    ২) চিহ্নিত লেখায় ক্লিক করলে সেখানেই একটা বাক্স খোলে: লেখা বদলে "সংরক্ষণ করুন" চাপলে সঙ্গে সঙ্গে সাইটে বদলায়।
    ৩) যে লেখায় সাজ চলে (সার্ভারের colored()/t()), বাক্সে বোল্ড/ইটালিক/আন্ডারলাইন/রঙের বাটন আর পেইজের মতো দেখতে একটা নমুনা।
    ৪) সেকশনের ছোট আইকনে (data-jk-icon) ক্লিক: নতুন ছবি দেওয়া, শুরুর ছবিতে ফেরা, লুকানো/দেখানো (শেষ দুটি সুপার অ্যাডমিন)।
+   ৫) ছোট হেডিংয়ের বক্সে (data-jk-box) থাকা লেখায় ক্লিক: লেখার বাক্সে "বক্সের রং" সারি (শুধু সুপার অ্যাডমিন)।
    ===================================================================================================== */
 (function () {
     var dataEl = document.getElementById("jk-live-data");
@@ -160,6 +161,9 @@
             '<textarea class="jk-live-panel__text" rows="3" maxlength="3000"></textarea>' +
             '<p class="jk-live-panel__preview" aria-label="নমুনা"></p>' +
             '<p class="jk-live-panel__hint"></p>' +
+            '<div class="jk-live-panel__box"><span class="jk-live-panel__boxlabel">বক্সের রং:</span>' +
+            '<span class="jk-live-panel__boxcolors"></span>' +
+            '<button type="button" class="jk-live-panel__boxreset" data-box="">শুরুর রং</button></div>' +
             '<p class="jk-live-panel__msg" role="status"></p>' +
             '<div class="jk-live-panel__row">' +
             '<button type="button" class="jk-live-panel__save">সংরক্ষণ করুন</button>' +
@@ -184,6 +188,22 @@
             }
         });
         panel.querySelector(".jk-live-panel__text").addEventListener("input", preview);
+        var boxColors = panel.querySelector(".jk-live-panel__boxcolors");
+        Object.keys(data.boxColors || {}).forEach(function (name) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "jk-bsw jk-bsw--" + name;
+            b.setAttribute("data-box", name);
+            b.title = data.boxColors[name];
+            b.setAttribute("aria-label", "বক্সের রং: " + data.boxColors[name]);
+            boxColors.appendChild(b);
+        });
+        panel.querySelector(".jk-live-panel__box").addEventListener("click", function (e) {
+            var b = e.target.closest("[data-box]");
+            if (b) {
+                sendBox(b.getAttribute("data-box"));
+            }
+        });
         panel.querySelector(".jk-live-panel__save").addEventListener("click", function () {
             send(false);
         });
@@ -233,6 +253,16 @@
         pv.style.color = getComputedStyle(el).color;
         pv.style.backgroundColor = backgroundOf(el);
         preview();
+        var box = el.closest("[data-jk-box]");
+        var boxInfo = box ? (data.boxes || {})[box.getAttribute("data-jk-box")] : null;
+        current.box = boxInfo ? box.getAttribute("data-jk-box") : null;
+        panel.querySelector(".jk-live-panel__box").hidden = !boxInfo || !data.super;
+        if (boxInfo) {
+            panel.querySelectorAll(".jk-bsw").forEach(function (b) {
+                b.classList.toggle("is-on", b.getAttribute("data-box") === boxInfo.color);
+            });
+            panel.querySelector(".jk-live-panel__boxreset").hidden = boxInfo.color === boxInfo.original;
+        }
         place(panel, el);
         area.focus();
     }
@@ -313,6 +343,33 @@
             }
         }
         return "#fff";
+    }
+
+    // বক্সের রং সঙ্গে সঙ্গে সংরক্ষণ (লেখার "সংরক্ষণ" থেকে আলাদা); খালি নাম = শুরুর রং
+    function sendBox(color) {
+        if (!current || !current.box) {
+            return;
+        }
+        var msg = panel.querySelector(".jk-live-panel__msg");
+        var body = new FormData();
+        body.append("_token", data.token);
+        body.append("slot", current.box);
+        body.append("color", color);
+        msg.textContent = "সংরক্ষণ হচ্ছে…";
+        fetch(data.boxSave, { method: "POST", body: body, credentials: "same-origin" })
+            .then(function (res) {
+                return res.json();
+            })
+            .then(function (res) {
+                if (res.ok) {
+                    window.location.reload();
+                    return;
+                }
+                msg.textContent = res.error || "সংরক্ষণ করা যায়নি।";
+            })
+            .catch(function () {
+                msg.textContent = "সংরক্ষণ করা যায়নি। লগইনের মেয়াদ শেষ হয়ে থাকতে পারে; অ্যাডমিন পেইজটি রিফ্রেশ করুন।";
+            });
     }
 
     function close() {

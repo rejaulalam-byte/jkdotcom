@@ -328,3 +328,18 @@ function section_icon(string $slot, int $width, int $height): string
 
     return '<img src="' . e(\App\Models\SiteIcons::src($slot)) . '" alt="" width="' . $width . '" height="' . $height . '"' . $extra . '>';
 }
+
+/**
+ * সেকশনের ছোট হেডিংয়ের বক্সের (ক্যাপসুল) class="…" (App\Models\SiteBoxes: অ্যাডমিনের বাছা বা শুরুর রং)।
+ * লাইভ পেইজ এডিটের ফ্রেমে data-jk-box-ও বসে, যাতে লেখার বাক্সে "বক্সের রং" দেখায়।
+ */
+function pill_attrs(string $slot, string $extraClass = ''): string
+{
+    $attrs = 'class="pill ' . e(\App\Models\SiteBoxes::cssClass($slot)) . ($extraClass !== '' ? ' ' . e($extraClass) : '') . '"';
+    if (live_preview()) {
+        \App\Core\LiveEdit::box($slot);
+        $attrs .= ' data-jk-box="' . e($slot) . '"';
+    }
+
+    return $attrs;
+}

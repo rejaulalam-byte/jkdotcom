@@ -3,7 +3,7 @@
 ?>
 <section class="section reg-join" aria-labelledby="reg-join-title">
     <div class="container">
-        <p class="pill pill--olive">
+        <p <?= pill_attrs('reg.join') ?>>
             <?= section_icon('reg.join', 50, 32) ?>
             <span><?= t('reg.pro.badge') ?></span>
         </p>

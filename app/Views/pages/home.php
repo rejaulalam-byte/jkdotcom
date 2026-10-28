@@ -17,7 +17,7 @@ $faqKeys = [1, 2, 3, 4, 5];
 <section class="hero" aria-labelledby="hero-title">
     <div class="container hero__inner">
         <div class="hero__copy">
-            <p class="pill pill--amber">
+            <p <?= pill_attrs('home.hero') ?>>
                 <?= section_icon('home.hero', 50, 32) ?>
                 <span data-fly><?= t('home.hero.badge') ?></span>
             </p>
@@ -77,7 +77,7 @@ $faqKeys = [1, 2, 3, 4, 5];
 <!-- 3. SERVICES ------------------------------------------------------- -->
 <section class="section services" aria-labelledby="services-title">
     <div class="container section__head section__head--center">
-        <p class="pill pill--olive">
+        <p <?= pill_attrs('home.services') ?>>
             <?= section_icon('home.services', 50, 32) ?>
             <span><?= t('home.services.badge') ?></span>
         </p>
@@ -118,7 +118,7 @@ $faqKeys = [1, 2, 3, 4, 5];
 <!-- 4. ABOUT ---------------------------------------------------------- -->
 <section class="section about" aria-labelledby="about-title">
     <div class="container section__head section__head--center">
-        <p class="pill pill--olive">
+        <p <?= pill_attrs('home.about') ?>>
             <?= section_icon('home.about', 50, 32) ?>
             <span><?= t('home.about.badge') ?></span>
         </p>
@@ -136,7 +136,7 @@ $faqKeys = [1, 2, 3, 4, 5];
 <!-- 5. HOW IT WORKS --------------------------------------------------- -->
 <section class="section steps" aria-labelledby="steps-title">
     <div class="container section__head">
-        <p class="pill pill--olive">
+        <p <?= pill_attrs('home.steps') ?>>
             <?= section_icon('home.steps', 50, 32) ?>
             <span><?= t('home.steps.badge') ?></span>
         </p>
@@ -159,7 +159,7 @@ $faqKeys = [1, 2, 3, 4, 5];
 <!-- 6. FAQ + FEEDBACK -------------------------------------------------- -->
 <section class="section faq" id="faq" aria-labelledby="faq-title">
     <div class="container section__head section__head--center">
-        <p class="pill pill--olive">
+        <p <?= pill_attrs('home.faq') ?>>
             <?= section_icon('home.faq', 50, 32) ?>
             <span><?= t('home.faq.badge') ?></span>
         </p>

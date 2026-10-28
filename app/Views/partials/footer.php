@@ -78,7 +78,7 @@ $feedbackToken = Security::csrfToken();
             </form>
 
             <?php // শিরোনাম সবসময় থাকে; তার নিচে শুধু ঠিকানা-আছে এমন আইকন (কোনো লিংক না থাকলে social.php কিছুই ছাপে না) ?>
-            <p class="pill pill--social"><?= t('footer.social_title') ?></p>
+            <p <?= pill_attrs('footer.social', 'pill--footer-social') ?>><?= t('footer.social_title') ?></p>
             <?php $socialClass = 'social--footer'; require BASE_PATH . '/app/Views/partials/social.php'; ?>
         </div>
     </div>

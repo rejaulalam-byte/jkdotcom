@@ -179,3 +179,51 @@
 .jk-live-panel [hidden] {
     display: none;
 }
+
+/* বক্সের রঙের সারি: প্রতিটি রং ছোট চারকোনা বাটন (রং = app.css-এর .pill--* এর মতো), এখনকারটা মোটা দাগে */
+.jk-live-panel__box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 8px;
+    padding: 8px 0 0;
+    border-top: 1px solid #d5e0e3;
+}
+.jk-live-panel__boxlabel {
+    color: #125a6c;
+    font-weight: 600;
+}
+.jk-live-panel__boxcolors {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.jk-live-panel__box button {
+    min-height: 32px;
+    padding: 0 10px;
+    border: 1px solid #b9cbd0;
+    border-radius: 6px;
+    background: #fff;
+    color: #125a6c;
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+}
+.jk-live-panel__box .jk-bsw {
+    width: 34px;
+    padding: 0;
+}
+.jk-live-panel__box .jk-bsw.is-on {
+    border: 3px solid #125a6c;
+}
+.jk-live-panel__box .jk-bsw--olive { background: rgba(106, 93, 16, 0.1); }
+.jk-live-panel__box .jk-bsw--amber { background: rgba(192, 122, 0, 0.3); }
+.jk-live-panel__box .jk-bsw--social { background: rgba(192, 122, 0, 0.5); }
+.jk-live-panel__box .jk-bsw--tealsoft { background: rgba(18, 90, 108, 0.1); }
+.jk-live-panel__box .jk-bsw--teal { background: #125a6c; }
+.jk-live-panel__box .jk-bsw--gold { background: #f0d772; }
+.jk-live-panel__box .jk-bsw--orange { background: #c96a00; }
+.jk-live-panel__box .jk-bsw--maroon { background: #6d1b2f; }
+.jk-live-panel__box .jk-bsw--white { background: #fff; }
+.jk-live-panel__box .jk-bsw--none { background: repeating-linear-gradient(45deg, #fff 0 4px, #d5e0e3 4px 8px); }
