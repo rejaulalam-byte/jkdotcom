@@ -1,3 +1,4 @@
+## 2026-10-28: form fields parts C+D built (own fields: add/change/reorder/delete; migration 022 run on staging). Remaining big items: services management, menu editing, steps 6-8, report last.
 ## 2026-10-28: form fields part B built (box colour per field, super admin). Next: C add fields (needs migration + Reja's answers), D delete.
 ## 2026-10-28: form fields part A built (hide/show in live page edit, super admin). Next: B colour, C add fields, D delete, or what Reja chooses.
 ## 2026-10-28: live page edit step 4 built (long texts of open pages: click → full editor dialog over the live page). Next: Reja decides (services management, form fields hide/add, menu editing).
