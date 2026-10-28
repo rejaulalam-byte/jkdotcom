@@ -70,6 +70,7 @@ return [
         ['id' => 'form-agent', 'title' => 'প্রতিনিধি রেজিস্ট্রেশন ফর্ম', 'url' => '/registration/agent/form', 'parts' => [
             ['ব্যানার ও শিরোনাম', ['regform.agent.*']],
             ['সম্মতি', ['consent.agent.*']],
+            ['ফর্মের বার্তা (দুই ফর্মে একই)', ['regform.msg.*']],
         ]],
         ['id' => 'login', 'title' => 'লগইন (দুটি) ও পাসওয়ার্ড ভুলে গেলে', 'url' => '/login', 'parts' => [
             ['লগইন পেইজ', ['login.*']],

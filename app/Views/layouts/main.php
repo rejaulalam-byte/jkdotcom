@@ -39,6 +39,7 @@ $pageDescription = $description ?? content('site.description');
 <main id="main">
 <?php if (!live_preview()) { require BASE_PATH . '/app/Views/partials/popup-ad.php'; } ?>
 <?= $content ?>
+<?php if (live_preview()) { require BASE_PATH . '/app/Views/partials/live-messages.php'; } ?>
 </main>
 
 <?php require BASE_PATH . '/app/Views/partials/footer.php'; ?>
