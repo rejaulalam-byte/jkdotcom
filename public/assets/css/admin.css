@@ -140,7 +140,7 @@ legend {
 
 .adm-btn,
 .adm-small,
-.adm-user button {
+.adm-top__user button {
     display: inline-block;
     min-height: 54px;
     margin-top: 18px;
@@ -273,57 +273,87 @@ ul.adm-notice {
     text-align: center;
 }
 
-/* ---- প্যানেল: বাঁয়ে মেনু, ডানে কাজ ---- */
+/* ---- প্যানেল: ওপরে দুই সারির মেনু, নিচে কাজ ---- */
 .adm-shell {
-    display: grid;
-    grid-template-columns: 290px minmax(0, 1fr);
     min-height: 100vh;
 }
-.adm-side {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 22px 16px;
+.adm-top {
+    position: sticky;
+    top: 0;
+    z-index: 30;
     background: var(--teal);
     color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
-.adm-side .adm-brand {
+.adm-top__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 22px;
+    padding: 10px 24px;
+}
+.adm-brand--inline {
+    margin: 0;
     color: #fff;
 }
-.adm-side .adm-brand span {
+.adm-brand--inline span {
     color: var(--gold);
+    font-size: 15px;
 }
-.adm-side nav {
+.adm-top__nav {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
-.adm-side nav a {
-    padding: 8px 14px;
+.adm-top__nav a {
+    padding: 6px 18px;
     border-radius: 8px;
+    background: rgba(255, 255, 255, 0.12);
     color: #fff;
     text-decoration: none;
 }
-.adm-side nav a:hover,
-.adm-side nav a[aria-current="page"] {
-    background: rgba(255, 255, 255, 0.16);
+.adm-top__nav a:hover,
+.adm-top__nav a[aria-current="page"] {
+    background: var(--gold);
+    color: var(--teal-dark);
+    font-weight: 600;
 }
-.adm-user {
-    margin-top: auto;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.25);
+.adm-top__user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
 }
-.adm-user p {
-    margin: 0 0 6px;
-}
-.adm-user small {
+.adm-top__user small {
     color: var(--gold);
 }
-.adm-user button {
-    min-height: 44px;
-    margin-top: 6px;
+.adm-top__user form {
+    margin: 0;
+}
+.adm-top__user button {
+    min-height: 40px;
+    margin: 0;
+    padding: 4px 18px;
     background: rgba(255, 255, 255, 0.16);
     font-size: 19px;
+}
+.adm-top__work {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 24px 10px;
+    background: var(--teal-dark);
+}
+.adm-top__work a {
+    padding: 4px 14px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 19px;
+    text-decoration: none;
+}
+.adm-top__work a:hover,
+.adm-top__work a[aria-current="page"] {
+    background: rgba(255, 255, 255, 0.2);
 }
 .adm-main {
     padding: 28px 32px 48px;
@@ -487,27 +517,10 @@ ul.adm-notice {
 
 /* ফোন ও ছোট পর্দা: মেনু ওপরে */
 @media (max-width: 800px) {
-    .adm-shell {
-        display: block;
-    }
-    .adm-side {
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px 14px;
-        padding: 12px 14px;
-    }
-    .adm-side .adm-brand {
-        margin: 0;
-    }
-    .adm-side nav {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-    .adm-user {
-        margin: 0 0 0 auto;
-        padding: 0;
-        border: 0;
+    .adm-top__row,
+    .adm-top__work {
+        padding-left: 14px;
+        padding-right: 14px;
     }
     .adm-main {
         padding: 20px 14px 40px;

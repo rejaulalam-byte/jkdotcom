@@ -18,7 +18,6 @@ $ok = $ok ?? null;
 $pageTitle = ($title ?? 'অ্যাডমিন') . ' — অ্যাডমিন প্যানেল';
 // [লিংক, নাম, শুধু সুপার অ্যাডমিন, (ঐচ্ছিক) দরকারি অনুমতি]
 $nav = [
-    [admin_base(), 'ড্যাশবোর্ড', false, null],
     [admin_base() . '/workers', 'কর্মী', false, 'registrations'],
     [admin_base() . '/agents', 'প্রতিনিধি', false, 'registrations'],
     [admin_base() . '/old-workers', 'পুরনো কর্মী সক্রিয় করা', false, 'registrations'],
@@ -29,9 +28,13 @@ $nav = [
     [admin_base() . '/ads', 'বিজ্ঞাপন', false, 'ads'],
     [admin_base() . '/studio', 'সাইটের লেখা', false, 'pages'],
     [admin_base() . '/locks', 'আটকানো লগইন', false, 'locks'],
-    [admin_base() . '/account', 'আমার অ্যাকাউন্ট', false, null],
-    [admin_base() . '/admins', 'অ্যাডমিন', true, null],
-    [admin_base() . '/log', 'কার্যলগ', true, null],
+];
+// ওপরের সারি: ড্যাশবোর্ড ও প্যানেলের নিজের জিনিস (অ্যাকাউন্ট, অ্যাডমিন, কার্যলগ)
+$top = [
+    [admin_base(), 'ড্যাশবোর্ড', false],
+    [admin_base() . '/account', 'আমার অ্যাকাউন্ট', false],
+    [admin_base() . '/admins', 'অ্যাডমিন', true],
+    [admin_base() . '/log', 'কার্যলগ', true],
 ];
 ?>
 <!doctype html>
@@ -47,20 +50,29 @@ $nav = [
 </head>
 <body class="<?= $admin !== null ? 'adm-shell' : 'adm-plain' ?>">
 <?php if ($admin !== null): ?>
-    <aside class="adm-side">
-        <p class="adm-brand">Jorurikaj.com<span>অ্যাডমিন প্যানেল</span></p>
-        <nav aria-label="প্যানেলের মেনু">
+    <header class="adm-top">
+        <div class="adm-top__row">
+            <p class="adm-brand adm-brand--inline">Jorurikaj.com<span>অ্যাডমিন প্যানেল</span></p>
+            <nav class="adm-top__nav" aria-label="প্যানেলের মূল মেনু">
+                <?php foreach ($top as [$href, $label, $superOnly]): ?>
+                    <?php if (!$superOnly || AdminAuth::isSuper($admin)): ?>
+                        <a href="<?= e($href) ?>"<?= is_current($href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </nav>
+            <div class="adm-top__user">
+                <span><strong><?= e((string) $admin['name']) ?></strong> <small><?= e(AdminAuth::roleLabel((string) $admin['role'])) ?></small></span>
+                <form action="<?= admin_base() ?>/logout" method="post"><?= csrf_field() ?><button type="submit">লগআউট</button></form>
+            </div>
+        </div>
+        <nav class="adm-top__work" aria-label="কাজের মেনু">
             <?php foreach ($nav as [$href, $label, $superOnly, $need]): ?>
                 <?php if ((!$superOnly || AdminAuth::isSuper($admin)) && ($need === null || AdminAuth::can($admin, $need))): ?>
                     <a href="<?= e($href) ?>"<?= is_current($href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
                 <?php endif; ?>
             <?php endforeach; ?>
         </nav>
-        <div class="adm-user">
-            <p><strong><?= e((string) $admin['name']) ?></strong><br><small><?= e(AdminAuth::roleLabel((string) $admin['role'])) ?></small></p>
-            <form action="<?= admin_base() ?>/logout" method="post"><?= csrf_field() ?><button type="submit">লগআউট</button></form>
-        </div>
-    </aside>
+    </header>
     <main class="adm-main">
         <?php if (empty($hideTitle)): ?>
             <h1><?= e((string) ($title ?? '')) ?></h1>
