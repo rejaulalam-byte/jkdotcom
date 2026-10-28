@@ -275,3 +275,49 @@
 .jk-live-panel__box .jk-fsw--pink { background: #fbe9ee; }
 .jk-live-panel__box .jk-fsw--grey { background: #eef0f1; }
 .jk-live-panel__box .jk-fsw--teal { background: #d7e7eb; }
+
+/* ফর্মে অ্যাডমিনের যোগ করা ঘর: কোণের চিহ্ন অন্য রঙে; "+ নতুন ঘর যোগ করুন" বাটন; বাক্সের ঘরগুলো */
+[data-jk-custom] {
+    position: relative;
+    outline: 1px dashed #c96a00;
+    outline-offset: 4px;
+}
+.jk-field__tag--custom {
+    background: #c96a00;
+}
+.jk-custom-add {
+    min-height: 44px;
+    padding: 0 18px;
+    border: 2px dashed #c96a00;
+    border-radius: 10px;
+    background: #fff8e6;
+    color: #8a4a00;
+    font: 600 17px/1 "Hind Siliguri", "Nirmala UI", system-ui, sans-serif;
+    cursor: pointer;
+}
+.jk-live-custom__lbl {
+    display: block;
+    margin: 0 0 8px;
+    color: #125a6c;
+    font-weight: 600;
+}
+.jk-live-custom__lbl input,
+.jk-live-custom__lbl select,
+.jk-live-custom__lbl textarea {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 2px;
+    padding: 6px 10px;
+    border: 1px solid #b9cbd0;
+    border-radius: 6px;
+    color: #222;
+    font: inherit;
+    font-weight: 400;
+}
+.jk-live-custom__req {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0 0 8px;
+}

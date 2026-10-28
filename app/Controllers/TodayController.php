@@ -12,6 +12,7 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\ContactTrackingRepository;
+use App\Models\CustomFields;
 use App\Models\FormFields;
 use App\Models\GeoRepository;
 use App\Models\JobPostRepository;
@@ -212,21 +213,32 @@ final class TodayController
         }
 
         $errors = $this->validate($data);
+        // অ্যাডমিনের যোগ করা নতুন ঘর
+        [$custom, $customErrors] = CustomFields::read('post', is_array($_POST['cf'] ?? null) ? $_POST['cf'] : []);
+        $errors = array_merge($errors, $customErrors);
+        $data['cf'] = $custom;
         if ($errors !== []) {
             $this->fail($errors, $data);
         }
 
         $data['consent_at'] = date('Y-m-d H:i:s');
-        if (!JobPostRepository::create($data)) {
+        $jobId = JobPostRepository::create($data);
+        if ($jobId === null) {
             $this->fail(['দুঃখিত, তথ্যগুলো সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।'], $data);
         }
+        CustomFields::saveValues('post', $jobId, $custom);
 
         $to = Env::get('MAIL_TO', 'info@jorurikaj.com') ?? 'info@jorurikaj.com';
         $body = "নতুন কাজের তথ্য প্রকাশিত হয়েছে — jorurikaj.com\n\n"
             . "কাজের ধরন: {$data['title']}\nনাম: {$data['contact_name']}\nমোবাইল: {$data['phone']}\n"
             . "ইমেইল: {$data['email']}\nঠিকানা: {$data['address']}\n"
-            . "প্রচারের তারিখ: {$data['start_date']}" . ($data['end_date'] !== '' ? " থেকে {$data['end_date']}" : '') . "\n\n"
-            . "{$data['details']}\n";
+            . "প্রচারের তারিখ: {$data['start_date']}" . ($data['end_date'] !== '' ? " থেকে {$data['end_date']}" : '') . "\n";
+        foreach (CustomFields::forForm('post') as $f) {
+            if (isset($custom[$f['id']])) {
+                $body .= $f['label'] . ': ' . $custom[$f['id']] . "\n";
+            }
+        }
+        $body .= "\n{$data['details']}\n";
         $replyTo = filter_var($data['email'], FILTER_VALIDATE_EMAIL) ? $data['email'] : null;
         if (!Mailer::send($to, 'নতুন কাজের তথ্য: ' . $data['title'], $body, $replyTo)) {
             // আগেই সংরক্ষিত (অ্যাডমিন প্যানেলের জন্য), তাই কিছু হারাবে না

@@ -751,6 +751,9 @@ final class UserRepository
                 $ok = false;
             }
         }
+        if ($ok) {
+            CustomFields::deleteValuesFor((string) $member['role'], $id);
+        }
         if ($ok && $photo !== '' && \App\Core\PhotoUpload::url($photo) !== null) {
             @unlink(\App\Core\PhotoUpload::directory() . '/' . $photo);
         }

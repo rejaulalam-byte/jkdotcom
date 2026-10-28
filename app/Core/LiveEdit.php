@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Models\CustomFields;
 use App\Models\FormFields;
 use App\Models\SiteBoxes;
 use App\Models\SiteImages;
@@ -45,6 +46,15 @@ final class LiveEdit
 
     /** @var array<string,array{0:string,1:string}> এই পেইজের লুকানো-যায় এমন ফর্মের ঘর (field_open()) */
     private static array $fields = [];
+
+    /** @var array<string,list<array<string,mixed>>> এই পেইজের ফর্মে অ্যাডমিনের যোগ করা ঘর (partials/custom-fields.php) */
+    private static array $customForms = [];
+
+    /** @param list<array<string,mixed>> $fields */
+    public static function customForm(string $form, array $fields): void
+    {
+        self::$customForms[$form] = $fields;
+    }
 
     public static function field(string $form, string $field): void
     {
@@ -116,6 +126,10 @@ final class LiveEdit
                 'color' => FormFields::color($form, $field),
             ];
         }
+        $customForms = [];
+        foreach (self::$customForms as $form => $list) {
+            $customForms[$form] = ['label' => FormFields::FORMS[$form] ?? '', 'fields' => $list];
+        }
         $admin = AdminAuth::current();
 
         return [
@@ -128,6 +142,9 @@ final class LiveEdit
             'fields' => $fields,
             'fieldSave' => admin_base() . '/studio/live-field',
             'fieldColors' => FormFields::COLORS,
+            'customForms' => $customForms === [] ? new \stdClass() : $customForms,
+            'customTypes' => CustomFields::TYPES,
+            'customSave' => admin_base() . '/studio/live-custom',
             // লুকানো/দেখানো কাঠামোর কাজ: শুধু সুপার অ্যাডমিন
             'super' => $admin !== null && AdminAuth::isSuper($admin),
             'save' => admin_base() . '/studio/live-save',

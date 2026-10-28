@@ -235,6 +235,9 @@ $helpTel = content('today.post.helpline_tel');
                 <?= field_close() ?><?php endif; ?>
             <?php endif; ?>
 
+            <?php // অ্যাডমিনের যোগ করা নতুন ঘর (থাকলে) ?>
+            <?php $customForm = $role; require BASE_PATH . '/app/Views/partials/custom-fields.php'; ?>
+
             <?php $consentKey = $role; $consentChecked = !empty($old['consent']); require BASE_PATH . '/app/Views/partials/consent.php'; ?>
 
             <p class="post-form__submit">

@@ -8,6 +8,7 @@
    ৫) ছোট হেডিংয়ের বক্সে (data-jk-box) থাকা লেখায় ক্লিক: লেখার বাক্সে "বক্সের রং" সারি (শুধু সুপার অ্যাডমিন)।
    ৬) খোলা পেইজের মূল লেখায় (data-jk-rich) ক্লিক: অ্যাডমিনের পর্দাকে জানানো হয়, সেখানে পূর্ণ এডিটরের বড় বাক্স খোলে।
    ৭) ফর্মের ঘর (data-jk-field): সুপার অ্যাডমিনের জন্য কোণে "ঘর" চিহ্ন, ক্লিকে বাক্সের রং ও (যেখানে চলে) লুকান/দেখান।
+   ৮) ফর্মে অ্যাডমিনের যোগ করা ঘর (data-jk-custom): যোগ, বদল, ক্রম ও মোছা (শুধু সুপার অ্যাডমিন)।
    ===================================================================================================== */
 (function () {
     var dataEl = document.getElementById("jk-live-data");
@@ -694,9 +695,162 @@
         });
     }
 
+    /* ---- ৮. ফর্মে নতুন ঘর (অ্যাডমিনের যোগ করা): যোগ, বদল, ক্রম, মোছা (শুধু সুপার অ্যাডমিন) ---- */
+    var customPanel = null;
+    var customCurrent = null;
+
+    function buildCustom() {
+        customPanel = document.createElement("div");
+        customPanel.className = "jk-live-panel jk-live-panel--custom";
+        customPanel.setAttribute("role", "dialog");
+        customPanel.setAttribute("aria-label", "ফর্মের নতুন ঘর");
+        var types = "";
+        Object.keys(data.customTypes || {}).forEach(function (k) {
+            types += '<option value="' + k + '">' + data.customTypes[k] + "</option>";
+        });
+        customPanel.innerHTML =
+            '<p class="jk-live-panel__title"></p>' +
+            '<label class="jk-live-custom__lbl">ঘরের নাম (দর্শক যা দেখবেন)<input type="text" class="jk-live-custom__label" maxlength="200"></label>' +
+            '<label class="jk-live-custom__lbl">ঘরের ধরন<select class="jk-live-custom__type">' + types + "</select></label>" +
+            '<label class="jk-live-custom__lbl jk-live-custom__optwrap">ড্রপডাউনের বিকল্প (প্রতি লাইনে একটি)<textarea class="jk-live-custom__options" rows="4"></textarea></label>' +
+            '<label class="jk-live-custom__req"><input type="checkbox" class="jk-live-custom__required"> আবশ্যক (না পূরণ করলে জমা হবে না, নামের পাশে *)</label>' +
+            '<p class="jk-live-panel__hint">নতুন ঘর ফর্মের শেষে, সম্মতির টিকের ঠিক আগে বসে। পূরণ করা তথ্য ইমেইলে ও অ্যাডমিনের পেইজে দেখা যায়।</p>' +
+            '<p class="jk-live-panel__msg" role="status"></p>' +
+            '<div class="jk-live-panel__row">' +
+            '<button type="button" class="jk-live-panel__save" data-custom-act="save">সংরক্ষণ করুন</button>' +
+            '<button type="button" data-custom-act="up">ওপরে</button>' +
+            '<button type="button" data-custom-act="down">নিচে</button>' +
+            '<button type="button" data-custom-act="delete">ঘরটি মুছুন</button>' +
+            '<button type="button" class="jk-live-custom__cancel">বাতিল</button>' +
+            "</div>";
+        document.body.appendChild(customPanel);
+        var type = customPanel.querySelector(".jk-live-custom__type");
+        type.addEventListener("change", function () {
+            customPanel.querySelector(".jk-live-custom__optwrap").hidden = type.value !== "select";
+        });
+        customPanel.querySelector(".jk-live-custom__cancel").addEventListener("click", closeCustom);
+        customPanel.querySelector(".jk-live-panel__row").addEventListener("click", function (e) {
+            var b = e.target.closest("[data-custom-act]");
+            if (b) {
+                sendCustom(b.getAttribute("data-custom-act"));
+            }
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") {
+                closeCustom();
+            }
+        });
+    }
+
+    // field = আগের ঘর (বদলাতে) অথবা null (নতুন); form = কোন ফর্মে
+    function openCustom(anchor, form, field) {
+        close();
+        closeIcon();
+        closeField();
+        if (!customPanel) {
+            buildCustom();
+        }
+        closeCustom();
+        customCurrent = { el: anchor, form: form, id: field ? field.id : null };
+        anchor.classList.add("is-jk-editing");
+        var info = (data.customForms || {})[form] || {};
+        customPanel.querySelector(".jk-live-panel__title").textContent = (field ? "নতুন ঘর বদলান" : "নতুন ঘর যোগ করুন") + " (" + (info.label || "") + ")";
+        customPanel.querySelector(".jk-live-custom__label").value = field ? field.label : "";
+        customPanel.querySelector(".jk-live-custom__type").value = field ? field.field_type : "text";
+        customPanel.querySelector(".jk-live-custom__options").value = field ? field.options.join("\n") : "";
+        customPanel.querySelector(".jk-live-custom__optwrap").hidden = (field ? field.field_type : "text") !== "select";
+        customPanel.querySelector(".jk-live-custom__required").checked = field ? field.is_required : false;
+        customPanel.querySelector(".jk-live-panel__msg").textContent = "";
+        ["up", "down", "delete"].forEach(function (a) {
+            customPanel.querySelector('[data-custom-act="' + a + '"]').hidden = !field;
+        });
+        place(customPanel, anchor);
+        customPanel.querySelector(".jk-live-custom__label").focus();
+    }
+
+    function closeCustom() {
+        if (customPanel) {
+            customPanel.hidden = true;
+        }
+        if (customCurrent) {
+            customCurrent.el.classList.remove("is-jk-editing");
+            customCurrent = null;
+        }
+    }
+
+    function sendCustom(action) {
+        if (!customCurrent) {
+            return;
+        }
+        if (action === "delete" && !window.confirm("এই ঘর আর এতে পূরণ করা সব তথ্য চিরতরে মুছে যাবে। মুছবেন?")) {
+            return;
+        }
+        var msg = customPanel.querySelector(".jk-live-panel__msg");
+        var body = new FormData();
+        body.append("_token", data.token);
+        body.append("action", action === "save" ? (customCurrent.id ? "update" : "add") : action);
+        body.append("form", customCurrent.form);
+        if (customCurrent.id) {
+            body.append("id", customCurrent.id);
+        }
+        body.append("label", customPanel.querySelector(".jk-live-custom__label").value);
+        body.append("field_type", customPanel.querySelector(".jk-live-custom__type").value);
+        body.append("options", customPanel.querySelector(".jk-live-custom__options").value);
+        body.append("is_required", customPanel.querySelector(".jk-live-custom__required").checked ? "1" : "0");
+        msg.textContent = "সংরক্ষণ হচ্ছে…";
+        fetch(data.customSave, { method: "POST", body: body, credentials: "same-origin" })
+            .then(function (res) {
+                return res.json();
+            })
+            .then(function (res) {
+                if (res.ok) {
+                    window.location.reload();
+                    return;
+                }
+                msg.textContent = res.error || "সংরক্ষণ করা যায়নি।";
+            })
+            .catch(function () {
+                msg.textContent = "সংরক্ষণ করা যায়নি। লগইনের মেয়াদ শেষ হয়ে থাকতে পারে; অ্যাডমিন পেইজটি রিফ্রেশ করুন।";
+            });
+    }
+
+    // যোগ-করা প্রতিটি ঘরের কোণে চিহ্ন, আর তালিকার শেষে "+ নতুন ঘর যোগ করুন"
+    if (data.super) {
+        Object.keys(data.customForms || {}).forEach(function (form) {
+            (data.customForms[form].fields || []).forEach(function (field) {
+                var box = document.querySelector('[data-jk-custom="' + field.id + '"]');
+                if (!box) {
+                    return;
+                }
+                var tag = document.createElement("button");
+                tag.type = "button";
+                tag.className = "jk-field__tag jk-field__tag--custom";
+                tag.textContent = "নতুন ঘর: " + field.label;
+                tag.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openCustom(box, form, field);
+                });
+                box.appendChild(tag);
+            });
+        });
+        document.querySelectorAll("[data-jk-custom-add]").forEach(function (spot) {
+            var add = document.createElement("button");
+            add.type = "button";
+            add.className = "jk-custom-add";
+            add.textContent = "+ নতুন ঘর যোগ করুন";
+            add.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openCustom(add, spot.getAttribute("data-jk-custom-add"), null);
+            });
+            spot.appendChild(add);
+        });
+    }
+
     // চিহ্নিত লেখায় ক্লিক = বদলানোর বাক্স (লিংকের পেইজে যাওয়া বা বাটনের কাজ হয় না)
     document.addEventListener("click", function (e) {
-        if ((panel && panel.contains(e.target)) || (iconPanel && iconPanel.contains(e.target)) || (fieldPanel && fieldPanel.contains(e.target))) {
+        if ((panel && panel.contains(e.target)) || (iconPanel && iconPanel.contains(e.target)) || (fieldPanel && fieldPanel.contains(e.target)) || (customPanel && customPanel.contains(e.target))) {
             return;
         }
         var ic = e.target.closest("[data-jk-img]");

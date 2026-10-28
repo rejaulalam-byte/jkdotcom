@@ -12,6 +12,7 @@ use App\Core\RateLimiter;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
+use App\Models\CustomFields;
 use App\Models\FormFields;
 use App\Models\GeoRepository;
 use App\Models\ServiceRepository;
@@ -128,6 +129,10 @@ final class RegistrationController
         }
 
         $errors = $this->validate($data, $password, $confirm);
+        // অ্যাডমিনের যোগ করা নতুন ঘর
+        [$custom, $customErrors] = CustomFields::read($role, is_array($_POST['cf'] ?? null) ? $_POST['cf'] : []);
+        $errors = array_merge($errors, $customErrors);
+        $data['cf'] = $custom;
         [$photo, $photoError] = $hidden('photo') ? [null, null] : PhotoUpload::store($_FILES['photo'] ?? null);
         if ($photoError !== null) {
             $errors[] = $photoError;
@@ -151,6 +156,9 @@ final class RegistrationController
             ];
             $this->fail($back, [$messages[$result] ?? 'দুঃখিত, তথ্যগুলো সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।'], $data);
         }
+
+        $member = UserRepository::findByPhone((string) $data['phone'], $role);
+        CustomFields::saveValues($role, (int) ($member['id'] ?? 0), $custom);
 
         $this->notifyAdmin($data);
 
@@ -199,6 +207,11 @@ final class RegistrationController
         $rows['থানা/উপজেলা, জেলা, বিভাগ'] = implode(', ', array_filter([$geo['upazila'], $geo['district'], $geo['division']]));
         if ($isWorker && (string) $d['bio'] !== '') {
             $rows['সংক্ষিপ্ত বিবরণ'] = (string) $d['bio'];
+        }
+        foreach (CustomFields::forForm((string) $d['role']) as $f) {
+            if (isset($d['cf'][$f['id']])) {
+                $rows[$f['label']] = (string) $d['cf'][$f['id']];
+            }
         }
         $rows['আবেদনের সময়'] = bn_date(date('Y-m-d')) . ', ' . bn_time(date('Y-m-d H:i:s'));
 

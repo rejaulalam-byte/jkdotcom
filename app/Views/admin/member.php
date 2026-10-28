@@ -156,6 +156,11 @@ $back = admin_base() . '/members/' . (int) $member['id'];
         <?php endif; ?>
     </aside>
     <div class="adm-detail__body">
+        <?php // অ্যাডমিনের যোগ করা নতুন ঘরে পূরণ করা তথ্য (থাকলে) ?>
+        <?php $customValues = \App\Models\CustomFields::valuesFor((string) $member['role'], (int) $member['id']); ?>
+        <?php if ($customValues !== []): ?>
+            <?php $rows['ফর্মের নতুন ঘর'] = array_map(static fn (array $v): array => [$v['label'], nl2br(e($v['value']))], $customValues); ?>
+        <?php endif; ?>
         <?php foreach ($rows as $group => $items): ?>
             <section class="adm-box">
                 <h2><?= e($group) ?></h2>

@@ -5225,3 +5225,29 @@ html.popup-lock {
 .fc--pink .pf :is(input, select, textarea) { background-color: #fbe9ee; }
 .fc--grey .pf :is(input, select, textarea) { background-color: #eef0f1; }
 .fc--teal .pf :is(input, select, textarea) { background-color: #d7e7eb; }
+
+/* ---- ফর্মে অ্যাডমিনের যোগ করা ঘর (partials/custom-fields.php) ---------------------------- */
+.cf-fields {
+    display: grid;
+    gap: 1.5rem;
+    margin: 0 0 2rem;
+}
+.cf-label {
+    display: block;
+    margin: 0 0 0.4rem;
+    color: var(--teal);
+    font-size: var(--fs-body);
+}
+.cf-field--check .cf-check {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+    font-size: var(--fs-body);
+    cursor: pointer;
+}
+.cf-field--check .cf-check input {
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    accent-color: var(--teal);
+}

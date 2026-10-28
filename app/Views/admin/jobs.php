@@ -74,6 +74,10 @@ $url = static function (array $override = []) use ($base, $tab, $q, $page): stri
                 · প্রচার: <?= e((string) ($r['start_date'] ?? '—')) ?><?= (string) ($r['end_date'] ?? '') !== '' ? ' থেকে ' . e((string) $r['end_date']) : '' ?>
             </p>
             <p class="adm-msg__text"><?= nl2br(e((string) $r['details'])) ?></p>
+            <?php // অ্যাডমিনের যোগ করা নতুন ঘরে পূরণ করা তথ্য (থাকলে) ?>
+            <?php foreach (\App\Models\CustomFields::valuesFor('post', (int) $r['id']) as $cv): ?>
+                <p class="adm-muted"><?= e($cv['label']) ?>: <?= nl2br(e($cv['value'])) ?></p>
+            <?php endforeach; ?>
 
             <form class="adm-inline" action="<?= e($base) ?>/action" method="post">
                 <?= csrf_field() ?>

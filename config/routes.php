@@ -136,6 +136,7 @@ return [
     ['POST', admin_base() . '/studio/live-image',   [AdminStudio::class, 'liveImage']],
     ['POST', admin_base() . '/studio/live-box',     [AdminStudio::class, 'liveBox']],
     ['POST', admin_base() . '/studio/live-field',   [AdminStudio::class, 'liveField']],
+    ['POST', admin_base() . '/studio/live-custom',  [AdminStudio::class, 'liveCustom']],
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],

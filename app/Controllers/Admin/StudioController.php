@@ -12,6 +12,7 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminRepository;
+use App\Models\CustomFields;
 use App\Models\FormFields;
 use App\Models\LivePages;
 use App\Models\OpenPages;
@@ -357,6 +358,62 @@ final class StudioController
             $answer(false, 'সংরক্ষণ করা যায়নি।');
         }
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], $hide ? 'field_hide' : 'field_show', $form . '.' . $field);
+        $answer(true);
+    }
+
+    /**
+     * POST (লাইভ পেইজ এডিট, ফর্মে অ্যাডমিনের যোগ করা ঘর): _token, action = add | update | delete | up | down,
+     * form (worker | agent | post), id (add ছাড়া), label, field_type, options (প্রতি লাইনে একটি), is_required।
+     * ফর্মের কাঠামোর কাজ, তাই শুধু সুপার অ্যাডমিন। উত্তর JSON: {ok: true} অথবা {ok: false, error}।
+     */
+    public function liveCustom(): void
+    {
+        $admin = AdminAuth::require('pages');
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+        $answer = static function (bool $ok, ?string $error = null): never {
+            echo json_encode($ok ? ['ok' => true] : ['ok' => false, 'error' => $error], JSON_UNESCAPED_UNICODE);
+            exit;
+        };
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            http_response_code(403);
+            $answer(false, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। অ্যাডমিন পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+        if (!AdminAuth::isSuper($admin)) {
+            http_response_code(403);
+            $answer(false, 'ফর্মে নতুন ঘর যোগ বা বদল শুধু সুপার অ্যাডমিন পারেন।');
+        }
+        $action = (string) ($_POST['action'] ?? '');
+        $form = (string) ($_POST['form'] ?? '');
+        $id = (int) ($_POST['id'] ?? 0);
+        $field = $action === 'add' ? null : CustomFields::find($id);
+        if (!isset(FormFields::FORMS[$form]) || !in_array($action, ['add', 'update', 'delete', 'up', 'down'], true)
+            || ($action !== 'add' && ($field === null || $field['form_key'] !== $form))) {
+            http_response_code(422);
+            $answer(false, 'এই ঘর এখানে বদলানো যায় না।');
+        }
+        $logName = (string) $admin['name'];
+
+        if ($action === 'delete') {
+            if (!CustomFields::delete($id)) {
+                $answer(false, 'মোছা যায়নি।');
+            }
+            AdminRepository::log((int) $admin['id'], $logName, 'custom_field_delete', $form . ': ' . $field['label']);
+            $answer(true);
+        }
+        if ($action === 'up' || $action === 'down') {
+            $answer(CustomFields::move($id, $action === 'up' ? -1 : 1), 'ক্রম বদলানো যায়নি।');
+        }
+        $error = CustomFields::save($form, $action === 'add' ? null : $id, [
+            'label' => clean_input($_POST['label'] ?? '', CustomFields::MAX_LABEL),
+            'field_type' => (string) ($_POST['field_type'] ?? ''),
+            'options' => clean_input($_POST['options'] ?? '', 8000, true),
+            'is_required' => ($_POST['is_required'] ?? '') === '1',
+        ]);
+        if ($error !== null) {
+            $answer(false, $error);
+        }
+        AdminRepository::log((int) $admin['id'], $logName, 'custom_field_' . $action, $form . ': ' . clean_input($_POST['label'] ?? '', 200));
         $answer(true);
     }
 

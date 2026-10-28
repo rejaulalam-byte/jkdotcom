@@ -15,10 +15,11 @@ final class JobPostRepository
 {
     /**
      * সর্বজনীন ফর্ম থেকে জানানো কাজ সংরক্ষণ করে। সঙ্গে সঙ্গে প্রকাশিত হয় (status 'approved'); অ্যাডমিন পরে সম্পাদনা বা লুকাতে পারবেন।
+     * ফেরত: নতুন বিজ্ঞপ্তির id (অ্যাডমিনের যোগ করা ঘরের মান এই id ধরে রাখা হয়); না পারলে null।
      *
      * @param array{title:string,title_custom:int,details:string,contact_name:string,contact_gender:string,phone:string,email:string,address:string,upazila_id:int,district_id:int,division_id:int,start_date:string,end_date:string} $data
      */
-    public static function create(array $data): bool
+    public static function create(array $data): ?int
     {
         $pdo = Database::connection();
         if ($pdo === null) {
@@ -54,11 +55,11 @@ final class JobPostRepository
                 ':consent_at' => $data['consent_at'] ?? null,
             ]);
 
-            return true;
+            return (int) $pdo->lastInsertId();
         } catch (Throwable $e) {
             Logger::error('JobPostRepository::create failed: ' . $e->getMessage());
 
-            return false;
+            return null;
         }
     }
 
@@ -195,11 +196,12 @@ final class JobPostRepository
     }
 
     /** @param array<string,mixed> $data */
-    private static function demoAdd(array $data): bool
+    private static function demoAdd(array $data): ?int
     {
         $rows = self::demoRead();
+        $id = 1000 + count($rows) + 1;
         $rows[] = [
-            'id' => 1000 + count($rows) + 1,
+            'id' => $id,
             'title' => $data['title'],
             'details' => $data['details'],
             'contact_name' => $data['contact_name'],
@@ -220,10 +222,10 @@ final class JobPostRepository
         if (@file_put_contents($file, json_encode($rows, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT), LOCK_EX) === false) {
             Logger::error('Job post (demo mode) could not be written to ' . $file);
 
-            return false;
+            return null;
         }
 
-        return true;
+        return $id;
     }
 
     /** অ্যাডমিনের তালিকার ট্যাব: কী => নাম। */
@@ -357,6 +359,7 @@ final class JobPostRepository
     /** বিজ্ঞপ্তি চিরতরে মোছে। সফল হলে true। */
     public static function delete(int $id): bool
     {
+        CustomFields::deleteValuesFor('post', $id);
         $pdo = Database::connection();
         if ($pdo === null) {
             return self::demoWrite(array_values(array_filter(self::demoRead(), static fn (array $r): bool => (int) $r['id'] !== $id)));
