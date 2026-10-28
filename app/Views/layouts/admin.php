@@ -29,12 +29,13 @@ $nav = [
     [admin_base() . '/studio', 'সাইটের লেখা', false, 'pages'],
     [admin_base() . '/locks', 'আটকানো লগইন', false, 'locks'],
 ];
-// ওপরের সারি: ড্যাশবোর্ড ও প্যানেলের নিজের জিনিস (অ্যাকাউন্ট, অ্যাডমিন, কার্যলগ)
+// ওপরের সারি: বাঁয়ে ড্যাশবোর্ড; ডানে নিজের জিনিস (অ্যাকাউন্ট, অ্যাডমিন)। কার্যলগ ড্যাশবোর্ডের ডান পাশের আলাদা বাক্সে
 $top = [
     [admin_base(), 'ড্যাশবোর্ড', false],
+];
+$mine = [
     [admin_base() . '/account', 'আমার অ্যাকাউন্ট', false],
     [admin_base() . '/admins', 'অ্যাডমিন', true],
-    [admin_base() . '/log', 'কার্যলগ', true],
 ];
 ?>
 <!doctype html>
@@ -61,7 +62,14 @@ $top = [
                 <?php endforeach; ?>
             </nav>
             <div class="adm-top__user">
-                <span><strong><?= e((string) $admin['name']) ?></strong> <small><?= e(AdminAuth::roleLabel((string) $admin['role'])) ?></small></span>
+                <nav class="adm-top__nav" aria-label="আমার জিনিস">
+                    <?php foreach ($mine as [$href, $label, $superOnly]): ?>
+                        <?php if (!$superOnly || AdminAuth::isSuper($admin)): ?>
+                            <a href="<?= e($href) ?>"<?= is_current($href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </nav>
+                <small><?= e(AdminAuth::roleLabel((string) $admin['role'])) ?></small>
                 <form action="<?= admin_base() ?>/logout" method="post"><?= csrf_field() ?><button type="submit">লগআউট</button></form>
             </div>
         </div>

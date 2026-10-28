@@ -54,7 +54,6 @@ $cards = [
 ?>
 <section class="adm-hero">
     <p class="adm-hero__greet"><?= e($greeting) ?></p>
-    <h2 class="adm-hero__name"><?= e((string) $admin['name']) ?></h2>
     <p><span class="adm-badge"><?= e(AdminAuth::roleLabel((string) $admin['role'])) ?></span></p>
     <p class="adm-hero__date"><?= e($today) ?></p>
 
@@ -91,5 +90,10 @@ $cards = [
                 </ul>
             </section>
         <?php endforeach; ?>
+        <?php if (AdminAuth::isSuper($admin)): ?>
+            <section class="adm-panel adm-panel--link">
+                <a href="<?= e(admin_base()) ?>/log">কার্যলগ</a>
+            </section>
+        <?php endif; ?>
     </aside>
 </div>
