@@ -24,6 +24,10 @@ $pageDescription = $description ?? content('site.description');
     <link rel="icon" type="image/png" href="<?= e(asset('img/site/logo-figma.png')) ?>">
     <link rel="preload" href="<?= e(asset('fonts/hind-siliguri-400.woff2')) ?>" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
+    <?php if (live_preview()): // অ্যাডমিনের লাইভ পেইজ এডিট: app.js-এর আগে চলে (লেখার চিহ্ন খুঁজে নিয়ে মুছে দেয়) ?>
+        <link rel="stylesheet" href="<?= e(asset('css/live-edit.css')) ?>">
+        <script src="<?= e(asset('js/live-edit.js')) ?>" defer></script>
+    <?php endif; ?>
     <script src="<?= e(asset('js/app.js')) ?>" defer></script>
 </head>
 <body id="top"<?= !empty($bodyClass) ? ' class="' . e($bodyClass) . '"' : '' ?>>
@@ -43,5 +47,8 @@ $pageDescription = $description ?? content('site.description');
 <button class="to-top" type="button" aria-label="পেজের উপরে যান" data-to-top>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
 </button>
+<?php if (live_preview()): // পেইজের সব লেখার আসল মান ও সংরক্ষণের ঠিকানা (চালানো হয় না, শুধু তথ্য) ?>
+<script type="application/json" id="jk-live-data"><?= json_encode(\App\Core\LiveEdit::data(), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+<?php endif; ?>
 </body>
 </html>

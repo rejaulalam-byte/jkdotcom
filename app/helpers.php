@@ -49,10 +49,12 @@ function asset(string $path): string
     return '/assets/' . $path . '?v=' . $version;
 }
 
-/** সম্পাদনাযোগ্য সাইটের লেখা: অ্যাডমিন বদলালে ডাটাবেসের মান, নইলে ডিফল্ট। */
+/** সম্পাদনাযোগ্য সাইটের লেখা: অ্যাডমিন বদলালে ডাটাবেসের মান, নইলে ডিফল্ট। লাইভ পেইজ এডিটের ফ্রেমে অদৃশ্য চিহ্নসহ (LiveEdit)। */
 function content(string $key, string $fallback = ''): string
 {
-    return Content::get($key, $fallback);
+    $value = Content::get($key, $fallback);
+
+    return live_preview() ? \App\Core\LiveEdit::mark($key, $value) : $value;
 }
 
 /** escape-করা লেখা, যেখানে {বন্ধনীর শব্দ} <strong>মোটা</strong> হয়। */

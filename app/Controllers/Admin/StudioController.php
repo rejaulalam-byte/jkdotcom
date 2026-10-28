@@ -152,25 +152,11 @@ final class StudioController
             if (!SiteTexts::editable($key) || !is_string($value)) {
                 continue;
             }
-            $value = clean_input($value, SiteTexts::MAX_LENGTH, true);
-            if ($value === Content::get($key)) {
-                continue;
-            }
-            $short = '"' . mb_strimwidth(SiteTexts::original($key), 0, 40, '…') . '"';
-            $missing = array_filter(SiteTexts::placeholders($key), static fn (string $p): bool => !str_contains($value, $p));
-            if ($missing !== []) {
-                $errors[] = $short . ' লেখায় ' . implode(', ', $missing) . ' থাকতে হবে (সেখানে নাম/এলাকা বসে); এটা সংরক্ষণ হয়নি।';
-                continue;
-            }
-            if ($value === '') {
-                $errors[] = $short . ' খালি রাখা যাবে না; এটা সংরক্ষণ হয়নি। আগের লেখায় ফিরতে "শুরুর লেখায় ফিরুন" চাপুন।';
-                continue;
-            }
-            // শুরুর লেখার সমান হলে আলাদা করে রাখার দরকার নেই
-            if ($value === SiteTexts::original($key) ? Content::forget($key) : Content::set($key, $value)) {
+            [$saved, $error] = $this->saveText($key, $value);
+            if ($saved) {
                 $changed[] = $key;
-            } else {
-                $errors[] = $short . ' সংরক্ষণ করা যায়নি।';
+            } elseif ($error !== null) {
+                $errors[] = $error;
             }
         }
 
@@ -184,6 +170,74 @@ final class StudioController
             Session::flash('admin_errors', $errors);
         }
         redirect($back);
+    }
+
+    /**
+     * POST (লাইভ পেইজ এডিটের ফ্রেম থেকে, live-edit.js): _token, key, value অথবা reset=1।
+     * উত্তর JSON: {ok: true} অথবা {ok: false, error}। নিয়ম "লেখার তালিকা"-র সংরক্ষণের মতোই (saveText)।
+     */
+    public function liveSave(): void
+    {
+        $admin = AdminAuth::require('pages');
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+        $key = (string) ($_POST['key'] ?? '');
+        $answer = static function (bool $ok, ?string $error = null): never {
+            echo json_encode($ok ? ['ok' => true] : ['ok' => false, 'error' => $error], JSON_UNESCAPED_UNICODE);
+            exit;
+        };
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            http_response_code(403);
+            $answer(false, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। অ্যাডমিন পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+        if (!SiteTexts::editable($key)) {
+            http_response_code(422);
+            $answer(false, 'এই লেখা এখানে বদলানো যায় না।');
+        }
+
+        if (($_POST['reset'] ?? '') === '1') {
+            if (!Content::forget($key)) {
+                $answer(false, 'ফেরানো যায়নি।');
+            }
+            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'text_reset', $key);
+            $answer(true);
+        }
+
+        [$saved, $error] = $this->saveText($key, is_string($_POST['value'] ?? null) ? $_POST['value'] : '');
+        if ($error !== null) {
+            $answer(false, $error);
+        }
+        if ($saved) {
+            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'text_save', $key);
+        }
+        $answer(true);
+    }
+
+    /**
+     * একটা ছোট লেখা সংরক্ষণ: জায়গা-ধারক ({name} ইত্যাদি) থাকতে হবে, খালি চলবে না; শুরুর লেখার সমান হলে আলাদা
+     * করে রাখা হয় না। ফেরত: [সংরক্ষণ হয়েছে কি না, ভুলের বার্তা অথবা null]। বদল না থাকলে [false, null]।
+     *
+     * @return array{0:bool,1:?string}
+     */
+    private function saveText(string $key, string $value): array
+    {
+        $value = clean_input($value, SiteTexts::MAX_LENGTH, true);
+        if ($value === Content::get($key)) {
+            return [false, null];
+        }
+        $short = '"' . mb_strimwidth(SiteTexts::original($key), 0, 40, '…') . '"';
+        $missing = array_filter(SiteTexts::placeholders($key), static fn (string $p): bool => !str_contains($value, $p));
+        if ($missing !== []) {
+            return [false, $short . ' লেখায় ' . implode(', ', $missing) . ' থাকতে হবে (সেখানে নাম/এলাকা বসে); এটা সংরক্ষণ হয়নি।'];
+        }
+        if ($value === '') {
+            return [false, $short . ' খালি রাখা যাবে না; এটা সংরক্ষণ হয়নি। আগের লেখায় ফিরতে "শুরুর লেখায় ফিরুন" চাপুন।'];
+        }
+        if ($value === SiteTexts::original($key) ? Content::forget($key) : Content::set($key, $value)) {
+            return [true, null];
+        }
+
+        return [false, $short . ' সংরক্ষণ করা যায়নি।'];
     }
 
     /** POST (এডিটর থেকে): file, _token। উত্তর JSON: {location} অথবা {error}। */

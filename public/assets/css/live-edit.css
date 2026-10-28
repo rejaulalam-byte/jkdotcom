@@ -1,0 +1,83 @@
+/* =====================================================================================================
+   অ্যাডমিনের "লাইভ পেইজ এডিট"-এর ফ্রেমে শুধু (live-edit.js-এর সঙ্গী)। সাধারণ দর্শক এই ফাইল পান না।
+   বদলানো যায় এমন লেখায় মাউস রাখলে ড্যাশ-দাগ, যেটা বদলানো হচ্ছে সেটা সোনালি দাগে; নিচে বদলানোর বাক্স।
+   ===================================================================================================== */
+
+[data-jk-key] {
+    cursor: pointer;
+}
+[data-jk-key]:hover {
+    outline: 2px dashed #e08a1e;
+    outline-offset: 2px;
+}
+.is-jk-editing,
+.is-jk-editing:hover {
+    outline: 3px solid #f0d772;
+    outline-offset: 2px;
+}
+
+.jk-live-panel {
+    position: fixed;
+    z-index: 10000;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    border: 2px solid #125a6c;
+    border-radius: 10px;
+    background: #fff;
+    color: #222;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    font: 400 17px/1.5 "Bangla Digits", "Hind Siliguri", "Nirmala UI", system-ui, sans-serif;
+    text-align: left;
+}
+.jk-live-panel[hidden] {
+    display: none;
+}
+.jk-live-panel p {
+    margin: 0 0 6px;
+}
+.jk-live-panel__title {
+    color: #125a6c;
+    font-weight: 600;
+}
+.jk-live-panel__orig,
+.jk-live-panel__hint {
+    color: #5d6b70;
+    font-size: 15px;
+}
+.jk-live-panel__text {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 4px 0 6px;
+    padding: 8px 10px;
+    border: 1px solid #b9cbd0;
+    border-radius: 6px;
+    font: inherit;
+    resize: vertical;
+}
+.jk-live-panel__msg {
+    color: #870a0a;
+    font-weight: 600;
+}
+.jk-live-panel__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.jk-live-panel__row button {
+    min-height: 40px;
+    padding: 4px 16px;
+    border: 0;
+    border-radius: 6px;
+    background: #e6edef;
+    color: #125a6c;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+.jk-live-panel__row .jk-live-panel__save {
+    background: #125a6c;
+    color: #fff;
+}
+.jk-live-panel__row button:focus-visible {
+    outline: 3px solid #f0d772;
+}
