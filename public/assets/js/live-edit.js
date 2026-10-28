@@ -4,7 +4,7 @@
       লেখাটাকে (বা পুরো ঘরকে) data-jk-key চিহ্নিত করা হয়, তারপর চিহ্ন মুছে ফেলা হয় — পেইজ দেখতে হুবহু আগের মতো।
    ২) চিহ্নিত লেখায় ক্লিক করলে সেখানেই একটা বাক্স খোলে: লেখা বদলে "সংরক্ষণ করুন" চাপলে সঙ্গে সঙ্গে সাইটে বদলায়।
    ৩) যে লেখায় সাজ চলে (সার্ভারের colored()/t()), বাক্সে বোল্ড/ইটালিক/আন্ডারলাইন/রঙের বাটন আর পেইজের মতো দেখতে একটা নমুনা।
-   ৪) সেকশনের ছোট আইকনে (data-jk-icon) ক্লিক: নতুন ছবি দেওয়া, শুরুর ছবিতে ফেরা, লুকানো/দেখানো (শেষ দুটি সুপার অ্যাডমিন)।
+   ৪) পেইজের ছবি ও ছোট আইকনে (data-jk-img) ক্লিক: নতুন ছবি দেওয়া, শুরুর ছবিতে ফেরা, লুকানো/দেখানো (শেষ দুটি সুপার অ্যাডমিন)।
    ৫) ছোট হেডিংয়ের বক্সে (data-jk-box) থাকা লেখায় ক্লিক: লেখার বাক্সে "বক্সের রং" সারি (শুধু সুপার অ্যাডমিন)।
    ===================================================================================================== */
 (function () {
@@ -412,7 +412,7 @@
             });
     }
 
-    /* ---- ৪. সেকশনের আইকনের বাক্স ---- */
+    /* ---- ৪. পেইজের ছবি ও আইকনের বাক্স ---- */
     var iconPanel = null;
     var iconCurrent = null;
 
@@ -420,19 +420,20 @@
         iconPanel = document.createElement("div");
         iconPanel.className = "jk-live-panel jk-live-panel--icon";
         iconPanel.setAttribute("role", "dialog");
-        iconPanel.setAttribute("aria-label", "আইকন বদলান");
+        iconPanel.setAttribute("aria-label", "ছবি বদলান");
         iconPanel.innerHTML =
             '<p class="jk-live-panel__title"></p>' +
             '<div class="jk-live-icon">' +
             '<figure><img class="jk-live-icon__now" alt=""><figcaption>এখন</figcaption></figure>' +
-            '<figure><img class="jk-live-icon__orig" alt=""><figcaption>শুরুর আইকন</figcaption></figure>' +
+            '<figure><img class="jk-live-icon__orig" alt=""><figcaption>শুরুর ছবি</figcaption></figure>' +
             "</div>" +
-            '<p class="jk-live-panel__hint jk-live-icon__rule">নতুন ছবি: JPG, PNG বা WebP (সর্বোচ্চ ২ MB)। স্বচ্ছ পটভূমির PNG সবচেয়ে ভালো মানায়; ছবি আইকনের জায়গার মাপেই দেখাবে।</p>' +
-            '<p class="jk-live-icon__pick"><input type="file" class="jk-live-icon__file" accept="image/jpeg,image/png,image/webp" aria-label="নতুন আইকনের ছবি"></p>' +
+            '<p class="jk-live-panel__hint jk-live-icon__size"></p>' +
+            '<p class="jk-live-panel__hint jk-live-icon__rule">নতুন ছবি: JPG, PNG বা WebP (সর্বোচ্চ ২ MB)। আইকন ও লোগোতে স্বচ্ছ পটভূমির PNG সবচেয়ে ভালো মানায়। ছবি এই জায়গার মাপেই দেখাবে; এখনকার ছবির মতো একই অনুপাতের (চওড়া:উঁচু) ছবি দিলে নকশা ঠিক থাকে।</p>' +
+            '<p class="jk-live-icon__pick"><input type="file" class="jk-live-icon__file" accept="image/jpeg,image/png,image/webp" aria-label="নতুন ছবি"></p>' +
             '<p class="jk-live-panel__msg" role="status"></p>' +
             '<div class="jk-live-panel__row">' +
             '<button type="button" class="jk-live-panel__save" data-icon-act="upload">নতুন ছবি বসান</button>' +
-            '<button type="button" data-icon-act="reset">শুরুর আইকনে ফিরুন</button>' +
+            '<button type="button" data-icon-act="reset">শুরুর ছবিতে ফিরুন</button>' +
             '<button type="button" data-icon-act="hide">লুকান</button>' +
             '<button type="button" data-icon-act="show">দেখান</button>' +
             '<button type="button" class="jk-live-icon__cancel">বাতিল</button>' +
@@ -453,8 +454,8 @@
     }
 
     function openIcon(el) {
-        var slot = el.getAttribute("data-jk-icon");
-        var info = (data.icons || {})[slot];
+        var slot = el.getAttribute("data-jk-img");
+        var info = (data.images || {})[slot];
         if (!info) {
             return;
         }
@@ -477,6 +478,12 @@
         iconPanel.querySelector('[data-icon-act="upload"]').hidden = hidden;
         iconPanel.querySelector(".jk-live-icon__pick").hidden = hidden;
         iconPanel.querySelector(".jk-live-icon__rule").hidden = hidden;
+        var sizeNote = iconPanel.querySelector(".jk-live-icon__size");
+        // আসল মাপ (ছবি লোড না হয়ে থাকলে ঘরের width/height, যা একই অনুপাতের)
+        var w = el.naturalWidth || parseInt(el.getAttribute("width"), 10) || 0;
+        var h = el.naturalHeight || parseInt(el.getAttribute("height"), 10) || 0;
+        sizeNote.textContent = w && h ? "এখনকার ছবির মাপ: " + w + " × " + h + " পিক্সেল (চওড়া × উঁচু)।" : "";
+        sizeNote.hidden = hidden || !w || !h;
         place(iconPanel, el);
     }
 
@@ -508,7 +515,7 @@
             body.append("file", file);
         }
         msg.textContent = "সংরক্ষণ হচ্ছে…";
-        fetch(data.iconSave, { method: "POST", body: body, credentials: "same-origin" })
+        fetch(data.imageSave, { method: "POST", body: body, credentials: "same-origin" })
             .then(function (res) {
                 return res.json();
             })
@@ -541,7 +548,7 @@
         if ((panel && panel.contains(e.target)) || (iconPanel && iconPanel.contains(e.target))) {
             return;
         }
-        var ic = e.target.closest("[data-jk-icon]");
+        var ic = e.target.closest("[data-jk-img]");
         if (ic) {
             e.preventDefault();
             e.stopPropagation();

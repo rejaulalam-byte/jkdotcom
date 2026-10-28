@@ -18,7 +18,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
         <div class="contact-cards">
             <?php // ১. ঠিকানা ?>
             <article class="contact-card">
-                <img src="<?= e(asset('img/site/contact-address.svg')) ?>" alt="" width="81" height="81">
+                <?= site_image('contact.icon.address', ['width' => 81, 'height' => 81]) ?>
                 <p class="contact-card__text">
                     <?= t('site.address_1') ?><br>
                     <?= t('site.address_2') ?><br>
@@ -29,7 +29,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
 
             <?php // ২. ফোন ও অফিস-সময় ?>
             <article class="contact-card">
-                <img src="<?= e(asset('img/site/contact-phone.svg')) ?>" alt="" width="81" height="81">
+                <?= site_image('contact.icon.phone', ['width' => 81, 'height' => 81]) ?>
                 <p class="contact-card__text"><?= t('contact.mobile') ?> <a href="<?= e(tel(content('site.phone_top'))) ?>"><?= t('site.phone_top') ?></a></p>
                 <p class="contact-card__text"><?= t('contact.hotline') ?> <a class="contact-card__strong" href="<?= e(tel(content('site.hotline'))) ?>"><?= t('site.hotline') ?></a></p>
                 <p class="contact-card__note"><strong><?= t('contact.open') ?></strong><br><?= t('contact.open_time') ?></p>
@@ -37,14 +37,14 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
 
             <?php // ৩. ইমেইল ?>
             <article class="contact-card">
-                <img src="<?= e(asset('img/site/contact-email.svg')) ?>" alt="" width="81" height="81">
+                <?= site_image('contact.icon.email', ['width' => 81, 'height' => 81]) ?>
                 <p class="contact-card__text"><?= t('contact.communication') ?><br><a class="contact-card__strong" href="mailto:<?= e(content('site.email')) ?>"><?= t('site.email') ?></a></p>
                 <p class="contact-card__text"><?= t('contact.registration') ?><br><a class="contact-card__strong" href="mailto:<?= e(content('site.email_registration')) ?>"><?= t('site.email_registration') ?></a></p>
             </article>
 
             <?php // ৪. ওয়েবসাইট ও অবস্থান ?>
             <article class="contact-card">
-                <img src="<?= e(asset('img/site/contact-web.svg')) ?>" alt="" width="81" height="81">
+                <?= site_image('contact.icon.web', ['width' => 81, 'height' => 81]) ?>
                 <p class="contact-card__text"><?= t('contact.web') ?> <a class="contact-card__strong" href="/"><?= t('site.website') ?></a></p>
                 <p class="contact-card__text"><?= t('contact.location') ?>
                     <a href="https://www.google.com/maps?q=<?= e(rawurlencode(str_replace(' ', '', content('site.coordinates')))) ?>" target="_blank" rel="noopener noreferrer"><?= t('site.coordinates') ?></a>
@@ -59,7 +59,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
         <h2 class="ceo__title" id="ceo-title"><?= t('contact.ceo.heading') ?></h2>
         <figure class="ceo">
             <div class="ceo__photo">
-                <img src="<?= e(asset('img/site/ceo.png')) ?>" alt="<?= e(content('contact.ceo.alt')) ?>" width="512" height="620" loading="lazy">
+                <?= site_image('contact.ceo', ['alt' => content('contact.ceo.alt'), 'width' => 512, 'height' => 620, 'loading' => 'lazy']) ?>
             </div>
             <figcaption>
                 <strong class="ceo__name"><?= t('contact.ceo.name') ?></strong>
@@ -79,7 +79,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
             <?php // মানচিত্র: OpenStreetMap-এর ছবি (লাইসেন্সের শর্তে নিচে কৃতজ্ঞতা-লিংক); ক্লিকে গুগল ম্যাপ খোলে ?>
             <div class="contact-map">
                 <a href="https://www.google.com/maps?q=<?= e(rawurlencode(str_replace(' ', '', content('site.coordinates')))) ?>" target="_blank" rel="noopener noreferrer">
-                    <img src="<?= e(asset('img/site/map-contact.jpg')) ?>" alt="<?= e(content('home.map.alt')) ?>" width="1005" height="1280" loading="lazy">
+                    <?= site_image('contact.map', ['alt' => content('home.map.alt'), 'width' => 1005, 'height' => 1280, 'loading' => 'lazy']) ?>
                 </a>
                 <a class="contact-map__credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>
             </div>

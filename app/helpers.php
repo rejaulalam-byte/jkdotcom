@@ -310,23 +310,45 @@ function clean_input(mixed $value, int $max, bool $multiline = false): string
 }
 
 /**
- * সেকশনের ছোট হেডিংয়ের আইকন (App\Models\SiteIcons): অ্যাডমিনের দেওয়া ছবি বা সাইটের সঙ্গে আসা ছবি;
- * লুকানো থাকলে কিছুই না। লাইভ পেইজ এডিটের ফ্রেমে লুকানোটাও ঝাপসা করে দেখায়, যাতে আবার "দেখান" চাপা যায়।
+ * পেইজের বদলানো-যায় এমন ছবি (App\Models\SiteImages): অ্যাডমিনের দেওয়া ছবি বা সাইটের সঙ্গে আসা ছবি;
+ * লুকানো থাকলে কিছুই না। $attrs: class, alt, width, height, loading ইত্যাদি (সব escape হয়)।
+ * অ্যাডমিনের দেওয়া ছবিতে width/height তার আসল মাপে বদলায় (অনুপাত ঠিক থাকে)।
+ * লাইভ পেইজ এডিটের ফ্রেমে লুকানোটাও ঝাপসা করে দেখায়, যাতে আবার "দেখান" চাপা যায়।
+ *
+ * @param array<string,string|int> $attrs
  */
-function section_icon(string $slot, int $width, int $height): string
+function site_image(string $slot, array $attrs = []): string
 {
-    $state = \App\Models\SiteIcons::state($slot);
+    $state = \App\Models\SiteImages::state($slot);
     $live = live_preview();
     if ($state === 'hidden' && !$live) {
         return '';
     }
-    $extra = '';
+    [$w, $h] = \App\Models\SiteImages::customSize($slot);
+    if ($w > 0 && $h > 0) {
+        $attrs['width'] = $w;
+        $attrs['height'] = $h;
+    }
+    $attrs = ['src' => \App\Models\SiteImages::src($slot)] + $attrs + ['alt' => ''];
     if ($live) {
-        \App\Core\LiveEdit::icon($slot);
-        $extra = ' data-jk-icon="' . e($slot) . '"' . ($state === 'hidden' ? ' class="is-jk-hidden"' : '');
+        \App\Core\LiveEdit::image($slot);
+        $attrs['data-jk-img'] = $slot;
+        if ($state === 'hidden') {
+            $attrs['class'] = trim((string) ($attrs['class'] ?? '') . ' is-jk-hidden');
+        }
+    }
+    $html = '<img';
+    foreach ($attrs as $name => $value) {
+        $html .= ' ' . $name . '="' . e((string) $value) . '"';
     }
 
-    return '<img src="' . e(\App\Models\SiteIcons::src($slot)) . '" alt="" width="' . $width . '" height="' . $height . '"' . $extra . '>';
+    return $html . '>';
+}
+
+/** সেকশনের ছোট হেডিংয়ের আইকন (site_image()-এর ছোট রূপ)। */
+function section_icon(string $slot, int $width, int $height): string
+{
+    return site_image($slot, ['width' => $width, 'height' => $height]);
 }
 
 /**

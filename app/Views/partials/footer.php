@@ -8,7 +8,7 @@ $feedbackToken = Security::csrfToken();
         <?php // head = গ্রিডের সারি ১, body = সারি ২: লিংকের কলাম ও সোশ্যাল বাক্স (এরাও সারি ২) ঠিকানার লাইন থেকে শুরু ?>
         <div class="footer__brand">
             <a class="footer__brand-head" href="#top" aria-label="পেজের উপরে যান">
-            <span class="emblem emblem--footer"><img src="<?= e(asset('img/site/logo-figma.png')) ?>" alt="" width="596" height="541" loading="lazy"></span>
+            <span class="emblem emblem--footer"><?= site_image('site.logo_footer', ['width' => 596, 'height' => 541, 'loading' => 'lazy']) ?></span>
             <div class="footer__brand-text">
                 <p class="footer__name"><span><?= t('site.brand') ?></span><?= t('site.brand_suffix') ?></p>
                 <p class="footer__tagline"><?= t('site.tagline') ?></p>

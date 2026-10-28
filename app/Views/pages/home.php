@@ -129,7 +129,7 @@ $faqKeys = [1, 2, 3, 4, 5];
             <p><?= t('home.about.text') ?></p>
             <p><a class="btn btn--teal-soft" href="/about"><?= t('home.about.button') ?></a></p>
         </div>
-        <img class="about__map" src="<?= e(asset('img/site/bangladesh-map.png')) ?>" alt="<?= e(content('home.about.map_alt')) ?>" width="400" height="510" loading="lazy">
+        <?= site_image('home.about.map', ['class' => 'about__map', 'alt' => content('home.about.map_alt'), 'width' => 400, 'height' => 510, 'loading' => 'lazy']) ?>
     </div>
 </section>
 
@@ -177,6 +177,6 @@ $faqKeys = [1, 2, 3, 4, 5];
 <!-- 7. LOCATION MAP ---------------------------------------------------- -->
 <section class="map" aria-label="<?= e(content('home.map.alt')) ?>">
     <a href="https://www.google.com/maps?q=<?= e(rawurlencode(str_replace(' ', '', content('site.coordinates')))) ?>" target="_blank" rel="noopener noreferrer">
-        <img src="<?= e(asset('img/site/map-location.png')) ?>" alt="<?= e(content('home.map.alt')) ?>" width="1221" height="580" loading="lazy">
+        <?= site_image('home.map', ['alt' => content('home.map.alt'), 'width' => 1221, 'height' => 580, 'loading' => 'lazy']) ?>
     </a>
 </section>

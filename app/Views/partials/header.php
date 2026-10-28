@@ -22,7 +22,7 @@ $registrationPaths = ['/login', '/welcome'];
     <div class="container header__inner">
         <a class="brand" href="/" aria-label="Jorurikaj.com — হোম পেজ">
             <?php // মেনুর লোগো = নাম ও ট্যাগলাইনসহ একটাই ছবি; ফুটারের নিজের লোগো আছে ?>
-            <img class="brand__logo" src="<?= e(asset('img/site/logo-header.png')) ?>" alt="Jorurikaj.com — <?= e(content('site.tagline')) ?>" width="760" height="272">
+            <?= site_image('site.logo', ['class' => 'brand__logo', 'alt' => 'Jorurikaj.com — ' . content('site.tagline'), 'width' => 760, 'height' => 272]) ?>
         </a>
 
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
