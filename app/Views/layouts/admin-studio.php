@@ -17,14 +17,14 @@ $ok = $ok ?? null;
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title><?= e((string) ($title ?? 'সাইটের লেখা')) ?> — অ্যাডমিন প্যানেল</title>
+    <title><?= e((string) ($title ?? 'লাইভ পেইজ এডিট')) ?> — অ্যাডমিন প্যানেল</title>
     <link rel="icon" type="image/png" href="<?= e(asset('img/site/logo-figma.png')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/admin.css')) ?>">
     <script src="<?= e(asset('js/admin.js')) ?>" defer></script>
 </head>
 <body class="adm-studio">
     <header class="adm-studio__bar">
-        <p class="adm-studio__name"><?= e((string) ($title ?? 'সাইটের লেখা')) ?></p>
+        <p class="adm-studio__name"><?= e((string) ($title ?? 'লাইভ পেইজ এডিট')) ?></p>
         <a class="adm-studio__exit" href="<?= e(admin_base()) ?>">বাহির হোন</a>
     </header>
     <div class="adm-studio__body">

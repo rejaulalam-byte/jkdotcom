@@ -63,7 +63,7 @@ final class StudioController
         header('Cache-Control: no-store');
         View::render('admin/studio', [
             'admin' => $admin,
-            'title' => 'সাইটের লেখা',
+            'title' => 'লাইভ পেইজ এডিট',
             'tree' => PageMap::tree(),
             'node' => $node,
             'q' => $q,
