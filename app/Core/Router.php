@@ -52,7 +52,7 @@ final class Router
         if ($pathExists) {
             http_response_code(405);
             header('Allow: GET, POST');
-            View::render('pages/error', ['title' => 'অনুমোদিত নয়', 'code' => 405]);
+            View::render('pages/error', ['title' => msg('msg.forbidden'), 'code' => 405]);
             return;
         }
 
@@ -78,6 +78,6 @@ final class Router
     private static function notFound(): void
     {
         http_response_code(404);
-        View::render('pages/error', ['title' => 'পেজটি পাওয়া যায়নি', 'code' => 404]);
+        View::render('pages/error', ['title' => msg('msg.not_found'), 'code' => 404]);
     }
 }

@@ -115,17 +115,17 @@ final class TodayController
         $name = $this->clean($_POST['name'] ?? '', 100);
         $phone = normalize_phone($this->clean($_POST['phone'] ?? '', 20));
         if ($name === '' || mb_strlen($name) < 2) {
-            $reply(['error' => 'invalid', 'message' => 'আপনার নাম লিখুন।'], 422);
+            $reply(['error' => 'invalid', 'message' => msg('msg.name')], 422);
 
             return;
         }
         if (!preg_match('/^01[3-9][0-9]{8}$/', $phone)) {
-            $reply(['error' => 'invalid', 'message' => 'মোবাইল নাম্বারটি সঠিক নয়। ১১ সংখ্যার নাম্বার দিন, যেমন 01712345678।'], 422);
+            $reply(['error' => 'invalid', 'message' => msg('msg.phone_bad')], 422);
 
             return;
         }
         if (!ContactTrackingRepository::lead('job', $id, $kind, $name, $phone)) {
-            $reply(['error' => 'save', 'message' => 'দুঃখিত, এখন সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।'], 500);
+            $reply(['error' => 'save', 'message' => msg('msg.save_failed_short')], 500);
 
             return;
         }
@@ -173,7 +173,7 @@ final class TodayController
     public function postStore(array $meta = []): void
     {
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
-            $this->fail(['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+            $this->fail([msg('msg.csrf')]);
         }
 
         // লুকানো "website" ঘর: আসল মানুষ ফাঁকা রাখে, স্প্যাম-বট ভরে ফেলে
@@ -182,7 +182,7 @@ final class TodayController
         }
 
         if (RateLimiter::tooMany('job_post', 5, 3600)) {
-            $this->fail(['অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
+            $this->fail([msg('msg.rate')]);
         }
 
         $data = [
@@ -224,7 +224,7 @@ final class TodayController
         $data['consent_at'] = date('Y-m-d H:i:s');
         $jobId = JobPostRepository::create($data);
         if ($jobId === null) {
-            $this->fail(['দুঃখিত, তথ্যগুলো সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।'], $data);
+            $this->fail([msg('msg.save_failed')], $data);
         }
         CustomFields::saveValues('post', $jobId, $custom);
 
@@ -262,50 +262,50 @@ final class TodayController
     {
         $errors = [];
         if ($d['title'] === '') {
-            $errors[] = 'কাজের ধরন বাছাই করুন, অথবা নিজে লিখুন।';
+            $errors[] = msg('today.post.msg.kind');
         }
         if ($d['contact_name'] === '') {
-            $errors[] = 'আপনার নাম লিখুন।';
+            $errors[] = msg('msg.name');
         }
         if ($d['contact_gender'] === '' && !FormFields::hidden('post', 'gender')) {
-            $errors[] = 'জেন্ডার বাছাই করুন।';
+            $errors[] = msg('msg.gender');
         }
         if ($d['phone'] === '') {
-            $errors[] = 'মোবাইল নাম্বার লিখুন।';
+            $errors[] = msg('msg.phone_empty');
         } elseif (!preg_match('/^01[3-9][0-9]{8}$/', $d['phone'])) {
-            $errors[] = 'মোবাইল নাম্বারটি সঠিক নয়। ১১ সংখ্যার নাম্বার দিন, যেমন 01712345678।';
+            $errors[] = msg('msg.phone_bad');
         }
         if ($d['email'] !== '' && !filter_var($d['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'ইমেইল ঠিকানাটি সঠিক নয়।';
+            $errors[] = msg('msg.email_bad');
         }
         if ($d['address'] === '' && !FormFields::hidden('post', 'address')) {
-            $errors[] = 'কাজের ঠিকানা লিখুন।';
+            $errors[] = msg('today.post.msg.address');
         }
         if ($d['division_id'] === 0 || $d['district_id'] === 0 || $d['upazila_id'] === 0) {
-            $errors[] = 'বিভাগ, জেলা এবং উপজেলা / থানা নির্বাচন করুন।';
+            $errors[] = msg('msg.area');
         } elseif (!GeoRepository::isConsistent($d['division_id'], $d['district_id'], $d['upazila_id'])) {
-            $errors[] = 'নির্বাচিত বিভাগ, জেলা ও উপজেলা / থানা একে অপরের সঙ্গে মিলছে না। আবার নির্বাচন করুন।';
+            $errors[] = msg('msg.area_mismatch');
         }
 
         $today = date('Y-m-d');
         $start = $this->validDate($d['start_date']);
         if ($d['start_date'] === '') {
-            $errors[] = 'প্রচারের তারিখ দিন।';
+            $errors[] = msg('today.post.msg.date_empty');
         } elseif ($start === null) {
-            $errors[] = 'প্রচারের তারিখটি সঠিক নয়।';
+            $errors[] = msg('today.post.msg.date_bad');
         } elseif ($start < $today) {
-            $errors[] = 'প্রচারের তারিখ আজকের বা পরের কোনো দিন হতে হবে।';
+            $errors[] = msg('today.post.msg.date_past');
         }
         if ($d['end_date'] !== '') {
             $end = $this->validDate($d['end_date']);
             if ($end === null) {
-                $errors[] = 'প্রচার বন্ধের তারিখটি সঠিক নয়।';
+                $errors[] = msg('today.post.msg.end_bad');
             } elseif ($start !== null && $end < $start) {
-                $errors[] = 'প্রচার বন্ধের তারিখ প্রচারের তারিখের আগে হতে পারে না।';
+                $errors[] = msg('today.post.msg.end_before');
             }
         }
         if (mb_strlen($d['details']) < 10) {
-            $errors[] = 'কাজ সম্পর্কে বিস্তারিত লিখুন (কমপক্ষে ১০ অক্ষর)।';
+            $errors[] = msg('today.post.msg.details');
         }
         if (!$d['consent']) {
             $errors[] = content('consent.error');

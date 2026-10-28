@@ -29,7 +29,7 @@ final class PasswordResetController
 
         $email = mb_strtolower(trim((string) ($_POST['email'] ?? '')));
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 150) {
-            $this->reply(['error' => 'email', 'message' => 'ইমেইল ঠিকানাটি সঠিক নয়। সঠিক ইমেইল লিখুন।'], 422);
+            $this->reply(['error' => 'email', 'message' => msg('msg.email_bad_hint')], 422);
         }
 
         // একই ইমেইলে দুই পাশে অ্যাকাউন্ট থাকতে পারে; পপ-আপ যে পেইজ থেকে খুলেছে সেই পাশেরটার পাসওয়ার্ড বদলায়
@@ -62,17 +62,17 @@ final class PasswordResetController
         $pr = $_SESSION['pr'] ?? null;
         if (!is_array($pr) || (int) $pr['exp'] < time()) {
             unset($_SESSION['pr']);
-            $this->reply(['error' => 'expired', 'message' => 'কোডের মেয়াদ শেষ হয়ে গেছে। আবার ইমেইল দিয়ে নতুন কোড নিন।'], 422);
+            $this->reply(['error' => 'expired', 'message' => msg('forgot.msg.expired')], 422);
         }
         if ((int) $pr['tries'] >= self::MAX_TRIES) {
             unset($_SESSION['pr']);
-            $this->reply(['error' => 'tries', 'message' => 'অনেকবার ভুল কোড দেওয়া হয়েছে। আবার ইমেইল দিয়ে নতুন কোড নিন।'], 429);
+            $this->reply(['error' => 'tries', 'message' => msg('forgot.msg.too_many')], 429);
         }
         $_SESSION['pr']['tries'] = (int) $pr['tries'] + 1;
 
         $code = preg_replace('/\D/', '', (string) ($_POST['code'] ?? '')) ?? '';
         if ((int) $pr['uid'] === 0 || !hash_equals((string) $pr['hash'], hash('sha256', $pr['salt'] . $code))) {
-            $this->reply(['error' => 'code', 'message' => 'কোডটি সঠিক নয়। ইমেইলে পাঠানো ৬ সংখ্যার কোডটি আবার লিখুন।'], 422);
+            $this->reply(['error' => 'code', 'message' => msg('forgot.msg.wrong_code')], 422);
         }
 
         $_SESSION['pr_ok'] = ['uid' => (int) $pr['uid'], 'exp' => time() + self::CODE_TTL];
@@ -88,7 +88,7 @@ final class PasswordResetController
         $ok = $_SESSION['pr_ok'] ?? null;
         if (!is_array($ok) || (int) $ok['exp'] < time()) {
             unset($_SESSION['pr_ok']);
-            $this->reply(['error' => 'expired', 'message' => 'সময় শেষ হয়ে গেছে। আবার শুরু থেকে চেষ্টা করুন।'], 422);
+            $this->reply(['error' => 'expired', 'message' => msg('forgot.msg.timeout')], 422);
         }
 
         $new = (string) ($_POST['password'] ?? '');
@@ -96,17 +96,17 @@ final class PasswordResetController
         $user = UserRepository::findById((int) $ok['uid']);
         // bcrypt ৭২ বাইটের পরের অংশ উপেক্ষা করে, তাই বেশি লম্বা পাসওয়ার্ড আটকানো হয়
         $error = match (true) {
-            mb_strlen($new) < self::MIN_PASSWORD => 'পাসওয়ার্ড অবশ্যই ৮ (আট) অক্ষর বা তার বেশি হতে হবে।',
-            strlen($new) > 72 => 'পাসওয়ার্ড সর্বোচ্চ ৭২ বাইট (প্রায় ৭০ ইংরেজি অক্ষর) হতে পারে।',
-            $user !== null && $new === (string) $user['phone'] => 'মোবাইল নাম্বারকে পাসওয়ার্ড হিসেবে ব্যবহার করবেন না।',
-            $new !== $confirm => 'দুইবার লেখা পাসওয়ার্ড একই নয়।',
+            mb_strlen($new) < self::MIN_PASSWORD => msg('msg.password_short'),
+            strlen($new) > 72 => msg('msg.password_long'),
+            $user !== null && $new === (string) $user['phone'] => msg('msg.password_is_phone'),
+            $new !== $confirm => msg('msg.password_match'),
             default => null,
         };
         if ($error !== null) {
             $this->reply(['error' => 'password', 'message' => $error], 422);
         }
         if ($user === null || !UserRepository::changePassword((int) $user['id'], password_hash($new, PASSWORD_DEFAULT))) {
-            $this->reply(['error' => 'save', 'message' => 'দুঃখিত, পাসওয়ার্ড সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।'], 500);
+            $this->reply(['error' => 'save', 'message' => msg('msg.password_save_failed')], 500);
         }
 
         unset($_SESSION['pr_ok']);
@@ -117,10 +117,10 @@ final class PasswordResetController
     private function guard(string $bucket, int $perHour): void
     {
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
-            $this->reply(['error' => 'csrf', 'message' => 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।'], 403);
+            $this->reply(['error' => 'csrf', 'message' => msg('msg.csrf')], 403);
         }
         if (RateLimiter::tooMany($bucket, $perHour, 3600)) {
-            $this->reply(['error' => 'limit', 'message' => 'অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পরে আবার চেষ্টা করুন।'], 429);
+            $this->reply(['error' => 'limit', 'message' => msg('msg.rate')], 429);
         }
     }
 

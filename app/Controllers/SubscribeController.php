@@ -24,7 +24,7 @@ final class SubscribeController
 
         $email = mb_substr(trim((string) ($_POST['email'] ?? '')), 0, 150);
         if (!$ok || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            Session::flash('feedback_errors', ['ইমেইল ঠিকানাটি সঠিক নয়, অথবা কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
+            Session::flash('feedback_errors', [msg('subscribe.msg.bad')]);
             redirect($back);
         }
 
@@ -38,7 +38,7 @@ final class SubscribeController
             }
         }
 
-        Session::flash('feedback_ok', 'ধন্যবাদ! আপনার ইমেইল ঠিকানাটি যুক্ত হয়েছে।');
+        Session::flash('feedback_ok', msg('subscribe.msg.done'));
         redirect($back);
     }
 }

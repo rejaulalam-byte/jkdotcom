@@ -21,6 +21,7 @@ return [
         ['ফুটার', ['footer.*']],
         ['লগইনের পর ছবির মেনু', ['nav.*']],
         ['সব ফর্মে একই', ['gender.*', 'geo.*', 'input.bn.*', 'form.msg.*', 'consent.error']],
+        ['সার্ভারের বার্তা (সব ফর্মে একই; মতামত ও ফুটারের ইমেইল-ঘরও)', ['msg.*', 'feedback.msg.*', 'subscribe.msg.*']],
     ]],
     ['id' => 'home', 'title' => 'হোম', 'url' => '/', 'parts' => [
         ['হিরো (একদম ওপরের বড় অংশ)', ['home.hero.*']],
@@ -62,7 +63,7 @@ return [
         ['id' => 'reg-agent', 'title' => 'প্রতিনিধি নির্দেশিকা', 'url' => '/registration/agent', 'open' => 'registration-agent', 'parts' => []],
         ['id' => 'form-worker', 'title' => 'পেশাজীবীদের রেজিস্ট্রেশন ফর্ম', 'url' => '/registration/professional/form', 'parts' => [
             ['ব্যানার ও শিরোনাম', ['regform.worker.*']],
-            ['ঘরের নাম (দুই ফর্মে একই)', ['regform.f.*', 'regform.service.*', 'regform.password_note', 'regform.wd.*', 'regform.es.*']],
+            ['ঘরের নাম (দুই ফর্মে একই)', ['regform.f.*', 'regform.service.*', 'regform.password_note', 'regform.wd.*', 'regform.es.*', 'regform.msg.*']],
             ['ছবির ঘর', ['regform.photo.*']],
             ['সম্মতি ও জমা', ['consent.worker.*', 'regform.submit']],
         ]],

@@ -39,7 +39,7 @@ final class ServiceController
         $service = ServiceRepository::findBySlug((string) ($meta['slug'] ?? ''));
         if ($service === null) {
             http_response_code(404);
-            View::render('pages/error', ['title' => 'পেজটি পাওয়া যায়নি', 'code' => 404]);
+            View::render('pages/error', ['title' => msg('msg.not_found'), 'code' => 404]);
             return;
         }
 

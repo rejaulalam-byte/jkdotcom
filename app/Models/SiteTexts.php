@@ -16,7 +16,7 @@ final class SiteTexts
     private const SKIP = '/^(settings\.|page\.|popup\.|home\.ads\.show$)/';
 
     /** বার্তা-ধরনের কী: সফলতা/ভুলের বার্তা, পপ-আপ, আগ্রহীর পপ-আপ, ফাঁকা-তালিকার লেখা (পেইজের শেষে আলাদা অংশে দেখায়)। */
-    private const MESSAGE = '/(\.done(\.|_|$)|^form\.msg\.|\.lead\.|^consent\.error$|\.empty$|\.none$|^worker\.rate\.(thanks|invalid|limit|error)$'
+    private const MESSAGE = '/(\.done(\.|_|$)|(^|\.)msg\.|\.lead\.|^consent\.error$|\.empty$|\.none$|^worker\.rate\.(thanks|invalid|limit|error)$'
         . '|^(login\.unlocked|password\.changed|setup\.done|setup\.missing|profile\.done|forgot\.(ok|done_title|done_1|done_2))$)/';
 
     /** কী-র শেষ অংশ => ঘরের সহজ নাম (না মিললে নাম ছাড়া শুধু শুরুর লেখা দেখায়)। */

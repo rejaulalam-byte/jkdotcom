@@ -40,13 +40,13 @@ final class AccountSetupController
         $user = $this->member();
 
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
-            $this->fail(['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+            $this->fail([msg('msg.csrf')]);
         }
         if (trim((string) ($_POST['website'] ?? '')) !== '') {
             redirect('/account/setup');
         }
         if (RateLimiter::tooMany('setup_' . $user['id'], 20, 3600)) {
-            $this->fail(['অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
+            $this->fail([msg('msg.rate')]);
         }
 
         $new = (string) ($_POST['password'] ?? '');
@@ -68,13 +68,13 @@ final class AccountSetupController
         $errors = [];
         // bcrypt ৭২ বাইটের পরের অংশ উপেক্ষা করে, তাই বেশি লম্বা পাসওয়ার্ড আটকানো হয়
         if (mb_strlen($new) < 8) {
-            $errors[] = 'নতুন পাসওয়ার্ড অবশ্যই ৮ (আট) অক্ষর বা তার বেশি হতে হবে।';
+            $errors[] = msg('msg.new_password_short');
         } elseif (strlen($new) > 72) {
-            $errors[] = 'নতুন পাসওয়ার্ড সর্বোচ্চ ৭২ বাইট (প্রায় ৭০ ইংরেজি অক্ষর) হতে পারে।';
+            $errors[] = msg('msg.new_password_long');
         } elseif ($new === (string) $user['phone'] || ($needsPhone && $new === $data['phone'])) {
-            $errors[] = 'মোবাইল নাম্বারকে পাসওয়ার্ড হিসেবে ব্যবহার করবেন না।';
+            $errors[] = msg('msg.password_is_phone');
         } elseif ($new !== $confirm) {
-            $errors[] = 'দুইবার লেখা নতুন পাসওয়ার্ড একই নয়।';
+            $errors[] = msg('msg.new_password_match');
         }
         if ($data['gender'] === '') {
             $errors[] = '"' . content('setup.f.gender') . '" ' . $missing;
@@ -82,12 +82,12 @@ final class AccountSetupController
         if ($data['email'] === '') {
             $errors[] = '"' . content('setup.f.email') . '" ' . $missing;
         } elseif (filter_var($data['email'], FILTER_VALIDATE_EMAIL) === false) {
-            $errors[] = 'ইমেইল ঠিকানাটি সঠিক নয়। সঠিক ইমেইল লিখুন।';
+            $errors[] = msg('msg.email_bad_hint');
         }
         if ($needsPhone && $data['phone'] === '') {
             $errors[] = '"' . content('setup.f.phone') . '" ' . $missing;
         } elseif ($needsPhone && preg_match('/^01[3-9][0-9]{8}$/', $data['phone']) !== 1) {
-            $errors[] = 'মোবাইল নাম্বার ১১ সংখ্যার হতে হবে, যেমন 01712345678।';
+            $errors[] = msg('setup.msg.phone');
         }
         if (mb_strlen($data['address']) < 2) {
             $errors[] = '"' . content('setup.f.address') . '" ' . $missing;
@@ -99,7 +99,7 @@ final class AccountSetupController
         }
         if ($data['upazila_id'] > 0 && $data['district_id'] > 0 && $data['division_id'] > 0
             && !GeoRepository::isConsistent($data['division_id'], $data['district_id'], $data['upazila_id'])) {
-            $errors[] = 'উপজেলা/থানা, জেলা ও বিভাগ একটার সঙ্গে আরেকটা মেলেনি। আবার বাছাই করুন।';
+            $errors[] = msg('setup.msg.area_mismatch');
         }
         if (empty($_POST['consent'])) {
             $errors[] = content('consent.error');
@@ -111,9 +111,9 @@ final class AccountSetupController
         $result = UserRepository::completeSetup((int) $user['id'], $data + ['password_hash' => password_hash($new, PASSWORD_DEFAULT)]);
         if ($result !== 'ok') {
             $this->fail([[
-                'duplicate' => 'এই মোবাইল নাম্বারটি পূর্বেই এন্ট্রি করা হয়েছে। অনুগ্রহ করে অন্য কোন নাম্বার ব্যবহার করুন, অথবা সাহায্যের জন্য হেল্পলাইনে কল করুন।',
-                'duplicate_email' => 'এই ইমেইল ঠিকানাটি আগেই রেজিস্ট্রেশন করা আছে। অন্য কোন ইমেইল ব্যবহার করুন, অথবা সাহায্যের জন্য হেল্পলাইনে কল করুন।',
-            ][$result] ?? 'দুঃখিত, তথ্যগুলো সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।'], $data);
+                'duplicate' => msg('msg.duplicate_phone'),
+                'duplicate_email' => msg('msg.duplicate_email'),
+            ][$result] ?? msg('msg.save_failed')], $data);
         }
 
         Auth::login((int) $user['id']); // সেশন-id নতুন

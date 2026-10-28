@@ -103,11 +103,11 @@ final class GeoRepository
         }
         foreach ($list as $id) {
             if (!self::districtExists($id)) {
-                return ['ids' => [], 'all' => false, 'error' => 'কাজ করতে আগ্রহী জেলাটি সঠিক নয়। আবার নির্বাচন করুন।'];
+                return ['ids' => [], 'all' => false, 'error' => msg('msg.work_district_bad')];
             }
         }
         if (count($list) > self::MAX_WORK_DISTRICTS) {
-            return ['ids' => [], 'all' => false, 'error' => 'কাজ করতে আগ্রহী জেলা সর্বোচ্চ ' . bn(self::MAX_WORK_DISTRICTS) . 'টি বাছাই করা যাবে। বেশি জেলা হলে "সব জেলা" বাছুন।'];
+            return ['ids' => [], 'all' => false, 'error' => msg('msg.work_districts_max', ['max' => bn(self::MAX_WORK_DISTRICTS)])];
         }
 
         return ['ids' => array_values($list), 'all' => false, 'error' => null];

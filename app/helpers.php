@@ -57,6 +57,22 @@ function content(string $key, string $fallback = ''): string
     return live_preview() ? \App\Core\LiveEdit::mark($key, $value) : $value;
 }
 
+/**
+ * সার্ভারের বার্তা (ভুল/সফলতা), অ্যাডমিনে বদলানো যায় এমন কী থেকে; {max}-ধাঁচের জায়গা-ধারকে মান বসে।
+ * content()-এর মতো লাইভ-এডিটের চিহ্ন বসায় না, কারণ বার্তা সেশনে রেখে পরের পেইজে দেখানো হয়।
+ *
+ * @param array<string, string> $vars
+ */
+function msg(string $key, array $vars = []): string
+{
+    $text = Content::get($key);
+    foreach ($vars as $name => $value) {
+        $text = str_replace('{' . $name . '}', $value, $text);
+    }
+
+    return $text;
+}
+
 /** escape-করা লেখা, যেখানে {বন্ধনীর শব্দ} <strong>মোটা</strong> হয়। */
 function rich(string $text): string
 {

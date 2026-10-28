@@ -25,7 +25,7 @@ final class FeedbackController
         $back = in_array($_POST['return'] ?? '', self::RETURN_TO, true) ? (string) $_POST['return'] : '/#feedback';
 
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
-            Session::flash('feedback_errors', ['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+            Session::flash('feedback_errors', [msg('msg.csrf')]);
             redirect($back);
         }
 
@@ -35,7 +35,7 @@ final class FeedbackController
         }
 
         if (RateLimiter::tooMany('feedback', 5, 3600)) {
-            Session::flash('feedback_errors', ['অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
+            Session::flash('feedback_errors', [msg('msg.rate')]);
             redirect($back);
         }
 
@@ -50,23 +50,23 @@ final class FeedbackController
         // পাঁচটি ঘরই আবশ্যক
         $errors = [];
         if ($data['name'] === '') {
-            $errors[] = 'আপনার নাম লিখুন।';
+            $errors[] = msg('msg.name');
         }
         if ($data['email'] === '') {
-            $errors[] = 'ইমেইল ঠিকানা লিখুন।';
+            $errors[] = msg('msg.email_empty');
         } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'ইমেইল ঠিকানাটি সঠিক নয়।';
+            $errors[] = msg('msg.email_bad');
         }
         if ($data['phone'] === '') {
-            $errors[] = 'ফোন নাম্বার লিখুন।';
+            $errors[] = msg('feedback.msg.phone_empty');
         } elseif (!preg_match('/^[0-9+\-\s()০-৯]{6,20}$/u', $data['phone'])) {
-            $errors[] = 'ফোন নাম্বারটি সঠিক নয়।';
+            $errors[] = msg('feedback.msg.phone_bad');
         }
         if ($data['subject'] === '') {
-            $errors[] = 'বিষয় বস্তু লিখুন।';
+            $errors[] = msg('feedback.msg.subject');
         }
         if (mb_strlen($data['message']) < 5) {
-            $errors[] = 'আপনার পরামর্শ / মতামত লিখুন।';
+            $errors[] = msg('feedback.msg.message');
         }
 
         if ($errors !== []) {
@@ -76,7 +76,7 @@ final class FeedbackController
         }
 
         if (!FeedbackRepository::save($data)) {
-            Session::flash('feedback_errors', ['দুঃখিত, মতামতটি সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
+            Session::flash('feedback_errors', [msg('feedback.msg.save_failed')]);
             Session::flash('feedback_old', $data);
             redirect($back);
         }
@@ -91,7 +91,7 @@ final class FeedbackController
             Logger::error('Feedback e-mail could not be sent');
         }
 
-        Session::flash('feedback_ok', 'আপনার মতামত পাঠানো হয়েছে। ধন্যবাদ!');
+        Session::flash('feedback_ok', msg('feedback.msg.done'));
         redirect($back);
     }
 

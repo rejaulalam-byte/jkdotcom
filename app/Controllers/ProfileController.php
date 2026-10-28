@@ -78,13 +78,13 @@ final class ProfileController
             redirect('/account/setup');
         }
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
-            $this->fail(['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+            $this->fail([msg('msg.csrf')]);
         }
         if (trim((string) ($_POST['website'] ?? '')) !== '') {
             redirect('/profile');
         }
         if (RateLimiter::tooMany('profile_' . $user['id'], 30, 3600)) {
-            $this->fail(['অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
+            $this->fail([msg('msg.rate')]);
         }
 
         $isWorker = $user['role'] === 'worker';
@@ -130,8 +130,8 @@ final class ProfileController
         if ($result !== 'ok') {
             $this->discard($photo);
             $this->fail([$result === 'duplicate'
-                ? 'এই মোবাইল নাম্বারে অন্য একটি অ্যাকাউন্ট আছে। অন্য নাম্বার দিন, অথবা সাহায্যের জন্য হেল্পলাইনে কল করুন।'
-                : 'দুঃখিত, তথ্যগুলো সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।'], $data);
+                ? msg('profile.msg.duplicate_phone')
+                : msg('msg.save_failed')], $data);
         }
         if ($photo !== null) {
             $this->discard((string) ($user['photo'] ?? '') !== '' ? (string) $user['photo'] : null); // পুরনো ছবি আর লাগে না
@@ -150,38 +150,38 @@ final class ProfileController
     {
         $errors = [];
         if ($d['phone'] === '') {
-            $errors[] = 'মোবাইল নম্বর লিখুন।';
+            $errors[] = msg('msg.mobile_empty');
         } elseif (!preg_match('/^01[3-9][0-9]{8}$/', (string) $d['phone'])) {
-            $errors[] = 'মোবাইল নম্বরটি সঠিক নয়। ১১ সংখ্যার নম্বর দিন, যেমন 01712345678।';
+            $errors[] = msg('msg.mobile_bad');
         } elseif ($d['phone'] !== (string) $user['phone']) {
             // মোবাইল লগইন-আইডি: বদলাতে বর্তমান পাসওয়ার্ড লাগে (ভুল পাসওয়ার্ডের সীমা পাসওয়ার্ড-পরিবর্তনের মতোই)
             $bucket = 'pwchange_' . $user['id'];
             if (RateLimiter::blocked($bucket, 5, 900)) {
-                $errors[] = 'আপনি বর্তমান পাসওয়ার্ড ৫ বার ভুল লিখেছেন। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।';
+                $errors[] = msg('password.msg.locked');
             } elseif ($currentPassword === '' || !password_verify($currentPassword, (string) $user['password_hash'])) {
                 if ($currentPassword !== '') {
                     RateLimiter::hit($bucket, 900);
                 }
-                $errors[] = 'মোবাইল নাম্বার বদলাতে আপনার বর্তমান পাসওয়ার্ডটি সঠিকভাবে লিখুন।';
+                $errors[] = msg('profile.msg.password_needed');
             }
         }
         if ($d['address'] === '') {
-            $errors[] = 'বর্তমান ঠিকানা লিখুন।';
+            $errors[] = msg('msg.address');
         }
         if ($d['division_id'] === 0 || $d['district_id'] === 0 || $d['upazila_id'] === 0) {
-            $errors[] = 'বিভাগ, জেলা এবং উপজেলা / থানা নির্বাচন করুন।';
+            $errors[] = msg('msg.area');
         } elseif (!GeoRepository::isConsistent($d['division_id'], $d['district_id'], $d['upazila_id'])) {
-            $errors[] = 'নির্বাচিত বিভাগ, জেলা ও উপজেলা / থানা একে অপরের সঙ্গে মিলছে না। আবার নির্বাচন করুন।';
+            $errors[] = msg('msg.area_mismatch');
         }
         if ($isWorker) {
             if (mb_strlen((string) $d['service_name']) < 2) {
-                $errors[] = 'আপনার পেশা লিখুন বা তালিকা থেকে বাছাই করুন।';
+                $errors[] = msg('msg.service');
             }
             if ($d['experience_years'] !== null && ($d['experience_years'] < 0 || $d['experience_years'] > 70)) {
-                $errors[] = 'কাজের অভিজ্ঞতা ০ থেকে ৭০ বছরের মধ্যে লিখুন।';
+                $errors[] = msg('msg.experience');
             }
             if ($d['reference_1'] === '' || $d['reference_2'] === '') {
-                $errors[] = 'দুইজন রেফারেন্সের তথ্যই লিখুন।';
+                $errors[] = msg('profile.msg.references');
             }
             if ($d['work_error'] !== null) {
                 $errors[] = $d['work_error'];

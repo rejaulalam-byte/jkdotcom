@@ -75,11 +75,11 @@ final class ServiceRepository
         unset($list[(string) $mainSlug]);
         foreach ($list as $slug) {
             if (self::findBySlug($slug) === null) {
-                return ['slugs' => [], 'error' => 'আরও পেশার একটি নাম সঠিক নয়। আবার নির্বাচন করুন।'];
+                return ['slugs' => [], 'error' => msg('msg.extra_service_bad')];
             }
         }
         if (count($list) > self::MAX_EXTRA) {
-            return ['slugs' => [], 'error' => 'প্রধান পেশার বাইরে আরও সর্বোচ্চ ' . bn(self::MAX_EXTRA) . 'টি পেশা বাছাই করা যাবে।'];
+            return ['slugs' => [], 'error' => msg('msg.extra_services_max', ['max' => bn(self::MAX_EXTRA)])];
         }
 
         return ['slugs' => array_values($list), 'error' => null];

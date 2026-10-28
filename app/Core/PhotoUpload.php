@@ -37,45 +37,45 @@ final class PhotoUpload
             return [null, null];
         }
         if ($file['error'] === UPLOAD_ERR_INI_SIZE || $file['error'] === UPLOAD_ERR_FORM_SIZE) {
-            return [null, 'ছবির ফাইলটি অনেক বড়। কম সাইজের ছবি দিন।'];
+            return [null, msg('msg.photo_too_big')];
         }
         if ($file['error'] !== UPLOAD_ERR_OK || !is_uploaded_file((string) $file['tmp_name'])) {
-            return [null, 'ছবিটি আপলোড করা যায়নি। আবার চেষ্টা করুন।'];
+            return [null, msg('msg.photo_upload_failed')];
         }
         if ((int) $file['size'] > self::RAW_MAX_BYTES) {
-            return [null, 'ছবির ফাইলটি অনেক বড়। কম সাইজের ছবি দিন।'];
+            return [null, msg('msg.photo_too_big')];
         }
 
         $tmp = (string) $file['tmp_name'];
         $mime = (string) (new \finfo(FILEINFO_MIME_TYPE))->file($tmp);
         $info = @getimagesize($tmp);
         if (!isset(self::TYPES[$mime]) || $info === false || ($info['mime'] ?? '') !== $mime) {
-            return [null, 'ছবির ফরমেট অবশ্যই JPG or PNG or WebP হতে হবে।'];
+            return [null, msg('msg.photo_format')];
         }
         if ($info[0] < 100 || $info[1] < 100 || $info[0] > 12000 || $info[1] > 12000) {
-            return [null, 'ছবির মাপ ঠিক নয়। কমপক্ষে ১০০×১০০ পিক্সেলের একটি স্পষ্ট ছবি দিন।'];
+            return [null, msg('msg.photo_dimensions')];
         }
 
         $raw = file_get_contents($tmp);
         if ($raw === false) {
-            return [null, 'ছবিটি আপলোড করা যায়নি। আবার চেষ্টা করুন।'];
+            return [null, msg('msg.photo_upload_failed')];
         }
         [$bytes, $ext] = self::prepare($raw, $mime);
         if ($bytes === null) {
-            return [null, 'ছবির ফাইল সাইজ অবশ্যই 150 KB এর ভিতর থাকতে হবে।'];
+            return [null, msg('msg.photo_size')];
         }
 
         $dir = self::directory();
         if (!is_dir($dir) && !@mkdir($dir, 0700, true)) {
             Logger::error('Photo folder could not be created: ' . $dir);
 
-            return [null, 'ছবিটি সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।'];
+            return [null, msg('msg.photo_save_failed')];
         }
         $name = bin2hex(random_bytes(16)) . '.' . $ext;
         if (@file_put_contents($dir . '/' . $name, $bytes) === false) {
             Logger::error('Photo could not be written: ' . $dir . '/' . $name);
 
-            return [null, 'ছবিটি সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।'];
+            return [null, msg('msg.photo_save_failed')];
         }
 
         return [$name, null];

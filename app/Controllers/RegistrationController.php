@@ -55,14 +55,14 @@ final class RegistrationController
         $back = $role === 'agent' ? '/registration/agent/form' : '/registration/professional/form';
 
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
-            $this->fail($back, ['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+            $this->fail($back, [msg('msg.csrf')]);
         }
         // লুকানো "website" ঘর: আসল মানুষ ফাঁকা রাখে, স্প্যাম-বট ভরে ফেলে
         if (trim((string) ($_POST['website'] ?? '')) !== '') {
             redirect($back);
         }
         if (RateLimiter::tooMany('register', 5, 3600)) {
-            $this->fail($back, ['অনেকবার চেষ্টা করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
+            $this->fail($back, [msg('msg.rate')]);
         }
 
         $data = [
@@ -149,12 +149,12 @@ final class RegistrationController
         if ($result !== 'ok') {
             $this->discard($photo);
             $messages = [
-                'duplicate' => 'এই মোবাইল নাম্বারটি পূর্বেই এন্ট্রি করা হয়েছে। অনুগ্রহ করে অন্য কোন নাম্বার ব্যবহার করুন, অথবা সাহায্যের জন্য হেল্পলাইনে কল করুন।',
-                'duplicate_email' => 'এই ইমেইল ঠিকানাটি আগেই রেজিস্ট্রেশন করা আছে। অন্য কোন ইমেইল ব্যবহার করুন, অথবা সাহায্যের জন্য হেল্পলাইনে কল করুন।',
-                'duplicate_legacy' => 'এই মোবাইল নাম্বারে পুরনো jorurikaj.com-এর একজন পেশাজীবী নিবন্ধিত আছেন। আপনি সেই ব্যক্তি হলে নতুন করে রেজিস্ট্রেশন করতে হবে না; হেল্পলাইনে কল করুন, আমরা আপনার অ্যাকাউন্ট চালু করে দেব। অন্য কেউ হলে অন্য নাম্বার ব্যবহার করুন।',
-                'duplicate_email_legacy' => 'এই ইমেইল ঠিকানায় পুরনো jorurikaj.com-এর একজন পেশাজীবী নিবন্ধিত আছেন। আপনি সেই ব্যক্তি হলে নতুন করে রেজিস্ট্রেশন করতে হবে না; হেল্পলাইনে কল করুন, আমরা আপনার অ্যাকাউন্ট চালু করে দেব। অন্য কেউ হলে অন্য ইমেইল ব্যবহার করুন।',
+                'duplicate' => msg('msg.duplicate_phone'),
+                'duplicate_email' => msg('msg.duplicate_email'),
+                'duplicate_legacy' => msg('regform.msg.duplicate_legacy'),
+                'duplicate_email_legacy' => msg('regform.msg.duplicate_email_legacy'),
             ];
-            $this->fail($back, [$messages[$result] ?? 'দুঃখিত, তথ্যগুলো সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।'], $data);
+            $this->fail($back, [$messages[$result] ?? msg('msg.save_failed')], $data);
         }
 
         $member = UserRepository::findByPhone((string) $data['phone'], $role);
@@ -245,24 +245,24 @@ final class RegistrationController
     {
         $errors = [];
         if (mb_strlen((string) $d['name']) < 2) {
-            $errors[] = 'আপনার নাম লিখুন।';
+            $errors[] = msg('msg.name');
         }
         if ($d['role'] === 'worker') {
             if (mb_strlen((string) $d['service_name']) < 2) {
-                $errors[] = 'আপনার পেশা লিখুন বা তালিকা থেকে বাছাই করুন।';
+                $errors[] = msg('msg.service');
             }
             if ($d['experience_years'] !== null && ($d['experience_years'] < 0 || $d['experience_years'] > 70)) {
-                $errors[] = 'কাজের অভিজ্ঞতা ০ থেকে ৭০ বছরের মধ্যে লিখুন।';
+                $errors[] = msg('msg.experience');
             }
         } elseif (!FormFields::hidden('agent', 'nid') && !preg_match('/^([0-9]{10}|[0-9]{13}|[0-9]{17})$/', (string) $d['nid_number'])) {
-            $errors[] = 'জাতীয় পরিচয়পত্র নম্বর সঠিক নয়। ১০, ১৩ বা ১৭ সংখ্যার নম্বর দিন।';
+            $errors[] = msg('regform.msg.nid');
         }
         if ($d['gender'] === '' && !FormFields::hidden($d['role'], 'gender')) {
-            $errors[] = 'জেন্ডার বাছাই করুন।';
+            $errors[] = msg('msg.gender');
         }
         if ($d['role'] === 'worker') {
             if (($d['reference_1'] === '' || $d['reference_2'] === '') && !FormFields::hidden('worker', 'references')) {
-                $errors[] = 'দুইজন রেফারেন্সের নাম, পেশা, মোবাইল নাম্বার ও ঠিকানা লিখুন।';
+                $errors[] = msg('regform.msg.references');
             }
             if ($d['work_error'] !== null) {
                 $errors[] = $d['work_error'];
@@ -275,33 +275,33 @@ final class RegistrationController
             $errors[] = content('consent.error');
         }
         if ($d['email'] === '') {
-            $errors[] = 'ইমেইল ঠিকানা লিখুন।';
+            $errors[] = msg('msg.email_empty');
         } elseif (!filter_var($d['email'], FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'ইমেইল ঠিকানাটি সঠিক নয়।';
+            $errors[] = msg('msg.email_bad');
         }
         if ($d['phone'] === '') {
-            $errors[] = 'মোবাইল নম্বর লিখুন।';
+            $errors[] = msg('msg.mobile_empty');
         } elseif (!preg_match('/^01[3-9][0-9]{8}$/', (string) $d['phone'])) {
-            $errors[] = 'মোবাইল নম্বরটি সঠিক নয়। ১১ সংখ্যার নম্বর দিন, যেমন 01712345678।';
+            $errors[] = msg('msg.mobile_bad');
         }
         if ($d['address'] === '' && !FormFields::hidden($d['role'], 'address')) {
-            $errors[] = 'বর্তমান ঠিকানা লিখুন।';
+            $errors[] = msg('msg.address');
         }
         if ($d['division_id'] === 0 || $d['district_id'] === 0 || $d['upazila_id'] === 0) {
-            $errors[] = 'বিভাগ, জেলা এবং উপজেলা / থানা নির্বাচন করুন।';
+            $errors[] = msg('msg.area');
         } elseif (!GeoRepository::isConsistent($d['division_id'], $d['district_id'], $d['upazila_id'])) {
-            $errors[] = 'নির্বাচিত বিভাগ, জেলা ও উপজেলা / থানা একে অপরের সঙ্গে মিলছে না। আবার নির্বাচন করুন।';
+            $errors[] = msg('msg.area_mismatch');
         }
 
         // bcrypt ৭২ বাইটের পরের অংশ উপেক্ষা করে, তাই বেশি লম্বা পাসওয়ার্ড আটকানো হয়
         if (mb_strlen($password) < self::MIN_PASSWORD) {
-            $errors[] = 'লগইন পাসওয়ার্ড অবশ্যই ৮ (আট) অক্ষর বা তার বেশি হতে হবে।';
+            $errors[] = msg('regform.msg.password_short');
         } elseif (strlen($password) > 72) {
-            $errors[] = 'লগইন পাসওয়ার্ড সর্বোচ্চ ৭২ বাইট (প্রায় ৭০ ইংরেজি অক্ষর) হতে পারে।';
+            $errors[] = msg('regform.msg.password_long');
         } elseif ($password === (string) $d['phone']) {
-            $errors[] = 'মোবাইল নাম্বারকে পাসওয়ার্ড হিসেবে ব্যবহার করবেন না।';
+            $errors[] = msg('msg.password_is_phone');
         } elseif ($password !== $confirm) {
-            $errors[] = 'দুইবার লেখা পাসওয়ার্ড একই নয়।';
+            $errors[] = msg('msg.password_match');
         }
 
         return $errors;

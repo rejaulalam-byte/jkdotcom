@@ -58,7 +58,7 @@ final class AuthController
         $back = $role === 'agent' ? '/login/agent' : '/login';
 
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
-            $this->fail($back, ['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+            $this->fail($back, [msg('msg.csrf')]);
         }
         // লুকানো "website" ঘর: স্প্যাম-বট ভরে ফেলে
         if (trim((string) ($_POST['website'] ?? '')) !== '') {
@@ -66,7 +66,7 @@ final class AuthController
         }
         // সীমা শুধু ব্যর্থ লগইনে গোনা হয়: সঠিক লগইন কখনও আটকায় না
         if (RateLimiter::count('login', self::WINDOW) >= self::DEVICE_HARD_LIMIT) {
-            $this->fail($back, ['এই ডিভাইস থেকে অনেকবার ভুল চেষ্টা করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
+            $this->fail($back, [msg('login.msg.device_locked')]);
         }
 
         // লগইন আইডি = ইমেইল অথবা রেজিস্টার্ড মোবাইল নাম্বার (@ থাকলে ইমেইল)
@@ -76,14 +76,14 @@ final class AuthController
         $password = (string) ($_POST['password'] ?? '');
         $validId = $byEmail ? filter_var($id, FILTER_VALIDATE_EMAIL) !== false : preg_match('/^01[3-9][0-9]{8}$/', $id) === 1;
         if (!$validId || $password === '' || strlen($password) > 200) {
-            $this->fail($back, ['লগইন আইডি (ইমেইল বা রেজিস্টার্ড মোবাইল নাম্বার) ও পাসওয়ার্ড দিন।'], $id);
+            $this->fail($back, [msg('login.msg.empty')], $id);
         }
         // একই আইডিতে বারবার অনুমান ঠেকাতে আইডি-ভিত্তিক সীমা: ৫ ভুলে "নরম লক" (সঠিক পাসওয়ার্ড তখনও ঢুকতে দেয়,
         // কিন্তু বার্তা দেখায়), ১০ ভুলে "কড়া লক" (সঠিক পাসওয়ার্ডও ঢোকে না)
         $bucket = 'login_' . $role . '_' . $id;
         $fails = RateLimiter::count($bucket, self::WINDOW);
         if ($fails >= self::ID_HARD_LIMIT) {
-            $this->fail($back, ['আপনি ১০ বার ভুল চেষ্টা করেছেন। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।'], $id);
+            $this->fail($back, [msg('login.msg.hard_locked')], $id);
         }
 
         // একই ইমেইল/মোবাইলে দুই পাশেই অ্যাকাউন্ট থাকতে পারে, তাই এই পেইজের পাশেরটাই খোঁজা হয়
@@ -100,21 +100,21 @@ final class AuthController
             $other = $user === null ? $find($role === 'agent' ? 'worker' : 'agent') : null;
             if ($other !== null && password_verify($password, (string) $other['password_hash'])) {
                 $this->fail($back, [$role === 'agent'
-                    ? 'এই অ্যাকাউন্টটি পেশাজীবী কর্মীর। পেশাজীবীদের লগইন পেইজ ব্যবহার করুন।'
-                    : 'এই অ্যাকাউন্টটি প্রতিনিধির। প্রতিনিধিদের লগইন পেইজ ব্যবহার করুন।'], $id);
+                    ? msg('login.msg.worker_account')
+                    : msg('login.msg.agent_account')], $id);
             }
             RateLimiter::hit('login', self::WINDOW);
             RateLimiter::hit($bucket, self::WINDOW);
             $this->fail($back, [$fails + 1 >= self::ID_SOFT_LIMIT
-                ? 'আপনি ৫ বার ভুল চেষ্টা করেছেন। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।'
-                : 'লগইন আইডি বা পাসওয়ার্ড সঠিক নয়।'], $id);
+                ? msg('login.msg.soft_locked')
+                : msg('login.msg.wrong')], $id);
         }
         // পাসওয়ার্ড ঠিক আছে: এবার অ্যাকাউন্টের অবস্থা বলা নিরাপদ
         if ($user['status'] === 'pending') {
-            $this->fail($back, ['আপনার আবেদনটি এখনও অনুমোদনের অপেক্ষায় আছে। অনুমোদন হলে আপনি লগইন করতে পারবেন।'], $id);
+            $this->fail($back, [msg('login.msg.pending')], $id);
         }
         if ($user['status'] !== 'approved') {
-            $this->fail($back, ['আপনার অ্যাকাউন্টটি এখন সক্রিয় নেই। অনুগ্রহ করে হেল্পলাইনে যোগাযোগ করুন।'], $id);
+            $this->fail($back, [msg('login.msg.inactive')], $id);
         }
 
         // নরম লকে থাকা সদস্য সঠিক পাসওয়ার্ড দিলে ঢোকে; বার্তাটা প্রোফাইলে দেখানো হয়, গোনা শূন্য হয়
@@ -160,14 +160,14 @@ final class AuthController
         $back = '/account/password';
 
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
-            $this->failPassword(['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+            $this->failPassword([msg('msg.csrf')]);
         }
         if (trim((string) ($_POST['website'] ?? '')) !== '') {
             redirect($back);
         }
         // বর্তমান পাসওয়ার্ড অনুমানের চেষ্টা ঠেকাতে সদস্য-ভিত্তিক সীমা
         if (RateLimiter::blocked('pwchange_' . $user['id'], 5, 900)) {
-            $this->failPassword(['আপনি বর্তমান পাসওয়ার্ড ৫ বার ভুল লিখেছেন। অনুগ্রহ করে ১৫ মিনিট পরে আবার চেষ্টা করুন।']);
+            $this->failPassword([msg('password.msg.locked')]);
         }
 
         $current = (string) ($_POST['current_password'] ?? '');
@@ -177,26 +177,26 @@ final class AuthController
         $errors = [];
         if (!password_verify($current, (string) $user['password_hash'])) {
             RateLimiter::hit('pwchange_' . $user['id'], 900);
-            $errors[] = 'বর্তমান পাসওয়ার্ডটি সঠিক নয়।';
+            $errors[] = msg('password.msg.current_wrong');
         }
         // bcrypt ৭২ বাইটের পরের অংশ উপেক্ষা করে, তাই বেশি লম্বা পাসওয়ার্ড আটকানো হয়
         if (mb_strlen($new) < 8) {
-            $errors[] = 'নতুন পাসওয়ার্ড অবশ্যই ৮ (আট) অক্ষর বা তার বেশি হতে হবে।';
+            $errors[] = msg('msg.new_password_short');
         } elseif (strlen($new) > 72) {
-            $errors[] = 'নতুন পাসওয়ার্ড সর্বোচ্চ ৭২ বাইট (প্রায় ৭০ ইংরেজি অক্ষর) হতে পারে।';
+            $errors[] = msg('msg.new_password_long');
         } elseif ($new === $current) {
-            $errors[] = 'নতুন পাসওয়ার্ড বর্তমান পাসওয়ার্ডের চেয়ে আলাদা হতে হবে।';
+            $errors[] = msg('password.msg.same');
         } elseif ($new === (string) $user['phone']) {
-            $errors[] = 'মোবাইল নাম্বারকে পাসওয়ার্ড হিসেবে ব্যবহার করবেন না।';
+            $errors[] = msg('msg.password_is_phone');
         } elseif ($new !== $confirm) {
-            $errors[] = 'দুইবার লেখা নতুন পাসওয়ার্ড একই নয়।';
+            $errors[] = msg('msg.new_password_match');
         }
         if ($errors !== []) {
             $this->failPassword($errors);
         }
 
         if (!UserRepository::changePassword((int) $user['id'], password_hash($new, PASSWORD_DEFAULT))) {
-            $this->failPassword(['দুঃখিত, পাসওয়ার্ড সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন অথবা হেল্পলাইনে কল করুন।']);
+            $this->failPassword([msg('msg.password_save_failed')]);
         }
         Auth::login((int) $user['id']);
         Session::flash('password_changed', true);
@@ -268,7 +268,7 @@ final class AuthController
             }
         }
         http_response_code(404);
-        View::render('pages/error', ['title' => 'পেজটি পাওয়া যায়নি', 'code' => 404]);
+        View::render('pages/error', ['title' => msg('msg.not_found'), 'code' => 404]);
     }
 
     /** @param array<string,mixed> $meta */

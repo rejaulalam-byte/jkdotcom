@@ -34,7 +34,7 @@ final class WorkerController
         $user = UserRepository::findPublicWorker($id);
         if ($user === null) {
             http_response_code(404);
-            View::render('pages/error', ['title' => 'পেজটি পাওয়া যায়নি', 'code' => 404]);
+            View::render('pages/error', ['title' => msg('msg.not_found'), 'code' => 404]);
 
             return;
         }
@@ -156,17 +156,17 @@ final class WorkerController
         $name = clean_input($_POST['name'] ?? '', 100);
         $phone = normalize_phone(clean_input($_POST['phone'] ?? '', 20));
         if (mb_strlen($name) < 2) {
-            $this->reply(['error' => 'invalid', 'message' => 'আপনার নাম লিখুন।'], 422);
+            $this->reply(['error' => 'invalid', 'message' => msg('msg.name')], 422);
 
             return;
         }
         if (!preg_match('/^01[3-9][0-9]{8}$/', $phone)) {
-            $this->reply(['error' => 'invalid', 'message' => 'মোবাইল নাম্বারটি সঠিক নয়। ১১ সংখ্যার নাম্বার দিন, যেমন 01712345678।'], 422);
+            $this->reply(['error' => 'invalid', 'message' => msg('msg.phone_bad')], 422);
 
             return;
         }
         if (!ContactTrackingRepository::lead('worker', $id, $kind, $name, $phone)) {
-            $this->reply(['error' => 'save', 'message' => 'দুঃখিত, এখন সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।'], 500);
+            $this->reply(['error' => 'save', 'message' => msg('msg.save_failed_short')], 500);
 
             return;
         }
