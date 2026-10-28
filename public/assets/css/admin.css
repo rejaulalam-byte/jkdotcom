@@ -1329,3 +1329,32 @@ input.adm-short {
 .adm-rich-dialog__row .adm-small {
     margin-top: 0;
 }
+
+/* ---- সেবার তালিকা: আইকন হোমের কার্ডের মতো টিল বৃত্তে (সাদা আইকন দেখা যায়); বন্ধ সেবার সারি ফ্যাকাশে ---- */
+.adm-services__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--teal);
+}
+.adm-services__icon img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+.adm-services .is-off td {
+    opacity: 0.6;
+}
+.adm-services__order form {
+    display: flex;
+    gap: 4px;
+}
+.adm-services td form {
+    margin: 0;
+}
+.adm-services td .adm-small {
+    margin-top: 0;
+}

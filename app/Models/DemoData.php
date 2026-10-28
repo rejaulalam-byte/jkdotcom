@@ -63,21 +63,21 @@ final class DemoData
     }
 
     /**
-     * পুরনো সাইটের সব সেবা (database/seeds/services.php)।
-     * আইকন হলো ডিফল্ট ফাইল public/assets/img/service-icons/<slug>.svg, যদি থাকে।
+     * লোকাল প্রিভিউয়ের সেবা-তালিকা: ServiceAdmin-এর ফাইল (না থাকলে database/seeds/services.php-এর পুরনো সাইটের সব সেবা),
+     * শুধু চালুগুলো, অ্যাডমিনের ক্রমে। আইকন: অ্যাডমিনের দেওয়া ছবি বা public/assets/img/service-icons/<slug>.svg।
      *
      * @return list<array{name:string,slug:string,icon:?string}>
      */
     public static function services(): array
     {
-        /** @var list<array{0:int,1:string,2:string}> $rows */
-        $rows = require BASE_PATH . '/database/seeds/services.php';
+        $rows = array_values(array_filter(ServiceAdmin::demoRead(), static fn (array $r): bool => (bool) $r['is_active']));
+        usort($rows, static fn (array $x, array $y): int => [(int) $x['sort_order'], (int) $x['id']] <=> [(int) $y['sort_order'], (int) $y['id']]);
 
         return array_map(
             static fn (array $r): array => [
-                'name' => $r[1],
-                'slug' => $r[2],
-                'icon' => ServiceRepository::iconUrl('/assets/img/service-icons/' . $r[2] . '.svg'),
+                'name' => (string) $r['name'],
+                'slug' => (string) $r['slug'],
+                'icon' => ServiceRepository::iconUrl($r['icon_path'] !== null ? (string) $r['icon_path'] : null),
             ],
             $rows
         );

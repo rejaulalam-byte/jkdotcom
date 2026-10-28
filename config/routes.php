@@ -14,6 +14,7 @@ use App\Controllers\Admin\MemberEditController as AdminMemberEdit;
 use App\Controllers\Admin\StudioController as AdminStudio;
 use App\Controllers\Admin\MembersController as AdminMembers;
 use App\Controllers\Admin\PanelController as AdminPanel;
+use App\Controllers\Admin\ServicesController as AdminServices;
 use App\Controllers\AccountSetupController;
 use App\Controllers\AdImageController;
 use App\Controllers\PageImageController;
@@ -129,6 +130,8 @@ return [
     ['POST', admin_base() . '/ads/action',          [AdminAds::class, 'action']],
     ['POST', admin_base() . '/ads/show',            [AdminAds::class, 'show']],
     ['POST', admin_base() . '/ads/popup',           [AdminAds::class, 'popup']],
+    ['GET',  admin_base() . '/services',            [AdminServices::class, 'index']],
+    ['POST', admin_base() . '/services/action',     [AdminServices::class, 'action']],
     ['GET',  admin_base() . '/studio',              [AdminStudio::class, 'index']],
     ['POST', admin_base() . '/studio/save',         [AdminStudio::class, 'save']],
     ['POST', admin_base() . '/studio/image',        [AdminStudio::class, 'image']],

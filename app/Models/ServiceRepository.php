@@ -11,7 +11,7 @@ use Throwable;
 /** সেবার বিভাগ (ইলেকট্রিশিয়ান, প্লাম্বার ইত্যাদি)। */
 final class ServiceRepository
 {
-    /** সাইটের সঙ্গে আসা ডিফল্ট আইকন এখানে; অ্যাডমিনের আপলোড করা আইকন /uploads/services/-এ। */
+    /** সাইটের সঙ্গে আসা ডিফল্ট আইকন এখানে; অ্যাডমিনের আপলোড করা আইকন পেইজের ছবির মতো /page-image/<৩২ হেক্স> (ServiceAdmin)। */
     private const DEFAULT_ICON_DIR = '/assets/img/service-icons/';
 
     /**
@@ -114,7 +114,7 @@ final class ServiceRepository
 
     /**
      * services.icon_path-এ রাখা আইকনের ওয়েব ঠিকানা:
-     * "/assets/img/service-icons/x.svg" (ডিফল্ট সেট) বা আপলোড-করা ফাইলের নাম (অ্যাডমিন)।
+     * "/assets/img/service-icons/x.svg" (ডিফল্ট সেট) বা "/page-image/<৩২ হেক্স>" (অ্যাডমিনের আপলোড)।
      * ফাইল না থাকলে null দেয়, তখন কার্ডে ফাঁকা বৃত্ত দেখায়।
      */
     public static function iconUrl(?string $iconPath): ?string
@@ -131,7 +131,7 @@ final class ServiceRepository
             return asset('img/service-icons/' . $file);
         }
 
-        return '/uploads/services/' . basename($iconPath);
+        return preg_match('#^/page-image/[a-f0-9]{32}$#', $iconPath) === 1 ? $iconPath : null;
     }
 
     /**

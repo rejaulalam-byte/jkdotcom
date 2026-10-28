@@ -1179,6 +1179,111 @@ final class UserRepository
         }
     }
 
+    /**
+     * অনুমোদিত কর্মীর সংখ্যা প্রতিটি পেশায় (প্রধান পেশা ও "আরও পেশা" দুটোই গোনা): slug => সংখ্যা।
+     *
+     * @return array<string,int>
+     */
+    public static function workerCountsByService(): array
+    {
+        $pdo = Database::connection();
+        $counts = [];
+        if ($pdo === null) {
+            foreach (self::demoRead() as $r) {
+                if (($r['role'] ?? '') === 'worker' && ($r['status'] ?? '') === 'approved') {
+                    foreach (array_unique(array_filter(array_merge([(string) ($r['service_slug'] ?? '')], (array) ($r['extra_services'] ?? [])))) as $slug) {
+                        $counts[$slug] = ($counts[$slug] ?? 0) + 1;
+                    }
+                }
+            }
+
+            return $counts;
+        }
+        try {
+            $rows = $pdo->query(
+                "SELECT slug, COUNT(DISTINCT uid) AS n FROM (
+                    SELECT service_slug AS slug, id AS uid FROM users WHERE role = 'worker' AND status = 'approved' AND service_slug IS NOT NULL
+                    UNION ALL
+                    SELECT ws.service_slug, ws.user_id FROM worker_services ws JOIN users u ON u.id = ws.user_id WHERE u.role = 'worker' AND u.status = 'approved'
+                 ) t GROUP BY slug"
+            )->fetchAll();
+            foreach ($rows as $r) {
+                $counts[(string) $r['slug']] = (int) $r['n'];
+            }
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::workerCountsByService failed: ' . $e->getMessage());
+        }
+
+        return $counts;
+    }
+
+    /**
+     * কর্মীদের নিজের লেখা পেশা (তালিকায় ছিল না, service_custom), একই লেখা এক সারিতে।
+     * মোছার পথে থাকা (সংরক্ষিত/ডাস্টবিন) সদস্য বাদ।
+     *
+     * @return list<array{text:string,members:list<array{id:int,name:string,status:string}>}>
+     */
+    public static function customProfessions(): array
+    {
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = array_values(array_filter(self::demoRead(), static fn (array $r): bool => ($r['role'] ?? '') === 'worker'
+                && (string) ($r['service_custom'] ?? '') !== '' && !in_array($r['status'] ?? '', ['reserved', 'trashed'], true)));
+        } else {
+            try {
+                $rows = $pdo->query(
+                    "SELECT id, name, status, service_custom FROM users
+                     WHERE role = 'worker' AND service_custom IS NOT NULL AND service_custom <> '' AND status NOT IN ('reserved', 'trashed')
+                     ORDER BY service_custom, id"
+                )->fetchAll();
+            } catch (Throwable $e) {
+                Logger::error('UserRepository::customProfessions failed: ' . $e->getMessage());
+
+                return [];
+            }
+        }
+        $groups = [];
+        foreach ($rows as $r) {
+            $text = trim((string) $r['service_custom']);
+            $groups[$text][] = ['id' => (int) $r['id'], 'name' => (string) $r['name'], 'status' => (string) $r['status']];
+        }
+
+        return array_map(static fn (string $text, array $members): array => ['text' => $text, 'members' => $members], array_keys($groups), array_values($groups));
+    }
+
+    /**
+     * নিজের লেখা একটা পেশার সব কর্মীকে তালিকার একটা সেবায় বসায় (service_slug), service_custom মুছে।
+     * ফেরত: কতজন বদলাল।
+     */
+    public static function assignCustomProfession(string $text, string $slug): int
+    {
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $rows = self::demoRead();
+            $n = 0;
+            foreach ($rows as &$r) {
+                if (($r['role'] ?? '') === 'worker' && trim((string) ($r['service_custom'] ?? '')) === $text) {
+                    $r['service_slug'] = $slug;
+                    $r['service_custom'] = null;
+                    $n++;
+                }
+            }
+            unset($r);
+
+            return self::demoWrite($rows) ? $n : 0;
+        }
+        try {
+            $stmt = $pdo->prepare("UPDATE users SET service_slug = :slug, service_custom = NULL WHERE role = 'worker' AND TRIM(service_custom) = :text");
+            $stmt->execute([':slug' => $slug, ':text' => $text]);
+
+            return $stmt->rowCount();
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::assignCustomProfession failed: ' . $e->getMessage());
+
+            return 0;
+        }
+    }
+
     /** @return list<array<string,mixed>> */
     private static function demoRead(): array
     {
