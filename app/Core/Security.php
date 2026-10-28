@@ -7,6 +7,9 @@ namespace App\Core;
 /** নিরাপত্তা-হেডার, CSRF সুরক্ষা ও ছোট ছোট নিরাপত্তা-সহায়ক। */
 final class Security
 {
+    /** "লাইভ পেইজ এডিট": এই অনুরোধের পেইজ নিজের সাইটের ফ্রেমে (অ্যাডমিনের পর্দায়) দেখানো যাবে কি না। */
+    private static bool $selfFrame = false;
+
     public static function isHttps(): bool
     {
         return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
@@ -20,7 +23,7 @@ final class Security
         }
         header_remove('X-Powered-By');
         header('X-Content-Type-Options: nosniff');
-        header('X-Frame-Options: DENY');
+        header('X-Frame-Options: ' . (self::$selfFrame ? 'SAMEORIGIN' : 'DENY'));
         header('Referrer-Policy: strict-origin-when-cross-origin');
         header('Cross-Origin-Opener-Policy: same-origin');
         header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()');
@@ -46,7 +49,26 @@ final class Security
         $style = $editor ? "'self' 'unsafe-inline'" : ($styleHashes === [] ? "'self'" : "'self' 'unsafe-hashes' " . implode(' ', $styleHashes));
         header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src {$style}; "
             . 'img-src \'self\' data:' . ($editor ? ' blob:' : '') . "; font-src 'self'; connect-src 'self'; object-src 'none'; "
-            . "base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
+            . "base-uri 'self'; form-action 'self'; frame-ancestors " . (self::$selfFrame ? "'self'" : "'none'"));
+    }
+
+    /**
+     * লগইন-করা অ্যাডমিনের "লাইভ পেইজ এডিট" (?live=1): পেইজটা শুধু নিজের সাইটের ফ্রেমে খুলতে দেয়।
+     * অন্য সব দর্শকের জন্য ফ্রেমে খোলা আগের মতোই বন্ধ (ক্লিকজ্যাকিং ঠেকাতে)।
+     */
+    public static function allowSelfFrame(): void
+    {
+        self::$selfFrame = true;
+        if (!headers_sent()) {
+            header('X-Frame-Options: SAMEORIGIN');
+            header('Cache-Control: no-store');
+            self::sendCsp();
+        }
+    }
+
+    public static function isLivePreview(): bool
+    {
+        return self::$selfFrame;
     }
 
     public static function csrfToken(): string

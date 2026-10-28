@@ -12,13 +12,16 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminRepository;
+use App\Models\LivePages;
 use App\Models\OpenPages;
 use App\Models\PageMap;
 use App\Models\SiteTexts;
 
 /**
- * "সাইটের লেখা" (/admin/studio): মূল অ্যাডমিন মেনু ছাড়া নিজস্ব পুরো পর্দা। বাঁয়ে সাইটের পেইজের তালিকা (PageMap),
- * ডানে বাছা পেইজের সব লেখা পেইজের ক্রমে, খোলা পেইজে পূর্ণ এডিটরসহ। সব এক ফর্মে সংরক্ষণ। অনুমতি: "pages"।
+ * "লাইভ পেইজ এডিট" (/admin/studio): মূল অ্যাডমিন মেনু ছাড়া নিজস্ব পুরো পর্দা। ওপরে "সকল পেইজ", সাইটের মেনুর প্রতিটি
+ * আইটেম ও "অন্যান্য"-এর ড্রপডাউন (LivePages); নিচে বাছা পেইজটা সাইটে যেমন দেখায় তেমন (ফ্রেমে, ?live=1)।
+ * "লেখার তালিকা" (view=list): বাঁয়ে পেইজের তালিকা (PageMap), ডানে বাছা পেইজের সব লেখা পেইজের ক্রমে,
+ * খোলা পেইজে পূর্ণ এডিটরসহ; সব এক ফর্মে সংরক্ষণ। অনুমতি: "pages"।
  * ছোট লেখা সাইটে সাধারণ লেখা (escape করা); পূর্ণ লেখা RichText দিয়ে ছেঁকে সংরক্ষণ।
  */
 final class StudioController
@@ -58,6 +61,16 @@ final class StudioController
         }
 
         $open = isset($node['open']) && OpenPages::exists((string) $node['open']) ? (string) $node['open'] : null;
+
+        // ওপরের ড্রপডাউন ও বাছা পেইজ; ঠিকানা না-থাকা পেইজ (সদস্যের পেইজ ইত্যাদি) ও খোঁজার ফল তালিকায় দেখায়
+        $live = LivePages::menus();
+        $page = null;
+        foreach ($live['all'] as $candidate) {
+            if ($candidate['id'] === (string) $node['id']) {
+                $page = $candidate;
+            }
+        }
+        $listView = $q !== '' || ($_GET['view'] ?? '') === 'list' || $page === null || $page['url'] === null;
         // পূর্ণ এডিটর নিজের ভেতরে style ও blob: ছবি ব্যবহার করে; স্ক্রিপ্টের নিয়ম একই কড়া
         Security::sendCsp([], true);
         header('Cache-Control: no-store');
@@ -65,6 +78,9 @@ final class StudioController
             'admin' => $admin,
             'title' => 'লাইভ পেইজ এডিট',
             'tree' => PageMap::tree(),
+            'live' => $live,
+            'page' => $page,
+            'listView' => $listView,
             'node' => $node,
             'q' => $q,
             'parts' => $parts,

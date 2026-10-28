@@ -10,7 +10,7 @@ $pageTitle = isset($title) && $title !== '' ? $title : content('site.title');
 $pageDescription = $description ?? content('site.description');
 ?>
 <!doctype html>
-<html lang="bn">
+<html lang="bn"<?= live_preview() ? ' data-live="1"' : '' ?>>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -33,7 +33,7 @@ $pageDescription = $description ?? content('site.description');
 <?php require BASE_PATH . '/app/Views/partials/header.php'; ?>
 
 <main id="main">
-<?php require BASE_PATH . '/app/Views/partials/popup-ad.php'; ?>
+<?php if (!live_preview()) { require BASE_PATH . '/app/Views/partials/popup-ad.php'; } ?>
 <?= $content ?>
 </main>
 

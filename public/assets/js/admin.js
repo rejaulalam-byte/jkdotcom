@@ -140,3 +140,16 @@
     filter(district, division.value);
     filter(upazila, district.value);
 })();
+
+/* ---- "লাইভ পেইজ এডিট"-এর ড্রপডাউন: পেইজ বাছলেই খোলে (form[data-auto-submit]); JavaScript ছাড়া "দেখুন" বাটন থাকে ---- */
+(function () {
+    document.querySelectorAll("form[data-auto-submit]").forEach(function (form) {
+        var go = form.querySelector(".adm-live__go");
+        if (go) {
+            go.hidden = true;
+        }
+        form.querySelector("select").addEventListener("change", function () {
+            form.submit();
+        });
+    });
+})();

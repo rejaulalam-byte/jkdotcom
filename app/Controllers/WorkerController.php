@@ -44,7 +44,9 @@ final class WorkerController
         $mySlugs = array_merge([(string) ($user['service_slug'] ?? '')], $extraSlugs);
         $from = (string) ($_GET['s'] ?? '');
         $_SESSION['wk_service'][$id] = in_array($from, $mySlugs, true) ? $from : $mySlugs[0];
-        WorkerRotation::recordVisit($id);
+        if (!live_preview()) { // অ্যাডমিনের লাইভ দেখা দর্শকের হিসাবে গোনা হয় না
+            WorkerRotation::recordVisit($id);
+        }
 
         $service = ServiceRepository::findBySlug((string) ($user['service_slug'] ?? ''));
         $profession = (string) ($user['service_custom'] ?? '') !== '' ? (string) $user['service_custom'] : ($service['name'] ?? '');

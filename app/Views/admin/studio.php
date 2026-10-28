@@ -1,7 +1,8 @@
 <?php
 /**
- * "সাইটের লেখা": বাঁয়ে সাইটের পেইজের তালিকা (ভেতরের পেইজ একটু ভেতরে), ডানে বাছা পেইজের সব লেখা পেইজের ক্রমে
- * (খোলা পেইজে পূর্ণ এডিটরসহ), সবশেষে ওই পেইজের বার্তা। একটা "সংরক্ষণ করুন" সব জমা দেয়।
+ * "লাইভ পেইজ এডিট": ওপরে পেইজ বাছাইয়ের সারি (studio-bar.php)। সাধারণভাবে নিচে বাছা পেইজটা সাইটে যেমন দেখায় তেমন (ফ্রেমে)।
+ * "লেখার তালিকা"-য় ($listView): বাঁয়ে সাইটের পেইজের তালিকা (ভেতরের পেইজ একটু ভেতরে), ডানে বাছা পেইজের সব লেখা
+ * পেইজের ক্রমে (খোলা পেইজে পূর্ণ এডিটরসহ), সবশেষে ওই পেইজের বার্তা। একটা "সংরক্ষণ করুন" সব জমা দেয়।
  *
  * @var list<array<string,mixed>> $tree
  * @var array<string,mixed> $node
@@ -12,16 +13,19 @@
  * @var int $openAfter           পূর্ণ এডিটরের আগে কয়টি অংশ
  * @var string $openHtml
  * @var bool $openChanged
+ * @var array<string,mixed> $live      LivePages::menus()
+ * @var array<string,mixed>|null $page  বাছা পেইজ (id, title, url, note)
+ * @var bool $listView
  */
 $base = admin_base() . '/studio';
-$here = $base . '?' . http_build_query(array_filter(['p' => (string) $node['id'], 'q' => $q], static fn ($v): bool => $v !== ''));
+$here = $base . '?' . http_build_query(array_filter(['p' => (string) $node['id'], 'q' => $q, 'view' => $listView ? 'list' : ''], static fn ($v): bool => $v !== ''));
 
 // বাঁয়ের তালিকা (ভেতরের পেইজ একটু ভেতরে)
 $menu = static function (array $nodes, int $depth) use (&$menu, $base, $node, $q): string {
     $html = '';
     foreach ($nodes as $n) {
         $current = $q === '' && $n['id'] === $node['id'];
-        $html .= '<a class="adm-studio__page adm-studio__page--d' . $depth . '" href="' . e($base . '?p=' . $n['id']) . '"' . ($current ? ' aria-current="page"' : '') . '>'
+        $html .= '<a class="adm-studio__page adm-studio__page--d' . $depth . '" href="' . e($base . '?p=' . $n['id'] . '&view=list') . '"' . ($current ? ' aria-current="page"' : '') . '>'
             . e((string) $n['title']) . '</a>';
         $html .= $menu($n['children'] ?? [], $depth + 1);
     }
@@ -59,6 +63,20 @@ $fields = static function (array $list) use ($base): string {
     return $html;
 };
 ?>
+<?php require __DIR__ . '/studio-bar.php'; ?>
+
+<?php if (!$listView && $page !== null): ?>
+    <?php $frame = (string) $page['url'] . (str_contains((string) $page['url'], '?') ? '&' : '?') . 'live=1'; ?>
+    <section class="adm-live">
+        <div class="adm-live__head">
+            <h1><?= e((string) $page['title']) ?></h1>
+            <a class="adm-link" href="<?= e((string) $page['url']) ?>" target="_blank" rel="noopener">সাইটে নতুন ট্যাবে খুলুন</a>
+            <a class="adm-link" href="<?= e($base . '?p=' . $page['id'] . '&view=list') ?>">এই পেইজের লেখার তালিকা</a>
+        </div>
+        <p class="adm-live__note">পেইজটা এখন শুধু দেখার জন্য। ক্লিক করে সেখানেই লেখা বদলানোর সুবিধা পরের ধাপে আসছে; ততদিন "এই পেইজের লেখার তালিকা" থেকে বদলান।</p>
+        <iframe class="adm-live__frame" src="<?= e($frame) ?>" title="<?= e((string) $page['title']) ?> — সাইটে যেমন দেখায়" sandbox="allow-same-origin allow-scripts"></iframe>
+    </section>
+<?php else: ?>
 <div class="adm-studio__layout">
     <nav class="adm-studio__pages" aria-label="সাইটের পেইজ">
         <form class="adm-studio__search" action="<?= e($base) ?>" method="get">
@@ -70,10 +88,13 @@ $fields = static function (array $list) use ($base): string {
     <section class="adm-studio__main">
         <div class="adm-studio__head">
             <h1><?= e((string) $node['title']) ?></h1>
-            <?php if (!empty($node['url'])): ?>
-                <a class="adm-link" href="<?= e((string) $node['url']) ?>" target="_blank" rel="noopener">সাইটে এই পেইজটি দেখুন (নতুন ট্যাবে)</a>
+            <?php if ($page !== null && $page['url'] !== null && $q === ''): ?>
+                <a class="adm-link" href="<?= e($base . '?p=' . $page['id']) ?>">লাইভ পেইজে দেখুন</a>
             <?php endif; ?>
         </div>
+        <?php if ($page !== null && $page['note'] !== null && $q === ''): ?>
+            <p class="adm-muted"><?= e((string) $page['note']) ?> এর লেখা নিচে বদলান।</p>
+        <?php endif; ?>
 
         <?php if ($parts === [] && $open === null): ?>
             <p class="adm-muted">এই নামের নিচের পেইজগুলো বাঁয়ের তালিকা থেকে বাছুন।</p>
@@ -103,7 +124,8 @@ $fields = static function (array $list) use ($base): string {
         <?php endif; ?>
     </section>
 </div>
-<?php if ($open !== null): ?>
+<?php endif; ?>
+<?php if ($listView && $open !== null): ?>
     <script src="<?= e(asset('vendor/tinymce/tinymce.min.js')) ?>"></script>
     <script src="<?= e(asset('js/admin-editor.js')) ?>"></script>
 <?php endif; ?>

@@ -57,3 +57,12 @@ set_exception_handler(static function (Throwable $e) use ($isLocal): void {
 
 Security::sendHeaders();
 Session::start();
+
+// অ্যাডমিনের "লাইভ পেইজ এডিট": শুধু "pages" অনুমতির লগইন-করা অ্যাডমিনের জন্য পেইজটা নিজের সাইটের ফ্রেমে খোলা যায়
+if (($_GET['live'] ?? '') === '1') {
+    $liveAdmin = App\Core\AdminAuth::current();
+    if ($liveAdmin !== null && App\Core\AdminAuth::can($liveAdmin, 'pages')) {
+        Security::allowSelfFrame();
+    }
+    unset($liveAdmin);
+}

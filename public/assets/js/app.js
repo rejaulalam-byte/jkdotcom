@@ -1817,3 +1817,21 @@
     document.addEventListener("keydown", onKey);
     timer = window.setTimeout(close, (parseInt(box.getAttribute("data-seconds"), 10) || 20) * 1000);
 })();
+
+/* ---- অ্যাডমিনের "লাইভ পেইজ এডিট"-এর ফ্রেম (<html data-live="1">) -----------------------------
+   ফ্রেমের ভেতরে পেইজটা শুধু দেখার জন্য: লিংকে ক্লিক বা ফর্ম জমায় অন্য পেইজে যাওয়া বন্ধ
+   (অন্য পেইজ অ্যাডমিন পর্দার ওপরের ড্রপডাউন থেকে খোলা হয়)। ---- */
+(function () {
+    if (document.documentElement.getAttribute("data-live") !== "1") {
+        return;
+    }
+    document.addEventListener("click", function (e) {
+        var link = e.target.closest("a[href]");
+        if (link && !link.getAttribute("href").startsWith("#")) {
+            e.preventDefault();
+        }
+    }, true);
+    document.addEventListener("submit", function (e) {
+        e.preventDefault();
+    }, true);
+})();

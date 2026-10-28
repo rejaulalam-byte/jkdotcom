@@ -34,6 +34,12 @@ function admin_base(): string
 }
 
 /** public/assets-এর ভেতরের ফাইলের URL; ফাইল বদলালে ব্রাউজার যেন নতুনটা নেয় সেজন্য ভার্সন-সহ। */
+/** অ্যাডমিনের "লাইভ পেইজ এডিট"-এর ফ্রেমে খোলা পেইজ কি না (পপ-আপ বিজ্ঞাপন, দেখার হিসাব ইত্যাদি তখন বাদ)। */
+function live_preview(): bool
+{
+    return \App\Core\Security::isLivePreview();
+}
+
 function asset(string $path): string
 {
     $path = ltrim($path, '/');
