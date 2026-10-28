@@ -153,3 +153,26 @@
         });
     });
 })();
+
+/* ---- "লাইভ পেইজ এডিট": ফ্রেমের মূল লেখায় ক্লিক (live-edit.js পাঠায় {jk: "open-rich"}) = পূর্ণ এডিটরের বড় বাক্স।
+   প্রথমবার খোলার সময় এডিটর শুরু হয় (admin-editor.js, "jk:open-rich")। বন্ধ করার আগে না-সংরক্ষিত বদল থাকলে জিজ্ঞেস। ---- */
+(function () {
+    var dialog = document.getElementById("rich-dialog");
+    if (!dialog || typeof dialog.showModal !== "function") {
+        return;
+    }
+    window.addEventListener("message", function (e) {
+        if (e.origin !== window.location.origin || !e.data || e.data.jk !== "open-rich" || dialog.open) {
+            return;
+        }
+        dialog.showModal();
+        document.dispatchEvent(new CustomEvent("jk:open-rich"));
+    });
+    dialog.querySelector("[data-rich-close]").addEventListener("click", function () {
+        var editor = window.tinymce ? window.tinymce.get("rich-editor") : null;
+        if (editor && editor.isDirty() && !window.confirm("লেখার বদল সংরক্ষণ হয়নি। তবুও বন্ধ করবেন?")) {
+            return;
+        }
+        dialog.close();
+    });
+})();

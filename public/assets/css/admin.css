@@ -1304,3 +1304,28 @@ input.adm-short {
         flex: 1 1 140px;
     }
 }
+
+/* ---- "লাইভ পেইজ এডিট": পেইজের মূল লেখার পূর্ণ এডিটরের বড় বাক্স ---- */
+.adm-rich-dialog {
+    width: min(1400px, 96vw);
+    max-height: 94vh;
+    padding: 16px 20px;
+    border: 2px solid var(--teal);
+    border-radius: 10px;
+}
+.adm-rich-dialog::backdrop {
+    background: rgba(13, 68, 82, 0.55);
+}
+.adm-rich-dialog__row {
+    position: sticky;
+    bottom: -16px;
+    display: flex;
+    gap: 12px;
+    margin: 12px 0 0;
+    padding: 10px 0;
+    background: #fff;
+}
+.adm-rich-dialog__row .adm-btn,
+.adm-rich-dialog__row .adm-small {
+    margin-top: 0;
+}

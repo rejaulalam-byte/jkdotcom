@@ -6,6 +6,7 @@
    ৩) যে লেখায় সাজ চলে (সার্ভারের colored()/t()), বাক্সে বোল্ড/ইটালিক/আন্ডারলাইন/রঙের বাটন আর পেইজের মতো দেখতে একটা নমুনা।
    ৪) পেইজের ছবি ও ছোট আইকনে (data-jk-img) ক্লিক: নতুন ছবি দেওয়া, শুরুর ছবিতে ফেরা, লুকানো/দেখানো (শেষ দুটি সুপার অ্যাডমিন)।
    ৫) ছোট হেডিংয়ের বক্সে (data-jk-box) থাকা লেখায় ক্লিক: লেখার বাক্সে "বক্সের রং" সারি (শুধু সুপার অ্যাডমিন)।
+   ৬) খোলা পেইজের মূল লেখায় (data-jk-rich) ক্লিক: অ্যাডমিনের পর্দাকে জানানো হয়, সেখানে পূর্ণ এডিটরের বড় বাক্স খোলে।
    ===================================================================================================== */
 (function () {
     var dataEl = document.getElementById("jk-live-data");
@@ -138,6 +139,14 @@
 
     markTextNodes();
     markAttributes();
+
+    // খোলা পেইজের মূল লেখা: সার্ভারের লুকানো চিহ্ন (OpenPages::html) থেকে ঘরটা চেনা
+    document.querySelectorAll("span[data-jk-rich]").forEach(function (mark) {
+        if (mark.parentElement) {
+            mark.parentElement.setAttribute("data-jk-rich", mark.getAttribute("data-jk-rich"));
+        }
+        mark.remove();
+    });
 
     /* ---- ৩. বদলানোর বাক্স ---- */
     var panel = null;
@@ -556,6 +565,15 @@
             return;
         }
         var el = e.target.closest("[data-jk-key]");
+        var rich = e.target.closest("[data-jk-rich]");
+        if (rich && (!el || rich.contains(el))) {
+            e.preventDefault();
+            e.stopPropagation();
+            close();
+            closeIcon();
+            window.parent.postMessage({ jk: "open-rich" }, window.location.origin);
+            return;
+        }
         if (!el) {
             return;
         }

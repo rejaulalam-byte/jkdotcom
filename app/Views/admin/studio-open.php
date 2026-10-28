@@ -5,6 +5,7 @@
  * @var string $open
  * @var string $openHtml
  * @var bool $openChanged
+ * @var bool|null $lazyEditor  true = লাইভ পেইজ এডিটের বড় বাক্সে (বাক্স খোলার পরে এডিটর শুরু)
  */
 ?>
 <fieldset class="adm-part adm-part--open">
@@ -16,7 +17,7 @@
     </ul>
     <input type="hidden" name="open" value="<?= e($open) ?>">
     <label class="sr-only" for="rich-editor">পেইজের মূল লেখা</label>
-    <textarea id="rich-editor" name="html" rows="30"
+    <textarea id="rich-editor" name="html" rows="30"<?= !empty($lazyEditor) ? ' data-lazy' : '' ?>
               data-upload="<?= e(admin_base()) ?>/studio/image"
               data-content-css="<?= e(asset('css/editor-content.css')) ?>"><?= e($openHtml) ?></textarea>
     <?php if ($openChanged): ?>

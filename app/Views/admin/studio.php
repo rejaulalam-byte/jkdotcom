@@ -74,8 +74,29 @@ $fields = static function (array $list) use ($base): string {
             <a class="adm-link" href="<?= e($base . '?p=' . $page['id'] . '&view=list') ?>">এই পেইজের লেখার তালিকা</a>
         </div>
         <p class="adm-live__note">যে লেখার ওপর মাউস রাখলে কমলা দাগ আসে, সেটায় ক্লিক করুন: সেখানেই বাক্স খুলবে, বদলে "সংরক্ষণ করুন" চাপুন। লিংক ও বাটন এখানে কাজ করে না; অন্য পেইজ ওপরের ড্রপডাউন থেকে খুলুন।</p>
+        <?php if ($open !== null): ?>
+            <p class="adm-live__note">পেইজের মূল লেখার (বড় লেখা) যেকোনো জায়গায় ক্লিক করলে পূর্ণ এডিটর খুলবে।</p>
+        <?php endif; ?>
         <iframe class="adm-live__frame" src="<?= e($frame) ?>" title="<?= e((string) $page['title']) ?> — সাইটে যেমন দেখায়" sandbox="allow-same-origin allow-scripts"></iframe>
     </section>
+    <?php if ($open !== null): ?>
+        <?php // পেইজের মূল লেখার পূর্ণ এডিটর: ফ্রেমের লেখায় ক্লিক করলে admin.js বাক্সটা খোলে ?>
+        <dialog class="adm-rich-dialog" id="rich-dialog" aria-label="পেইজের মূল লেখা বদলান">
+            <form id="studio-form" class="adm-editor" action="<?= e($base) ?>/save" method="post">
+                <?= csrf_field() ?>
+                <input type="hidden" name="back" value="<?= e($here) ?>">
+                <?php $lazyEditor = true; require __DIR__ . '/studio-open.php'; ?>
+                <p class="adm-rich-dialog__row">
+                    <button class="adm-btn" type="submit">সংরক্ষণ করুন</button>
+                    <button class="adm-small" type="button" data-rich-close>বন্ধ করুন</button>
+                </p>
+            </form>
+            <form id="studio-reset" action="<?= e($base) ?>/save" method="post" data-confirm="পুরো লেখা শুরুর রূপে ফিরবে। ফেরাবেন?">
+                <?= csrf_field() ?>
+                <input type="hidden" name="back" value="<?= e($here) ?>">
+            </form>
+        </dialog>
+    <?php endif; ?>
 <?php else: ?>
 <div class="adm-studio__layout">
     <nav class="adm-studio__pages" aria-label="সাইটের পেইজ">
@@ -125,7 +146,7 @@ $fields = static function (array $list) use ($base): string {
     </section>
 </div>
 <?php endif; ?>
-<?php if ($listView && $open !== null): ?>
+<?php if ($open !== null): ?>
     <script src="<?= e(asset('vendor/tinymce/tinymce.min.js')) ?>"></script>
     <script src="<?= e(asset('js/admin-editor.js')) ?>"></script>
 <?php endif; ?>

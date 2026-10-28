@@ -227,3 +227,12 @@
 .jk-live-panel__box .jk-bsw--maroon { background: #6d1b2f; }
 .jk-live-panel__box .jk-bsw--white { background: #fff; }
 .jk-live-panel__box .jk-bsw--none { background: repeating-linear-gradient(45deg, #fff 0 4px, #d5e0e3 4px 8px); }
+
+/* খোলা পেইজের মূল লেখা: পুরো ঘর একসঙ্গে (ক্লিক = অ্যাডমিনের পর্দায় পূর্ণ এডিটর) */
+[data-jk-rich] {
+    cursor: pointer;
+}
+[data-jk-rich]:hover {
+    outline: 2px dashed #e08a1e;
+    outline-offset: 6px;
+}

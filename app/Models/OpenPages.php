@@ -38,7 +38,10 @@ final class OpenPages
     /** পাবলিক পেইজে দেখানোর নিরাপদ HTML। */
     public static function html(string $slug): string
     {
-        return RichText::show(self::raw($slug));
+        // লাইভ পেইজ এডিটের ফ্রেমে: ঘরটা চেনার লুকানো চিহ্ন (ক্লিক করলে পূর্ণ এডিটর খোলে)
+        $mark = live_preview() ? '<span data-jk-rich="' . e($slug) . '" hidden></span>' : '';
+
+        return $mark . RichText::show(self::raw($slug));
     }
 
     /** সাইটের সঙ্গে আসা শুরুর লেখা। */
