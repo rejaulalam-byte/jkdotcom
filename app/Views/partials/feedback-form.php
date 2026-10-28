@@ -10,7 +10,7 @@
  */
 ?>
 <form class="feedback<?= !empty($feedbackClass) ? ' ' . e($feedbackClass) : '' ?>" id="feedback" action="/feedback" method="post" novalidate>
-    <h3 class="feedback__title"><?= e(content('home.feedback.title')) ?></h3>
+    <h3 class="feedback__title"><?= t('home.feedback.title') ?></h3>
     <?php require BASE_PATH . '/app/Views/partials/bn-switch.php'; ?>
 
     <?php if ($feedbackOk): ?>
@@ -30,37 +30,37 @@
 
     <?php // প্রতিটি ঘর আবশ্যক: প্রতিটি ইঙ্গিত-লেখার শেষে "*" ?>
     <div class="field">
-        <label class="sr-only" for="fb-name"><?= e(content('home.feedback.name')) ?></label>
+        <label class="sr-only" for="fb-name"><?= t('home.feedback.name') ?></label>
         <input id="fb-name" data-bn type="text" name="name" maxlength="100" required autocomplete="name"
                placeholder="<?= e(content('home.feedback.name')) ?> *" value="<?= e($old['name'] ?? '') ?>">
     </div>
 
     <div class="field">
-        <label class="sr-only" for="fb-email"><?= e(content('home.feedback.email')) ?></label>
+        <label class="sr-only" for="fb-email"><?= t('home.feedback.email') ?></label>
         <input id="fb-email" type="email" name="email" maxlength="150" required autocomplete="email"
                placeholder="<?= e(content('home.feedback.email')) ?> *" value="<?= e($old['email'] ?? '') ?>">
     </div>
 
     <div class="field">
-        <label class="sr-only" for="fb-phone"><?= e(content('home.feedback.phone')) ?></label>
+        <label class="sr-only" for="fb-phone"><?= t('home.feedback.phone') ?></label>
         <input id="fb-phone" type="tel" name="phone" maxlength="20" required autocomplete="tel"
                placeholder="<?= e(content('home.feedback.phone')) ?> *" value="<?= e($old['phone'] ?? '') ?>">
     </div>
 
     <div class="field">
-        <label class="sr-only" for="fb-subject"><?= e(content('home.feedback.subject')) ?></label>
+        <label class="sr-only" for="fb-subject"><?= t('home.feedback.subject') ?></label>
         <input id="fb-subject" data-bn type="text" name="subject" maxlength="150" required
                placeholder="<?= e(content('home.feedback.subject')) ?> *" value="<?= e($old['subject'] ?? '') ?>">
     </div>
 
     <div class="field">
-        <label class="sr-only" for="fb-message"><?= e(content('home.feedback.message')) ?></label>
+        <label class="sr-only" for="fb-message"><?= t('home.feedback.message') ?></label>
         <textarea id="fb-message" data-bn name="message" rows="5" maxlength="2000" required
                   placeholder="<?= e(content('home.feedback.message')) ?> *"><?= e($old['message'] ?? '') ?></textarea>
     </div>
 
     <button class="btn btn--white" type="submit">
-        <span><?= e(content('home.feedback.submit')) ?></span>
+        <span><?= t('home.feedback.submit') ?></span>
         <img src="<?= e(asset('img/icons/paper-plane.svg')) ?>" alt="" width="30" height="29">
     </button>
 </form>

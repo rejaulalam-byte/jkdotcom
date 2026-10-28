@@ -3,6 +3,7 @@
    ১) সার্ভার প্রতিটি সম্পাদনাযোগ্য লেখার দুই পাশে অদৃশ্য চিহ্ন বসায় (App\Core\LiveEdit); এখানে সেগুলো খুঁজে
       লেখাটাকে (বা পুরো ঘরকে) data-jk-key চিহ্নিত করা হয়, তারপর চিহ্ন মুছে ফেলা হয় — পেইজ দেখতে হুবহু আগের মতো।
    ২) চিহ্নিত লেখায় ক্লিক করলে সেখানেই একটা বাক্স খোলে: লেখা বদলে "সংরক্ষণ করুন" চাপলে সঙ্গে সঙ্গে সাইটে বদলায়।
+   ৩) যে লেখায় সাজ চলে (সার্ভারের colored()/t()), বাক্সে বোল্ড/ইটালিক/আন্ডারলাইন/রঙের বাটন আর পেইজের মতো দেখতে একটা নমুনা।
    ===================================================================================================== */
 (function () {
     var dataEl = document.getElementById("jk-live-data");
@@ -148,7 +149,15 @@
         panel.innerHTML =
             '<p class="jk-live-panel__title"></p>' +
             '<p class="jk-live-panel__orig"></p>' +
+            '<div class="jk-live-panel__tools" role="toolbar" aria-label="লেখার সাজ">' +
+            '<button type="button" data-wrap="b" title="মোটা (বোল্ড)"><b>B</b></button>' +
+            '<button type="button" data-wrap="i" title="বাঁকা (ইটালিক)"><i>I</i></button>' +
+            '<button type="button" data-wrap="u" title="নিচে দাগ (আন্ডারলাইন)"><u>U</u></button>' +
+            '<span class="jk-live-panel__colors"></span>' +
+            '<button type="button" data-wrap="clear" title="বাছা অংশের (বা পুরো লেখার) সব সাজ মুছুন">সাজ মুছুন</button>' +
+            '</div>' +
             '<textarea class="jk-live-panel__text" rows="3" maxlength="3000"></textarea>' +
+            '<p class="jk-live-panel__preview" aria-label="নমুনা"></p>' +
             '<p class="jk-live-panel__hint"></p>' +
             '<p class="jk-live-panel__msg" role="status"></p>' +
             '<div class="jk-live-panel__row">' +
@@ -157,6 +166,23 @@
             '<button type="button" class="jk-live-panel__reset">শুরুর লেখায় ফিরুন</button>' +
             "</div>";
         document.body.appendChild(panel);
+        var colors = panel.querySelector(".jk-live-panel__colors");
+        (data.colors || []).forEach(function (name) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "jk-sw jk-sw--" + name;
+            b.setAttribute("data-wrap", "color:" + name);
+            b.title = (COLOR_NAMES[name] || name) + " রং";
+            b.setAttribute("aria-label", b.title);
+            colors.appendChild(b);
+        });
+        panel.querySelector(".jk-live-panel__tools").addEventListener("click", function (e) {
+            var b = e.target.closest("[data-wrap]");
+            if (b) {
+                wrap(b.getAttribute("data-wrap"));
+            }
+        });
+        panel.querySelector(".jk-live-panel__text").addEventListener("input", preview);
         panel.querySelector(".jk-live-panel__save").addEventListener("click", function () {
             send(false);
         });
@@ -194,11 +220,17 @@
             hint.push(p + " রেখে দিন (এখানে নাম/এলাকা বসে)");
         });
         if (t.markup) {
-            hint.push("রং: [[color:gold|শব্দ]] (gold, amber, white, red), মোটা: {শব্দ}");
+            hint.push("শব্দ বেছে ওপরের বাটন চাপুন; কিছু না বাছলে পুরো লেখায় বসে");
         }
         panel.querySelector(".jk-live-panel__hint").textContent = hint.join(" · ");
         panel.querySelector(".jk-live-panel__msg").textContent = "";
         panel.querySelector(".jk-live-panel__reset").hidden = !t.changed;
+        panel.querySelector(".jk-live-panel__tools").hidden = !t.markup;
+        var pv = panel.querySelector(".jk-live-panel__preview");
+        pv.hidden = !t.markup;
+        pv.style.color = getComputedStyle(el).color;
+        pv.style.backgroundColor = backgroundOf(el);
+        preview();
 
         // বাক্সটা লেখার ঠিক নিচে (জায়গা না থাকলে ওপরে), পর্দার ভেতরে
         panel.hidden = false;
@@ -210,6 +242,84 @@
         var h = panel.offsetHeight;
         panel.style.top = (below + h > window.innerHeight && r.top - h - 8 > 0 ? r.top - h - 8 : Math.min(below, window.innerHeight - h - 12)) + "px";
         area.focus();
+    }
+
+    var COLOR_NAMES = {
+        gold: "সোনালি", amber: "হলুদ-কমলা", white: "সাদা", red: "হালকা লাল", teal: "টিল",
+        orange: "কমলা", maroon: "মেরুন", darkred: "গাঢ় লাল", brown: "বাদামি", black: "কালো"
+    };
+
+    // বাছা অংশে (কিছু বাছা না থাকলে পুরো লেখায়) সাজের চিহ্ন বসানো: {মোটা}, [[i|…]], [[u|…]], [[color:নাম|…]]
+    function wrap(kind) {
+        var area = panel.querySelector(".jk-live-panel__text");
+        var a = area.selectionStart;
+        var b = area.selectionEnd;
+        if (a === b) {
+            a = 0;
+            b = area.value.length;
+        }
+        var part = area.value.slice(a, b);
+        var out;
+        if (kind === "clear") {
+            out = stripMarkup(part);
+        } else if (kind === "b") {
+            out = "{" + part + "}";
+        } else {
+            out = "[[" + kind + "|" + part + "]]";
+        }
+        area.value = area.value.slice(0, a) + out + area.value.slice(b);
+        area.focus();
+        area.setSelectionRange(a, a + out.length);
+        preview();
+    }
+
+    function stripMarkup(text) {
+        var prev;
+        do {
+            prev = text;
+            text = text.replace(/\[\[(?:color:[a-z]+|i|u)\|((?:(?!\[\[)[\s\S])*?)\]\]/g, "$1");
+        } while (text !== prev);
+        return text.replace(/\{([\s\S]+?)\}/g, "$1");
+    }
+
+    // সার্ভারের colored()-এর মতো: আগে escape, তারপর চিহ্ন বদল (তাই নমুনায় কোনো HTML ঢোকে না)
+    function render(text) {
+        var html = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        var re = /\[\[(color:[a-z]+|i|u)\|((?:(?!\[\[)[\s\S])*?)\]\]/g;
+        var prev;
+        var guard = 0;
+        do {
+            prev = html;
+            html = html.replace(re, function (m, kind, inner) {
+                if (kind === "i") {
+                    return "<em>" + inner + "</em>";
+                }
+                if (kind === "u") {
+                    return "<u>" + inner + "</u>";
+                }
+                var name = kind.slice(6);
+                return (data.colors || []).indexOf(name) !== -1 ? '<span class="tc-' + name + '">' + inner + "</span>" : inner;
+            });
+        } while (html !== prev && ++guard < 20);
+        return html.replace(/\{([\s\S]+?)\}/g, "<strong>$1</strong>");
+    }
+
+    function preview() {
+        var pv = panel.querySelector(".jk-live-panel__preview");
+        if (!pv.hidden) {
+            pv.innerHTML = render(panel.querySelector(".jk-live-panel__text").value);
+        }
+    }
+
+    // লেখাটার পেছনের আসল রং (স্বচ্ছ হলে ওপরের ঘরে খোঁজা), যাতে নমুনা পেইজের মতোই দেখায়
+    function backgroundOf(el) {
+        for (var n = el; n && n.nodeType === 1; n = n.parentElement) {
+            var bg = getComputedStyle(n).backgroundColor;
+            if (bg && bg !== "transparent" && !/rgba\(.*,\s*0\)$/.test(bg)) {
+                return bg;
+            }
+        }
+        return "#fff";
     }
 
     function close() {

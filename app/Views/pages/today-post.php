@@ -21,12 +21,12 @@ $helpTel = content('today.post.helpline_tel');
 ?>
 <section class="section section--post-job" aria-labelledby="post-title">
     <div class="container">
-        <h2 id="post-title" class="section__title post-job__title"><?= e(content('today.post.heading')) ?></h2>
-        <p class="post-job__intro"><?= e(content('today.post.intro')) ?></p>
+        <h2 id="post-title" class="section__title post-job__title"><?= t('today.post.heading') ?></h2>
+        <p class="post-job__intro"><?= t('today.post.intro') ?></p>
 
             <div class="svc-notice post-job__note">
-                <p><?= e(content('today.post.help_1')) ?><a class="post-job__tel" href="tel:<?= e($helpTel) ?>"><?= e(content('today.post.helpline')) ?></a><?= e(content('today.post.help_2')) ?></p>
-                <p><?= rich(content('today.post.required')) ?></p>
+                <p><?= t('today.post.help_1') ?><a class="post-job__tel" href="tel:<?= e($helpTel) ?>"><?= t('today.post.helpline') ?></a><?= t('today.post.help_2') ?></p>
+                <p><?= t('today.post.required') ?></p>
             </div>
 
             <form class="post-form" id="form" action="/today/post" method="post" novalidate <?= form_msg_attrs() ?>>
@@ -47,11 +47,11 @@ $helpTel = content('today.post.helpline_tel');
                     <div class="post-form__col">
                         <?php // JavaScript ছাড়া এটা পরামর্শসহ সাধারণ লেখার ঘর (datalist); app.js একে খোঁজা-যায় এমন ড্রপডাউন বানায় ?>
                         <div class="pf pf--combo" data-combo data-none="<?= e(content('today.post.combo.none')) ?>" data-use="<?= e(content('today.post.combo.use')) ?>" data-hint="<?= e(content('today.post.combo.hint')) ?>">
-                            <label class="sr-only" for="pj-title"><?= e(content('today.post.f.title')) ?></label>
+                            <label class="sr-only" for="pj-title"><?= t('today.post.f.title') ?></label>
                             <input id="pj-title" data-bn type="text" name="title" list="pj-types" maxlength="120" required autocomplete="off"
                                    placeholder="<?= $ph('title') ?>" value="<?= $val('title') ?>">
                             <?php // ইঙ্গিতটা খালি ঘরের ডান প্রান্তে, ফ্যাকাশে ইঙ্গিত-লেখার চেয়ে গাঢ় (বাটনের মতো কাজ করে) ?>
-                            <span class="pf__aside" aria-hidden="true"><?= e(content('today.post.f.title_hint')) ?></span>
+                            <span class="pf__aside" aria-hidden="true"><?= t('today.post.f.title_hint') ?></span>
                             <datalist id="pj-types">
                                 <?php foreach ($services as $service): ?>
                                     <option value="<?= e($service['name']) ?>"></option>
@@ -59,7 +59,7 @@ $helpTel = content('today.post.helpline_tel');
                             </datalist>
                         </div>
                         <div class="pf">
-                            <label class="sr-only" for="pj-name"><?= e(content('today.post.f.name')) ?></label>
+                            <label class="sr-only" for="pj-name"><?= t('today.post.f.name') ?></label>
                             <input id="pj-name" data-bn type="text" name="contact_name" maxlength="100" required autocomplete="name"
                                    placeholder="<?= $ph('name') ?>" value="<?= $val('contact_name') ?>">
                         </div>
@@ -68,13 +68,13 @@ $helpTel = content('today.post.helpline_tel');
                         require BASE_PATH . '/app/Views/partials/gender-field.php';
                         ?>
                         <div class="pf pf--phone">
-                            <label class="sr-only" for="pj-phone"><?= e(content('today.post.f.phone')) ?></label>
+                            <label class="sr-only" for="pj-phone"><?= t('today.post.f.phone') ?></label>
                             <span class="pf__code" aria-hidden="true">+৮৮</span>
                             <input id="pj-phone" type="tel" name="phone" maxlength="14" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}"
                                    placeholder="<?= $ph('phone') ?>" value="<?= $val('phone') ?>">
                         </div>
                         <div class="pf">
-                            <label class="sr-only" for="pj-email"><?= e(content('today.post.f.email')) ?></label>
+                            <label class="sr-only" for="pj-email"><?= t('today.post.f.email') ?></label>
                             <input id="pj-email" type="email" name="email" maxlength="150" autocomplete="email"
                                    placeholder="<?= $ph('email', false) ?>" value="<?= $val('email') ?>">
                         </div>
@@ -86,13 +86,13 @@ $helpTel = content('today.post.helpline_tel');
 
                     <div class="post-form__col">
                         <div class="pf">
-                            <label class="sr-only" for="pj-address"><?= e(content('today.post.f.address')) ?></label>
+                            <label class="sr-only" for="pj-address"><?= t('today.post.f.address') ?></label>
                             <input id="pj-address" data-bn type="text" name="address" maxlength="250" required autocomplete="street-address"
                                    placeholder="<?= $ph('address') ?>" value="<?= $val('address') ?>">
                         </div>
                         <?php // Figma-র ক্রম: উপজেলা, জেলা, বিভাগ। app.js-এ তিনটির যেকোনোটা আগে বাছা যায়। ?>
                         <div class="pf pf--select">
-                            <label class="sr-only" for="pj-upazila"><?= e(content('today.post.f.upazila')) ?></label>
+                            <label class="sr-only" for="pj-upazila"><?= t('today.post.f.upazila') ?></label>
                             <select id="pj-upazila" name="upazila_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.upazila')) ?>">
                                 <option value=""><?= $ph('upazila') ?></option>
                                 <?php foreach ($geo['upazilas'] as $u): ?>
@@ -101,7 +101,7 @@ $helpTel = content('today.post.helpline_tel');
                             </select>
                         </div>
                         <div class="pf pf--select">
-                            <label class="sr-only" for="pj-district"><?= e(content('today.post.f.district')) ?></label>
+                            <label class="sr-only" for="pj-district"><?= t('today.post.f.district') ?></label>
                             <select id="pj-district" name="district_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.district')) ?>">
                                 <option value=""><?= $ph('district') ?></option>
                                 <?php foreach ($geo['districts'] as $d): ?>
@@ -110,7 +110,7 @@ $helpTel = content('today.post.helpline_tel');
                             </select>
                         </div>
                         <div class="pf pf--select">
-                            <label class="sr-only" for="pj-division"><?= e(content('today.post.f.division')) ?></label>
+                            <label class="sr-only" for="pj-division"><?= t('today.post.f.division') ?></label>
                             <select id="pj-division" name="division_id" required data-search data-none="<?= e(content('geo.search.none')) ?>" data-all="<?= e(content('geo.all.division')) ?>">
                                 <option value=""><?= $ph('division') ?></option>
                                 <?php foreach ($geo['divisions'] as $v): ?>
@@ -126,7 +126,7 @@ $helpTel = content('today.post.helpline_tel');
                 </div>
 
                 <div class="pf pf--wide">
-                    <label class="sr-only" for="pj-details"><?= e(content('today.post.f.details')) ?></label>
+                    <label class="sr-only" for="pj-details"><?= t('today.post.f.details') ?></label>
                     <textarea id="pj-details" data-bn name="details" maxlength="3000" required
                               placeholder="<?= $ph('details') ?>"><?= $val('details') ?></textarea>
                 </div>
@@ -134,7 +134,7 @@ $helpTel = content('today.post.helpline_tel');
                 <?php $consentKey = 'post'; $consentChecked = !empty($old['consent']); require BASE_PATH . '/app/Views/partials/consent.php'; ?>
 
                 <p class="post-form__submit">
-                    <button class="pf-submit" type="submit"><?= e(content('today.post.submit')) ?></button>
+                    <button class="pf-submit" type="submit"><?= t('today.post.submit') ?></button>
                 </p>
             </form>
     </div>

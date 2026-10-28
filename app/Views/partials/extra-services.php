@@ -15,7 +15,7 @@ foreach ($services as $s) {
 ?>
 <div class="pf pf--select pf--chips" data-chip-select data-name="extra_services[]" data-max="<?= \App\Models\ServiceRepository::MAX_EXTRA ?>"
      data-remove="<?= e(content('regform.wd.remove')) ?>" data-msg-max="<?= e(content('regform.es.max')) ?>">
-    <label class="sr-only" for="rf-extra-service"><?= e(content('regform.f.extra_service')) ?></label>
+    <label class="sr-only" for="rf-extra-service"><?= t('regform.f.extra_service') ?></label>
     <select id="rf-extra-service" name="extra_service_pick" data-search data-none="<?= e(content('geo.search.none')) ?>">
         <option value=""><?= e(content('regform.f.extra_service')) ?></option>
         <?php foreach ($services as $s): ?>

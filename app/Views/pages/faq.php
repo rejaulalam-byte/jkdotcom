@@ -14,8 +14,8 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
 ?>
 <section class="section section--faq" aria-labelledby="faq-page-title">
     <div class="container">
-        <h2 class="faq-page__title" id="faq-page-title"><?= e(content('home.faq.title')) ?></h2>
-        <p class="faq-page__intro"><?= e(content('faq.intro')) ?></p>
+        <h2 class="faq-page__title" id="faq-page-title"><?= t('home.faq.title') ?></h2>
+        <p class="faq-page__intro"><?= t('faq.intro') ?></p>
 
         <div class="faq-page__grid">
             <div class="faq-page__main">

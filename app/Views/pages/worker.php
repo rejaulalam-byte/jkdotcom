@@ -29,7 +29,7 @@ $fmt = static fn (float $n): string => bn(rtrim(rtrim(number_format($n, 1, '.', 
 <section class="section section--worker" data-lead-root data-token="<?= e($token) ?>" data-contact-url="/workers/contact"
          data-limit="<?= e(content('today.list.too_many')) ?>">
     <div class="container">
-        <h2 class="wk-heading"><?= e(content('worker.title')) ?></h2>
+        <h2 class="wk-heading"><?= t('worker.title') ?></h2>
 
         <div class="wk-layout">
             <div class="wk-card">
@@ -38,23 +38,23 @@ $fmt = static fn (float $n): string => bn(rtrim(rtrim(number_format($n, 1, '.', 
                 </div>
 
                 <dl class="wk-info">
-                    <div class="wk-info__row wk-info__row--short"><dt><?= e(content('worker.l.name')) ?></dt><dd><?= e($name) ?></dd></div>
-                    <div class="wk-info__row wk-info__row--short"><dt><?= e(content('worker.l.profession')) ?></dt><dd><?= $professions !== '' ? e($professions) . '।' : '—' ?></dd></div>
-                    <div class="wk-info__row wk-info__row--short"><dt><?= e(content('worker.l.experience')) ?></dt><dd><?= $experience !== null ? e(bn(str_pad((string) $experience, 2, '0', STR_PAD_LEFT))) . ' ' . e(content('worker.experience_unit')) . '।' : '—' ?></dd></div>
-                    <div class="wk-info__row"><dt><?= e(content('worker.l.bio')) ?></dt><dd><?= $bio !== '' ? nl2br(e($bio)) : '—' ?></dd></div>
-                    <div class="wk-info__row"><dt><?= e(content('worker.l.address')) ?></dt><dd><?= e($address) ?></dd></div>
-                    <div class="wk-info__row wk-info__row--contact"><dt><?= e(content('worker.l.phone')) ?></dt><dd><?php if ($phoneMasked !== ''): ?><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="phone"><?= e($phoneMasked) ?></button><?php else: ?>—<?php endif; ?></dd></div>
-                    <div class="wk-info__row wk-info__row--contact"><dt><?= e(content('worker.l.email')) ?></dt><dd><?php if ($emailMasked !== ''): ?><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="email"><?= e($emailMasked) ?></button><?php else: ?>—<?php endif; ?></dd></div>
+                    <div class="wk-info__row wk-info__row--short"><dt><?= t('worker.l.name') ?></dt><dd><?= e($name) ?></dd></div>
+                    <div class="wk-info__row wk-info__row--short"><dt><?= t('worker.l.profession') ?></dt><dd><?= $professions !== '' ? e($professions) . '।' : '—' ?></dd></div>
+                    <div class="wk-info__row wk-info__row--short"><dt><?= t('worker.l.experience') ?></dt><dd><?= $experience !== null ? e(bn(str_pad((string) $experience, 2, '0', STR_PAD_LEFT))) . ' ' . e(content('worker.experience_unit')) . '।' : '—' ?></dd></div>
+                    <div class="wk-info__row"><dt><?= t('worker.l.bio') ?></dt><dd><?= $bio !== '' ? nl2br(e($bio)) : '—' ?></dd></div>
+                    <div class="wk-info__row"><dt><?= t('worker.l.address') ?></dt><dd><?= e($address) ?></dd></div>
+                    <div class="wk-info__row wk-info__row--contact"><dt><?= t('worker.l.phone') ?></dt><dd><?php if ($phoneMasked !== ''): ?><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="phone"><?= e($phoneMasked) ?></button><?php else: ?>—<?php endif; ?></dd></div>
+                    <div class="wk-info__row wk-info__row--contact"><dt><?= t('worker.l.email') ?></dt><dd><?php if ($emailMasked !== ''): ?><button class="job-reveal" type="button" data-id="<?= $id ?>" data-kind="email"><?= e($emailMasked) ?></button><?php else: ?>—<?php endif; ?></dd></div>
                 </dl>
 
                 <p class="wk-hint">
-                    <?= e(content('worker.hint.before')) ?><strong><?= e(content('worker.hint.phone')) ?></strong><?= e(content('worker.hint.or')) ?><strong><?= e(content('worker.hint.email')) ?></strong><?= e(content('worker.hint.after')) ?>
-                    <br><?= e(content('worker.hint.line2')) ?>
+                    <?= t('worker.hint.before') ?><strong><?= t('worker.hint.phone') ?></strong><?= t('worker.hint.or') ?><strong><?= t('worker.hint.email') ?></strong><?= t('worker.hint.after') ?>
+                    <br><?= t('worker.hint.line2') ?>
                 </p>
 
                 <div class="wk-note">
-                    <strong><?= e(content('worker.note.title')) ?></strong>
-                    <p><?= colored(content('worker.note.text')) ?></p>
+                    <strong><?= t('worker.note.title') ?></strong>
+                    <p><?= t('worker.note.text') ?></p>
                 </div>
 
                 <form class="wk-rate" id="rating" action="/workers/rate" method="post">
@@ -64,24 +64,24 @@ $fmt = static fn (float $n): string => bn(rtrim(rtrim(number_format($n, 1, '.', 
                         <p class="wk-rate__msg is-<?= e($ratingMessage[0]) ?>" role="status"><?= e($ratingMessage[1]) ?></p>
                     <?php endif; ?>
                     <div class="wk-rate__line">
-                        <label class="wk-rate__label" for="wk-rating"><?= e(content('worker.rate.label')) ?></label>
+                        <label class="wk-rate__label" for="wk-rating"><?= t('worker.rate.label') ?></label>
                         <select id="wk-rating" name="rating">
                             <?php foreach ($choices as $choice): ?>
                                 <option value="<?= e(number_format($choice, 1, '.', '')) ?>"><?= e($fmt($choice)) ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <button class="wk-rate__submit" type="submit"><?= e(content('worker.rate.submit')) ?></button>
+                        <button class="wk-rate__submit" type="submit"><?= t('worker.rate.submit') ?></button>
                         <p class="wk-rate__current">
-                            <?= e(content('worker.rate.current')) ?>
+                            <?= t('worker.rate.current') ?>
                             <span class="wk-rate__badge"><?= $rating['avg'] !== null ? e($fmt($rating['avg'])) : '—' ?></span>
                         </p>
                     </div>
-                    <p class="wk-rate__legend"><?= e(content('worker.rate.legend')) ?></p>
+                    <p class="wk-rate__legend"><?= t('worker.rate.legend') ?></p>
                 </form>
             </div>
 
             <aside class="wk-warn" aria-labelledby="wk-warn-title">
-                <p class="wk-warn__title" id="wk-warn-title"><?= e(content('worker.warn.title')) ?></p>
+                <p class="wk-warn__title" id="wk-warn-title"><?= t('worker.warn.title') ?></p>
                 <ul>
                     <?php foreach ([1, 2, 3] as $n): ?>
                         <li><?= e(content("worker.warn.{$n}")) ?></li>
@@ -90,7 +90,7 @@ $fmt = static fn (float $n): string => bn(rtrim(rtrim(number_format($n, 1, '.', 
             </aside>
         </div>
 
-        <p class="wk-back"><a class="wk-back__btn" href="<?= e($listUrl) ?>" data-back><?= e(content('worker.back')) ?></a></p>
+        <p class="wk-back"><a class="wk-back__btn" href="<?= e($listUrl) ?>" data-back><?= t('worker.back') ?></a></p>
     </div>
 </section>
 

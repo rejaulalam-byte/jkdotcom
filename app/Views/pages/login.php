@@ -33,14 +33,14 @@ $otherRole = $role === 'agent' ? 'worker' : 'agent';
             <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
 
             <div class="login-card__row">
-                <label for="lg-id"><?= e(content('login.f.id')) ?></label>
+                <label for="lg-id"><?= t('login.f.id') ?></label>
                 <div class="lg-field">
                     <input id="lg-id" type="text" name="login_id" maxlength="150" required autocomplete="username" autocapitalize="none" spellcheck="false"
                            placeholder="<?= e(content('login.f.id_hint')) ?>" value="<?= e($oldPhone) ?>">
                 </div>
             </div>
             <div class="login-card__row">
-                <label for="lg-pass"><?= e(content('login.f.password')) ?></label>
+                <label for="lg-pass"><?= t('login.f.password') ?></label>
                 <div class="lg-field">
                     <input id="lg-pass" type="password" name="password" maxlength="200" required autocomplete="current-password">
                     <?php // বাটন লুকানো (hidden) থাকে; app.js দেখায়। JavaScript না থাকলে পাসওয়ার্ড ঢাকা অবস্থাতেই কাজ করে ?>
@@ -50,7 +50,7 @@ $otherRole = $role === 'agent' ? 'worker' : 'agent';
                 </div>
             </div>
             <p class="login-card__submit">
-                <button class="lg-submit" type="submit"><?= e(content('login.submit')) ?></button>
+                <button class="lg-submit" type="submit"><?= t('login.submit') ?></button>
             </p>
         </form>
 
@@ -58,7 +58,7 @@ $otherRole = $role === 'agent' ? 'worker' : 'agent';
         <p class="login__links">
             <a href="<?= $otherRole === 'agent' ? '/login/agent' : '/login' ?>"><?= e(content('login.other.' . $otherRole)) ?></a>
             <span aria-hidden="true">·</span>
-            <a href="/registration"><?= e(content('login.register')) ?></a>
+            <a href="/registration"><?= t('login.register') ?></a>
         </p>
     </div>
 </section>

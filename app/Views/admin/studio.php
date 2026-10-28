@@ -52,7 +52,7 @@ $fields = static function (array $list) use ($base): string {
             $html .= '<b class="adm-red">' . e($p) . '</b> রেখে দিন (এখানে সাইট নাম/এলাকা বসায়) ';
         }
         if ($r['markup']) {
-            $html .= 'রং: <code>[[color:gold|শব্দ]]</code> (gold, amber, white, red), মোটা: <code>{শব্দ}</code> ';
+            $html .= 'রং: <code>[[color:gold|শব্দ]]</code> (' . e(implode(', ', array_keys(TEXT_COLORS))) . '), মোটা: <code>{শব্দ}</code>, বাঁকা: <code>[[i|শব্দ]]</code>, নিচে দাগ: <code>[[u|শব্দ]]</code> ';
         }
         if ($r['changed']) {
             $html .= '<button class="adm-link-button" type="submit" form="studio-reset" name="reset" value="' . e((string) $r['key']) . '">শুরুর লেখায় ফিরুন</button>';

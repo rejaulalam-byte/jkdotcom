@@ -17,10 +17,10 @@ $rows = [
 ?>
 <section class="section section--login" aria-labelledby="pw-title">
     <div class="container">
-        <h2 id="pw-title" class="section__title login__title"><?= e(content('password.title')) ?></h2>
+        <h2 id="pw-title" class="section__title login__title"><?= t('password.title') ?></h2>
 
         <?php if ($forced): ?>
-            <p class="notice notice--error login__notice"><?= e(content('password.forced')) ?></p>
+            <p class="notice notice--error login__notice"><?= t('password.forced') ?></p>
         <?php endif; ?>
 
         <form class="login-card" id="form" action="/account/password" method="post" novalidate <?= form_msg_attrs() ?>>
@@ -47,9 +47,9 @@ $rows = [
                     </div>
                 </div>
             <?php endforeach; ?>
-            <p class="pw-note"><?= e(content('regform.password_note')) ?></p>
+            <p class="pw-note"><?= t('regform.password_note') ?></p>
             <p class="login-card__submit">
-                <button class="lg-submit" type="submit"><?= e(content('password.submit')) ?></button>
+                <button class="lg-submit" type="submit"><?= t('password.submit') ?></button>
             </p>
         </form>
 

@@ -28,9 +28,9 @@ $pwRows = [
 ?>
 <section class="section section--login" aria-labelledby="st-title">
     <div class="container">
-        <h2 id="st-title" class="section__title login__title"><?= e(content('setup.title')) ?></h2>
-        <p class="login__notice notice notice--ok"><?= e(honorific_name($user['gender'] ?? null, (string) $user['name'])) ?>, <?= e(content('setup.intro')) ?></p>
-        <p class="login__notice notice"><?= e(content('setup.required_note')) ?></p>
+        <h2 id="st-title" class="section__title login__title"><?= t('setup.title') ?></h2>
+        <p class="login__notice notice notice--ok"><?= e(honorific_name($user['gender'] ?? null, (string) $user['name'])) ?>, <?= t('setup.intro') ?></p>
+        <p class="login__notice notice"><?= t('setup.required_note') ?></p>
 
         <form class="login-card" id="form" action="/account/setup" method="post" novalidate <?= form_msg_attrs() ?>>
             <?php if ($errors): ?>
@@ -56,10 +56,10 @@ $pwRows = [
                     </div>
                 </div>
             <?php endforeach; ?>
-            <p class="pw-note"><?= e(content('regform.password_note')) ?></p>
+            <p class="pw-note"><?= t('regform.password_note') ?></p>
 
             <div class="login-card__row">
-                <label for="st-gender"><?= e(content('setup.f.gender')) ?><?= $star ?></label>
+                <label for="st-gender"><?= t('setup.f.gender') ?><?= $star ?></label>
                 <div class="lg-field lg-field--select">
                     <select id="st-gender" name="gender" required>
                         <option value=""><?= e(content('regform.f.gender')) ?></option>
@@ -70,28 +70,28 @@ $pwRows = [
                 </div>
             </div>
             <div class="login-card__row">
-                <label for="st-email"><?= e(content('setup.f.email')) ?><?= $star ?></label>
+                <label for="st-email"><?= t('setup.f.email') ?><?= $star ?></label>
                 <div class="lg-field">
                     <input id="st-email" type="email" name="email" maxlength="150" required autocomplete="email" inputmode="email" autocapitalize="none" value="<?= $val('email') ?>">
                 </div>
             </div>
             <?php if ($needsPhone): ?>
                 <div class="login-card__row">
-                    <label for="st-phone"><?= e(content('setup.f.phone')) ?><?= $star ?></label>
+                    <label for="st-phone"><?= t('setup.f.phone') ?><?= $star ?></label>
                     <div class="lg-field">
                         <input id="st-phone" type="tel" name="phone" maxlength="14" required autocomplete="tel-national" inputmode="numeric" pattern="01[3-9][0-9]{8}" value="<?= $val('phone') ?>">
                     </div>
                 </div>
             <?php endif; ?>
             <div class="login-card__row">
-                <label for="st-address"><?= e(content('setup.f.address')) ?><?= $star ?></label>
+                <label for="st-address"><?= t('setup.f.address') ?><?= $star ?></label>
                 <div class="lg-field">
                     <input id="st-address" data-bn type="text" name="address" maxlength="250" required autocomplete="street-address" value="<?= $val('address', (string) ($user['address'] ?? '')) ?>">
                 </div>
             </div>
             <?php // এলাকার তিন ড্রপডাউন: id-গুলো সাইটের অন্য ফর্মের মতোই (pj-*), app.js একই কোডে চালায় ?>
             <div class="login-card__row">
-                <label for="pj-upazila"><?= e(content('setup.f.upazila')) ?><?= $star ?></label>
+                <label for="pj-upazila"><?= t('setup.f.upazila') ?><?= $star ?></label>
                 <div class="lg-field lg-field--select">
                     <select id="pj-upazila" name="upazila_id" <?= $selectAttrs ?> data-all="<?= e(content('geo.all.upazila')) ?>">
                         <option value=""><?= e(content('regform.f.upazila')) ?></option>
@@ -102,7 +102,7 @@ $pwRows = [
                 </div>
             </div>
             <div class="login-card__row">
-                <label for="pj-district"><?= e(content('setup.f.district')) ?><?= $star ?></label>
+                <label for="pj-district"><?= t('setup.f.district') ?><?= $star ?></label>
                 <div class="lg-field lg-field--select">
                     <select id="pj-district" name="district_id" <?= $selectAttrs ?> data-all="<?= e(content('geo.all.district')) ?>">
                         <option value=""><?= e(content('regform.f.district')) ?></option>
@@ -113,7 +113,7 @@ $pwRows = [
                 </div>
             </div>
             <div class="login-card__row">
-                <label for="pj-division"><?= e(content('setup.f.division')) ?><?= $star ?></label>
+                <label for="pj-division"><?= t('setup.f.division') ?><?= $star ?></label>
                 <div class="lg-field lg-field--select">
                     <select id="pj-division" name="division_id" <?= $selectAttrs ?> data-all="<?= e(content('geo.all.division')) ?>">
                         <option value=""><?= e(content('regform.f.division')) ?></option>
@@ -136,9 +136,9 @@ $pwRows = [
             <?php $consentKey = 'worker'; $consentChecked = false; require BASE_PATH . '/app/Views/partials/consent.php'; ?>
 
             <p class="login-card__submit">
-                <button class="lg-submit" type="submit"><?= e(content('setup.submit')) ?></button>
+                <button class="lg-submit" type="submit"><?= t('setup.submit') ?></button>
             </p>
         </form>
-        <p class="login__help"><?= e(content('setup.help')) ?></p>
+        <p class="login__help"><?= t('setup.help') ?></p>
     </div>
 </section>

@@ -39,7 +39,7 @@ $divisionText = count($divisions) > 1
 <section class="section section--workers">
     <div class="container">
         <form class="svc-search wk-search" action="<?= e($base) ?>" method="get" role="search">
-            <label class="sr-only" for="wk-q"><?= e(content('workers.search.placeholder')) ?></label>
+            <label class="sr-only" for="wk-q"><?= t('workers.search.placeholder') ?></label>
             <input id="wk-q" data-bn type="search" name="q" value="<?= e($query) ?>" maxlength="100"
                    placeholder="<?= e(content('workers.search.placeholder')) ?>" autocomplete="off">
             <?php if ($perPage !== 15): ?>
@@ -49,30 +49,30 @@ $divisionText = count($divisions) > 1
                 <input type="hidden" name="o" value="rating">
             <?php endif; ?>
             <button class="svc-search__btn" type="submit">
-                <span><?= e(content('workers.search.button')) ?></span>
+                <span><?= t('workers.search.button') ?></span>
                 <img src="<?= e(asset('img/icons/search-white.svg')) ?>" alt="" width="32" height="32">
             </button>
         </form>
         <?php require BASE_PATH . '/app/Views/partials/bn-switch.php'; ?>
 
-        <h2 class="wk-title"><?= e(content('workers.title')) ?>(<?= e($service['name']) ?>)</h2>
+        <h2 class="wk-title"><?= t('workers.title') ?>(<?= e($service['name']) ?>)</h2>
 
         <?php // বিভাগের লাইন, প্রতি-পৃষ্ঠা ও টেবিলের মাথা সবসময় থাকে; কেউ না থাকলে একটা খালি সারিতে বার্তা ?>
         <div class="wk-bar">
             <p class="wk-bar__division">
-                <?= e(content('workers.division')) ?>
+                <?= t('workers.division') ?>
                 <span><?= $divisionText !== '' ? e($divisionText) : '—' ?></span>
             </p>
             <form class="wk-bar__per" action="<?= e($base) ?>" method="get">
                 <?php if ($query !== ''): ?><input type="hidden" name="q" value="<?= e($query) ?>"><?php endif; ?>
                 <?php if ($byRating): ?><input type="hidden" name="o" value="rating"><?php endif; ?>
-                <label for="wk-per"><?= e(content('workers.per_page')) ?></label>
+                <label for="wk-per"><?= t('workers.per_page') ?></label>
                 <select id="wk-per" name="n" data-autosubmit>
                     <?php foreach ([15, 25, 50, 0] as $n): ?>
                         <option value="<?= $n === 0 ? 'all' : $n ?>"<?= $n === $perPage ? ' selected' : '' ?>><?= $n === 0 ? e(content('workers.per_page_all')) : e(bn($n)) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <span><?= e(content('workers.per_page_unit')) ?></span>
+                <span><?= t('workers.per_page_unit') ?></span>
                 <noscript><button type="submit">&#10003;</button></noscript>
             </form>
         </div>
@@ -95,13 +95,13 @@ $divisionText = count($divisions) > 1
             <table class="wk-table">
                 <thead>
                     <tr>
-                        <th class="wk-no" scope="col"><?= e(content('workers.col.no')) ?></th>
-                        <th class="wk-name" scope="col"><?= e(content('workers.col.name')) ?></th>
-                        <th scope="col"><?= e(content('workers.col.area')) ?></th>
-                        <th scope="col"><?= e(content('workers.col.upazila')) ?></th>
-                        <th scope="col"><?= e(content('workers.col.district')) ?></th>
-                        <th class="wk-rating" scope="col"><?= e(content('workers.col.rating')) ?></th>
-                        <th class="wk-details" scope="col"><?= e(content('workers.col.details')) ?></th>
+                        <th class="wk-no" scope="col"><?= t('workers.col.no') ?></th>
+                        <th class="wk-name" scope="col"><?= t('workers.col.name') ?></th>
+                        <th scope="col"><?= t('workers.col.area') ?></th>
+                        <th scope="col"><?= t('workers.col.upazila') ?></th>
+                        <th scope="col"><?= t('workers.col.district') ?></th>
+                        <th class="wk-rating" scope="col"><?= t('workers.col.rating') ?></th>
+                        <th class="wk-details" scope="col"><?= t('workers.col.details') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -109,10 +109,10 @@ $divisionText = count($divisions) > 1
                         <tr class="wk-empty">
                             <td colspan="7">
                                 <?php if ($total === 0): ?>
-                                    <?= e(content('workers.empty')) ?>
+                                    <?= t('workers.empty') ?>
                                 <?php else: ?>
-                                    “<?= e($query) ?>” — <?= e(content('workers.nomatch')) ?>
-                                    <a href="<?= e($base) ?>"><?= e(content('workers.all')) ?></a>
+                                    “<?= e($query) ?>” — <?= t('workers.nomatch') ?>
+                                    <a href="<?= e($base) ?>"><?= t('workers.all') ?></a>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -127,7 +127,7 @@ $divisionText = count($divisions) > 1
                             <td data-label="<?= e(content('workers.col.district')) ?>"><?= $w['district'] !== '' ? e($w['district']) : '—' ?></td>
                             <td class="wk-rating" data-label="<?= e(content('workers.col.rating')) ?>"><?= isset($ratings[$w['id']]) ? e(bn(rtrim(rtrim(number_format($ratings[$w['id']], 1, '.', ''), '0'), '.'))) : e(content('workers.rating_none')) ?></td>
                             <td class="wk-details">
-                                <a class="wk-open" href="/workers/<?= (int) $w['id'] ?>?s=<?= e(rawurlencode($service['slug'])) ?>"><?= e(content('workers.details_btn')) ?></a>
+                                <a class="wk-open" href="/workers/<?= (int) $w['id'] ?>?s=<?= e(rawurlencode($service['slug'])) ?>"><?= t('workers.details_btn') ?></a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

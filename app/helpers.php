@@ -66,32 +66,67 @@ function rich(string $text): string
 /**
  * লেখার ভেতরে [[color:NAME|শব্দ]] দিয়ে অ্যাডমিন যে রংগুলো ব্যবহার করতে পারবেন।
  * NAME => CSS ক্লাস (app.css-এ আছে)। তালিকায় নেই এমন কিছু সাধারণ লেখা হিসেবে দেখায়।
+ * gold/amber/white/red গাঢ় টিল পটভূমির জন্য; বাকিগুলো সাদা/হালকা পটভূমির জন্য।
+ * CSP-তে style="" চলে না, তাই রং শুধু এই তালিকার ক্লাস দিয়ে।
  */
 const TEXT_COLORS = [
-    'gold'  => 'tc-gold',
-    'amber' => 'tc-amber',
-    'white' => 'tc-white',
-    'red'   => 'tc-red',
+    'gold'   => 'tc-gold',
+    'amber'  => 'tc-amber',
+    'white'  => 'tc-white',
+    'red'    => 'tc-red',
+    'teal'   => 'tc-teal',
+    'orange' => 'tc-orange',
+    'maroon' => 'tc-maroon',
+    'darkred' => 'tc-darkred',
+    'brown'  => 'tc-brown',
+    'black'  => 'tc-black',
 ];
 
 /**
  * সহজ ও নিরাপদ মার্কআপসহ escape-করা লেখা:
  *   [[color:gold|শব্দ]]  -> অনুমোদিত রঙে শব্দ (TEXT_COLORS দেখুন)
+ *   [[i|শব্দ]]           -> বাঁকা (ইটালিক)
+ *   [[u|শব্দ]]           -> নিচে দাগ (আন্ডারলাইন)
  *   {শব্দ}               -> মোটা
- * লেখা আগে escape হয়, তাই অ্যাডমিনের দেওয়া কোনো HTML কখনও ঢুকতে পারে না।
+ * একটার ভেতরে আরেকটা চলে (ভেতরেরটা আগে বদলায়)। লেখা আগে escape হয়, তাই অ্যাডমিনের দেওয়া কোনো HTML কখনও ঢুকতে পারে না।
  */
 function colored(string $text): string
 {
-    $html = (string) preg_replace_callback(
-        '/\[\[color:([a-z]+)\|(.+?)\]\]/u',
-        static function (array $m): string {
-            $class = TEXT_COLORS[$m[1]] ?? null;
+    $html = e($text);
+    // সবচেয়ে ভেতরের [[...]] আগে: যার ভেতরে আর [[ নেই
+    $pattern = '/\[\[(color:[a-z]+|i|u)\|((?:(?!\[\[).)+?)\]\]/u';
+    for ($guard = 0; $guard < 20 && preg_match($pattern, $html) === 1; $guard++) {
+        $html = (string) preg_replace_callback($pattern, static function (array $m): string {
+            if ($m[1] === 'i') {
+                return '<em>' . $m[2] . '</em>';
+            }
+            if ($m[1] === 'u') {
+                return '<u>' . $m[2] . '</u>';
+            }
+            $class = TEXT_COLORS[substr($m[1], 6)] ?? null;
+
             return $class === null ? $m[2] : '<span class="' . $class . '">' . $m[2] . '</span>';
-        },
-        e($text)
-    );
+        }, $html);
+    }
 
     return (string) preg_replace('/\{(.+?)\}/u', '<strong>$1</strong>', $html);
+}
+
+/**
+ * পেইজে দেখানোর জন্য একটা সাইটের লেখা, বোল্ড/ইটালিক/আন্ডারলাইন/রঙের চিহ্নসহ (colored())।
+ * "{name}"-ধাঁচের জায়গা-ধারক থাকা লেখা সাধারণ escape-করা লেখা থাকে (সেখানে {…} মানে নাম/এলাকা, মোটা নয়)।
+ * ঘরের বৈশিষ্ট্যে (placeholder="", alt="" …) এটা নয়, e(content()) ব্যবহার করুন।
+ */
+function t(string $key): string
+{
+    if (\App\Models\SiteTexts::placeholders($key) !== []) {
+        return e(content($key));
+    }
+    if (live_preview()) {
+        \App\Core\LiveEdit::formattable($key);
+    }
+
+    return colored(content($key));
 }
 
 /**

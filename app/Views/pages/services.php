@@ -12,7 +12,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
 ?>
 <section class="section section--services-page">
     <div class="container">
-        <p class="services-intro"><?= e(content('services.intro')) ?></p>
+        <p class="services-intro"><?= t('services.intro') ?></p>
 
         <div class="svc-notice">
             <ul>
@@ -23,11 +23,11 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
         </div>
 
         <form class="svc-search" action="/services" method="get" role="search">
-            <label class="sr-only" for="svc-q"><?= e(content('services.search.placeholder')) ?></label>
+            <label class="sr-only" for="svc-q"><?= t('services.search.placeholder') ?></label>
             <input id="svc-q" data-bn type="search" name="q" value="<?= e($query) ?>" maxlength="100"
                    placeholder="<?= e(content('services.search.placeholder')) ?>" autocomplete="off">
             <button class="svc-search__btn" type="submit">
-                <span><?= e(content('services.search.button')) ?></span>
+                <span><?= t('services.search.button') ?></span>
                 <img src="<?= e(asset('img/icons/search-white.svg')) ?>" alt="" width="32" height="32">
             </button>
         </form>
@@ -43,7 +43,7 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
                 <?php endif; ?>
                 <a href="/services">সব সেবা দেখুন</a>
             </p>
-            <p class="svc-result svc-result--note"><?= e(content('services.search.note')) ?></p>
+            <p class="svc-result svc-result--note"><?= t('services.search.note') ?></p>
         <?php endif; ?>
 
         <div class="svc-columns">

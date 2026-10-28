@@ -18,7 +18,7 @@ foreach ($geo['districts'] as $d) {
 <div class="pf pf--select pf--chips" data-work-districts data-max="<?= \App\Models\GeoRepository::MAX_WORK_DISTRICTS ?>"
      data-all-label="<?= e(content('regform.wd.all')) ?>" data-remove="<?= e(content('regform.wd.remove')) ?>"
      data-msg-max="<?= e(content('regform.wd.max')) ?>">
-    <label class="sr-only" for="rf-work-district"><?= e(content('regform.f.work_district')) ?></label>
+    <label class="sr-only" for="rf-work-district"><?= t('regform.f.work_district') ?></label>
     <select id="rf-work-district" name="work_district_pick" data-search data-none="<?= e(content('geo.search.none')) ?>">
         <option value=""><?= e(content('regform.f.work_district')) ?></option>
         <option value="all"><?= e(content('regform.wd.all')) ?></option>
@@ -28,7 +28,7 @@ foreach ($geo['districts'] as $d) {
     </select>
     <ul class="chips" data-chips>
         <?php if ($wdAll): ?>
-            <li class="chips__item" data-all><span><?= e(content('regform.wd.all')) ?></span>
+            <li class="chips__item" data-all><span><?= t('regform.wd.all') ?></span>
                 <button type="button" aria-label="<?= e(content('regform.wd.remove')) ?>">&times;</button>
                 <input type="hidden" name="work_all" value="1">
             </li>

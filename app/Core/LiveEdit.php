@@ -26,6 +26,14 @@ final class LiveEdit
     /** @var array<string,int> এই পেইজে ব্যবহার হওয়া কী => ক্রমিক নম্বর */
     private static array $keys = [];
 
+    /** @var array<string,bool> যে লেখাগুলো t() দিয়ে দেখানো (বোল্ড/রং ইত্যাদি চলে) */
+    private static array $formattable = [];
+
+    public static function formattable(string $key): void
+    {
+        self::$formattable[$key] = true;
+    }
+
     public static function mark(string $key, string $value): string
     {
         if ($value === '' || preg_match(self::NOT_TEXT, $key) === 1 || !SiteTexts::editable($key)) {
@@ -54,7 +62,7 @@ final class LiveEdit
                 'label' => SiteTexts::label($key),
                 'changed' => Content::has($key),
                 'placeholders' => SiteTexts::placeholders($key),
-                'markup' => SiteTexts::usesColorMarkup($key),
+                'markup' => SiteTexts::usesColorMarkup($key) || isset(self::$formattable[$key]),
             ];
         }
 
@@ -62,6 +70,7 @@ final class LiveEdit
             'texts' => $texts,
             'save' => admin_base() . '/studio/live-save',
             'token' => Security::csrfToken(),
+            'colors' => array_keys(TEXT_COLORS),
         ];
     }
 }

@@ -19,21 +19,21 @@ $faqKeys = [1, 2, 3, 4, 5];
         <div class="hero__copy">
             <p class="pill pill--amber">
                 <img src="<?= e(asset('img/icons/badge-hero.svg')) ?>" alt="" width="50" height="32">
-                <span data-fly><?= e(content('home.hero.badge')) ?></span>
+                <span data-fly><?= t('home.hero.badge') ?></span>
             </p>
             <h1 id="hero-title" class="hero__title">
-                <span class="hero__title-1" data-fly><?= e(content('home.hero.title_1')) ?></span>
-                <span class="hero__title-2" data-fly><?= e(content('home.hero.title_2')) ?></span>
+                <span class="hero__title-1" data-fly><?= t('home.hero.title_1') ?></span>
+                <span class="hero__title-2" data-fly><?= t('home.hero.title_2') ?></span>
             </h1>
-            <p class="hero__text" data-fly><?= e(content('home.hero.text')) ?></p>
-            <a class="btn btn--light" href="/services"><?= e(content('home.hero.button')) ?></a>
+            <p class="hero__text" data-fly><?= t('home.hero.text') ?></p>
+            <a class="btn btn--light" href="/services"><?= t('home.hero.button') ?></a>
         </div>
 
         <aside class="today" aria-labelledby="today-title">
-            <h2 id="today-title" class="today__head"><?= e(content('home.today.title')) ?></h2>
+            <h2 id="today-title" class="today__head"><?= t('home.today.title') ?></h2>
             <div class="today__body">
                 <?php if ($jobs === []): ?>
-                    <p class="today__empty"><?= e(content('home.today.empty')) ?></p>
+                    <p class="today__empty"><?= t('home.today.empty') ?></p>
                 <?php else: ?>
                     <ol class="ticker" data-page-size="8" data-rise="4000" data-hold="5500">
                         <?php foreach ($jobs as $i => $job): ?>
@@ -41,7 +41,7 @@ $faqKeys = [1, 2, 3, 4, 5];
                         <?php endforeach; ?>
                     </ol>
                 <?php endif; ?>
-                <p class="today__note"><span><?= rich(content('home.today.note')) ?></span></p>
+                <p class="today__note"><span><?= t('home.today.note') ?></span></p>
             </div>
         </aside>
     </div>
@@ -70,7 +70,7 @@ $faqKeys = [1, 2, 3, 4, 5];
     </div>
     <?php endif; ?>
     <div class="rep-bar" data-marquee>
-        <p class="rep-bar__text"><span class="rep-bar__move"><?= colored(content('home.rep.text')) ?></span></p>
+        <p class="rep-bar__text"><span class="rep-bar__move"><?= t('home.rep.text') ?></span></p>
     </div>
 </section>
 
@@ -79,10 +79,10 @@ $faqKeys = [1, 2, 3, 4, 5];
     <div class="container section__head section__head--center">
         <p class="pill pill--olive">
             <img src="<?= e(asset('img/icons/badge-section.svg')) ?>" alt="" width="50" height="32">
-            <span><?= e(content('home.services.badge')) ?></span>
+            <span><?= t('home.services.badge') ?></span>
         </p>
-        <h2 id="services-title" class="section__title"><?= e(content('home.services.title')) ?></h2>
-        <p class="section__text"><?= e(content('home.services.text_1')) ?> <?= e(content('home.services.text_2')) ?></p>
+        <h2 id="services-title" class="section__title"><?= t('home.services.title') ?></h2>
+        <p class="section__text"><?= t('home.services.text_1') ?> <?= t('home.services.text_2') ?></p>
     </div>
 
     <?php
@@ -111,7 +111,7 @@ $faqKeys = [1, 2, 3, 4, 5];
         <?php endforeach; ?>
     </div>
     <div class="container">
-        <p class="center"><a class="btn btn--teal-soft" href="/services"><?= e(content('home.services.button')) ?></a></p>
+        <p class="center"><a class="btn btn--teal-soft" href="/services"><?= t('home.services.button') ?></a></p>
     </div>
 </section>
 
@@ -120,14 +120,14 @@ $faqKeys = [1, 2, 3, 4, 5];
     <div class="container section__head section__head--center">
         <p class="pill pill--olive">
             <img src="<?= e(asset('img/icons/badge-section.svg')) ?>" alt="" width="50" height="32">
-            <span><?= e(content('home.about.badge')) ?></span>
+            <span><?= t('home.about.badge') ?></span>
         </p>
-        <h2 id="about-title" class="section__title"><?= e(content('home.about.title')) ?></h2>
+        <h2 id="about-title" class="section__title"><?= t('home.about.title') ?></h2>
     </div>
     <div class="container about__grid">
         <div class="about__copy">
-            <p><?= e(content('home.about.text')) ?></p>
-            <p><a class="btn btn--teal-soft" href="/about"><?= e(content('home.about.button')) ?></a></p>
+            <p><?= t('home.about.text') ?></p>
+            <p><a class="btn btn--teal-soft" href="/about"><?= t('home.about.button') ?></a></p>
         </div>
         <img class="about__map" src="<?= e(asset('img/site/bangladesh-map.png')) ?>" alt="<?= e(content('home.about.map_alt')) ?>" width="400" height="510" loading="lazy">
     </div>
@@ -138,10 +138,10 @@ $faqKeys = [1, 2, 3, 4, 5];
     <div class="container section__head">
         <p class="pill pill--olive">
             <img src="<?= e(asset('img/icons/badge-section.svg')) ?>" alt="" width="50" height="32">
-            <span><?= e(content('home.steps.badge')) ?></span>
+            <span><?= t('home.steps.badge') ?></span>
         </p>
-        <h2 id="steps-title" class="section__title"><?= e(content('home.steps.title')) ?></h2>
-        <p class="section__text"><?= e(content('home.steps.text')) ?></p>
+        <h2 id="steps-title" class="section__title"><?= t('home.steps.title') ?></h2>
+        <p class="section__text"><?= t('home.steps.text') ?></p>
     </div>
     <div class="container">
         <ol class="step-grid">
@@ -161,10 +161,10 @@ $faqKeys = [1, 2, 3, 4, 5];
     <div class="container section__head section__head--center">
         <p class="pill pill--olive">
             <img src="<?= e(asset('img/icons/badge-section.svg')) ?>" alt="" width="50" height="32">
-            <span><?= e(content('home.faq.badge')) ?></span>
+            <span><?= t('home.faq.badge') ?></span>
         </p>
-        <h2 id="faq-title" class="section__title"><?= e(content('home.faq.title')) ?></h2>
-        <p class="section__text"><?= e(content('home.faq.text')) ?></p>
+        <h2 id="faq-title" class="section__title"><?= t('home.faq.title') ?></h2>
+        <p class="section__text"><?= t('home.faq.text') ?></p>
     </div>
 
     <div class="container faq__grid">

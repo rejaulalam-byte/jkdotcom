@@ -29,25 +29,25 @@ $label = static fn (string $for, string $key, bool $required = false): string =>
 ?>
 <section class="section section--post-job section--regform" aria-labelledby="pf-title">
     <div class="container">
-        <h2 id="pf-title" class="section__title post-job__title"><?= e(content('profile.title')) ?></h2>
-        <p class="post-job__intro"><?= e(honorific_name($user['gender'] ?? null, (string) $user['name'])) ?>, <?= e(content('profile.intro')) ?></p>
+        <h2 id="pf-title" class="section__title post-job__title"><?= t('profile.title') ?></h2>
+        <p class="post-job__intro"><?= e(honorific_name($user['gender'] ?? null, (string) $user['name'])) ?>, <?= t('profile.intro') ?></p>
 
         <?php if ($setupDone): ?>
-            <p class="notice notice--ok profile__done" role="status"><?= e(content('setup.done')) ?></p>
+            <p class="notice notice--ok profile__done" role="status"><?= t('setup.done') ?></p>
         <?php endif; ?>
         <?php if ($passwordChanged): ?>
-            <p class="notice notice--ok profile__done" role="status"><?= e(content('password.changed')) ?></p>
+            <p class="notice notice--ok profile__done" role="status"><?= t('password.changed') ?></p>
         <?php endif; ?>
         <?php if ($unlocked): ?>
-            <p class="notice notice--ok profile__done" role="status"><?= e(content('login.unlocked')) ?></p>
+            <p class="notice notice--ok profile__done" role="status"><?= t('login.unlocked') ?></p>
         <?php endif; ?>
         <?php if ($done): ?>
-            <p class="notice notice--ok profile__done" role="status"><?= e(content('profile.done')) ?></p>
+            <p class="notice notice--ok profile__done" role="status"><?= t('profile.done') ?></p>
         <?php endif; ?>
 
         <div class="svc-notice post-job__note">
-            <p><?= e(content('profile.locked')) ?></p>
-            <p><?= e(content('today.post.help_1')) ?><a class="post-job__tel" href="tel:<?= e($helpTel) ?>"><?= e(content('today.post.helpline')) ?></a><?= e(content('today.post.help_2')) ?></p>
+            <p><?= t('profile.locked') ?></p>
+            <p><?= t('today.post.help_1') ?><a class="post-job__tel" href="tel:<?= e($helpTel) ?>"><?= t('today.post.helpline') ?></a><?= t('today.post.help_2') ?></p>
         </div>
 
         <form class="post-form reg-form" id="form" action="/profile" method="post" enctype="multipart/form-data" novalidate <?= form_msg_attrs() ?>>
@@ -157,13 +157,13 @@ $label = static fn (string $for, string $key, bool $required = false): string =>
                      data-too-big="<?= e(content('regform.photo.too_big')) ?>"
                      data-size-shrunk="<?= e(content('regform.photo.size_shrunk')) ?>" data-size-same="<?= e(content('regform.photo.size_same')) ?>" data-bad-type="<?= e(content('regform.photo.bad_type')) ?>">
                     <div class="reg-photo__pick">
-                        <label class="reg-photo__label" for="rf-photo"><?= e(content('profile.photo.label')) ?></label>
-                        <span class="reg-photo__btn" aria-hidden="true"><?= e(content('regform.photo.browse')) ?></span>
+                        <label class="reg-photo__label" for="rf-photo"><?= t('profile.photo.label') ?></label>
+                        <span class="reg-photo__btn" aria-hidden="true"><?= t('regform.photo.browse') ?></span>
                         <input id="rf-photo" type="file" name="photo" accept="image/jpeg,image/png,image/webp">
                     </div>
-                    <p class="reg-photo__name" data-photo-name><?= e(content('profile.photo.none')) ?></p>
+                    <p class="reg-photo__name" data-photo-name><?= t('profile.photo.none') ?></p>
                     <img class="reg-photo__preview" data-photo-preview src="<?= e($photoUrl ?? asset('img/icons/user-placeholder.svg')) ?>" alt="" width="249" height="273">
-                    <p class="reg-photo__note"><?= e(content('regform.photo.note_1')) ?><br><span data-photo-size><?= e(content('regform.photo.note_2')) ?></span></p>
+                    <p class="reg-photo__note"><?= t('regform.photo.note_1') ?><br><span data-photo-size><?= t('regform.photo.note_2') ?></span></p>
                     <p class="reg-photo__error" data-photo-error role="alert" hidden></p>
                 </div>
             </div>
@@ -176,15 +176,15 @@ $label = static fn (string $for, string $key, bool $required = false): string =>
                 </div>
                 <?php // দুইজন রেফারেন্স (দুটোই আবশ্যক) ?>
                 <fieldset class="reg-refs">
-                    <legend><?= e(content('regform.f.references')) ?></legend>
+                    <legend><?= t('regform.f.references') ?></legend>
                     <div class="reg-refs__box">
                         <div class="pf">
-                            <label class="sr-only" for="rf-ref1"><?= e(content('regform.f.ref1')) ?></label>
+                            <label class="sr-only" for="rf-ref1"><?= t('regform.f.ref1') ?></label>
                             <textarea id="rf-ref1" data-bn name="reference_1" maxlength="300" required rows="3"
                                       placeholder="<?= $ph('ref1') ?>"><?= $val('reference_1') ?></textarea>
                         </div>
                         <div class="pf">
-                            <label class="sr-only" for="rf-ref2"><?= e(content('regform.f.ref2')) ?></label>
+                            <label class="sr-only" for="rf-ref2"><?= t('regform.f.ref2') ?></label>
                             <textarea id="rf-ref2" data-bn name="reference_2" maxlength="300" required rows="3"
                                       placeholder="<?= $ph('ref2') ?>"><?= $val('reference_2') ?></textarea>
                         </div>
@@ -198,9 +198,9 @@ $label = static fn (string $for, string $key, bool $required = false): string =>
             <?php endif; ?>
 
             <p class="post-form__submit">
-                <button class="pf-submit" type="submit"><?= e(content('profile.submit')) ?></button>
+                <button class="pf-submit" type="submit"><?= t('profile.submit') ?></button>
             </p>
-            <p class="profile__pw"><a href="/account/password"><?= e(content('nav.password')) ?></a></p>
+            <p class="profile__pw"><a href="/account/password"><?= t('nav.password') ?></a></p>
         </form>
     </div>
 </section>

@@ -10,8 +10,8 @@ $feedbackToken = Security::csrfToken();
             <a class="footer__brand-head" href="#top" aria-label="পেজের উপরে যান">
             <span class="emblem emblem--footer"><img src="<?= e(asset('img/site/logo-figma.png')) ?>" alt="" width="596" height="541" loading="lazy"></span>
             <div class="footer__brand-text">
-                <p class="footer__name"><span><?= e(content('site.brand')) ?></span><?= e(content('site.brand_suffix')) ?></p>
-                <p class="footer__tagline"><?= e(content('site.tagline')) ?></p>
+                <p class="footer__name"><span><?= t('site.brand') ?></span><?= t('site.brand_suffix') ?></p>
+                <p class="footer__tagline"><?= t('site.tagline') ?></p>
             </div>
             </a>
 
@@ -20,32 +20,32 @@ $feedbackToken = Security::csrfToken();
                 <li>
                     <img src="<?= e(asset('img/icons/home-footer.svg')) ?>" alt="" width="21" height="18">
                     <address>
-                        <?= e(content('site.address_1')) ?><br>
-                        <?= e(content('site.address_2')) ?><br>
-                        <?= e(content('site.address_3')) ?>
+                        <?= t('site.address_1') ?><br>
+                        <?= t('site.address_2') ?><br>
+                        <?= t('site.address_3') ?>
                     </address>
                 </li>
                 <li>
                     <img src="<?= e(asset('img/icons/phone-footer.svg')) ?>" alt="" width="18" height="18">
-                    <a href="<?= e(tel(content('site.phone_footer'))) ?>"><?= e(content('site.phone_footer')) ?></a>
+                    <a href="<?= e(tel(content('site.phone_footer'))) ?>"><?= t('site.phone_footer') ?></a>
                 </li>
                 <li>
                     <img src="<?= e(asset('img/icons/mail-footer.svg')) ?>" alt="" width="20" height="15">
-                    <a href="mailto:<?= e(content('site.email')) ?>"><?= e(content('site.email')) ?></a>
+                    <a href="mailto:<?= e(content('site.email')) ?>"><?= t('site.email') ?></a>
                 </li>
                 <li>
                     <img src="<?= e(asset('img/icons/web-footer.svg')) ?>" alt="" width="18" height="18">
-                    <a href="/"><?= e(content('site.website')) ?></a>
+                    <a href="/"><?= t('site.website') ?></a>
                 </li>
                 <li>
                     <img src="<?= e(asset('img/icons/location-footer.svg')) ?>" alt="" width="15" height="20">
-                    <span><?= e(content('site.coordinates')) ?></span>
+                    <span><?= t('site.coordinates') ?></span>
                 </li>
             </ul>
 
             <p class="footer__hotline">
-                <span><?= e(content('footer.hotline')) ?></span>
-                <a href="<?= e(tel(content('site.hotline'))) ?>"><?= e(content('site.hotline')) ?></a>
+                <span><?= t('footer.hotline') ?></span>
+                <a href="<?= e(tel(content('site.hotline'))) ?>"><?= t('site.hotline') ?></a>
             </p>
             </div>
         </div>
@@ -68,7 +68,7 @@ $feedbackToken = Security::csrfToken();
         <div class="footer__side">
             <form class="newsletter" action="/subscribe" method="post">
                 <?= csrf_field() ?>
-                <label class="sr-only" for="newsletter-email"><?= e(content('footer.newsletter')) ?></label>
+                <label class="sr-only" for="newsletter-email"><?= t('footer.newsletter') ?></label>
                 <input id="newsletter-email" type="email" name="email" maxlength="150" required
                        placeholder="<?= e(content('footer.newsletter')) ?>" autocomplete="email">
                 <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -78,15 +78,15 @@ $feedbackToken = Security::csrfToken();
             </form>
 
             <?php // শিরোনাম সবসময় থাকে; তার নিচে শুধু ঠিকানা-আছে এমন আইকন (কোনো লিংক না থাকলে social.php কিছুই ছাপে না) ?>
-            <p class="pill pill--social"><?= e(content('footer.social_title')) ?></p>
+            <p class="pill pill--social"><?= t('footer.social_title') ?></p>
             <?php $socialClass = 'social--footer'; require BASE_PATH . '/app/Views/partials/social.php'; ?>
         </div>
     </div>
 
     <div class="container footer__bottom">
         <p>
-            <?= e(content('footer.copyright_1')) ?><a href="/"><?= e(content('site.top_tagline_brand') !== '' ? strtolower(content('site.top_tagline_brand')) : 'jorurikaj.com') ?></a><?= e(content('footer.copyright_2')) ?><strong><?= e(content('footer.developer')) ?></strong>
+            <?= t('footer.copyright_1') ?><a href="/"><?= e(content('site.top_tagline_brand') !== '' ? strtolower(content('site.top_tagline_brand')) : 'jorurikaj.com') ?></a><?= t('footer.copyright_2') ?><strong><?= t('footer.developer') ?></strong>
         </p>
-        <p><a href="/privacy"><?= e(content('footer.policy')) ?></a> - <a href="/terms"><?= e(content('footer.terms')) ?></a></p>
+        <p><a href="/privacy"><?= t('footer.policy') ?></a> - <a href="/terms"><?= t('footer.terms') ?></a></p>
     </div>
 </footer>

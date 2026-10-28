@@ -6,6 +6,6 @@
  */
 ?>
 <div class="bn-switch" data-bn-switch>
-    <span class="bn-switch__text"><?= e(content('input.bn.label')) ?></span>
-    <button class="bn-switch__btn" type="button" aria-pressed="true" data-on="<?= e(content('input.bn.on')) ?>" data-off="<?= e(content('input.bn.off')) ?>"><?= e(content('input.bn.on')) ?></button>
+    <span class="bn-switch__text"><?= t('input.bn.label') ?></span>
+    <button class="bn-switch__btn" type="button" aria-pressed="true" data-on="<?= e(content('input.bn.on')) ?>" data-off="<?= e(content('input.bn.off')) ?>"><?= t('input.bn.on') ?></button>
 </div>

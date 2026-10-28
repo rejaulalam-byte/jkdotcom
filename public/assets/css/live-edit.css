@@ -81,3 +81,64 @@
 .jk-live-panel__row button:focus-visible {
     outline: 3px solid #f0d772;
 }
+
+/* সাজের টুলবার: B / I / U, রঙের ছোট গোল বাটন (রং = app.css-এর .tc-* এর মতো), "সাজ মুছুন" */
+.jk-live-panel__tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0 2px;
+}
+.jk-live-panel__tools[hidden],
+.jk-live-panel__preview[hidden] {
+    display: none;
+}
+.jk-live-panel__tools button {
+    min-width: 36px;
+    min-height: 36px;
+    padding: 0 10px;
+    border: 1px solid #b9cbd0;
+    border-radius: 6px;
+    background: #fff;
+    color: #125a6c;
+    font: inherit;
+    font-size: 16px;
+    cursor: pointer;
+}
+.jk-live-panel__tools button:hover,
+.jk-live-panel__tools button:focus-visible {
+    border-color: #125a6c;
+    outline: 2px solid #f0d772;
+}
+.jk-live-panel__colors {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.jk-live-panel__tools .jk-sw {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
+    padding: 0;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px #8fa5ab;
+}
+.jk-sw--gold { background: #f0d772; }
+.jk-sw--amber { background: #ffb11f; }
+.jk-sw--white { background: #fff; }
+.jk-sw--red { background: #ff8a8a; }
+.jk-sw--teal { background: #125a6c; }
+.jk-sw--orange { background: #c96a00; }
+.jk-sw--maroon { background: #6d1b2f; }
+.jk-sw--darkred { background: #870a0a; }
+.jk-sw--brown { background: #582a0d; }
+.jk-sw--black { background: #222; }
+.jk-live-panel__preview {
+    margin: 0 0 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 18px;
+}

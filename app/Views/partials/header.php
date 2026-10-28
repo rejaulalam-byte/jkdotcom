@@ -68,12 +68,12 @@ $registrationPaths = ['/login', '/welcome'];
                     </summary>
                     <div class="user-menu">
                         <p class="user-menu__name"><?= e((string) $member['name']) ?></p>
-                        <a class="user-menu__item" href="/account/password"><?= e(content('nav.password')) ?></a>
-                        <a class="user-menu__item" href="/profile"><?= e(content('nav.profile')) ?></a>
-                        <a class="user-menu__item" href="/profile#photo"><?= e(content('nav.photo')) ?></a>
+                        <a class="user-menu__item" href="/account/password"><?= t('nav.password') ?></a>
+                        <a class="user-menu__item" href="/profile"><?= t('nav.profile') ?></a>
+                        <a class="user-menu__item" href="/profile#photo"><?= t('nav.photo') ?></a>
                         <form action="/logout" method="post">
                             <?= csrf_field() ?>
-                            <button class="user-menu__item user-menu__logout" type="submit"><?= e(content('nav.logout')) ?></button>
+                            <button class="user-menu__item user-menu__logout" type="submit"><?= t('nav.logout') ?></button>
                         </form>
                     </div>
                 </details>

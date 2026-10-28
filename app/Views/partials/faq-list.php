@@ -18,6 +18,6 @@
         </details>
     <?php endforeach; ?>
     <?php if ($faqButton ?? true): ?>
-        <p><a class="btn btn--teal-soft" href="/faq"><?= e(content('home.faq.button')) ?></a></p>
+        <p><a class="btn btn--teal-soft" href="/faq"><?= t('home.faq.button') ?></a></p>
     <?php endif; ?>
 </div>

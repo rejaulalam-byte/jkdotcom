@@ -763,7 +763,8 @@ textarea {
         transform: translateX(-100%);
     }
 }
-/* লেখার ভেতরে অ্যাডমিন যে রংগুলো ব্যবহার করতে পারবেন: [[color:gold|শব্দ]] (helpers.php-র TEXT_COLORS) */
+/* লেখার ভেতরে অ্যাডমিন যে রংগুলো ব্যবহার করতে পারবেন: [[color:gold|শব্দ]] (helpers.php-র TEXT_COLORS)।
+   প্রথম চারটি গাঢ় টিল পটভূমির জন্য, বাকিগুলো সাদা/হালকা পটভূমির জন্য। */
 .tc-gold {
     color: var(--gold);
 }
@@ -775,6 +776,24 @@ textarea {
 }
 .tc-red {
     color: #ff8a8a;
+}
+.tc-teal {
+    color: var(--teal);
+}
+.tc-orange {
+    color: #c96a00;
+}
+.tc-maroon {
+    color: var(--maroon);
+}
+.tc-darkred {
+    color: var(--red);
+}
+.tc-brown {
+    color: var(--brown);
+}
+.tc-black {
+    color: var(--ink);
 }
 
 /* ---- Services (হোম): সেবার কার্ডের দুই সারি --------------------------------- */
