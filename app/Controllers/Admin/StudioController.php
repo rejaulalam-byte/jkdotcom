@@ -15,6 +15,7 @@ use App\Models\AdminRepository;
 use App\Models\LivePages;
 use App\Models\OpenPages;
 use App\Models\PageMap;
+use App\Models\SiteIcons;
 use App\Models\SiteTexts;
 
 /**
@@ -210,6 +211,59 @@ final class StudioController
         if ($saved) {
             AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'text_save', $key);
         }
+        $answer(true);
+    }
+
+    /**
+     * POST (লাইভ পেইজ এডিট, সেকশনের আইকন): _token, slot, action = upload (+ file) | reset | hide | show।
+     * উত্তর JSON: {ok: true} অথবা {ok: false, error}। লুকানো/দেখানো কাঠামোর কাজ, তাই শুধু সুপার অ্যাডমিন।
+     * নতুন ছবি দিলে বা শুরুর ছবিতে ফিরলে আগের দেওয়া ছবির ফাইল মুছে যায়।
+     */
+    public function liveIcon(): void
+    {
+        $admin = AdminAuth::require('pages');
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+        $answer = static function (bool $ok, ?string $error = null): never {
+            echo json_encode($ok ? ['ok' => true] : ['ok' => false, 'error' => $error], JSON_UNESCAPED_UNICODE);
+            exit;
+        };
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            http_response_code(403);
+            $answer(false, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। অ্যাডমিন পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+        $slot = (string) ($_POST['slot'] ?? '');
+        $action = (string) ($_POST['action'] ?? '');
+        if (!SiteIcons::exists($slot) || !in_array($action, ['upload', 'reset', 'hide', 'show'], true)) {
+            http_response_code(422);
+            $answer(false, 'এই আইকন এখানে বদলানো যায় না।');
+        }
+        if (in_array($action, ['hide', 'show'], true) && !AdminAuth::isSuper($admin)) {
+            http_response_code(403);
+            $answer(false, 'আইকন লুকানো বা দেখানো শুধু সুপার অ্যাডমিন পারেন।');
+        }
+
+        $key = 'icon.' . $slot;
+        $old = Content::get($key);
+        if ($action === 'upload') {
+            [$url, $error] = PageImage::store($_FILES['file'] ?? null);
+            if ($url === null) {
+                $answer(false, $error);
+            }
+            $ok = Content::set($key, $url);
+        } elseif ($action === 'hide') {
+            // লুকানোর সময় দেওয়া ছবিটা রাখা হয় না: আবার দেখালে শুরুর ছবি আসে
+            $ok = Content::set($key, SiteIcons::HIDDEN);
+        } else {
+            $ok = Content::forget($key);
+        }
+        if (!$ok) {
+            $answer(false, 'সংরক্ষণ করা যায়নি।');
+        }
+        if (SiteIcons::isCustom($old) && $action !== 'show') {
+            PageImage::remove($old);
+        }
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'icon_' . $action, $slot);
         $answer(true);
     }
 

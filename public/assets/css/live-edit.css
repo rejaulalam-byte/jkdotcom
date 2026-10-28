@@ -142,3 +142,40 @@
     border-radius: 6px;
     font-size: 18px;
 }
+
+/* সেকশনের আইকন: লুকানো আইকন ফ্রেমে ঝাপসা দেখায় (সাধারণ দর্শক দেখেন না); বাক্সে এখনকার ও শুরুর আইকন পাশাপাশি */
+[data-jk-icon] {
+    cursor: pointer;
+}
+[data-jk-icon]:hover {
+    outline: 2px dashed #e08a1e;
+    outline-offset: 2px;
+}
+.is-jk-hidden {
+    opacity: 0.3;
+}
+.jk-live-icon {
+    display: flex;
+    gap: 16px;
+    margin: 4px 0 8px;
+}
+.jk-live-icon figure {
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: #e6edef;
+    text-align: center;
+}
+.jk-live-icon img {
+    display: block;
+    max-width: 120px;
+    max-height: 60px;
+    margin: 0 auto 4px;
+}
+.jk-live-icon figcaption {
+    color: #5d6b70;
+    font-size: 14px;
+}
+.jk-live-panel [hidden] {
+    display: none;
+}

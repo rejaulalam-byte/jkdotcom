@@ -18,7 +18,7 @@ $faqKeys = [1, 2, 3, 4, 5];
     <div class="container hero__inner">
         <div class="hero__copy">
             <p class="pill pill--amber">
-                <img src="<?= e(asset('img/icons/badge-hero.svg')) ?>" alt="" width="50" height="32">
+                <?= section_icon('home.hero', 50, 32) ?>
                 <span data-fly><?= t('home.hero.badge') ?></span>
             </p>
             <h1 id="hero-title" class="hero__title">
@@ -78,7 +78,7 @@ $faqKeys = [1, 2, 3, 4, 5];
 <section class="section services" aria-labelledby="services-title">
     <div class="container section__head section__head--center">
         <p class="pill pill--olive">
-            <img src="<?= e(asset('img/icons/badge-section.svg')) ?>" alt="" width="50" height="32">
+            <?= section_icon('home.services', 50, 32) ?>
             <span><?= t('home.services.badge') ?></span>
         </p>
         <h2 id="services-title" class="section__title"><?= t('home.services.title') ?></h2>
@@ -119,7 +119,7 @@ $faqKeys = [1, 2, 3, 4, 5];
 <section class="section about" aria-labelledby="about-title">
     <div class="container section__head section__head--center">
         <p class="pill pill--olive">
-            <img src="<?= e(asset('img/icons/badge-section.svg')) ?>" alt="" width="50" height="32">
+            <?= section_icon('home.about', 50, 32) ?>
             <span><?= t('home.about.badge') ?></span>
         </p>
         <h2 id="about-title" class="section__title"><?= t('home.about.title') ?></h2>
@@ -137,7 +137,7 @@ $faqKeys = [1, 2, 3, 4, 5];
 <section class="section steps" aria-labelledby="steps-title">
     <div class="container section__head">
         <p class="pill pill--olive">
-            <img src="<?= e(asset('img/icons/badge-section.svg')) ?>" alt="" width="50" height="32">
+            <?= section_icon('home.steps', 50, 32) ?>
             <span><?= t('home.steps.badge') ?></span>
         </p>
         <h2 id="steps-title" class="section__title"><?= t('home.steps.title') ?></h2>
@@ -160,7 +160,7 @@ $faqKeys = [1, 2, 3, 4, 5];
 <section class="section faq" id="faq" aria-labelledby="faq-title">
     <div class="container section__head section__head--center">
         <p class="pill pill--olive">
-            <img src="<?= e(asset('img/icons/badge-section.svg')) ?>" alt="" width="50" height="32">
+            <?= section_icon('home.faq', 50, 32) ?>
             <span><?= t('home.faq.badge') ?></span>
         </p>
         <h2 id="faq-title" class="section__title"><?= t('home.faq.title') ?></h2>

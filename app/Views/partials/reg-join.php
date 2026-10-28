@@ -4,7 +4,7 @@
 <section class="section reg-join" aria-labelledby="reg-join-title">
     <div class="container">
         <p class="pill pill--olive">
-            <img src="<?= e(asset('img/icons/badge-section.svg')) ?>" alt="" width="50" height="32">
+            <?= section_icon('reg.join', 50, 32) ?>
             <span><?= t('reg.pro.badge') ?></span>
         </p>
         <h2 id="reg-join-title" class="reg-join__title"><?= t('reg.pro.join.title') ?></h2>

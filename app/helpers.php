@@ -308,3 +308,23 @@ function clean_input(mixed $value, int $max, bool $multiline = false): string
 
     return mb_substr(trim($value), 0, $max);
 }
+
+/**
+ * সেকশনের ছোট হেডিংয়ের আইকন (App\Models\SiteIcons): অ্যাডমিনের দেওয়া ছবি বা সাইটের সঙ্গে আসা ছবি;
+ * লুকানো থাকলে কিছুই না। লাইভ পেইজ এডিটের ফ্রেমে লুকানোটাও ঝাপসা করে দেখায়, যাতে আবার "দেখান" চাপা যায়।
+ */
+function section_icon(string $slot, int $width, int $height): string
+{
+    $state = \App\Models\SiteIcons::state($slot);
+    $live = live_preview();
+    if ($state === 'hidden' && !$live) {
+        return '';
+    }
+    $extra = '';
+    if ($live) {
+        \App\Core\LiveEdit::icon($slot);
+        $extra = ' data-jk-icon="' . e($slot) . '"' . ($state === 'hidden' ? ' class="is-jk-hidden"' : '');
+    }
+
+    return '<img src="' . e(\App\Models\SiteIcons::src($slot)) . '" alt="" width="' . $width . '" height="' . $height . '"' . $extra . '>';
+}

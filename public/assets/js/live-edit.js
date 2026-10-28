@@ -4,6 +4,7 @@
       লেখাটাকে (বা পুরো ঘরকে) data-jk-key চিহ্নিত করা হয়, তারপর চিহ্ন মুছে ফেলা হয় — পেইজ দেখতে হুবহু আগের মতো।
    ২) চিহ্নিত লেখায় ক্লিক করলে সেখানেই একটা বাক্স খোলে: লেখা বদলে "সংরক্ষণ করুন" চাপলে সঙ্গে সঙ্গে সাইটে বদলায়।
    ৩) যে লেখায় সাজ চলে (সার্ভারের colored()/t()), বাক্সে বোল্ড/ইটালিক/আন্ডারলাইন/রঙের বাটন আর পেইজের মতো দেখতে একটা নমুনা।
+   ৪) সেকশনের ছোট আইকনে (data-jk-icon) ক্লিক: নতুন ছবি দেওয়া, শুরুর ছবিতে ফেরা, লুকানো/দেখানো (শেষ দুটি সুপার অ্যাডমিন)।
    ===================================================================================================== */
 (function () {
     var dataEl = document.getElementById("jk-live-data");
@@ -202,6 +203,7 @@
         if (!t) {
             return;
         }
+        closeIcon();
         if (!panel) {
             build();
         }
@@ -231,16 +233,7 @@
         pv.style.color = getComputedStyle(el).color;
         pv.style.backgroundColor = backgroundOf(el);
         preview();
-
-        // বাক্সটা লেখার ঠিক নিচে (জায়গা না থাকলে ওপরে), পর্দার ভেতরে
-        panel.hidden = false;
-        var r = el.getBoundingClientRect();
-        var w = Math.min(560, window.innerWidth - 24);
-        panel.style.width = w + "px";
-        panel.style.left = Math.max(12, Math.min(r.left, window.innerWidth - w - 12)) + "px";
-        var below = r.bottom + 8;
-        var h = panel.offsetHeight;
-        panel.style.top = (below + h > window.innerHeight && r.top - h - 8 > 0 ? r.top - h - 8 : Math.min(below, window.innerHeight - h - 12)) + "px";
+        place(panel, el);
         area.focus();
     }
 
@@ -362,9 +355,140 @@
             });
     }
 
+    /* ---- ৪. সেকশনের আইকনের বাক্স ---- */
+    var iconPanel = null;
+    var iconCurrent = null;
+
+    function buildIcon() {
+        iconPanel = document.createElement("div");
+        iconPanel.className = "jk-live-panel jk-live-panel--icon";
+        iconPanel.setAttribute("role", "dialog");
+        iconPanel.setAttribute("aria-label", "আইকন বদলান");
+        iconPanel.innerHTML =
+            '<p class="jk-live-panel__title"></p>' +
+            '<div class="jk-live-icon">' +
+            '<figure><img class="jk-live-icon__now" alt=""><figcaption>এখন</figcaption></figure>' +
+            '<figure><img class="jk-live-icon__orig" alt=""><figcaption>শুরুর আইকন</figcaption></figure>' +
+            "</div>" +
+            '<p class="jk-live-panel__hint jk-live-icon__rule">নতুন ছবি: JPG, PNG বা WebP (সর্বোচ্চ ২ MB)। স্বচ্ছ পটভূমির PNG সবচেয়ে ভালো মানায়; ছবি আইকনের জায়গার মাপেই দেখাবে।</p>' +
+            '<p class="jk-live-icon__pick"><input type="file" class="jk-live-icon__file" accept="image/jpeg,image/png,image/webp" aria-label="নতুন আইকনের ছবি"></p>' +
+            '<p class="jk-live-panel__msg" role="status"></p>' +
+            '<div class="jk-live-panel__row">' +
+            '<button type="button" class="jk-live-panel__save" data-icon-act="upload">নতুন ছবি বসান</button>' +
+            '<button type="button" data-icon-act="reset">শুরুর আইকনে ফিরুন</button>' +
+            '<button type="button" data-icon-act="hide">লুকান</button>' +
+            '<button type="button" data-icon-act="show">দেখান</button>' +
+            '<button type="button" class="jk-live-icon__cancel">বাতিল</button>' +
+            "</div>";
+        document.body.appendChild(iconPanel);
+        iconPanel.querySelector(".jk-live-icon__cancel").addEventListener("click", closeIcon);
+        iconPanel.querySelector(".jk-live-panel__row").addEventListener("click", function (e) {
+            var b = e.target.closest("[data-icon-act]");
+            if (b) {
+                sendIcon(b.getAttribute("data-icon-act"));
+            }
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") {
+                closeIcon();
+            }
+        });
+    }
+
+    function openIcon(el) {
+        var slot = el.getAttribute("data-jk-icon");
+        var info = (data.icons || {})[slot];
+        if (!info) {
+            return;
+        }
+        close();
+        if (!iconPanel) {
+            buildIcon();
+        }
+        closeIcon();
+        iconCurrent = { el: el, slot: slot };
+        el.classList.add("is-jk-editing");
+        var hidden = info.state === "hidden";
+        iconPanel.querySelector(".jk-live-panel__title").textContent = info.label + (hidden ? " (এখন লুকানো)" : "");
+        iconPanel.querySelector(".jk-live-icon__now").src = info.src;
+        iconPanel.querySelector(".jk-live-icon__orig").src = info.original;
+        iconPanel.querySelector(".jk-live-icon__file").value = "";
+        iconPanel.querySelector(".jk-live-panel__msg").textContent = "";
+        iconPanel.querySelector('[data-icon-act="reset"]').hidden = info.state !== "custom";
+        iconPanel.querySelector('[data-icon-act="hide"]').hidden = !data.super || hidden;
+        iconPanel.querySelector('[data-icon-act="show"]').hidden = !data.super || !hidden;
+        iconPanel.querySelector('[data-icon-act="upload"]').hidden = hidden;
+        iconPanel.querySelector(".jk-live-icon__pick").hidden = hidden;
+        iconPanel.querySelector(".jk-live-icon__rule").hidden = hidden;
+        place(iconPanel, el);
+    }
+
+    function closeIcon() {
+        if (iconPanel) {
+            iconPanel.hidden = true;
+        }
+        if (iconCurrent) {
+            iconCurrent.el.classList.remove("is-jk-editing");
+            iconCurrent = null;
+        }
+    }
+
+    function sendIcon(action) {
+        if (!iconCurrent) {
+            return;
+        }
+        var msg = iconPanel.querySelector(".jk-live-panel__msg");
+        var body = new FormData();
+        body.append("_token", data.token);
+        body.append("slot", iconCurrent.slot);
+        body.append("action", action);
+        if (action === "upload") {
+            var file = iconPanel.querySelector(".jk-live-icon__file").files[0];
+            if (!file) {
+                msg.textContent = "আগে একটা ছবি বাছুন।";
+                return;
+            }
+            body.append("file", file);
+        }
+        msg.textContent = "সংরক্ষণ হচ্ছে…";
+        fetch(data.iconSave, { method: "POST", body: body, credentials: "same-origin" })
+            .then(function (res) {
+                return res.json();
+            })
+            .then(function (res) {
+                if (res.ok) {
+                    window.location.reload();
+                    return;
+                }
+                msg.textContent = res.error || "সংরক্ষণ করা যায়নি।";
+            })
+            .catch(function () {
+                msg.textContent = "সংরক্ষণ করা যায়নি। লগইনের মেয়াদ শেষ হয়ে থাকতে পারে; অ্যাডমিন পেইজটি রিফ্রেশ করুন।";
+            });
+    }
+
+    // বাক্সটা জিনিসটার ঠিক নিচে (জায়গা না থাকলে ওপরে), পর্দার ভেতরে
+    function place(box, el) {
+        box.hidden = false;
+        var r = el.getBoundingClientRect();
+        var w = Math.min(560, window.innerWidth - 24);
+        box.style.width = w + "px";
+        box.style.left = Math.max(12, Math.min(r.left, window.innerWidth - w - 12)) + "px";
+        var below = r.bottom + 8;
+        var h = box.offsetHeight;
+        box.style.top = (below + h > window.innerHeight && r.top - h - 8 > 0 ? r.top - h - 8 : Math.max(12, Math.min(below, window.innerHeight - h - 12))) + "px";
+    }
+
     // চিহ্নিত লেখায় ক্লিক = বদলানোর বাক্স (লিংকের পেইজে যাওয়া বা বাটনের কাজ হয় না)
     document.addEventListener("click", function (e) {
-        if (panel && panel.contains(e.target)) {
+        if ((panel && panel.contains(e.target)) || (iconPanel && iconPanel.contains(e.target))) {
+            return;
+        }
+        var ic = e.target.closest("[data-jk-icon]");
+        if (ic) {
+            e.preventDefault();
+            e.stopPropagation();
+            openIcon(ic);
             return;
         }
         var el = e.target.closest("[data-jk-key]");

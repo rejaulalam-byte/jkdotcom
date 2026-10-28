@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Models\SiteIcons;
 use App\Models\SiteTexts;
 
 /**
@@ -28,6 +29,14 @@ final class LiveEdit
 
     /** @var array<string,bool> যে লেখাগুলো t() দিয়ে দেখানো (বোল্ড/রং ইত্যাদি চলে) */
     private static array $formattable = [];
+
+    /** @var array<string,bool> এই পেইজে দেখানো সেকশন-আইকন (section_icon()) */
+    private static array $icons = [];
+
+    public static function icon(string $slot): void
+    {
+        self::$icons[$slot] = true;
+    }
 
     public static function formattable(string $key): void
     {
@@ -66,8 +75,23 @@ final class LiveEdit
             ];
         }
 
+        $icons = [];
+        foreach (array_keys(self::$icons) as $slot) {
+            $icons[$slot] = [
+                'label' => SiteIcons::label($slot),
+                'state' => SiteIcons::state($slot),
+                'src' => SiteIcons::src($slot),
+                'original' => SiteIcons::original($slot),
+            ];
+        }
+        $admin = AdminAuth::current();
+
         return [
             'texts' => $texts,
+            'icons' => $icons,
+            'iconSave' => admin_base() . '/studio/live-icon',
+            // লুকানো/দেখানো কাঠামোর কাজ: শুধু সুপার অ্যাডমিন
+            'super' => $admin !== null && AdminAuth::isSuper($admin),
             'save' => admin_base() . '/studio/live-save',
             'token' => Security::csrfToken(),
             'colors' => array_keys(TEXT_COLORS),
