@@ -5405,3 +5405,52 @@ html.popup-lock {
 .home-extra__btn--right {
     text-align: right;
 }
+
+/* পটভূমি (অ্যাডমিনের তালিকা থেকে, HomeSections::BACKGROUNDS); গাঢ় টিলে লেখা সাদা, সাইটের নাম সোনালি */
+.hx-bg--tealsoft {
+    background: var(--teal-10);
+}
+.hx-bg--grey {
+    background: #eef0f1;
+}
+.hx-bg--olive {
+    background: var(--olive-10);
+}
+.hx-bg--gold {
+    background: rgba(240, 215, 114, 0.25);
+}
+.hx-bg--teal {
+    background: var(--teal);
+    color: var(--white);
+}
+.hx-bg--teal .rich,
+.hx-bg--teal .section__title,
+.hx-bg--teal .rich h2,
+.hx-bg--teal .rich h3,
+.hx-bg--teal .rich h4 {
+    color: var(--white);
+}
+.hx-bg--teal .rich a {
+    color: var(--gold);
+}
+.hx-bg--teal .brandname {
+    color: var(--gold);
+}
+
+/* বাটনের বাড়তি দুই রং (নতুন সেকশনে বাছা যায়; হালকা টিল, সাদা, স্বচ্ছ সাদা আগে থেকেই আছে) */
+.btn--teal {
+    background: var(--teal);
+    color: var(--white);
+}
+.btn--teal:hover,
+.btn--teal:focus-visible {
+    background: var(--teal-dark);
+}
+.btn--orange {
+    background: var(--amber);
+    color: var(--white);
+}
+.btn--orange:hover,
+.btn--orange:focus-visible {
+    filter: brightness(0.9);
+}

@@ -4,11 +4,12 @@
  * খোলা লেখা (ছবি, টেবিল…), আর ঐচ্ছিক বাটন (লেখা, লিংক, জায়গা)। লাইভ পেইজ এডিটের সেকশন-পট্টির "সম্পাদনা" থেকে আসে।
  *
  * @var string $id
- * @var array{badge:string,heading:string,align:string,icon:string,button_text:string,button_url:string,button_align:string} $data
+ * @var array{badge:string,heading:string,align:string,icon:string,pill:string,bg:string,button_text:string,button_url:string,button_align:string,button_style:string} $data
  * @var string $html
  */
 
 use App\Models\HomeSections;
+use App\Models\SiteBoxes;
 
 $radios = static function (string $name, string $current): string {
     $out = '';
@@ -17,6 +18,15 @@ $radios = static function (string $name, string $current): string {
     }
 
     return $out;
+};
+/** @param array<string,string> $options মান => নাম */
+$select = static function (string $name, string $id, array $options, string $current): string {
+    $out = '<select id="' . e($id) . '" name="' . e($name) . '">';
+    foreach ($options as $value => $label) {
+        $out .= '<option value="' . e((string) $value) . '"' . ((string) $value === $current ? ' selected' : '') . '>' . e($label) . '</option>';
+    }
+
+    return $out . '</select>';
 };
 ?>
 <p><a class="adm-link" href="<?= e(admin_base() . '/studio?p=home') ?>">← লাইভ পেইজ এডিটে হোমে ফিরুন (সংরক্ষণ ছাড়া)</a></p>
@@ -46,6 +56,12 @@ $radios = static function (string $name, string $current): string {
 
             <span>শিরোনামের জায়গা</span>
             <div><?= $radios('align', $data['align']) ?></div>
+
+            <label for="hs-pill">ছোট শিরোনামের ক্যাপসুলের রং</label>
+            <?= $select('pill', 'hs-pill', array_map(static fn (array $c): string => $c[0], SiteBoxes::COLORS), $data['pill']) ?>
+
+            <label for="hs-bg">সেকশনের পটভূমির রং</label>
+            <?= $select('bg', 'hs-bg', HomeSections::BACKGROUNDS, $data['bg']) ?>
         </div>
     </div>
 
@@ -67,6 +83,8 @@ $radios = static function (string $name, string $current): string {
             <input id="hs-burl" type="text" name="button_url" maxlength="300" value="<?= e($data['button_url']) ?>" placeholder="যেমন /services বা /page/eid-offer বা https://…">
             <span>বাটনের জায়গা</span>
             <div><?= $radios('button_align', $data['button_align']) ?></div>
+            <label for="hs-bstyle">বাটনের রং</label>
+            <?= $select('button_style', 'hs-bstyle', HomeSections::BUTTONS, $data['button_style']) ?>
         </div>
     </div>
 

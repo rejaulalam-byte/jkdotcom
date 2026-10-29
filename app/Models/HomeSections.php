@@ -11,7 +11,7 @@ use App\Core\RichText;
  * হোম পেইজের সেকশন: ক্রম, লুকানো/দেখানো, আর অ্যাডমিনের যোগ করা নতুন সেকশন (শুধু সুপার অ্যাডমিন, লাইভ পেইজ এডিট থেকে)।
  * ক্রম ও লুকানো একটা কী-তে JSON ("home.sections": [{id, hidden}]); হিরো সবসময় একদম ওপরে।
  * নতুন সেকশন একটাই নকশায়: ছোট লোগোসহ ছোট শিরোনাম, বড় শিরোনাম, খোলা লেখা (পূর্ণ এডিটর), ঐচ্ছিক বাটন;
- * শিরোনাম ও বাটন বাঁয়ে / মাঝে / ডানে। তথ্য "home.section.<id>" (JSON), লেখা "home.section.<id>.html" (RichText-এ ছাঁকা)।
+ * শিরোনাম ও বাটন বাঁয়ে / মাঝে / ডানে; ক্যাপসুলের রং (SiteBoxes-এর তালিকা), পটভূমি ও বাটনের রং তালিকা থেকে। তথ্য "home.section.<id>" (JSON), লেখা "home.section.<id>.html" (RichText-এ ছাঁকা)।
  */
 final class HomeSections
 {
@@ -30,6 +30,25 @@ final class HomeSections
 
     /** শিরোনাম ও বাটনের জায়গা => নাম। */
     public const ALIGNS = ['left' => 'বাঁয়ে', 'center' => 'মাঝে', 'right' => 'ডানে'];
+
+    /** নতুন সেকশনের পটভূমি => নাম (CSS .hx-bg--*); '' = সাদা। গাঢ় টিলে লেখা সাদা হয়। */
+    public const BACKGROUNDS = [
+        '' => 'সাদা (রং ছাড়া)',
+        'tealsoft' => 'হালকা টিল',
+        'grey' => 'হালকা ধূসর',
+        'olive' => 'হালকা জলপাই',
+        'gold' => 'হালকা সোনালি',
+        'teal' => 'গাঢ় টিল (লেখা সাদা)',
+    ];
+
+    /** নতুন সেকশনের বাটন => নাম (CSS .btn--*)। */
+    public const BUTTONS = [
+        'teal-soft' => 'হালকা টিল',
+        'teal' => 'গাঢ় টিল',
+        'white' => 'সাদা',
+        'light' => 'স্বচ্ছ সাদা (গাঢ় পটভূমির জন্য)',
+        'orange' => 'কমলা',
+    ];
 
     /** সর্বোচ্চ কতগুলো নতুন সেকশন। */
     public const MAX_NEW = 20;
@@ -100,7 +119,7 @@ final class HomeSections
     /**
      * নতুন সেকশনের তথ্য, না থাকলে null।
      *
-     * @return array{badge:string,heading:string,align:string,icon:string,button_text:string,button_url:string,button_align:string}|null
+     * @return array{badge:string,heading:string,align:string,icon:string,pill:string,bg:string,button_text:string,button_url:string,button_align:string,button_style:string}|null
      */
     public static function data(string $id): ?array
     {
@@ -118,9 +137,12 @@ final class HomeSections
             'heading' => (string) ($d['heading'] ?? ''),
             'align' => $align($d['align'] ?? null),
             'icon' => (string) ($d['icon'] ?? ''),
+            'pill' => isset(SiteBoxes::COLORS[$d['pill'] ?? '']) ? (string) $d['pill'] : 'olive',
+            'bg' => isset(self::BACKGROUNDS[$d['bg'] ?? '']) ? (string) $d['bg'] : '',
             'button_text' => (string) ($d['button_text'] ?? ''),
             'button_url' => (string) ($d['button_url'] ?? ''),
             'button_align' => $align($d['button_align'] ?? null),
+            'button_style' => isset(self::BUTTONS[$d['button_style'] ?? '']) ? (string) $d['button_style'] : 'teal-soft',
         ];
     }
 
@@ -196,8 +218,8 @@ final class HomeSections
             $n++;
         }
         $id = 's' . $n;
-        $data = ['badge' => 'নতুন সেকশন', 'heading' => 'নতুন সেকশনের বড় শিরোনাম', 'align' => 'center', 'icon' => '',
-            'button_text' => '', 'button_url' => '', 'button_align' => 'center'];
+        $data = ['badge' => 'নতুন সেকশন', 'heading' => 'নতুন সেকশনের বড় শিরোনাম', 'align' => 'center', 'icon' => '', 'pill' => 'olive', 'bg' => '',
+            'button_text' => '', 'button_url' => '', 'button_align' => 'center', 'button_style' => 'teal-soft'];
         $at = $above ? $i : $i + 1;
         $at = max(1, $at); // হিরোর ওপরে নয়
         array_splice($all, $at, 0, [['id' => $id, 'hidden' => false, 'builtin' => false]]);
@@ -216,7 +238,7 @@ final class HomeSections
     /**
      * নতুন সেকশনের সব তথ্য ও লেখা একসঙ্গে। ঘরগুলো আগেই ছোট করে ছাঁকা (clean_input); লেখা এখানে RichText-এ ছাঁকে।
      *
-     * @param array{badge:string,heading:string,align:string,icon:string,button_text:string,button_url:string,button_align:string} $data
+     * @param array{badge:string,heading:string,align:string,icon:string,pill:string,bg:string,button_text:string,button_url:string,button_align:string,button_style:string} $data
      */
     public static function update(string $id, array $data, string $html): ?string
     {
@@ -231,6 +253,10 @@ final class HomeSections
                 $data[$f] = 'center';
             }
         }
+        // রং শুধু তালিকা থেকে; অচেনা হলে শুরুর রং
+        $data['pill'] = isset(SiteBoxes::COLORS[$data['pill']]) ? $data['pill'] : 'olive';
+        $data['bg'] = isset(self::BACKGROUNDS[$data['bg']]) ? $data['bg'] : '';
+        $data['button_style'] = isset(self::BUTTONS[$data['button_style']]) ? $data['button_style'] : 'teal-soft';
         if ($data['button_text'] !== '' && !self::validUrl($data['button_url'])) {
             return 'বাটনের লিংক সাইটের ঠিকানা (/ দিয়ে শুরু, যেমন /services) অথবা http(s)://… হতে হবে।';
         }

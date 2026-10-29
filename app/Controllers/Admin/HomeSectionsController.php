@@ -104,9 +104,12 @@ final class HomeSectionsController
             'heading' => clean_input($_POST['heading'] ?? '', 200),
             'align' => (string) ($_POST['align'] ?? 'center'),
             'icon' => $current['icon'],
+            'pill' => (string) ($_POST['pill'] ?? 'olive'),
+            'bg' => (string) ($_POST['bg'] ?? ''),
             'button_text' => clean_input($_POST['button_text'] ?? '', 60),
             'button_url' => trim((string) ($_POST['button_url'] ?? '')),
             'button_align' => (string) ($_POST['button_align'] ?? 'center'),
+            'button_style' => (string) ($_POST['button_style'] ?? 'teal-soft'),
         ];
         $html = (string) ($_POST['html'] ?? '');
         $keepOld = static function (string $message) use ($data, $html, $self): never {

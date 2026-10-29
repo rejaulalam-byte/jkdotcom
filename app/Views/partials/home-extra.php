@@ -2,11 +2,13 @@
 /**
  * হোমে অ্যাডমিনের যোগ করা নতুন সেকশন (App\Models\HomeSections), অন্য সেকশনের মতো একই নকশা: ছোট লোগোসহ ছোট শিরোনামের
  * ক্যাপসুল, বড় শিরোনাম (দুটো একসঙ্গে বাঁয়ে / মাঝে / ডানে), খোলা লেখা (পূর্ণ এডিটরের, ছাঁকা), আর ঐচ্ছিক বাটন (নিজের জায়গায়)।
+ * ক্যাপসুল, পটভূমি ও বাটনের রং অ্যাডমিনের তালিকা থেকে বাছা ক্লাস (.pill--*, .hx-bg--*, .btn--*)।
  *
  * @var string $sectionId
  */
 
 use App\Models\HomeSections;
+use App\Models\SiteBoxes;
 
 $extra = HomeSections::data($sectionId);
 if ($extra === null) {
@@ -14,10 +16,10 @@ if ($extra === null) {
 }
 $external = str_starts_with($extra['button_url'], 'http');
 ?>
-<section class="section home-extra" id="section-<?= e($sectionId) ?>" aria-labelledby="hx-<?= e($sectionId) ?>">
+<section class="section home-extra<?= $extra['bg'] !== '' ? ' hx-bg--' . e($extra['bg']) : '' ?>" id="section-<?= e($sectionId) ?>" aria-labelledby="hx-<?= e($sectionId) ?>">
     <div class="container section__head section__head--<?= e($extra['align']) ?>">
         <?php if ($extra['badge'] !== ''): ?>
-            <p class="pill pill--olive">
+            <p class="pill <?= e(SiteBoxes::COLORS[$extra['pill']][1]) ?>">
                 <img src="<?= e(HomeSections::iconUrl($extra)) ?>" alt="" width="50" height="32">
                 <span><?= e($extra['badge']) ?></span>
             </p>
@@ -29,7 +31,7 @@ $external = str_starts_with($extra['button_url'], 'http');
     </div>
     <?php if ($extra['button_text'] !== '' && $extra['button_url'] !== ''): ?>
         <div class="container home-extra__btn home-extra__btn--<?= e($extra['button_align']) ?>">
-            <a class="btn btn--teal-soft" href="<?= e($extra['button_url']) ?>"<?= $external ? ' target="_blank" rel="noopener"' : '' ?>><?= e($extra['button_text']) ?></a>
+            <a class="btn btn--<?= e($extra['button_style']) ?>" href="<?= e($extra['button_url']) ?>"<?= $external ? ' target="_blank" rel="noopener"' : '' ?>><?= e($extra['button_text']) ?></a>
         </div>
     <?php endif; ?>
 </section>
