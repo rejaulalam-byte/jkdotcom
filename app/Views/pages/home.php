@@ -9,10 +9,12 @@
  * @var list<string> $feedbackErrors
  * @var array<string,string> $old
  */
+$blocks = []; // সেকশন-id => তার HTML (নিচে ক্রম অনুযায়ী বসে)
 $stepKeys = [1, 2, 3, 4];
 $faqKeys = [1, 2, 3, 4, 5];
 ?>
 
+<?php ob_start(); ?>
 <!-- 1. HERO ---------------------------------------------------------- -->
 <section class="hero" aria-labelledby="hero-title">
     <div class="container hero__inner">
@@ -47,6 +49,7 @@ $faqKeys = [1, 2, 3, 4, 5];
     </div>
 </section>
 
+<?php $blocks['hero'] = ob_get_clean(); ob_start(); ?>
 <!-- 2. ADVERTISEMENTS + REPRESENTATIVE BAR --------------------------- -->
 <section class="ads" aria-label="<?= e(content('home.ads.label')) ?>">
     <?php // সক্রিয় বিজ্ঞাপন থাকলে এবং অ্যাডমিন লুকিয়ে না রাখলে (home.ads.show) তবেই সাদা বক্স ও স্ট্রিপ ?>
@@ -74,6 +77,7 @@ $faqKeys = [1, 2, 3, 4, 5];
     </div>
 </section>
 
+<?php $blocks['ads'] = ob_get_clean(); ob_start(); ?>
 <!-- 3. SERVICES ------------------------------------------------------- -->
 <section class="section services" aria-labelledby="services-title">
     <div class="container section__head section__head--center">
@@ -115,6 +119,7 @@ $faqKeys = [1, 2, 3, 4, 5];
     </div>
 </section>
 
+<?php $blocks['services'] = ob_get_clean(); ob_start(); ?>
 <!-- 4. ABOUT ---------------------------------------------------------- -->
 <section class="section about" aria-labelledby="about-title">
     <div class="container section__head section__head--center">
@@ -133,6 +138,7 @@ $faqKeys = [1, 2, 3, 4, 5];
     </div>
 </section>
 
+<?php $blocks['about'] = ob_get_clean(); ob_start(); ?>
 <!-- 5. HOW IT WORKS --------------------------------------------------- -->
 <section class="section steps" aria-labelledby="steps-title">
     <div class="container section__head">
@@ -156,6 +162,7 @@ $faqKeys = [1, 2, 3, 4, 5];
     </div>
 </section>
 
+<?php $blocks['steps'] = ob_get_clean(); ob_start(); ?>
 <!-- 6. FAQ + FEEDBACK -------------------------------------------------- -->
 <section class="section faq" id="faq" aria-labelledby="faq-title">
     <div class="container section__head section__head--center">
@@ -174,9 +181,17 @@ $faqKeys = [1, 2, 3, 4, 5];
     </div>
 </section>
 
+<?php $blocks['faq'] = ob_get_clean(); ob_start(); ?>
 <!-- 7. LOCATION MAP ---------------------------------------------------- -->
 <section class="map" aria-label="<?= e(content('home.map.alt')) ?>">
     <a href="https://www.google.com/maps?q=<?= e(rawurlencode(str_replace(' ', '', content('site.coordinates')))) ?>" target="_blank" rel="noopener noreferrer">
         <?= site_image('home.map', ['alt' => content('home.map.alt'), 'width' => 1221, 'height' => 580, 'loading' => 'lazy']) ?>
     </a>
 </section>
+<?php $blocks['map'] = ob_get_clean();
+
+// সেকশনগুলো অ্যাডমিনের সাজানো ক্রমে (App\Models\HomeSections): লুকানোগুলো দর্শক পান না; লাইভ পেইজ এডিটে
+// সুপার অ্যাডমিন প্রতিটির ওপরে নিয়ন্ত্রণ-পট্টি পান (সরানো, লুকানো, নতুন সেকশন), লুকানোগুলো ঝাপসা দেখায়।
+foreach (\App\Models\HomeSections::all() as $section) {
+    require BASE_PATH . '/app/Views/partials/home-section-slot.php';
+}

@@ -442,3 +442,48 @@ summary.live-msgs__title {
 .live-msgs__style .live-msgs__switch {
     margin: 0;
 }
+
+/* হোমের সেকশন-পট্টি (সুপার অ্যাডমিন; partials/home-section-slot.php): সেকশনের ওপরে টিল পট্টি, লুকানো সেকশন ঝাপসা */
+.jk-home-slot {
+    position: relative;
+    outline: 2px dashed transparent;
+}
+.jk-home-slot:hover {
+    outline-color: #e08a1e;
+}
+.jk-home-bar {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 6px 12px;
+    background: #125a6c;
+    color: #fff;
+    font: 400 15px/1.4 "Bangla Digits", "Hind Siliguri", "Nirmala UI", system-ui, sans-serif;
+}
+.jk-home-bar__name {
+    margin-right: auto;
+    font-weight: 600;
+}
+.jk-home-bar button {
+    padding: 3px 10px;
+    border: 1px solid #fff;
+    border-radius: 6px;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+}
+.jk-home-bar button:hover,
+.jk-home-bar button:focus-visible {
+    background: #fff;
+    color: #125a6c;
+}
+.jk-home-slot.is-jk-hidden .jk-home-bar {
+    background: #8a1111;
+}
+.jk-home-slot.is-jk-hidden > :not(.jk-home-bar) {
+    opacity: 0.35;
+}

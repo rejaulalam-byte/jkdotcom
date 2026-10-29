@@ -1448,3 +1448,17 @@ input.adm-short {
 .adm-details > form {
     margin-top: 12px;
 }
+
+/* ---- হোমের নতুন সেকশনের পাতা (admin/home-section.php) ---- */
+.adm-radio {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    margin: 4px 18px 4px 0;
+    cursor: pointer;
+}
+.adm-hs-icon {
+    padding: 6px;
+    border-radius: 8px;
+    background: #f1f4f2;
+}

@@ -5368,3 +5368,26 @@ html.popup-lock {
 .msgc p {
     color: var(--msg-ink);
 }
+
+/* ---- হোমে অ্যাডমিনের যোগ করা নতুন সেকশন (partials/home-extra.php): শিরোনাম ও বাটন বাঁয়ে / মাঝে / ডানে ---- */
+.section__head--left {
+    text-align: left;
+}
+.section__head--right {
+    text-align: right;
+}
+.home-extra__body {
+    margin-top: 1.5rem;
+}
+.home-extra__btn {
+    margin-top: 2rem;
+}
+.home-extra__btn--left {
+    text-align: left;
+}
+.home-extra__btn--center {
+    text-align: center;
+}
+.home-extra__btn--right {
+    text-align: right;
+}

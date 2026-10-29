@@ -911,6 +911,47 @@
         });
     });
 
+    /* ---- হোমের সেকশন: প্রতিটি সেকশনের ওপরের পট্টি (সুপার অ্যাডমিন; partials/home-section-slot.php) —
+       সরানো, লুকানো/দেখানো, নতুন সেকশন যোগ ও মোছা সঙ্গে সঙ্গে সংরক্ষণ; "সম্পাদনা" পুরো অ্যাডমিন-পর্দায় সেকশনের পাতা খোলে ---- */
+    document.querySelectorAll("[data-jk-home]").forEach(function (slot) {
+        slot.querySelectorAll(".jk-home-bar button").forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var act = btn.getAttribute("data-act");
+                if (act === "edit") {
+                    window.top.location.href = btn.getAttribute("data-url");
+                    return;
+                }
+                var question = btn.getAttribute("data-confirm");
+                if (question && !window.confirm(question)) {
+                    return;
+                }
+                var body = new FormData();
+                body.append("_token", data.token);
+                body.append("id", slot.getAttribute("data-jk-home"));
+                body.append("do", act);
+                btn.disabled = true;
+                fetch(data.homeSave, { method: "POST", body: body, credentials: "same-origin" })
+                    .then(function (res) {
+                        return res.json();
+                    })
+                    .then(function (res) {
+                        if (res.ok) {
+                            window.location.reload();
+                            return;
+                        }
+                        btn.disabled = false;
+                        window.alert(res.error || "সংরক্ষণ করা যায়নি।");
+                    })
+                    .catch(function () {
+                        btn.disabled = false;
+                        window.alert("সংরক্ষণ করা যায়নি। লগইনের মেয়াদ শেষ হয়ে থাকতে পারে; অ্যাডমিন পেইজটি রিফ্রেশ করুন।");
+                    });
+            });
+        });
+    });
+
     document.addEventListener("click", function (e) {
         if ((panel && panel.contains(e.target)) || (iconPanel && iconPanel.contains(e.target)) || (fieldPanel && fieldPanel.contains(e.target)) || (customPanel && customPanel.contains(e.target))) {
             return;

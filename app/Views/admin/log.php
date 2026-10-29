@@ -12,6 +12,8 @@ $labels = [
     'member_trash' => 'ডাস্টবিনে পাঠানো', 'member_restore' => 'ফিরিয়ে আনা', 'member_reopen' => 'নতুন আবেদনে ফেরানো', 'member_edit' => 'তথ্য সম্পাদনা', 'member_purged' => 'চিরতরে মোছা', 'sweep' => 'স্বয়ংক্রিয় ঝাড়া',
     'message_on' => 'বার্তা চালু', 'message_off' => 'বার্তা বন্ধ', 'message_style' => 'বার্তার বাক্সের ডিজাইন', 'mail_edit' => 'ইমেইলের লেখা বদল', 'mail_reset' => 'ইমেইলের লেখা শুরুতে ফেরা', 'mail_test' => 'নমুনা ইমেইল',
     'page_add' => 'নতুন পেইজ', 'page_update' => 'পেইজের নাম বদল', 'page_publish' => 'পেইজ প্রকাশ', 'page_hide' => 'পেইজ লুকানো', 'page_delete' => 'পেইজ মোছা',
+    'home_section_up' => 'হোমের সেকশন ওপরে', 'home_section_down' => 'হোমের সেকশন নিচে', 'home_section_hide' => 'হোমের সেকশন লুকানো', 'home_section_show' => 'হোমের সেকশন দেখানো',
+    'home_section_add_above' => 'হোমে নতুন সেকশন', 'home_section_add_below' => 'হোমে নতুন সেকশন', 'home_section_delete' => 'হোমের সেকশন মোছা', 'home_section_edit' => 'হোমের সেকশন সম্পাদনা',
 ];
 ?>
 <div class="adm-tablewrap">
