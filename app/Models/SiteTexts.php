@@ -13,7 +13,7 @@ use App\Core\Content;
 final class SiteTexts
 {
     /** যে কী-গুলো লেখা নয় (সুইচ বা সেটিং) বা অন্য জায়গায় বদলায় (খোলা পেইজের পুরো লেখা)। */
-    private const SKIP = '/^(settings\.|page\.|popup\.|home\.ads\.show$)/';
+    private const SKIP = '/^(settings\.|page\.|popup\.|mail\.|message\.|home\.ads\.show$)/';
 
     /** বার্তা-ধরনের কী: সফলতা/ভুলের বার্তা, পপ-আপ, আগ্রহীর পপ-আপ, ফাঁকা-তালিকার লেখা (পেইজের শেষে আলাদা অংশে দেখায়)। */
     private const MESSAGE = '/(\.done(\.|_|$)|(^|\.)msg\.|\.lead\.|^consent\.error$|\.empty$|\.none$|^worker\.rate\.(thanks|invalid|limit|error)$'

@@ -10,6 +10,7 @@ use App\Controllers\Admin\JobsController as AdminJobs;
 use App\Controllers\Admin\LeadsController as AdminLeads;
 use App\Controllers\Admin\LegacyController as AdminLegacy;
 use App\Controllers\Admin\LocksController as AdminLocks;
+use App\Controllers\Admin\MailsController as AdminMails;
 use App\Controllers\Admin\MemberEditController as AdminMemberEdit;
 use App\Controllers\Admin\StudioController as AdminStudio;
 use App\Controllers\Admin\MembersController as AdminMembers;
@@ -132,6 +133,8 @@ return [
     ['POST', admin_base() . '/ads/popup',           [AdminAds::class, 'popup']],
     ['GET',  admin_base() . '/services',            [AdminServices::class, 'index']],
     ['POST', admin_base() . '/services/action',     [AdminServices::class, 'action']],
+    ['GET',  admin_base() . '/mails',               [AdminMails::class, 'index']],
+    ['POST', admin_base() . '/mails',               [AdminMails::class, 'action']],
     ['GET',  admin_base() . '/studio',              [AdminStudio::class, 'index']],
     ['POST', admin_base() . '/studio/save',         [AdminStudio::class, 'save']],
     ['POST', admin_base() . '/studio/image',        [AdminStudio::class, 'image']],

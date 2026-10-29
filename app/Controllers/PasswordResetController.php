@@ -9,6 +9,7 @@ use App\Core\Logger;
 use App\Core\Mailer;
 use App\Core\RateLimiter;
 use App\Core\Security;
+use App\Models\MailTemplates;
 use App\Models\UserRepository;
 
 /**
@@ -127,15 +128,13 @@ final class PasswordResetController
     /** কোডসহ ইমেইল পাঠায়। ডাটাবেস না থাকলে (লোকাল ডেমো) মেইল না পাঠিয়ে storage/demo-mail.log-এ লেখে। */
     private function sendCode(string $to, string $code): void
     {
-        $body = "আপনার পাসওয়ার্ড পুনরুদ্ধারের কোড: {$code}\n\n"
-            . "কোডটি ১০ মিনিট পর্যন্ত কাজ করবে। কোডটি কাউকে জানাবেন না।\n"
-            . "আপনি এটি চেয়ে না থাকলে এই ইমেইল উপেক্ষা করুন।\n\n— jorurikaj.com";
+        $mail = MailTemplates::render('password_code', ['{code}' => $code]);
         if (Database::connection() === null) {
             @file_put_contents(BASE_PATH . '/storage/demo-mail.log', $to . ' | ' . $code . PHP_EOL, FILE_APPEND | LOCK_EX);
 
             return;
         }
-        if (!Mailer::send($to, 'পাসওয়ার্ড পুনরুদ্ধারের কোড — jorurikaj.com', $body)) {
+        if (!Mailer::send($to, $mail['subject'], $mail['body'])) {
             Logger::error('Password reset e-mail could not be sent');
         }
     }

@@ -10,6 +10,7 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminRepository;
+use App\Models\MailTemplates;
 use App\Models\GeoRepository;
 use App\Models\MemberStatus;
 use App\Models\ServiceRepository;
@@ -184,17 +185,17 @@ final class MembersController
         $isWorker = $member['role'] === 'worker';
         $base = AdminAuth::baseUrl();
         $loginId = (string) ($member['phone'] ?? '') !== '' ? format_phone((string) $member['phone']) . ' অথবা ' . $email : $email;
-        $body = 'প্রিয় ' . honorific_name($member['gender'] ?? null, (string) $member['name']) . ", অভিনন্দন!\n\nআপনার আবেদনটি অনুমোদিত হয়েছে"
-            . ($isWorker ? ' এবং আপনার নাম jorurikaj.com ওয়েবসাইটে প্রকাশিত হয়েছে।' : '।') . "\n\n"
-            . 'লগইন আইডি: ' . $loginId . "\n"
-            . 'লগইন করুন: ' . $base . ($isWorker ? '/login' : '/login/agent') . "\n"
-            . "পাসওয়ার্ড ভুলে গেলে লগইন পেইজের \"পাসওয়ার্ড মনে নেই\" লিংকে ক্লিক করুন, ইমেইলে কোড যাবে।\n"
-            . "(নিরাপত্তার জন্য আপনার পাসওয়ার্ড আমরা ইমেইলে পাঠাই না, আর আমরা তা জানিও না।)\n\n"
-            . 'আপনার প্রোফাইল: ' . $base . "/profile\n"
-            . ($isWorker ? 'আপনার পাবলিক পেইজ: ' . $base . '/workers/' . (int) $member['id'] . "\n" : '')
-            . "\nপ্রয়োজনে হেল্পলাইনে কল করুন: " . content('today.post.helpline') . "\n\n— jorurikaj.com";
+        // বিষয় ও লেখা অ্যাডমিনের "ইমেইলের লেখা" পেইজ থেকে (App\Models\MailTemplates)
+        $mail = MailTemplates::render($isWorker ? 'approval_worker' : 'approval_agent', [
+            '{name}' => honorific_name($member['gender'] ?? null, (string) $member['name']),
+            '{login_id}' => $loginId,
+            '{login_url}' => $base . ($isWorker ? '/login' : '/login/agent'),
+            '{profile_url}' => $base . '/profile',
+            '{public_url}' => $base . '/workers/' . (int) $member['id'],
+            '{helpline}' => content('today.post.helpline'),
+        ]);
 
-        return AdminAuth::mail($email, 'আপনার আবেদন অনুমোদিত হয়েছে — jorurikaj.com', $body);
+        return AdminAuth::mail($email, $mail['subject'], $mail['body']);
     }
 
     /**
@@ -209,12 +210,13 @@ final class MembersController
         if ($email === '') {
             return false;
         }
-        $helpline = content('today.post.helpline');
-        $body = 'প্রিয় ' . honorific_name($member['gender'] ?? null, (string) $member['name']) . ",\n\njorurikaj.com-এ আবেদন করার জন্য আপনাকে ধন্যবাদ।\nদুঃখের সাথে জানাচ্ছি, আপাতত আপনার আবেদনটি গ্রহণ করা সম্ভব হয়নি।\n\n"
-            . ($reason !== '' ? 'কারণ: ' . $reason . "\n\nতথ্য ঠিক করে আবার আবেদন করতে পারেন, অথবা হেল্পলাইনে কল করুন: " : "এ বিষয়ে আরও জানতে বা তথ্য ঠিক করে নিতে চাইলে আমাদের হেল্পলাইনে কল করুন: ")
-            . $helpline . "।\n\nধন্যবাদান্তে,\njorurikaj.com";
+        $mail = MailTemplates::render($reason !== '' ? 'reject_reason' : 'reject', [
+            '{name}' => honorific_name($member['gender'] ?? null, (string) $member['name']),
+            '{reason}' => $reason,
+            '{helpline}' => content('today.post.helpline'),
+        ]);
 
-        return AdminAuth::mail($email, 'আপনার আবেদনের বিষয়ে — jorurikaj.com', $body);
+        return AdminAuth::mail($email, $mail['subject'], $mail['body']);
     }
 
     /** কাজ শেষে ফেরার পথ: শুধু /admin/ দিয়ে শুরু হওয়া নিজের পাথ, নইলে কর্মীর তালিকা। */

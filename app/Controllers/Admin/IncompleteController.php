@@ -10,6 +10,7 @@ use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminRepository;
 use App\Models\IncompleteInfo;
+use App\Models\MailTemplates;
 use App\Models\UserRepository;
 
 /**
@@ -113,14 +114,14 @@ final class IncompleteController
         foreach ($missing as $key) {
             $list .= '• ' . IncompleteInfo::LABELS[$key] . "\n";
         }
-        $base = AdminAuth::baseUrl();
-        $body = 'প্রিয় ' . honorific_name($member['gender'] ?? null, (string) $member['name']) . ",\n\njorurikaj.com-এ আপনার প্রোফাইলের কিছু তথ্য বাকি আছে:\n\n" . $list
-            . "\nলগইন করে প্রোফাইল পেইজে তথ্যগুলো পূরণ করে সংরক্ষণ করুন। এতে সাধারণ মানুষ আপনাকে সহজে খুঁজে পাবেন।\n\n"
-            . 'লগইন করুন: ' . $base . "/login\n"
-            . "পাসওয়ার্ড ভুলে গেলে লগইন পেইজের \"পাসওয়ার্ড মনে নেই\" লিংকে ক্লিক করুন, ইমেইলে কোড যাবে।\n\n"
-            . 'প্রয়োজনে হেল্পলাইনে কল করুন: ' . content('today.post.helpline') . "\n\n— jorurikaj.com";
+        $mail = MailTemplates::render('fill_info', [
+            '{name}' => honorific_name($member['gender'] ?? null, (string) $member['name']),
+            '{missing_list}' => rtrim($list),
+            '{login_url}' => AdminAuth::baseUrl() . '/login',
+            '{helpline}' => content('today.post.helpline'),
+        ]);
 
-        if (!AdminAuth::mail($email, 'আপনার তথ্য পূর্ণ করুন — jorurikaj.com', $body)) {
+        if (!AdminAuth::mail($email, $mail['subject'], $mail['body'])) {
             $this->fail($back, 'ইমেইল পাঠানো যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।');
         }
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'member_fill_mail', (string) $member['name']);

@@ -28,6 +28,7 @@ $nav = [
     [admin_base() . '/ads', 'বিজ্ঞাপন', false, 'ads'],
     [admin_base() . '/services', 'সেবার তালিকা', false, 'services'],
     [admin_base() . '/studio', 'লাইভ পেইজ এডিট', false, 'pages'],
+    [admin_base() . '/mails', 'ইমেইলের লেখা', false, 'email'],
     [admin_base() . '/locks', 'আটকানো লগইন', false, 'locks'],
 ];
 // ওপরের সারি: বাঁয়ে ড্যাশবোর্ড; ডানে নিজের জিনিস (অ্যাকাউন্ট, অ্যাডমিন)। কার্যলগ ড্যাশবোর্ডের ডান পাশের আলাদা বাক্সে
