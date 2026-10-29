@@ -9,10 +9,12 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminRepository;
+use App\Models\SiteSizes;
 use App\Models\SiteTheme;
 
 /**
- * রং ও আকার (<admin>/theme): সাইটের থিমের মূল রং বদলানো, নমুনা দেখা, শুরুর রঙে ফেরা (App\Models\SiteTheme)।
+ * রং ও আকার (<admin>/theme): সাইটের থিমের মূল রং (App\Models\SiteTheme) ও ছয় দলের লেখার আকার শতাংশে (SiteSizes)
+ * বদলানো, নমুনা দেখা, শুরুতে ফেরা।
  * কাঠামোর কাজ, তাই শুধু সুপার অ্যাডমিন। পড়া কঠিন হতে পারে এমন রঙে সতর্ক করে, তবে সংরক্ষণ আটকায় না।
  */
 final class ThemeController
@@ -24,11 +26,16 @@ final class ThemeController
         foreach (array_keys(SiteTheme::COLORS) as $name) {
             $colors[$name] = SiteTheme::color($name);
         }
+        $sizes = [];
+        foreach (array_keys(SiteSizes::GROUPS) as $group) {
+            $sizes[$group] = SiteSizes::percent($group);
+        }
         header('Cache-Control: no-store');
         View::render('admin/theme', [
             'admin' => $admin,
             'title' => 'রং ও আকার',
             'colors' => $colors,
+            'sizes' => $sizes,
             'warnings' => SiteTheme::warnings($colors),
             'errors' => Session::pull('admin_errors', []),
             'ok' => Session::pull('admin_ok'),
@@ -44,6 +51,29 @@ final class ThemeController
             $this->fail($back, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
         }
         $log = static fn (string $detail) => AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'theme_colors', $detail);
+
+        // লেখার আকারের ফর্ম (আলাদা বাক্স)
+        if (($_POST['sizes'] ?? '') === '1') {
+            $posted = ($_POST['sizes_reset'] ?? '') === '1' ? [] : (is_array($_POST['size'] ?? null) ? $_POST['size'] : []);
+            $changed = [];
+            foreach (array_keys(SiteSizes::GROUPS) as $group) {
+                $percent = (int) ($posted[$group] ?? 100);
+                if (!in_array($percent, SiteSizes::STEPS, true)) {
+                    $this->fail($back, 'আকার শুধু তালিকার শতাংশগুলো থেকে বাছা যায়।');
+                }
+                if ($percent !== SiteSizes::percent($group)) {
+                    if (!SiteSizes::set($group, $percent)) {
+                        $this->fail($back, 'সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।');
+                    }
+                    $changed[] = $group . '=' . $percent . '%';
+                }
+            }
+            if ($changed !== []) {
+                AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'theme_sizes', implode(', ', $changed));
+            }
+            Session::flash('admin_ok', $changed === [] ? 'কোনো আকার বদলায়নি।' : 'লেখার আকার সংরক্ষণ হয়েছে; পুরো সাইটে এখনই নতুন আকার।');
+            redirect($back);
+        }
 
         $reset = (string) ($_POST['reset'] ?? '');
         if ($reset !== '' || ($_POST['reset_all'] ?? '') === '1') {

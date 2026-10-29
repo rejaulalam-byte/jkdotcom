@@ -24,7 +24,7 @@ $pageDescription = $description ?? content('site.description');
     <link rel="icon" type="image/png" href="<?= e(asset('img/site/logo-figma.png')) ?>">
     <link rel="preload" href="<?= e(asset('fonts/hind-siliguri-400.woff2')) ?>" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
-    <?php if (\App\Models\SiteTheme::anyChanged()): // অ্যাডমিনের বাছা থিমের রং (app.css-এর মান বদলে দেয়) ?>
+    <?php if (\App\Models\SiteTheme::anyCustom()): // অ্যাডমিনের বাছা থিমের রং ও লেখার আকার (app.css-এর মান বদলে দেয়) ?>
         <link rel="stylesheet" href="/site-theme?v=<?= e(\App\Models\SiteTheme::version()) ?>">
     <?php endif; ?>
     <?php if (live_preview()): // অ্যাডমিনের লাইভ পেইজ এডিট: app.js-এর আগে চলে (লেখার চিহ্ন খুঁজে নিয়ে মুছে দেয়) ?>

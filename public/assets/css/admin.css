@@ -1577,3 +1577,17 @@ input.adm-short {
     background: color-mix(in srgb, var(--p-teal) 35%, #fff);
     color: var(--p-teal);
 }
+/* আকারের বাক্স রঙের বাক্সের নিচে, নমুনা ডানে দুটোর পাশে */
+.adm-theme > form {
+    grid-column: 1;
+}
+.adm-theme__preview {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+}
+@media (max-width: 1000px) {
+    .adm-theme__preview {
+        grid-column: 1;
+        grid-row: auto;
+    }
+}

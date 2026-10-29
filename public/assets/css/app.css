@@ -109,6 +109,15 @@
     --fs-small: 1.125rem;  /* 18px */
     --fs-foot: 1.25rem;    /* 20px */
 
+    /* লেখার আকারের গুণক (অ্যাডমিনের "রং ও আকার", App\Models\SiteSizes; ১ = নকশার মাপ): প্রতিটি font-size এদের একটা দিয়ে গুণ হয় —
+       body = সাধারণ ও ছোট লেখা (২.৫rem-এর কম), head = বড় শিরোনাম (২.৫rem বা বেশি), pill = সেকশনের ক্যাপসুল, nav = মেনু, btn = বাটন, foot = ফুটার */
+    --k-body: 1;
+    --k-head: 1;
+    --k-pill: 1;
+    --k-nav: 1;
+    --k-btn: 1;
+    --k-foot: 1;
+
     --ad-h: 17.375rem;     /* বিজ্ঞাপন-স্ট্রিপের উচ্চতা (২৭৮px) */
 }
 
@@ -127,7 +136,7 @@ html {
 body {
     margin: 0;
     font-family: var(--font);
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 1.6;
     color: var(--ink);
     background: var(--white);
@@ -214,7 +223,7 @@ textarea {
     min-height: 4.6875rem;
     padding: 0 3.75rem;
     border-radius: 50px;
-    font-size: var(--fs-pill);
+    font-size: calc(var(--fs-pill) * var(--k-pill));
     font-weight: 500;
     letter-spacing: 0.105rem;
     line-height: 1.3;
@@ -266,7 +275,7 @@ textarea {
 }
 /* ফুটারের "সামাজিক যোগাযোগ মাধ্যম" ক্যাপসুলের মাপ (রং আলাদা ক্লাসে, অ্যাডমিন বদলাতে পারেন) */
 .pill--footer-social {
-    font-size: 1.375rem;
+    font-size: calc(1.375rem * var(--k-body));
     letter-spacing: 0.069rem;
     min-height: 3.9375rem;
 }
@@ -280,7 +289,7 @@ textarea {
     padding: 0.5rem 3.75rem;
     border: 0;
     border-radius: 50px;
-    font-size: var(--fs-btn);
+    font-size: calc(var(--fs-btn) * var(--k-btn));
     font-weight: 500;
     line-height: 1.3;
     text-align: center;
@@ -295,7 +304,7 @@ textarea {
     min-width: 20.125rem;
     background: rgba(255, 255, 255, 0.75);
     color: var(--brown);
-    font-size: var(--fs-lead);
+    font-size: calc(var(--fs-lead) * var(--k-body));
 }
 .btn--light:hover {
     background: rgba(255, 255, 255, 0.95);
@@ -310,7 +319,7 @@ textarea {
 .btn--white {
     background: var(--white);
     color: var(--teal);
-    font-size: var(--fs-lead);
+    font-size: calc(var(--fs-lead) * var(--k-body));
 }
 .btn--white img {
     width: 1.875rem;
@@ -331,14 +340,14 @@ textarea {
 }
 .section__title {
     margin-top: 2.5rem;
-    font-size: var(--fs-h2);
+    font-size: calc(var(--fs-h2) * var(--k-head));
     font-weight: 500;
     line-height: 1.35;
     color: #000;
 }
 .section__text {
     margin-top: 1.5rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 1.9;
     color: #000;
 }
@@ -351,7 +360,7 @@ textarea {
     margin: 0 0 1.5rem;
     padding: 1rem 1.25rem;
     border-radius: 0.625rem;
-    font-size: 1.125rem;
+    font-size: calc(1.125rem * var(--k-body));
     line-height: 1.6;
 }
 .notice--ok {
@@ -369,7 +378,7 @@ textarea {
     background: var(--teal);
     color: var(--white);
     min-height: 5.375rem;
-    font-size: var(--fs-small);
+    font-size: calc(var(--fs-small) * var(--k-body));
 }
 .topbar__inner {
     display: grid;
@@ -392,7 +401,7 @@ textarea {
     gap: 0.5rem;
 }
 .topbar__tagline {
-    font-size: 1.375rem;
+    font-size: calc(1.375rem * var(--k-body));
     text-align: center;
 }
 .topbar__tagline span {
@@ -475,7 +484,7 @@ textarea {
 .nav__link {
     display: inline-block;
     padding: 0.4rem 0 0.15rem;
-    font-size: var(--fs-nav);
+    font-size: calc(var(--fs-nav) * var(--k-nav));
     line-height: 1.35;
     color: var(--ink);
     text-decoration: none;
@@ -537,7 +546,7 @@ textarea {
 .sub a {
     display: block;
     padding: 0.7rem 1.5rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     text-decoration: none;
     white-space: nowrap;
 }
@@ -571,7 +580,7 @@ textarea {
 }
 .hero__title {
     margin-top: 3.75rem;
-    font-size: var(--fs-h1);
+    font-size: calc(var(--fs-h1) * var(--k-head));
     font-weight: 600; /* শিরোনাম মোটা; আমরা Hind Siliguri-র সবচেয়ে মোটা যে ওজন লোড করি সেটাই ৬০০ */
     line-height: 1.5;
 }
@@ -584,7 +593,7 @@ textarea {
 }
 .hero__text {
     max-width: 51.75rem;
-    font-size: var(--fs-lead);
+    font-size: calc(var(--fs-lead) * var(--k-body));
     line-height: 1.5;
 }
 .hero .btn {
@@ -602,7 +611,7 @@ textarea {
     padding: 0 3.7rem;
     border-radius: 0.625rem 0.625rem 0 0;
     background: rgba(176, 176, 176, 0.82);
-    font-size: 1.625rem;
+    font-size: calc(1.625rem * var(--k-body));
     font-weight: 600;
     line-height: 1.3;
 }
@@ -615,7 +624,7 @@ textarea {
 .today__empty {
     margin: 0 3rem;
     min-height: 22.5rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     opacity: 0.9;
 }
 .ticker {
@@ -626,7 +635,7 @@ textarea {
 }
 .ticker li {
     height: 2.8125rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 2.8125rem;
     white-space: nowrap;
     overflow: hidden;
@@ -657,7 +666,7 @@ textarea {
     border-radius: 0.3125rem;
     background: var(--white);
     color: var(--brown);
-    font-size: 1.25rem;
+    font-size: calc(1.25rem * var(--k-body));
     line-height: 1.5;
     text-align: center;
 }
@@ -778,7 +787,7 @@ textarea {
 .rep-bar__text {
     width: 100%;
     overflow: hidden;
-    font-size: 2.1875rem;
+    font-size: calc(2.1875rem * var(--k-body));
     font-weight: 500;
     line-height: 1.5;
     white-space: nowrap;
@@ -913,7 +922,7 @@ textarea {
     flex: 1;
     align-items: center;
     padding: 0 0.5rem 0.75rem;
-    font-size: var(--fs-card);
+    font-size: calc(var(--fs-card) * var(--k-body));
     font-weight: 600;
     line-height: 1.4;
     text-align: center;
@@ -936,7 +945,7 @@ textarea {
 }
 .about__copy {
     padding-top: 6.3rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 2.05;
 }
 .about__copy .btn {
@@ -975,13 +984,13 @@ textarea {
        তাই এখানে ডিভাইসের নিজের বাংলা ফন্ট (Windows: Nirmala UI, Android: Noto Sans Bengali,
        Apple: Kohinoor Bangla) — লম্বা, পরিষ্কার অঙ্ক। */
     font-family: "Nirmala UI", "Noto Sans Bengali", "Kohinoor Bangla", "Hind Siliguri", sans-serif;
-    font-size: 2.5rem; /* প্রথম নকশার ৩.৭৫rem-এর চেয়ে এক-তৃতীয়াংশ ছোট */
+    font-size: calc(2.5rem * var(--k-head)); /* প্রথম নকশার ৩.৭৫rem-এর চেয়ে এক-তৃতীয়াংশ ছোট */
     font-weight: 700;
     line-height: 1;
 }
 .step-card h3 {
     margin-top: 2.5rem;
-    font-size: 2.25rem;
+    font-size: calc(2.25rem * var(--k-body));
     font-weight: 600;
     line-height: 1.4;
     color: var(--teal);
@@ -989,7 +998,7 @@ textarea {
 .step-card p {
     margin-top: 1.2rem;
     max-width: 18.5rem;
-    font-size: 1.625rem;
+    font-size: calc(1.625rem * var(--k-body));
     line-height: 1.5;
 }
 
@@ -1022,7 +1031,7 @@ textarea {
     align-items: flex-start;
     gap: 1.875rem;
     padding: 2.5rem 4.5rem 0.5rem 2.56rem;
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * var(--k-body));
     font-weight: 600;
     line-height: 1.5;
     list-style: none;
@@ -1040,7 +1049,7 @@ textarea {
     position: absolute;
     right: 3rem;
     top: 2.2rem;
-    font-size: 1.875rem;
+    font-size: calc(1.875rem * var(--k-body));
     font-weight: 400;
     letter-spacing: 0.1125rem;
     line-height: 1.2;
@@ -1051,7 +1060,7 @@ textarea {
 .faq-item p {
     max-width: 38rem;
     padding: 0 2rem 2.5rem 5.3rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 1.6;
 }
 .faq-item:not([open]) summary {
@@ -1080,7 +1089,7 @@ textarea {
 .feedback__title {
     max-width: 27.75rem;
     margin: 0 auto 2.2rem;
-    font-size: 2.5rem;
+    font-size: calc(2.5rem * var(--k-head));
     font-weight: 600;
     line-height: 1.25;
     text-align: center;
@@ -1097,7 +1106,7 @@ textarea {
     border-radius: 0.625rem;
     background: var(--white);
     color: var(--ink);
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 .feedback input[type="text"],
 .feedback input[type="email"],
@@ -1137,7 +1146,7 @@ textarea {
     text-align: center;
 }
 .page-banner__title {
-    font-size: var(--fs-h1);
+    font-size: calc(var(--fs-h1) * var(--k-head));
     font-weight: 400;
     line-height: 1.5;
 }
@@ -1147,7 +1156,7 @@ textarea {
     justify-content: center;
     gap: 0.4rem;
     margin-top: 0.5rem;
-    font-size: var(--fs-lead);
+    font-size: calc(var(--fs-lead) * var(--k-body));
 }
 .crumbs li + li::before {
     content: "/";
@@ -1162,7 +1171,7 @@ textarea {
     text-decoration: underline;
 }
 .error-code {
-    font-size: 8rem;
+    font-size: calc(8rem * var(--k-head));
     font-weight: 600;
     line-height: 1.2;
     color: var(--teal-20);
@@ -1176,7 +1185,7 @@ textarea {
     padding-top: 8rem; /* Figma: লোগোর সারি ফুটারের ওপরের কিনারা থেকে ১২৮px নিচে শুরু */
     background: var(--teal);
     color: var(--white);
-    font-size: var(--fs-small);
+    font-size: calc(var(--fs-small) * var(--k-body));
 }
 .site-footer a {
     text-decoration: none;
@@ -1218,19 +1227,19 @@ textarea {
 .footer__name {
     width: 13.875rem;
     margin-top: 0;
-    font-size: 1.7284rem;
+    font-size: calc(1.7284rem * var(--k-body));
     font-weight: 600;
     line-height: 1.2;
     text-align: center;
 }
 .footer__name span {
     color: var(--gold);
-    font-size: 2.0965rem;
+    font-size: calc(2.0965rem * var(--k-body));
 }
 .footer__tagline {
     width: 13.875rem;
     margin-top: 0.2rem;
-    font-size: 1.1314rem;
+    font-size: calc(1.1314rem * var(--k-body));
     font-weight: 600;
     text-align: center;
 }
@@ -1258,10 +1267,10 @@ textarea {
     align-items: baseline;
     gap: 1.8rem;
     margin-top: 1.6rem;
-    font-size: 1.625rem;
+    font-size: calc(1.625rem * var(--k-body));
 }
 .footer__hotline a {
-    font-size: 1.875rem;
+    font-size: calc(1.875rem * var(--k-body));
     font-weight: 600;
 }
 
@@ -1273,7 +1282,7 @@ textarea {
     display: grid;
     gap: 1.375rem;
     align-content: start;
-    font-size: var(--fs-foot);
+    font-size: calc(var(--fs-foot) * var(--k-foot));
 }
 .footer__links ul:first-child {
     grid-column: 2;
@@ -1289,7 +1298,7 @@ textarea {
 @media (min-width: 1200px) {
     .footer__contact,
     .footer__links ul {
-        font-size: 1.375rem;
+        font-size: calc(1.375rem * var(--k-body));
     }
 }
 
@@ -1313,7 +1322,7 @@ textarea {
     border-radius: 3.33rem;
     background: transparent;
     color: var(--ink);
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 .newsletter ::placeholder {
     color: rgba(var(--ink-rgb), 0.56);
@@ -1359,7 +1368,7 @@ textarea {
     margin-top: 3.2rem;
     padding: 3.6rem 0 3.4rem;
     border-top: 1px solid rgba(255, 255, 255, 0.35);
-    font-size: var(--fs-foot);
+    font-size: calc(var(--fs-foot) * var(--k-foot));
 }
 .footer__bottom a {
     color: var(--gold);
@@ -1525,7 +1534,7 @@ textarea {
         flex: 1;
         padding: 0.9rem 0;
         border-bottom: 0;
-        font-size: 1.1rem;
+        font-size: calc(1.1rem * var(--k-body));
     }
     .nav__link.is-active {
         border-bottom: 0;
@@ -1557,7 +1566,7 @@ textarea {
     }
     .sub a {
         padding: 0.6rem 0;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .nav__search {
         align-self: flex-start;
@@ -1591,7 +1600,7 @@ textarea {
     .today__head {
         min-height: 3.5rem;
         padding: 0 1.5rem;
-        font-size: 1.2rem;
+        font-size: calc(1.2rem * var(--k-body));
     }
     .today__body {
         min-height: 0;
@@ -1606,12 +1615,12 @@ textarea {
     .ticker li {
         height: 2.25rem;
         line-height: 2.25rem;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .today__note {
         min-height: 0;
         margin: 1rem 1rem 0;
-        font-size: 0.95rem;
+        font-size: calc(0.95rem * var(--k-body));
     }
 
     .ads {
@@ -1636,7 +1645,7 @@ textarea {
         padding: 1.25rem 0;
     }
     .rep-bar__text {
-        font-size: 1.15rem;
+        font-size: calc(1.15rem * var(--k-body));
         line-height: 1.6;
     }
 
@@ -1666,7 +1675,7 @@ textarea {
     }
     .service-card__name {
         padding: 0 0.25rem 0.5rem;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
         line-height: 1.4;
     }
     .services .center {
@@ -1701,15 +1710,15 @@ textarea {
     .step-card__no {
         width: 3.75rem;
         height: 3.75rem;
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .step-card h3 {
         margin-top: 1.25rem;
-        font-size: 1.2rem;
+        font-size: calc(1.2rem * var(--k-body));
     }
     .step-card p {
         margin-top: 0.5rem;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
 
     .faq {
@@ -1725,7 +1734,7 @@ textarea {
     .faq-item summary {
         gap: 0.9rem;
         padding: 1.25rem 3.25rem 0.25rem 1.25rem;
-        font-size: 1.05rem;
+        font-size: calc(1.05rem * var(--k-body));
     }
     .faq-item summary::after {
         right: 1.25rem;
@@ -1743,7 +1752,7 @@ textarea {
     }
     .feedback__title {
         margin-bottom: 1.5rem;
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .feedback input[type="text"],
     .feedback input[type="email"],
@@ -1775,7 +1784,7 @@ textarea {
         margin-top: 0.25rem;
     }
     .error-code {
-        font-size: 5rem;
+        font-size: calc(5rem * var(--k-head));
     }
 
     .site-footer {
@@ -1800,15 +1809,15 @@ textarea {
     .footer__name {
         width: auto;
         text-align: left;
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .footer__name span {
-        font-size: 1.75rem;
+        font-size: calc(1.75rem * var(--k-body));
     }
     .footer__tagline {
         width: auto;
         text-align: left;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .footer__contact {
         margin-top: 1.5rem;
@@ -1816,10 +1825,10 @@ textarea {
     .footer__hotline {
         flex-wrap: wrap;
         gap: 0.5rem 1rem;
-        font-size: 1.25rem;
+        font-size: calc(1.25rem * var(--k-body));
     }
     .footer__hotline a {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .footer__links {
         display: grid;
@@ -1891,10 +1900,10 @@ textarea {
         --ad-h: 9rem;
     }
     .topbar__contact a span {
-        font-size: 0.875rem;
+        font-size: calc(0.875rem * var(--k-body));
     }
     .service-card__name {
-        font-size: 0.95rem;
+        font-size: calc(0.95rem * var(--k-body));
     }
     .footer__links {
         grid-template-columns: 1fr;
@@ -2017,7 +2026,7 @@ textarea {
     padding: 9.75rem 0 10rem;
 }
 .rich {
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 2.05;
     color: #000;
     display: flow-root; /* ভাসমান ছবি যেন বাক্সের ভেতরেই থাকে */
@@ -2027,19 +2036,19 @@ textarea {
 }
 .rich h2 {
     margin: 0 0 4.4rem;
-    font-size: var(--fs-h2);
+    font-size: calc(var(--fs-h2) * var(--k-head));
     font-weight: 500;
     line-height: 1.35;
 }
 .rich h3 {
     margin: 2.8rem 0 0.4rem;
-    font-size: 2.1875rem;
+    font-size: calc(2.1875rem * var(--k-body));
     font-weight: 600;
     line-height: 1.3;
 }
 .rich h4 {
     margin: 2rem 0 0.4rem;
-    font-size: var(--fs-lead);
+    font-size: calc(var(--fs-lead) * var(--k-body));
     font-weight: 600;
 }
 .rich p {
@@ -2101,7 +2110,7 @@ textarea {
     }
     .rich h3 {
         margin-top: 2rem;
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .rich .img-right,
     .rich .img-left {
@@ -2146,7 +2155,7 @@ textarea {
     padding: 9.75rem 0 8rem;
 }
 .services-intro {
-    font-size: 1.625rem;
+    font-size: calc(1.625rem * var(--k-body));
     font-weight: 300;
     line-height: 1.73;
     color: var(--ink);
@@ -2157,7 +2166,7 @@ textarea {
     border-radius: 1.25rem;
     background: var(--teal);
     color: var(--white);
-    font-size: 1.625rem;
+    font-size: calc(1.625rem * var(--k-body));
     font-weight: 500;
     line-height: 1.73;
 }
@@ -2184,7 +2193,7 @@ textarea {
     border: 0;
     border-radius: 50px 0 0 50px;
     background: transparent;
-    font-size: var(--fs-lead);
+    font-size: calc(var(--fs-lead) * var(--k-body));
     color: var(--ink);
 }
 .svc-search input::placeholder {
@@ -2206,7 +2215,7 @@ textarea {
     border-radius: 50px;
     background: var(--teal);
     color: var(--white);
-    font-size: 2rem;
+    font-size: calc(2rem * var(--k-body));
     font-weight: 500;
     cursor: pointer;
 }
@@ -2216,7 +2225,7 @@ textarea {
 .svc-result {
     margin-top: 1.4rem;
     text-align: center;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 .svc-result a {
     margin-left: 0.6rem;
@@ -2225,7 +2234,7 @@ textarea {
 }
 .svc-result--note {
     margin-top: 0.4rem;
-    font-size: var(--fs-small);
+    font-size: calc(var(--fs-small) * var(--k-body));
     color: rgba(var(--ink-rgb), 0.7);
 }
 .svc-columns {
@@ -2246,7 +2255,7 @@ textarea {
 .svc-group__head {
     padding: 0.35rem 2rem;
     background: var(--teal-20);
-    font-size: var(--fs-lead);
+    font-size: calc(var(--fs-lead) * var(--k-body));
     font-weight: 600;
     line-height: 1.6;
     color: var(--teal);
@@ -2255,7 +2264,7 @@ textarea {
     display: block;
     padding: 0.4rem 2rem;
     border-bottom: 1px solid var(--teal-10);
-    font-size: 1.375rem;
+    font-size: calc(1.375rem * var(--k-body));
     line-height: 1.5;
     color: #000;
     text-decoration: none;
@@ -2275,7 +2284,7 @@ textarea {
     }
     .services-intro,
     .svc-notice {
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
     }
     .svc-notice {
         padding: 1.2rem 1.2rem 1.2rem 0.6rem;
@@ -2286,12 +2295,12 @@ textarea {
     }
     .svc-search input {
         padding-left: 1.2rem;
-        font-size: 0.9375rem;
+        font-size: calc(0.9375rem * var(--k-body));
     }
     .svc-search__btn {
         width: 7.5rem;
         gap: 0.4rem;
-        font-size: 1.125rem;
+        font-size: calc(1.125rem * var(--k-body));
     }
     .svc-search__btn img {
         width: 1.25rem;
@@ -2307,11 +2316,11 @@ textarea {
         padding-inline: 1.25rem;
     }
     .svc-group li a {
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
         padding-block: 0.6rem; /* আঙুলে চাপার জন্য আরামদায়ক উচ্চতা */
     }
     .svc-group__head {
-        font-size: 1.25rem;
+        font-size: calc(1.25rem * var(--k-body));
     }
 }
 
@@ -2338,7 +2347,7 @@ textarea {
 }
 .post-job__intro {
     margin-top: 2.3rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     font-weight: 300;
     line-height: 2.05;
     text-align: justify;
@@ -2389,7 +2398,7 @@ textarea {
     border-radius: 0.625rem;
     background: var(--teal-05);
     color: var(--ink);
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     font-weight: 300;
 }
 .pf textarea {
@@ -2435,7 +2444,7 @@ textarea {
 }
 .pf--date label {
     flex: none;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     font-weight: 300;
     color: rgba(var(--ink-rgb), 0.6);
 }
@@ -2447,7 +2456,7 @@ textarea {
     border: 0;
     background: transparent;
     text-align: right;
-    font-size: 1.125rem;
+    font-size: calc(1.125rem * var(--k-body));
 }
 .pf--date input:focus {
     background: transparent;
@@ -2463,7 +2472,7 @@ textarea {
     border-radius: 50px;
     background: rgba(var(--teal-rgb), 0.25);
     color: var(--teal);
-    font-size: 1.75rem;
+    font-size: calc(1.75rem * var(--k-body));
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s;
@@ -2479,15 +2488,15 @@ textarea {
         padding: 3rem 0 4rem;
     }
     .post-job__title {
-        font-size: 1.75rem;
+        font-size: calc(1.75rem * var(--k-body));
     }
     .post-job__intro {
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
         line-height: 1.85;
         text-align: left;
     }
     .post-job__note {
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
         padding: 1.2rem 1rem;
     }
     .post-form {
@@ -2505,7 +2514,7 @@ textarea {
     .pf--date {
         height: 3.75rem;
         padding-left: 1.2rem;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .pf textarea {
         height: 9rem;
@@ -2513,11 +2522,11 @@ textarea {
         line-height: 1.7;
     }
     .pf--date label {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .pf-submit {
         width: 100%;
-        font-size: 1.375rem;
+        font-size: calc(1.375rem * var(--k-body));
     }
     .post-form__submit {
         margin-top: 2rem;
@@ -2558,7 +2567,7 @@ textarea {
 }
 .combo__list [role="option"] {
     padding: 0.55rem 1.5rem 0.55rem 4.5rem;
-    font-size: 1.25rem;
+    font-size: calc(1.25rem * var(--k-body));
     line-height: 1.5;
     cursor: pointer;
 }
@@ -2569,7 +2578,7 @@ textarea {
 }
 .combo__none {
     padding: 1rem 1.5rem 1rem 4.5rem;
-    font-size: 1.125rem;
+    font-size: calc(1.125rem * var(--k-body));
     color: rgba(var(--ink-rgb), 0.75);
 }
 .combo__use {
@@ -2580,7 +2589,7 @@ textarea {
     border-radius: 50px;
     background: rgba(var(--teal-rgb), 0.12);
     color: var(--teal);
-    font-size: 1.125rem;
+    font-size: calc(1.125rem * var(--k-body));
     font-weight: 600;
     cursor: pointer;
 }
@@ -2592,7 +2601,7 @@ textarea {
     position: absolute;
     left: 0.25rem;
     top: calc(100% + 0.1rem);
-    font-size: 0.9375rem;
+    font-size: calc(0.9375rem * var(--k-body));
     line-height: 1.4;
     color: var(--teal);
 }
@@ -2612,7 +2621,7 @@ textarea {
     }
     .combo__list [role="option"] {
         padding-left: 1.2rem;
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
     }
     .combo__none {
         padding-left: 1.2rem;
@@ -2633,7 +2642,7 @@ textarea {
     border: 1px dashed var(--teal-35);
     border-radius: 0.625rem;
     background: var(--teal-05);
-    font-size: 1.0625rem;
+    font-size: calc(1.0625rem * var(--k-body));
     line-height: 1.5;
     color: var(--teal);
 }
@@ -2645,7 +2654,7 @@ textarea {
     border-radius: 50px;
     background: var(--teal);
     color: var(--white);
-    font-size: 1.0625rem;
+    font-size: calc(1.0625rem * var(--k-body));
     font-weight: 600;
     cursor: pointer;
 }
@@ -2669,7 +2678,7 @@ textarea {
     }
     .page-home .btn--teal-soft,
     .page-home .feedback .btn {
-        font-size: 1.6364rem;
+        font-size: calc(1.6364rem * var(--k-body));
     }
 }
 
@@ -2721,16 +2730,16 @@ textarea {
         --fs-body: 1.5rem;
     }
     .page-legal .rich h3 {
-        font-size: 2.25rem;
+        font-size: calc(2.25rem * var(--k-body));
     }
     .page-legal .rich h4 {
-        font-size: 1.875rem;
+        font-size: calc(1.875rem * var(--k-body));
     }
     .page-legal .rich {
         line-height: 1.875;
     }
     .page-legal .rich h2 {
-        font-size: 3.25rem;
+        font-size: calc(3.25rem * var(--k-head));
     }
 }
 
@@ -2749,7 +2758,7 @@ textarea {
     min-height: 3.75rem;
     padding: 0.4rem 2rem;
     border: 2px solid rgba(var(--teal-rgb), 0.5);
-    font-size: 1.25rem;
+    font-size: calc(1.25rem * var(--k-body));
 }
 .reg-tabs .btn.is-current {
     background: transparent;
@@ -2766,10 +2775,10 @@ textarea {
         --fs-h2: 3.25rem;
     }
     .page-regrules .rich h3 {
-        font-size: 2.25rem;
+        font-size: calc(2.25rem * var(--k-body));
     }
     .page-regrules .rich h4 {
-        font-size: 1.875rem;
+        font-size: calc(1.875rem * var(--k-body));
         font-weight: 600;
     }
     .page-regrules .rich {
@@ -2784,7 +2793,7 @@ textarea {
     }
     .reg-tabs .btn {
         padding-inline: 1rem;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
 }
 
@@ -2799,13 +2808,13 @@ textarea {
 }
 .reg-join__title {
     margin: 1.9rem 0 1.1rem;
-    font-size: var(--fs-h2);
+    font-size: calc(var(--fs-h2) * var(--k-head));
     font-weight: 500;
     line-height: 1.35;
 }
 .reg-join__text {
     text-align: justify;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 2.05;
 }
 .reg-cards {
@@ -2830,13 +2839,13 @@ textarea {
 }
 .reg-card h3 {
     margin: 2.6rem 0 0.4rem;
-    font-size: 2.5rem;
+    font-size: calc(2.5rem * var(--k-head));
     font-weight: 500;
     line-height: 1.3;
 }
 .reg-card p {
     margin: 0;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 1.9;
 }
 .reg-card a {
@@ -2844,7 +2853,7 @@ textarea {
     align-items: center;
     gap: 0.8rem;
     margin-top: 2.2rem;
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * var(--k-body));
     font-weight: 500;
     color: var(--white);
 }
@@ -2857,13 +2866,13 @@ textarea {
 }
 @media (min-width: 1200px) {
     .page-regguide .reg-join__title {
-        font-size: 3.25rem;
+        font-size: calc(3.25rem * var(--k-head));
     }
     .page-regguide .reg-card h3 {
-        font-size: 2.625rem;
+        font-size: calc(2.625rem * var(--k-head));
     }
     .page-regguide .reg-card a {
-        font-size: 1.625rem;
+        font-size: calc(1.625rem * var(--k-body));
     }
 }
 @media (max-width: 1199px) {
@@ -2874,7 +2883,7 @@ textarea {
         padding: 3rem 0 3.5rem;
     }
     .reg-join__title {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .reg-join__text {
         text-align: left;
@@ -2886,7 +2895,7 @@ textarea {
     }
     .reg-card h3 {
         margin-top: 1.5rem;
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .reg-card a {
         margin-top: 1.25rem;
@@ -2898,18 +2907,18 @@ textarea {
    কলামগুলো একটু কাছে, যাতে সবচেয়ে লম্বা নামও ২৪px-এ এক লাইনে ধরে। টিল বাক্সের লেখা আগের মতো। */
 @media (min-width: 1200px) {
     .services-intro {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .svc-columns {
         gap: 3.5rem;
     }
     .svc-group__head {
         padding-inline: 1.75rem;
-        font-size: 1.875rem;
+        font-size: calc(1.875rem * var(--k-body));
     }
     .svc-group li a {
         padding-inline: 1.75rem;
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .svc-search + .bn-switch {
         flex-wrap: nowrap;
@@ -2933,14 +2942,14 @@ textarea {
         --fs-body: 1.5rem;
     }
     .page-post .pf--date input {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .page-post .combo__list [role="option"] {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .page-post .combo__none,
     .page-post .combo__use {
-        font-size: 1.25rem;
+        font-size: calc(1.25rem * var(--k-body));
     }
     .page-post .post-form .bn-switch {
         flex-wrap: nowrap;
@@ -2960,7 +2969,7 @@ textarea {
     padding: 9.4rem 0 10rem;
 }
 .today-intro {
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     font-weight: 300;
     line-height: 2.05;
     text-align: justify;
@@ -2995,7 +3004,7 @@ textarea {
 }
 .job__title {
     display: block;
-    font-size: 1.875rem;
+    font-size: calc(1.875rem * var(--k-body));
     font-weight: 600;
     line-height: 1.4;
     color: var(--teal); /* বিজ্ঞপ্তির শিরোনাম রঙিন, বাকি লেখা সাধারণ রঙের */
@@ -3005,7 +3014,7 @@ textarea {
     flex-wrap: wrap;
     gap: 0.2rem 2.5rem;
     margin: 0.55rem 0 0 4.5rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 1.6;
     color: var(--ink);
 }
@@ -3013,7 +3022,7 @@ textarea {
     position: absolute;
     top: 1.5rem;
     right: 7rem;
-    font-size: 3.125rem;
+    font-size: calc(3.125rem * var(--k-head));
     font-weight: 600;
     line-height: 1;
     color: rgba(var(--ink-rgb), 0.78);
@@ -3026,7 +3035,7 @@ textarea {
 }
 .job__body {
     padding: 0.3rem 4rem 2.6rem 8.75rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 1.9;
     color: #000;
 }
@@ -3067,7 +3076,7 @@ textarea {
     border-radius: 0.625rem;
     background: var(--teal-05);
     text-align: center;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 /* ডেস্কটপ: সাধারণ লেখা ২৪px, বাকি সাইজ Figma + ২px */
 @media (min-width: 1200px) {
@@ -3077,10 +3086,10 @@ textarea {
         --fs-lead: 2rem;
     }
     .page-today .job__title {
-        font-size: 2rem;
+        font-size: calc(2rem * var(--k-body));
     }
     .page-today .job__toggle {
-        font-size: 3.25rem;
+        font-size: calc(3.25rem * var(--k-head));
     }
 }
 @media (max-width: 1199px) {
@@ -3088,7 +3097,7 @@ textarea {
         padding: 3rem 0 4rem;
     }
     .today-intro {
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
         line-height: 1.85;
         text-align: left;
     }
@@ -3096,27 +3105,27 @@ textarea {
         padding: 1.25rem 3.5rem 1.1rem 1.25rem;
     }
     .job__title {
-        font-size: 1.25rem;
+        font-size: calc(1.25rem * var(--k-body));
     }
     .job__meta {
         margin-left: 0;
-        font-size: 0.9375rem;
+        font-size: calc(0.9375rem * var(--k-body));
         gap: 0.1rem 1rem;
     }
     .job__toggle {
         top: 1rem;
         right: 1.25rem;
-        font-size: 2rem;
+        font-size: calc(2rem * var(--k-body));
     }
     .job__body {
         padding: 0.2rem 1.25rem 1.5rem;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
         line-height: 1.8;
     }
     .job__hint {
         display: block;
         margin: 0.2rem 0 0;
-        font-size: 0.9375rem;
+        font-size: calc(0.9375rem * var(--k-body));
     }
 }
 
@@ -3136,14 +3145,14 @@ textarea {
 }
 .lead h3 {
     margin: 0 0 0.8rem;
-    font-size: 2rem;
+    font-size: calc(2rem * var(--k-body));
     font-weight: 600;
     line-height: 1.35;
     color: var(--teal);
 }
 .lead p {
     margin: 0 0 1.1rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 1.7;
 }
 .lead__actions {
@@ -3154,7 +3163,7 @@ textarea {
     margin: 1.6rem 0 0 !important;
 }
 .lead .pf-submit {
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * var(--k-body));
     min-height: 3.9rem;
     padding: 0.3rem 2.2rem;
 }
@@ -3164,7 +3173,7 @@ textarea {
     background: transparent;
     color: var(--teal);
     font: inherit;
-    font-size: 1.375rem;
+    font-size: calc(1.375rem * var(--k-body));
     text-decoration: underline;
     text-underline-offset: 0.25rem;
     cursor: pointer;
@@ -3179,17 +3188,17 @@ textarea {
 .lead .bn-switch {
     margin-bottom: 1rem;
     padding: 0.4rem 0.8rem;
-    font-size: 0.9375rem;
+    font-size: calc(0.9375rem * var(--k-body));
 }
 .lead__error {
     margin: 0 0 0.4rem !important;
     color: #8a1111;
-    font-size: 1.25rem !important;
+    font-size: calc(1.25rem * var(--k-body)) !important;
     font-weight: 600;
 }
 @media (min-width: 1200px) {
     body.page-today .lead h3 {
-        font-size: 2rem; /* ৩০px + ২px */
+        font-size: calc(2rem * var(--k-body)); /* ৩০px + ২px */
     }
 }
 @media (max-width: 1199px) {
@@ -3197,18 +3206,18 @@ textarea {
         padding: 1.6rem 1.25rem 1.4rem;
     }
     .lead h3 {
-        font-size: 1.375rem;
+        font-size: calc(1.375rem * var(--k-body));
     }
     .lead p {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .lead .pf-submit {
         width: 100%;
-        font-size: 1.125rem;
+        font-size: calc(1.125rem * var(--k-body));
     }
     .lead .pf input {
         height: 3.5rem;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
 }
 
@@ -3232,7 +3241,7 @@ textarea {
     top: 50%;
     right: 4rem;
     transform: translateY(-50%);
-    font-size: 1.25rem;
+    font-size: calc(1.25rem * var(--k-body));
     font-weight: 500;
     color: rgba(var(--ink-rgb), 0.85);
     pointer-events: none;
@@ -3244,7 +3253,7 @@ textarea {
 @media (max-width: 1199px) {
     .pf__aside {
         right: 3rem;
-        font-size: 0.875rem;
+        font-size: calc(0.875rem * var(--k-body));
     }
 }
 
@@ -3257,7 +3266,7 @@ textarea {
     top: 50%;
     left: 4.5rem;
     transform: translateY(-50%);
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     font-weight: 500;
     color: var(--ink);
     pointer-events: none;
@@ -3274,7 +3283,7 @@ textarea {
 @media (max-width: 1199px) {
     .pf__code {
         left: 1.2rem;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .pf--phone input {
         padding-left: 3.9rem;
@@ -3321,18 +3330,18 @@ textarea {
 }
 .post-toast h3 {
     margin-top: 0.8rem;
-    font-size: 2rem;
+    font-size: calc(2rem * var(--k-body));
     font-weight: 600;
     color: var(--teal);
 }
 .post-toast p {
     margin-top: 0.9rem;
-    font-size: 1.0625rem;
+    font-size: calc(1.0625rem * var(--k-body));
     line-height: 1.8;
 }
 @media (min-width: 1200px) {
     .post-toast p {
-        font-size: 1.5rem; /* ২৪px */
+        font-size: calc(1.5rem * var(--k-body)); /* ২৪px */
         line-height: 1.85;
     }
 }
@@ -3345,7 +3354,7 @@ textarea {
     border: 0;
     border-radius: 50%;
     background: transparent;
-    font-size: 2rem;
+    font-size: calc(2rem * var(--k-body));
     line-height: 1;
     color: var(--ink);
     cursor: pointer;
@@ -3384,7 +3393,7 @@ textarea {
 }
 .login-card__errors {
     margin: -2.5rem 3rem 2rem;
-    font-size: var(--fs-small);
+    font-size: calc(var(--fs-small) * var(--k-body));
 }
 .login-card__row {
     display: grid;
@@ -3394,7 +3403,7 @@ textarea {
     margin-bottom: 3.1875rem;
 }
 .login-card__row label {
-    font-size: 1.875rem;
+    font-size: calc(1.875rem * var(--k-body));
     text-align: right;
 }
 .lg-field {
@@ -3409,7 +3418,7 @@ textarea {
     border-radius: 0.4rem;
     background: #dde5e8;
     color: var(--ink);
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 .lg-field input::placeholder {
     color: rgba(var(--ink-rgb), 0.55);
@@ -3450,7 +3459,7 @@ textarea {
     border-radius: 0.4rem;
     background: #fff8d2;
     color: var(--teal);
-    font-size: 1.75rem;
+    font-size: calc(1.75rem * var(--k-body));
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -3463,11 +3472,11 @@ textarea {
 .login__links {
     margin-top: 2.25rem;
     text-align: center;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 .login__links {
     margin-top: 1rem;
-    font-size: var(--fs-small);
+    font-size: calc(var(--fs-small) * var(--k-body));
 }
 .login__tel,
 .login__links a {
@@ -3485,7 +3494,7 @@ textarea {
 }
 .welcome__line {
     margin: 0;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 1.875;
 }
 .welcome__name {
@@ -3524,7 +3533,7 @@ textarea {
 }
 .nav__avatar span {
     display: block;
-    font-size: 1.875rem;
+    font-size: calc(1.875rem * var(--k-body));
     line-height: 3.625rem;
 }
 .nav__avatar::-webkit-details-marker {
@@ -3544,7 +3553,7 @@ textarea {
 .user-menu__name {
     margin: 0;
     padding: 0.4rem 1.5rem 0.9rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     font-weight: 600;
     color: var(--teal);
 }
@@ -3556,7 +3565,7 @@ textarea {
     border: 0;
     background: none;
     font: inherit;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     text-align: left;
     color: var(--ink);
 }
@@ -3586,7 +3595,7 @@ textarea {
 .reg-form__note {
     width: 36.125rem;
     margin: -0.25rem 0 1.1rem 2.75rem;
-    font-size: 1.25rem;
+    font-size: calc(1.25rem * var(--k-body));
     line-height: 1.5;
     text-align: justify;
     color: #000;
@@ -3605,7 +3614,7 @@ textarea {
 }
 .reg-photo__label {
     padding-left: 2.8rem;
-    font-size: 1.875rem;
+    font-size: calc(1.875rem * var(--k-body));
     color: rgba(var(--ink-rgb), 0.6);
 }
 .reg-photo__btn {
@@ -3617,7 +3626,7 @@ textarea {
     border-radius: 0.625rem;
     background: #cdcdcd;
     color: #000;
-    font-size: 1.875rem;
+    font-size: calc(1.875rem * var(--k-body));
     font-weight: 500;
 }
 /* আসল ফাইল-ঘরটা পুরো বাক্স জুড়ে স্বচ্ছ: যেকোনো জায়গায় ক্লিকে ফাইল-বাছাই খোলে */
@@ -3636,7 +3645,7 @@ textarea {
 .reg-photo__name {
     margin: 1.6rem 0 0;
     padding-left: 5.8rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     text-align: left;
     color: rgba(var(--ink-rgb), 0.9);
     overflow-wrap: anywhere;
@@ -3650,14 +3659,14 @@ textarea {
 }
 .reg-photo__note {
     margin: 2rem 0 0;
-    font-size: 1.375rem;
+    font-size: calc(1.375rem * var(--k-body));
     line-height: 1.5;
     color: rgba(var(--ink-rgb), 0.9);
 }
 .reg-photo__error {
     margin: 1rem 0 0;
     color: #8a1111;
-    font-size: var(--fs-small);
+    font-size: calc(var(--fs-small) * var(--k-body));
 }
 
 @media (max-width: 1199px) {
@@ -3665,7 +3674,7 @@ textarea {
         padding: 3rem 0 4rem;
     }
     .login__title {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .login-card {
         margin-top: 1.75rem;
@@ -3680,12 +3689,12 @@ textarea {
         margin-bottom: 1.25rem;
     }
     .login-card__row label {
-        font-size: 1.125rem;
+        font-size: calc(1.125rem * var(--k-body));
         text-align: left;
     }
     .lg-field input {
         height: 3.5rem;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .login-card__submit {
         margin: 0;
@@ -3693,10 +3702,10 @@ textarea {
     .lg-submit {
         width: 100%;
         min-height: 3.5rem;
-        font-size: 1.25rem;
+        font-size: calc(1.25rem * var(--k-body));
     }
     .login__help {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .login__links {
         display: flex;
@@ -3710,7 +3719,7 @@ textarea {
         padding: 3.5rem 0;
     }
     .welcome__line {
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
         line-height: 1.9;
     }
     .welcome__name {
@@ -3730,7 +3739,7 @@ textarea {
         border: 1px solid var(--teal-20);
     }
     .nav__avatar span {
-        font-size: 1.25rem;
+        font-size: calc(1.25rem * var(--k-body));
         line-height: 2.5rem;
     }
     .reg-form__grid {
@@ -3739,14 +3748,14 @@ textarea {
     .reg-form__note {
         width: auto;
         margin: -0.25rem 0 0.75rem;
-        font-size: 0.9375rem;
+        font-size: calc(0.9375rem * var(--k-body));
     }
     .reg-photo__pick {
         height: 3.75rem;
     }
     .reg-photo__label,
     .reg-photo__btn {
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
     }
     .reg-photo__label {
         padding-left: 1.2rem;
@@ -3756,14 +3765,14 @@ textarea {
     }
     .reg-photo__name {
         padding-left: 0;
-        font-size: 0.9375rem;
+        font-size: calc(0.9375rem * var(--k-body));
     }
     .reg-photo__preview {
         width: 11rem;
         height: 12rem;
     }
     .reg-photo__note {
-        font-size: 0.9375rem;
+        font-size: calc(0.9375rem * var(--k-body));
     }
     .reg-form .pf--wide {
         margin-top: 1.5rem;
@@ -3779,14 +3788,14 @@ textarea {
     }
     .page-login .login__title,
     .page-regform .post-job__title {
-        font-size: 3.25rem; /* Figma ৫০px + ২ */
+        font-size: calc(3.25rem * var(--k-head)); /* Figma ৫০px + ২ */
     }
 }
 
 /* ---- ফর্মের ভুল-বার্তা (app.js "ফর্মের ভুল-বার্তা"): ঘরের নিচে লাল লেখা, ঘরের কিনারা লাল ---------- */
 .pf__msg {
     margin: 0.4rem 0 0;
-    font-size: 1rem;
+    font-size: calc(1rem * var(--k-body));
     line-height: 1.5;
     color: #a61b1b;
 }
@@ -3799,7 +3808,7 @@ textarea {
 @media (min-width: 1200px) {
     .page-post .pf__msg,
     .page-regform .pf__msg {
-        font-size: 1.125rem;
+        font-size: calc(1.125rem * var(--k-body));
     }
 }
 
@@ -3834,13 +3843,13 @@ textarea {
 .post-toast--card p {
     margin: 0 auto;
     max-width: 61.8125rem; /* ৯৮৯px */
-    font-size: 1.0625rem;
+    font-size: calc(1.0625rem * var(--k-body));
     line-height: 1.9;
     color: #000;
 }
 @media (min-width: 1200px) {
     .post-toast--card p {
-        font-size: 1.75rem;    /* ২৮px: ধন্যবাদের লেখা বড় */
+        font-size: calc(1.75rem * var(--k-body));    /* ২৮px: ধন্যবাদের লেখা বড় */
         line-height: 3.125rem; /* ৫০px */
     }
 }
@@ -3863,7 +3872,7 @@ textarea {
 .pw-note {
     margin: -1.5rem 0 2.5rem 25.375rem; /* ঘরের বাঁ কিনারার সঙ্গে সোজা */
     max-width: 27.8125rem;
-    font-size: 1rem;
+    font-size: calc(1rem * var(--k-body));
     line-height: 1.5;
 }
 .login-card .pf__msg {
@@ -3898,7 +3907,7 @@ textarea {
 .forgot .reg-form__note {
     margin: -0.25rem 0 1rem;
     width: auto;
-    font-size: 1rem;
+    font-size: calc(1rem * var(--k-body));
 }
 
 /* ---- প্রোফাইল পেইজ: রেজিস্ট্রেশন ফর্মের বিন্যাসই; শুধু পড়া-যায়-এমন ঘর ও বার্তা ---- */
@@ -3929,7 +3938,7 @@ a.user-menu__item:hover {
 .pf__label {
     display: block;
     margin: 0 0 0.4rem 0.25rem;
-    font-size: 1.125rem;
+    font-size: calc(1.125rem * var(--k-body));
     font-weight: 500;
     line-height: 1.5;
     color: var(--ink);
@@ -3948,7 +3957,7 @@ a.user-menu__item:hover {
 }
 .wk-search input {
     padding-left: 2.2rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 .wk-search + .bn-switch {
     width: min(100%, 51.1rem);
@@ -3956,7 +3965,7 @@ a.user-menu__item:hover {
 }
 .wk-title {
     margin: 3rem 0 0;
-    font-size: 3.125rem;
+    font-size: calc(3.125rem * var(--k-head));
     font-weight: 500;
     line-height: 1.35;
     text-align: center;
@@ -3975,17 +3984,17 @@ a.user-menu__item:hover {
     margin: 0;
 }
 .wk-bar__division {
-    font-size: 1.625rem;
+    font-size: calc(1.625rem * var(--k-body));
 }
 .wk-bar__division span {
     margin-left: 0.4rem;
-    font-size: 1.375rem;
+    font-size: calc(1.375rem * var(--k-body));
 }
 .wk-bar__per {
     display: flex;
     align-items: center;
     gap: 0.9rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 .wk-bar__per select {
     width: 6.125rem; /* Figma: ৯৮px */
@@ -3995,7 +4004,7 @@ a.user-menu__item:hover {
     border-radius: 0;
     background: var(--white);
     font: inherit;
-    font-size: 1.625rem;
+    font-size: calc(1.625rem * var(--k-body));
     cursor: pointer;
 }
 .wk-bar__per select:focus-visible {
@@ -4006,7 +4015,7 @@ a.user-menu__item:hover {
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
-    font-size: 1.25rem; /* সারির লেখা ২০px */
+    font-size: calc(1.25rem * var(--k-body)); /* সারির লেখা ২০px */
 }
 .wk-table th,
 .wk-table td {
@@ -4023,7 +4032,7 @@ a.user-menu__item:hover {
     background: rgba(var(--teal-rgb), 0.48);
     border-color: var(--white);
     border-width: 0 2px;
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * var(--k-body));
     color: var(--ink);
 }
 .wk-table thead .wk-rating {
@@ -4089,7 +4098,7 @@ a.user-menu__item:hover {
     padding: 0 0.5rem;
     border-radius: 5px;
     background: transparent;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 2.3125rem;
     text-align: center;
     text-decoration: none;
@@ -4116,17 +4125,17 @@ a.wk-pages__item:focus-visible {
         --fs-body: 1.5rem; /* সাধারণ লেখা ২৪px; বাকি সাইজ Figma + ২px */
     }
     .page-workers .wk-title {
-        font-size: 3.25rem;
+        font-size: calc(3.25rem * var(--k-head));
     }
     .page-workers .wk-bar__division,
     .page-workers .wk-bar__division span {
-        font-size: 1.75rem;
+        font-size: calc(1.75rem * var(--k-body));
     }
     .page-workers .wk-bar__per select {
-        font-size: 1.625rem; /* প্রতি-পৃষ্ঠার সংখ্যা ২px ছোট */
+        font-size: calc(1.625rem * var(--k-body)); /* প্রতি-পৃষ্ঠার সংখ্যা ২px ছোট */
     }
     .page-workers .svc-search__btn {
-        font-size: 2.125rem;
+        font-size: calc(2.125rem * var(--k-body));
     }
 }
 @media (max-width: 1199px) {
@@ -4135,19 +4144,19 @@ a.wk-pages__item:focus-visible {
     }
     .wk-title {
         margin-top: 1.6rem;
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .wk-bar__division,
     .wk-bar__division span {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .wk-bar__per {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .wk-bar__per select {
         width: 4.5rem;
         height: 2.6rem;
-        font-size: 1.125rem;
+        font-size: calc(1.125rem * var(--k-body));
     }
     /* ফোনে টেবিল কার্ড হয়ে যায়: প্রতিটি পেশাজীবী এক কার্ড, ঘরের নাম বাঁ পাশে */
     .wk-table,
@@ -4174,13 +4183,13 @@ a.wk-pages__item:focus-visible {
         padding: 0.55rem 0.9rem;
         border: 0;
         border-bottom: 1px solid var(--teal-10);
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
         text-align: left;
     }
     .wk-table tbody th.wk-name {
         padding-left: 0.9rem;
         background: rgba(var(--teal-rgb), 0.48);
-        font-size: 1.125rem;
+        font-size: calc(1.125rem * var(--k-body));
     }
     .wk-table td[data-label]::before {
         content: attr(data-label) ": ";
@@ -4195,13 +4204,13 @@ a.wk-pages__item:focus-visible {
     }
     .wk-open {
         padding: 0.5rem 1rem;
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
     }
     .wk-pages {
         margin-top: 1.6rem;
     }
     .wk-pages__item {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
 }
 
@@ -4211,7 +4220,7 @@ a.wk-pages__item:focus-visible {
 }
 .wk-heading {
     margin: 0 0 4.6rem;
-    font-size: 3.125rem;
+    font-size: calc(3.125rem * var(--k-head));
     font-weight: 500;
     line-height: 1.2;
     text-align: center;
@@ -4255,15 +4264,15 @@ a.wk-pages__item:focus-visible {
     align-items: baseline;
 }
 .wk-info dt {
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 .wk-info dd {
     margin: 0;
-    font-size: var(--fs-body); /* বাঁ পাশের লেখার সমান */
+    font-size: calc(var(--fs-body) * var(--k-body)); /* বাঁ পাশের লেখার সমান */
     line-height: 1.5;
 }
 .wk-info__row--contact dd {
-    font-size: 1.75rem; /* মোবাইল ও ইমেইল: Figma ২৬px + ২px */
+    font-size: calc(1.75rem * var(--k-body)); /* মোবাইল ও ইমেইল: Figma ২৬px + ২px */
 }
 .wk-info__row--short dd {
     padding-right: 10.5rem; /* ছবির নিচে লেখা যেন না যায় */
@@ -4285,7 +4294,7 @@ a.wk-pages__item:focus-visible {
 }
 .wk-hint {
     margin: 1rem 0 0 19.3rem;
-    font-size: 1.375rem; /* ছোট ব্যাখ্যার লেখা: Figma-র ২২px, ২৪px করলে লাইন ভেঙে যায় */
+    font-size: calc(1.375rem * var(--k-body)); /* ছোট ব্যাখ্যার লেখা: Figma-র ২২px, ২৪px করলে লাইন ভেঙে যায় */
     line-height: 1.6;
 }
 .wk-hint strong {
@@ -4299,7 +4308,7 @@ a.wk-pages__item:focus-visible {
     border: 1px solid rgba(var(--teal-rgb), 0.8);
     border-radius: 0.625rem;
     background: rgba(var(--teal-rgb), 0.15);
-    font-size: 1.375rem; /* Figma-র ২২px */
+    font-size: calc(1.375rem * var(--k-body)); /* Figma-র ২২px */
     line-height: 1.4;
 }
 .wk-note p {
@@ -4317,7 +4326,7 @@ a.wk-pages__item:focus-visible {
 .wk-rate__label {
     min-width: 11.5rem;
     padding-left: 0.4rem;
-    font-size: 1.625rem;
+    font-size: calc(1.625rem * var(--k-body));
     font-weight: 500;
 }
 .wk-rate select {
@@ -4329,7 +4338,7 @@ a.wk-pages__item:focus-visible {
     background: #fbff00;
     color: var(--teal);
     font: inherit;
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * var(--k-body));
     font-weight: 500;
     text-align: center;
     cursor: pointer;
@@ -4348,7 +4357,7 @@ a.wk-pages__item:focus-visible {
     background: var(--teal);
     color: var(--white);
     font: inherit;
-    font-size: 1.375rem;
+    font-size: calc(1.375rem * var(--k-body));
     font-weight: 500;
     cursor: pointer;
 }
@@ -4360,7 +4369,7 @@ a.wk-pages__item:focus-visible {
     align-items: center;
     gap: 0.8rem;
     margin: 0 0 0 auto;
-    font-size: 1.375rem;
+    font-size: calc(1.375rem * var(--k-body));
     font-weight: 600;
 }
 .wk-rate__badge {
@@ -4373,13 +4382,13 @@ a.wk-pages__item:focus-visible {
 }
 .wk-rate__legend {
     margin: 1rem 0 0;
-    font-size: 1.375rem;
+    font-size: calc(1.375rem * var(--k-body));
 }
 .wk-rate__msg {
     margin: 0 0 1.2rem;
     padding: 0.7rem 1.2rem;
     border-radius: 0.625rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     font-weight: 500;
 }
 .wk-rate__msg.is-ok {
@@ -4402,7 +4411,7 @@ a.wk-pages__item:focus-visible {
     padding: 0.2rem 1rem;
     border-radius: 0.625rem;
     background: var(--white);
-    font-size: 3.125rem;
+    font-size: calc(3.125rem * var(--k-head));
     font-weight: 700;
     line-height: 5.9rem;
     text-align: center;
@@ -4417,7 +4426,7 @@ a.wk-pages__item:focus-visible {
     position: relative;
     margin-bottom: 2rem;
     padding-left: 2.2rem;
-    font-size: 1.625rem;
+    font-size: calc(1.625rem * var(--k-body));
     font-weight: 500;
     line-height: 1.5;
 }
@@ -4446,7 +4455,7 @@ a.wk-pages__item:focus-visible {
     border-radius: 3.125rem;
     background: rgba(var(--teal-rgb), 0.6);
     color: var(--white);
-    font-size: 1.625rem; /* হোম পেইজের বাটনের (২৬px) সমান */
+    font-size: calc(1.625rem * var(--k-body)); /* হোম পেইজের বাটনের (২৬px) সমান */
     font-weight: 500;
     text-decoration: none;
 }
@@ -4459,7 +4468,7 @@ a.wk-pages__item:focus-visible {
         --fs-body: 1.5rem; /* সাধারণ লেখা ২৪px; বাকি সাইজ Figma + ২px */
     }
     .page-worker .wk-heading {
-        font-size: 3.25rem;
+        font-size: calc(3.25rem * var(--k-head));
     }
 }
 @media (max-width: 1199px) {
@@ -4468,7 +4477,7 @@ a.wk-pages__item:focus-visible {
     }
     .wk-heading {
         margin-bottom: 1.6rem;
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .wk-layout {
         grid-template-columns: 1fr;
@@ -4492,7 +4501,7 @@ a.wk-pages__item:focus-visible {
     .wk-hint,
     .wk-note,
     .wk-rate__legend {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .wk-info dt {
         font-weight: 600;
@@ -4508,29 +4517,29 @@ a.wk-pages__item:focus-visible {
     }
     .wk-rate__label {
         min-width: 0;
-        font-size: 1.125rem;
+        font-size: calc(1.125rem * var(--k-body));
     }
     .wk-rate select {
-        font-size: 1.25rem;
+        font-size: calc(1.25rem * var(--k-body));
     }
     .wk-rate__submit {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .wk-rate__current {
         margin-left: 0;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .wk-warn {
         padding: 1.6rem 1.25rem 1.2rem;
     }
     .wk-warn__title {
-        font-size: 1.875rem;
+        font-size: calc(1.875rem * var(--k-body));
     }
     .wk-warn ul {
         margin-top: 1.4rem;
     }
     .wk-warn li {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
         margin-bottom: 1rem;
     }
     .wk-back {
@@ -4541,7 +4550,7 @@ a.wk-pages__item:focus-visible {
         justify-content: center;
         min-height: 3.5rem;
         padding: 0 1.25rem;
-        font-size: 1.125rem;
+        font-size: calc(1.125rem * var(--k-body));
     }
 }
 
@@ -4552,7 +4561,7 @@ a.wk-pages__item:focus-visible {
 .contact-intro {
     max-width: 94.8rem; /* Figma: ১৫১৭px */
     margin: 0 auto;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 2.8125rem; /* ৪৫px */
     text-align: center;
     color: #581022;
@@ -4581,7 +4590,7 @@ a.wk-pages__item:focus-visible {
 }
 .contact-card p {
     margin: 0 0 0.9rem;
-    font-size: 1.25rem; /* Figma ১৮px + ২px */
+    font-size: calc(1.25rem * var(--k-body)); /* Figma ১৮px + ২px */
     line-height: 1.45;
 }
 .contact-card a {
@@ -4595,14 +4604,14 @@ a.wk-pages__item:focus-visible {
 }
 .contact-card__note {
     margin-top: 1.4rem !important;
-    font-size: var(--fs-body) !important;
+    font-size: calc(var(--fs-body) * var(--k-body)) !important;
 }
 .section--ceo {
     padding: 0 0 9rem;
 }
 .ceo__title {
     margin: 0 0 3.1rem;
-    font-size: 3.125rem;
+    font-size: calc(3.125rem * var(--k-head));
     font-weight: 600;
     line-height: 2rem;
     text-align: center;
@@ -4632,12 +4641,12 @@ a.wk-pages__item:focus-visible {
     margin-top: 2.4rem;
 }
 .ceo__name {
-    font-size: 2.5rem;
+    font-size: calc(2.5rem * var(--k-head));
     font-weight: 600;
     line-height: 1.2;
 }
 .ceo__role {
-    font-size: 1.375rem;
+    font-size: calc(1.375rem * var(--k-body));
 }
 .contact-faq {
     padding: 9.75rem 0 10rem;
@@ -4645,7 +4654,7 @@ a.wk-pages__item:focus-visible {
 }
 .contact-faq__title {
     margin: 0;
-    font-size: 3.125rem;
+    font-size: calc(3.125rem * var(--k-head));
     font-weight: 500;
     line-height: 1.2;
     text-align: center;
@@ -4654,7 +4663,7 @@ a.wk-pages__item:focus-visible {
 .contact-faq__text {
     max-width: 82.75rem; /* ১৩২৪px */
     margin: 1.5rem auto 0;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 1.75;
     text-align: center;
     color: #000;
@@ -4688,7 +4697,7 @@ a.wk-pages__item:focus-visible {
     bottom: 0;
     padding: 0.15rem 0.6rem;
     background: rgba(255, 255, 255, 0.8);
-    font-size: 0.75rem;
+    font-size: calc(0.75rem * var(--k-body));
     color: #333;
     text-decoration: none;
 }
@@ -4703,20 +4712,20 @@ a.wk-pages__item:focus-visible {
     }
     .page-contact .ceo__title,
     .page-contact .contact-faq__title {
-        font-size: 3.25rem;
+        font-size: calc(3.25rem * var(--k-head));
     }
     .page-contact .ceo__name {
-        font-size: 2.625rem;
+        font-size: calc(2.625rem * var(--k-head));
     }
     .page-contact .ceo__role {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .page-contact .feedback__title {
         max-width: 31rem; /* ৪২px-এ দুই লাইনেই ধরে */
-        font-size: 2.625rem;
+        font-size: calc(2.625rem * var(--k-head));
     }
     .page-contact .feedback .btn {
-        font-size: 1.6364rem; /* হোমের বাটনের সমান */
+        font-size: calc(1.6364rem * var(--k-body)); /* হোমের বাটনের সমান */
     }
 }
 @media (max-width: 1199px) {
@@ -4724,7 +4733,7 @@ a.wk-pages__item:focus-visible {
         padding: 2.5rem 0 3rem;
     }
     .contact-intro {
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
         line-height: 1.85;
         text-align: left;
     }
@@ -4743,17 +4752,17 @@ a.wk-pages__item:focus-visible {
         margin-bottom: 1.2rem;
     }
     .contact-card p {
-        font-size: 1.0625rem;
+        font-size: calc(1.0625rem * var(--k-body));
     }
     .contact-card__note {
-        font-size: 1.0625rem !important;
+        font-size: calc(1.0625rem * var(--k-body)) !important;
     }
     .section--ceo {
         padding-bottom: 3rem;
     }
     .ceo__title {
         margin-bottom: 1.4rem;
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
         line-height: 1.3;
     }
     .ceo__photo {
@@ -4762,19 +4771,19 @@ a.wk-pages__item:focus-visible {
         aspect-ratio: 498 / 535;
     }
     .ceo__name {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .ceo__role {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .contact-faq {
         padding: 3rem 0 3.5rem;
     }
     .contact-faq__title {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .contact-faq__text {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
         text-align: left;
     }
     .contact-split {
@@ -4795,7 +4804,7 @@ a.wk-pages__item:focus-visible {
 }
 .faq-page__title {
     margin: 0;
-    font-size: 3.125rem;
+    font-size: calc(3.125rem * var(--k-head));
     font-weight: 500;
     line-height: 1.2;
     text-align: center;
@@ -4804,7 +4813,7 @@ a.wk-pages__item:focus-visible {
 .faq-page__intro {
     max-width: 87.125rem; /* Figma: ১৩৯৪px */
     margin: 1.5rem auto 0;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 2.625rem; /* ৪২px */
     text-align: center;
     color: #000;
@@ -4821,7 +4830,7 @@ a.wk-pages__item:focus-visible {
 }
 .faq-group__title {
     margin: 0 0 1.4rem;
-    font-size: 2rem;
+    font-size: calc(2rem * var(--k-body));
     font-weight: 600;
     line-height: 1.35;
     color: var(--teal);
@@ -4847,17 +4856,17 @@ a.wk-pages__item:focus-visible {
         --fs-body: 1.5rem; /* সাধারণ লেখা ২৪px; বাকি সাইজ Figma + ২px */
     }
     .page-faq .faq-page__title {
-        font-size: 3.25rem;
+        font-size: calc(3.25rem * var(--k-head));
     }
     .page-faq .faq-item summary {
-        font-size: 1.625rem;
+        font-size: calc(1.625rem * var(--k-body));
     }
     .page-faq .feedback__title {
         max-width: 31rem;
-        font-size: 2.625rem;
+        font-size: calc(2.625rem * var(--k-head));
     }
     .page-faq .feedback .btn {
-        font-size: 1.6364rem; /* হোমের বাটনের সমান */
+        font-size: calc(1.6364rem * var(--k-body)); /* হোমের বাটনের সমান */
     }
 }
 @media (max-width: 1199px) {
@@ -4865,10 +4874,10 @@ a.wk-pages__item:focus-visible {
         padding: 2.5rem 0 3.5rem;
     }
     .faq-page__title {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
     .faq-page__intro {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
         line-height: 1.8;
         text-align: left;
     }
@@ -4892,7 +4901,7 @@ a.wk-pages__item:focus-visible {
 }
 .consent__text {
     margin: 0;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 2.8125rem; /* ৪৫px */
     text-align: justify;
     color: #000;
@@ -4938,7 +4947,7 @@ a.wk-pages__item:focus-visible {
     outline-offset: 2px;
 }
 .consent__label span {
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 2.8125rem;
     color: #000;
 }
@@ -4961,7 +4970,7 @@ a.wk-pages__item:focus-visible {
 }
 .reg-refs legend {
     padding: 0 0 0.4rem 0.8rem;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     color: #000;
 }
 .reg-refs__box {
@@ -4983,7 +4992,7 @@ a.wk-pages__item:focus-visible {
     }
     .consent__text,
     .consent__label span {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
         line-height: 1.8;
     }
     .consent__label {
@@ -5022,7 +5031,7 @@ a.wk-pages__item:focus-visible {
     border: 1px solid rgba(var(--teal-rgb), 0.5);
     border-radius: 3rem;
     background: var(--teal-10);
-    font-size: 1.25rem;
+    font-size: calc(1.25rem * var(--k-body));
     line-height: 1.4;
     color: var(--ink);
 }
@@ -5032,7 +5041,7 @@ a.wk-pages__item:focus-visible {
     border: 0;
     border-radius: 50%;
     background: transparent;
-    font-size: 1.5rem;
+    font-size: calc(1.5rem * var(--k-body));
     line-height: 1;
     color: var(--teal);
     cursor: pointer;
@@ -5043,7 +5052,7 @@ a.wk-pages__item:focus-visible {
 }
 .chips__hint {
     margin: 0.6rem 0 0;
-    font-size: 1.125rem;
+    font-size: calc(1.125rem * var(--k-body));
     color: #8a1111;
 }
 .pf--wide-block {
@@ -5051,7 +5060,7 @@ a.wk-pages__item:focus-visible {
 }
 @media (max-width: 1199px) {
     .chips__item {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
 }
 
@@ -5063,7 +5072,7 @@ a.wk-pages__item:focus-visible {
     justify-content: space-between;
     gap: 0.6rem 1.4rem;
     margin: 0 0 1rem;
-    font-size: 1.25rem;
+    font-size: calc(1.25rem * var(--k-body));
     color: var(--ink);
 }
 .wk-sort__btn {
@@ -5072,7 +5081,7 @@ a.wk-pages__item:focus-visible {
     border-radius: 3rem;
     background: var(--teal-10);
     color: var(--teal);
-    font-size: 1.25rem;
+    font-size: calc(1.25rem * var(--k-body));
     font-weight: 500;
     text-decoration: none;
 }
@@ -5084,7 +5093,7 @@ a.wk-pages__item:focus-visible {
 @media (max-width: 1199px) {
     .wk-sort,
     .wk-sort__btn {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
 }
 
@@ -5102,7 +5111,7 @@ a.wk-pages__item:focus-visible {
     border-radius: 0.4rem;
     background: #dde5e8;
     color: var(--ink);
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 .lg-field select {
     height: 4.1875rem;
@@ -5134,10 +5143,10 @@ a.wk-pages__item:focus-visible {
 @media (max-width: 1199px) {
     .lg-field select {
         height: 3.5rem;
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .lg-field textarea {
-        font-size: 1rem;
+        font-size: calc(1rem * var(--k-body));
     }
     .lg-field--select .combo__toggle {
         height: 3.5rem;
@@ -5183,7 +5192,7 @@ a.wk-pages__item:focus-visible {
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.65);
     color: var(--white);
-    font-size: 1.75rem;
+    font-size: calc(1.75rem * var(--k-body));
     line-height: 1;
     cursor: pointer;
 }
@@ -5217,7 +5226,7 @@ html.popup-lock {
     .popup-ad__close {
         width: 2.5rem;
         height: 2.5rem;
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
 }
 
@@ -5241,13 +5250,13 @@ html.popup-lock {
     display: block;
     margin: 0 0 0.4rem;
     color: var(--teal);
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
 }
 .cf-field--check .cf-check {
     display: flex;
     gap: 0.8rem;
     align-items: center;
-    font-size: var(--fs-body);
+    font-size: calc(var(--fs-body) * var(--k-body));
     cursor: pointer;
 }
 .cf-field--check .cf-check input {
@@ -5285,7 +5294,7 @@ html.popup-lock {
 }
 .post-toast--popup p {
     margin: 0.4rem 0;
-    font-size: 1.125rem;
+    font-size: calc(1.125rem * var(--k-body));
     line-height: 1.8;
     color: var(--ink);
 }
@@ -5294,7 +5303,7 @@ html.popup-lock {
         width: min(48rem, calc(100vw - 2rem));
     }
     .post-toast--popup p {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
         line-height: 2.25rem;
     }
 }
@@ -5315,7 +5324,7 @@ html.popup-lock {
     padding: 1rem 0;
     background: #e3f4ea;
     color: #0b5a2a;
-    font-size: 1.125rem;
+    font-size: calc(1.125rem * var(--k-body));
     line-height: 1.7;
     box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
     animation: post-toast-out 0.4s ease 20s forwards;
@@ -5335,7 +5344,7 @@ html.popup-lock {
 }
 @media (min-width: 1200px) {
     .msg-strip--bar {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem * var(--k-body));
     }
 }
 

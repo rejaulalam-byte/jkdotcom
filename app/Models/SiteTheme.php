@@ -89,10 +89,22 @@ final class SiteTheme
         return $vars === [] ? '' : ":root {\n    " . implode(";\n    ", $vars) . ";\n}\n";
     }
 
-    /** লিংকের সংস্করণ (রং বদলালে ঠিকানা বদলায়, তাই ব্রাউজার পুরনো ফাইল রাখে না)। */
+    /** /site-theme-এর পুরো লেখা: বদলানো রং ও লেখার আকার (App\Models\SiteSizes)। */
+    public static function stylesheet(): string
+    {
+        return self::css() . SiteSizes::css();
+    }
+
+    /** রং বা আকারের কিছু বদলানো আছে কি না (না থাকলে /site-theme লিংকই বসে না)। */
+    public static function anyCustom(): bool
+    {
+        return self::anyChanged() || SiteSizes::anyChanged();
+    }
+
+    /** লিংকের সংস্করণ (রং বা আকার বদলালে ঠিকানা বদলায়, তাই ব্রাউজার পুরনো ফাইল রাখে না)। */
     public static function version(): string
     {
-        return substr(hash('sha256', self::css()), 0, 12);
+        return substr(hash('sha256', self::stylesheet()), 0, 12);
     }
 
     /**
