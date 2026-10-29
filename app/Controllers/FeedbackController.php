@@ -92,7 +92,7 @@ final class FeedbackController
         }
 
         if (msg_on('feedback.msg.done')) {
-            Session::flash('feedback_ok', msg('feedback.msg.done'));
+            Session::flash('feedback_ok', 'feedback.msg.done');
         }
         redirect($back);
     }

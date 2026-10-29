@@ -379,7 +379,7 @@ summary.live-msgs__title {
     background: #fff;
 }
 /* ধন্যবাদ-কার্ড: আসল কার্ডটা পর্দার মাঝে ভাসে; এখানে জায়গায় দাঁড়ানো, টিকের জন্য ওপরে ফাঁকা */
-.live-msgs .live-msgs__card {
+.live-msgs .msg-static {
     position: relative;
     top: auto;
     left: auto;
@@ -388,6 +388,9 @@ summary.live-msgs__title {
     box-shadow: none;
     transform: none;
     animation: none;
+}
+.live-msgs .post-toast--popup.msg-static {
+    margin-top: 1rem;
 }
 /* বার্তা চালু-বন্ধ: অবস্থার লেখা ও বাটন লেবেলের পাশে; বন্ধ বার্তার বাক্স ফিকে */
 .live-msgs__state {
@@ -417,4 +420,25 @@ summary.live-msgs__title {
 }
 .live-msgs__item.is-off > :last-child {
     opacity: 0.45;
+}
+
+/* বাক্সের ডিজাইন/রং/সময় বাছার সারি (সুপার অ্যাডমিন) */
+.live-msgs__style {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    align-items: center;
+    margin: 0 0 0.6rem;
+    font-size: 1.125rem;
+}
+.live-msgs__style select {
+    margin-left: 0.3rem;
+    padding: 0.15rem 0.4rem;
+    border: 1px solid #125a6c;
+    border-radius: 0.4rem;
+    background: #fff;
+    font: inherit;
+}
+.live-msgs__style .live-msgs__switch {
+    margin: 0;
 }

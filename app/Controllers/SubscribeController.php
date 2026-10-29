@@ -39,7 +39,7 @@ final class SubscribeController
         }
 
         if (msg_on('subscribe.msg.done')) {
-            Session::flash('feedback_ok', msg('subscribe.msg.done'));
+            Session::flash('feedback_ok', 'subscribe.msg.done');
         }
         redirect($back);
     }

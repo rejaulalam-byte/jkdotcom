@@ -2,7 +2,7 @@
 /**
  * মতামতের ফর্ম (পাঁচটি ঘরই আবশ্যক)। হোম ও যোগাযোগ পেইজ একই ফর্ম নেয়; জমার পর যে পেইজ থেকে এসেছিল সেখানেই ফেরে।
  *
- * @var string|null $feedbackOk
+ * @var string|null $feedbackOk  সফল বার্তার নাম (msg()-এর কী)
  * @var list<string> $feedbackErrors
  * @var array<string,string> $old
  * @var string $feedbackReturn  ফেরার ঠিকানা ('/#feedback' বা '/contact#feedback'; FeedbackController-এর তালিকায় থাকতে হবে)
@@ -13,9 +13,13 @@
     <h3 class="feedback__title"><?= t('home.feedback.title') ?></h3>
     <?php require BASE_PATH . '/app/Views/partials/bn-switch.php'; ?>
 
-    <?php if ($feedbackOk): ?>
-        <p class="notice notice--ok" role="status"><?= e($feedbackOk) ?></p>
-    <?php endif; ?>
+    <?php if ($feedbackOk): // $feedbackOk = বার্তার নাম (feedback.msg.done বা subscribe.msg.done); বাক্স অ্যাডমিনের বাছা ডিজাইনে
+        $msgName = (string) $feedbackOk;
+        $msgLines = [e(msg($msgName))];
+        $msgHome = false;
+        $msgPlace = 'inline';
+        require BASE_PATH . '/app/Views/partials/message-box.php';
+    endif; ?>
     <?php if ($feedbackErrors): ?>
         <ul class="notice notice--error" role="alert">
             <?php foreach ($feedbackErrors as $error): ?>

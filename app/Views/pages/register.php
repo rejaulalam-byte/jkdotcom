@@ -250,11 +250,11 @@ $helpTel = content('today.post.helpline_tel');
 <?php if ($done !== null && msg_on('regform.' . $role . '.done')):
     $say = static fn (string $key): string => e(strtr(content('regform.' . $role . '.done.' . $key), ['{name}' => (string) $done['name'], '{area}' => (string) $done['area']]));
 ?>
-<?php // সফল জমার বার্তা-বক্স (Figma 2827-341): সাদা বাক্স, সবুজ কিনারা, ওপরে সবুজ বৃত্তে হলুদ টিক; ২০ সেকেন্ড পরে সরে যায় ?>
-<div class="post-toast post-toast--card" id="post-toast" role="status" aria-live="polite">
-    <img class="post-toast__tick" src="<?= e(asset('img/icons/done-check.svg')) ?>" alt="" width="191" height="193">
-    <button class="post-toast__close" type="button" aria-label="বন্ধ করুন"><span aria-hidden="true">&times;</span></button>
-    <p><?= $say('text_1') ?></p>
-    <p><?= $say('text_2') ?></p>
-</div>
-<?php endif; ?>
+<?php // সফল জমার বার্তা-বক্স (Figma 2827-341): ডিজাইন/রং/সময় অ্যাডমিন ঠিক করেন (partials/message-box.php); বন্ধ হলে হোমে যায়
+$msgName = 'regform.' . $role . '.done';
+$msgLines = [$say('text_1'), $say('text_2')];
+$msgHome = true;
+$msgPlace = 'overlay';
+require BASE_PATH . '/app/Views/partials/message-box.php';
+endif;
+?>

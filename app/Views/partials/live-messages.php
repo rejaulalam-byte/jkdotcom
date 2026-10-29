@@ -64,7 +64,44 @@ $liveBox = static function (string $kind, array $keys): string {
                                 <?= $on ? 'data-warn="' . e(MessageSwitch::SWITCHABLE[$switch]) . '"' : '' ?>><?= $on ? 'বার্তা বন্ধ করুন' : 'বার্তা চালু করুন' ?></button>
                         <?php endif; ?>
                     <?php endif; ?>
-                    <?= $liveBox($run['kind'], $run['keys']) ?>
+                    <?php if (MessageSwitch::designable($switch)): ?>
+                        <?php if ($liveSuper): ?>
+                            <div class="live-msgs__style" data-jk-msg-style="<?= e($switch) ?>">
+                                <label>ডিজাইন
+                                    <select name="design">
+                                        <?php foreach (MessageSwitch::DESIGNS as $v => $label): ?>
+                                            <option value="<?= e($v) ?>"<?= MessageSwitch::design($switch) === $v ? ' selected' : '' ?>><?= e($label) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </label>
+                                <label>রং
+                                    <select name="color">
+                                        <?php foreach (MessageSwitch::COLORS as $v => $label): ?>
+                                            <option value="<?= e($v) ?>"<?= MessageSwitch::color($switch) === $v ? ' selected' : '' ?>><?= e($label) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </label>
+                                <label>কতক্ষণ থাকবে
+                                    <select name="seconds">
+                                        <?php foreach (MessageSwitch::SECONDS as $v): ?>
+                                            <option value="<?= $v ?>"<?= MessageSwitch::seconds($switch) === $v ? ' selected' : '' ?>><?= $v === 0 ? 'নিজে সরবে না (শুধু ✕)' : bn($v) . ' সেকেন্ড' ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </label>
+                                <button type="button" class="live-msgs__switch" data-jk-msg-style-save>প্রয়োগ করুন</button>
+                            </div>
+                        <?php endif; ?>
+                        <?php
+                        // নমুনা: দর্শক যে ডিজাইনে দেখবেন (ভাসে না, নিজে সরে না)
+                        $msgName = $switch;
+                        $msgLines = array_map(static fn (string $k): string => e(content($k)), $run['keys']);
+                        $msgHome = false;
+                        $msgPlace = 'static';
+                        require BASE_PATH . '/app/Views/partials/message-box.php';
+                        ?>
+                    <?php else: ?>
+                        <?= $liveBox($run['kind'], $run['keys']) ?>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
             <?= $group['folded'] ? '</details>' : '</div>' ?>

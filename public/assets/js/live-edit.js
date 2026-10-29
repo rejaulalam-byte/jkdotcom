@@ -881,6 +881,36 @@
         });
     });
 
+    /* ---- "এই পেইজের বার্তা": বাক্সের ডিজাইন, রং ও সময় ঠিক করা (সুপার অ্যাডমিন; ঘরগুলো partials/live-messages.php-তে) ---- */
+    document.querySelectorAll("[data-jk-msg-style]").forEach(function (box) {
+        var save = box.querySelector("[data-jk-msg-style-save]");
+        save.addEventListener("click", function () {
+            var body = new FormData();
+            body.append("_token", data.token);
+            body.append("name", box.getAttribute("data-jk-msg-style"));
+            ["design", "color", "seconds"].forEach(function (field) {
+                body.append(field, box.querySelector('[name="' + field + '"]').value);
+            });
+            save.disabled = true;
+            fetch(data.messageSave, { method: "POST", body: body, credentials: "same-origin" })
+                .then(function (res) {
+                    return res.json();
+                })
+                .then(function (res) {
+                    if (res.ok) {
+                        window.location.reload();
+                        return;
+                    }
+                    save.disabled = false;
+                    window.alert(res.error || "সংরক্ষণ করা যায়নি।");
+                })
+                .catch(function () {
+                    save.disabled = false;
+                    window.alert("সংরক্ষণ করা যায়নি। লগইনের মেয়াদ শেষ হয়ে থাকতে পারে; অ্যাডমিন পেইজটি রিফ্রেশ করুন।");
+                });
+        });
+    });
+
     document.addEventListener("click", function (e) {
         if ((panel && panel.contains(e.target)) || (iconPanel && iconPanel.contains(e.target)) || (fieldPanel && fieldPanel.contains(e.target)) || (customPanel && customPanel.contains(e.target))) {
             return;

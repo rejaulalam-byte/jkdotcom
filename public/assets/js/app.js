@@ -70,22 +70,28 @@
             }
         });
     }
-    /* ---- সফল-জমার বার্তা-বক্স (কাজ জানান, দুই রেজিস্ট্রেশন): ২০ সেকেন্ড পরে নিজে সরে যায়, ✕ বাটনে সঙ্গে সঙ্গে;
-       সরে যাওয়ার পর হোম পেইজে নিয়ে যায়, কারণ ফর্মের পেইজে আর কিছু করার নেই ---- */
-    var toast = document.getElementById("post-toast");
-    if (toast) {
-        var closeToast = function () {
-            toast.classList.add("is-closed");
-            window.location.assign("/");
+    /* ---- সফলতার বার্তার বাক্স (partials/message-box.php): data-seconds সেকেন্ড পরে নিজে সরে যায় (০ = যায় না),
+       ✕ বাটনে সঙ্গে সঙ্গে। data-home থাকলে (ফর্ম জমার পর) সরার পর হোম পেইজে নিয়ে যায়, কারণ ফর্মের পেইজে আর কিছু করার নেই ---- */
+    document.querySelectorAll("[data-msg-box]").forEach(function (box) {
+        var toHome = box.hasAttribute("data-home");
+        var closeBox = function () {
+            box.classList.add("is-closed");
+            if (toHome) {
+                window.location.assign("/");
+            }
         };
-        var toastClose = toast.querySelector(".post-toast__close");
-        if (toastClose) {
-            toastClose.addEventListener("click", closeToast);
-            toastClose.focus();
+        var x = box.querySelector(".post-toast__close");
+        if (x) {
+            x.addEventListener("click", closeBox);
+            if (box.classList.contains("post-toast")) {
+                x.focus();
+            }
         }
-        window.setTimeout(closeToast, 20000);
-    }
-
+        var seconds = parseInt(box.getAttribute("data-seconds"), 10);
+        if (seconds > 0) {
+            window.setTimeout(closeBox, seconds * 1000);
+        }
+    });
     /* ---- তারিখের ঘর: তারিখ বাছার আগে ব্রাউজারের নিজের ফরম্যাট (mm/dd/yyyy) ফ্যাকাশে দেখায় ---- */
     document.querySelectorAll(".pf--date input[type=date]").forEach(function (d) {
         var mark = function () {

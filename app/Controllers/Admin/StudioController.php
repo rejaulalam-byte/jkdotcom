@@ -385,6 +385,22 @@ final class StudioController
             $answer(false, 'বার্তা চালু-বন্ধ শুধু সুপার অ্যাডমিন পারেন।');
         }
         $name = (string) ($_POST['name'] ?? '');
+        if (isset($_POST['design'])) {
+            // বাক্সের ডিজাইন, রং ও সময়
+            $design = (string) $_POST['design'];
+            $color = (string) ($_POST['color'] ?? '');
+            $seconds = (int) ($_POST['seconds'] ?? MessageSwitch::DEFAULT_SECONDS);
+            if (!MessageSwitch::designable($name) || !isset(MessageSwitch::DESIGNS[$design]) || !isset(MessageSwitch::COLORS[$color])
+                || !in_array($seconds, MessageSwitch::SECONDS, true)) {
+                http_response_code(422);
+                $answer(false, 'এই বার্তার বাক্স এভাবে বদলানো যায় না।');
+            }
+            if (!MessageSwitch::setStyle($name, $design, $color, $seconds)) {
+                $answer(false, 'সংরক্ষণ করা যায়নি।');
+            }
+            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'message_style', $name . ' = ' . $design . ($color !== '' ? '/' . $color : '') . '/' . $seconds . 's');
+            $answer(true);
+        }
         if (!MessageSwitch::switchable($name)) {
             http_response_code(422);
             $answer(false, 'এই বার্তা বন্ধ করা যায় না।');

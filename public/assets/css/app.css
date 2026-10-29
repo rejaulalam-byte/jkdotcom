@@ -5251,3 +5251,120 @@ html.popup-lock {
     padding: 0;
     accent-color: var(--teal);
 }
+
+/* ---- সফলতার বার্তার বাক্স: তিন ডিজাইন, রং ও সময় (partials/message-box.php; অ্যাডমিন লাইভ পেইজ এডিটে বাছেন) ---- */
+/* কত সেকেন্ড পর CSS নিজে সরায় (JavaScript বন্ধ থাকলে); আসলে app.js একই সময়ে সরায়। ০ = সরে না। */
+[data-msg-box][data-seconds="0"] {
+    animation: none;
+}
+[data-msg-box][data-seconds="5"] {
+    animation-delay: 5s;
+}
+[data-msg-box][data-seconds="10"] {
+    animation-delay: 10s;
+}
+[data-msg-box][data-seconds="30"] {
+    animation-delay: 30s;
+}
+[data-msg-box][data-seconds="60"] {
+    animation-delay: 60s;
+}
+[data-msg-box][data-seconds="120"] {
+    animation-delay: 120s;
+}
+
+/* সাধারণ পপ-আপ: কার্ডের মতো মাঝখানে ভাসে, টিক ছাড়া ও ছোট */
+.post-toast--popup {
+    width: min(40rem, calc(100vw - 2rem));
+    padding: 2.75rem 2.25rem 2.25rem;
+}
+.post-toast--popup p {
+    margin: 0.4rem 0;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--ink);
+}
+@media (min-width: 1200px) {
+    .post-toast--popup {
+        width: min(48rem, calc(100vw - 2rem));
+    }
+    .post-toast--popup p {
+        font-size: 1.5rem;
+        line-height: 2.25rem;
+    }
+}
+
+/* পট্টি: নিজের জায়গায় (.notice--ok) অথবা, ফর্ম জমার পর, পর্দার একদম ওপরে লম্বা পট্টি */
+.msg-strip p {
+    margin: 0;
+}
+.msg-strip p + p {
+    margin-top: 0.4rem;
+}
+.msg-strip--bar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 110;
+    padding: 1rem 0;
+    background: #e3f4ea;
+    color: #0b5a2a;
+    font-size: 1.125rem;
+    line-height: 1.7;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+    animation: post-toast-out 0.4s ease 20s forwards;
+}
+.msg-strip--bar.is-closed {
+    display: none;
+}
+.msg-strip__in {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+.msg-strip__close {
+    position: static;
+    flex: none;
+}
+@media (min-width: 1200px) {
+    .msg-strip--bar {
+        font-size: 1.5rem;
+    }
+}
+
+/* রং: --msg-* তিন মান; বাছা না হলে প্রতিটি ডিজাইনের নিজের শুরুর রং */
+.msgc--green {
+    --msg-bg: #e3f4ea;
+    --msg-border: #319b07;
+    --msg-ink: #0b3d1c;
+}
+.msgc--teal {
+    --msg-bg: #e0f0f3;
+    --msg-border: #125a6c;
+    --msg-ink: #0b3a45;
+}
+.msgc--blue {
+    --msg-bg: #e6effb;
+    --msg-border: #2b62b8;
+    --msg-ink: #14335f;
+}
+.msgc--amber {
+    --msg-bg: #fff3dc;
+    --msg-border: #d98a1e;
+    --msg-ink: #5a3708;
+}
+.msgc--grey {
+    --msg-bg: #eef0f1;
+    --msg-border: #767676;
+    --msg-ink: #222;
+}
+.msgc {
+    border-color: var(--msg-border);
+    background: var(--msg-bg);
+    color: var(--msg-ink);
+}
+.msgc p {
+    color: var(--msg-ink);
+}
