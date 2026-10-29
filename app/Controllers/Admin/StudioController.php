@@ -15,6 +15,7 @@ use App\Models\AdminRepository;
 use App\Models\CustomFields;
 use App\Models\FormFields;
 use App\Models\LivePages;
+use App\Models\MessageSwitch;
 use App\Models\OpenPages;
 use App\Models\PageMap;
 use App\Models\SiteBoxes;
@@ -359,6 +360,40 @@ final class StudioController
             $answer(false, 'সংরক্ষণ করা যায়নি।');
         }
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], $hide ? 'field_hide' : 'field_show', $form . '.' . $field);
+        $answer(true);
+    }
+
+    /**
+     * POST (লাইভ পেইজ এডিট, "এই পেইজের বার্তা"): _token, name (MessageSwitch::SWITCHABLE-এর নাম), on = 1 | 0।
+     * সফলতা/তথ্যের বার্তা চালু-বন্ধ, শুধু সুপার অ্যাডমিন। উত্তর JSON: {ok: true} অথবা {ok: false, error}।
+     */
+    public function liveMessage(): void
+    {
+        $admin = AdminAuth::require('pages');
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+        $answer = static function (bool $ok, ?string $error = null): never {
+            echo json_encode($ok ? ['ok' => true] : ['ok' => false, 'error' => $error], JSON_UNESCAPED_UNICODE);
+            exit;
+        };
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            http_response_code(403);
+            $answer(false, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। অ্যাডমিন পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+        if (!AdminAuth::isSuper($admin)) {
+            http_response_code(403);
+            $answer(false, 'বার্তা চালু-বন্ধ শুধু সুপার অ্যাডমিন পারেন।');
+        }
+        $name = (string) ($_POST['name'] ?? '');
+        if (!MessageSwitch::switchable($name)) {
+            http_response_code(422);
+            $answer(false, 'এই বার্তা বন্ধ করা যায় না।');
+        }
+        $on = ($_POST['on'] ?? '') === '1';
+        if (!MessageSwitch::set($name, $on)) {
+            $answer(false, 'সংরক্ষণ করা যায়নি।');
+        }
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], $on ? 'message_on' : 'message_off', $name);
         $answer(true);
     }
 

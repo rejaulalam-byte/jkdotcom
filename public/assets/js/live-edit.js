@@ -850,6 +850,37 @@
     }
 
     // চিহ্নিত লেখায় ক্লিক = বদলানোর বাক্স (লিংকের পেইজে যাওয়া বা বাটনের কাজ হয় না)
+    /* ---- "এই পেইজের বার্তা": সফলতা/তথ্যের বার্তা চালু-বন্ধ (সুপার অ্যাডমিন; বাটন partials/live-messages.php-তে) ---- */
+    document.querySelectorAll("[data-jk-msg-switch]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            var warn = btn.getAttribute("data-warn");
+            if (warn && !window.confirm(warn + "\n\nবার্তাটি বন্ধ করবেন?")) {
+                return;
+            }
+            var body = new FormData();
+            body.append("_token", data.token);
+            body.append("name", btn.getAttribute("data-jk-msg-switch"));
+            body.append("on", btn.getAttribute("data-on"));
+            btn.disabled = true;
+            fetch(data.messageSave, { method: "POST", body: body, credentials: "same-origin" })
+                .then(function (res) {
+                    return res.json();
+                })
+                .then(function (res) {
+                    if (res.ok) {
+                        window.location.reload();
+                        return;
+                    }
+                    btn.disabled = false;
+                    window.alert(res.error || "সংরক্ষণ করা যায়নি।");
+                })
+                .catch(function () {
+                    btn.disabled = false;
+                    window.alert("সংরক্ষণ করা যায়নি। লগইনের মেয়াদ শেষ হয়ে থাকতে পারে; অ্যাডমিন পেইজটি রিফ্রেশ করুন।");
+                });
+        });
+    });
+
     document.addEventListener("click", function (e) {
         if ((panel && panel.contains(e.target)) || (iconPanel && iconPanel.contains(e.target)) || (fieldPanel && fieldPanel.contains(e.target)) || (customPanel && customPanel.contains(e.target))) {
             return;

@@ -10,6 +10,7 @@ $labels = [
     'admin_created' => 'নতুন অ্যাডমিন', 'admin_disabled' => 'অ্যাডমিন বন্ধ', 'admin_enabled' => 'অ্যাডমিন চালু', 'permissions_changed' => 'অনুমতি বদল',
     'member_approve' => 'অনুমোদন', 'member_hold' => 'হোল্ড', 'member_reject' => 'বাতিল', 'member_reserve' => 'মোছা (সংরক্ষিতে)',
     'member_trash' => 'ডাস্টবিনে পাঠানো', 'member_restore' => 'ফিরিয়ে আনা', 'member_reopen' => 'নতুন আবেদনে ফেরানো', 'member_edit' => 'তথ্য সম্পাদনা', 'member_purged' => 'চিরতরে মোছা', 'sweep' => 'স্বয়ংক্রিয় ঝাড়া',
+    'message_on' => 'বার্তা চালু', 'message_off' => 'বার্তা বন্ধ',
 ];
 ?>
 <div class="adm-tablewrap">

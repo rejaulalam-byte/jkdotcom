@@ -73,6 +73,12 @@ function msg(string $key, array $vars = []): string
     return $text;
 }
 
+/** সফলতা/তথ্যের বার্তাটি চালু কি না (সুপার অ্যাডমিন বন্ধ করতে পারেন; App\Models\MessageSwitch)। */
+function msg_on(string $name): bool
+{
+    return \App\Models\MessageSwitch::isOn($name);
+}
+
 /** escape-করা লেখা, যেখানে {বন্ধনীর শব্দ} <strong>মোটা</strong> হয়। */
 function rich(string $text): string
 {

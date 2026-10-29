@@ -167,7 +167,7 @@ $helpTel = content('today.post.helpline_tel');
     </div>
 </section>
 
-<?php if ($done !== null):
+<?php if ($done !== null && msg_on('today.post.done')):
     $say = static fn (string $key): string => e(strtr(content('today.post.done.' . $key), ['{name}' => (string) $done['name'], '{area}' => (string) $done['area']]));
 ?>
 <?php // সফল জমার বার্তা-বক্স (Figma 2830-465): রেজিস্ট্রেশনের বক্সের মতোই কার্ড-ধরন; ২০ সেকেন্ড পরে সরে যায় ?>

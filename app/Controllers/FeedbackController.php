@@ -91,7 +91,9 @@ final class FeedbackController
             Logger::error('Feedback e-mail could not be sent');
         }
 
-        Session::flash('feedback_ok', msg('feedback.msg.done'));
+        if (msg_on('feedback.msg.done')) {
+            Session::flash('feedback_ok', msg('feedback.msg.done'));
+        }
         redirect($back);
     }
 

@@ -32,16 +32,16 @@ $label = static fn (string $for, string $key, bool $required = false): string =>
         <h2 id="pf-title" class="section__title post-job__title"><?= t('profile.title') ?></h2>
         <p class="post-job__intro"><?= e(honorific_name($user['gender'] ?? null, (string) $user['name'])) ?>, <?= t('profile.intro') ?></p>
 
-        <?php if ($setupDone): ?>
+        <?php if ($setupDone && msg_on('setup.done')): ?>
             <p class="notice notice--ok profile__done" role="status"><?= t('setup.done') ?></p>
         <?php endif; ?>
-        <?php if ($passwordChanged): ?>
+        <?php if ($passwordChanged && msg_on('password.changed')): ?>
             <p class="notice notice--ok profile__done" role="status"><?= t('password.changed') ?></p>
         <?php endif; ?>
-        <?php if ($unlocked): ?>
+        <?php if ($unlocked && msg_on('login.unlocked')): ?>
             <p class="notice notice--ok profile__done" role="status"><?= t('login.unlocked') ?></p>
         <?php endif; ?>
-        <?php if ($done): ?>
+        <?php if ($done && msg_on('profile.done')): ?>
             <p class="notice notice--ok profile__done" role="status"><?= t('profile.done') ?></p>
         <?php endif; ?>
 

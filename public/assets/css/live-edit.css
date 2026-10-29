@@ -389,3 +389,32 @@ summary.live-msgs__title {
     transform: none;
     animation: none;
 }
+/* বার্তা চালু-বন্ধ: অবস্থার লেখা ও বাটন লেবেলের পাশে; বন্ধ বার্তার বাক্স ফিকে */
+.live-msgs__state {
+    margin: 0 0 0.35rem 0.6rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #2a7a3b;
+}
+.live-msgs__item.is-off .live-msgs__state {
+    color: #a61b1b;
+}
+.live-msgs__switch {
+    margin: 0 0 0.35rem 0.6rem;
+    padding: 0.2rem 0.8rem;
+    border: 1px solid #125a6c;
+    border-radius: 0.4rem;
+    background: #fff;
+    color: #125a6c;
+    font: inherit;
+    font-size: 1.125rem;
+    cursor: pointer;
+}
+.live-msgs__switch:hover,
+.live-msgs__switch:focus-visible {
+    background: #125a6c;
+    color: #fff;
+}
+.live-msgs__item.is-off > :last-child {
+    opacity: 0.45;
+}

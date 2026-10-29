@@ -247,7 +247,7 @@ $helpTel = content('today.post.helpline_tel');
     </div>
 </section>
 
-<?php if ($done !== null):
+<?php if ($done !== null && msg_on('regform.' . $role . '.done')):
     $say = static fn (string $key): string => e(strtr(content('regform.' . $role . '.done.' . $key), ['{name}' => (string) $done['name'], '{area}' => (string) $done['area']]));
 ?>
 <?php // সফল জমার বার্তা-বক্স (Figma 2827-341): সাদা বাক্স, সবুজ কিনারা, ওপরে সবুজ বৃত্তে হলুদ টিক; ২০ সেকেন্ড পরে সরে যায় ?>

@@ -139,6 +139,7 @@ final class LiveEdit
             'boxes' => $boxes,
             'boxColors' => array_map(static fn (array $c): string => $c[0], SiteBoxes::COLORS),
             'boxSave' => admin_base() . '/studio/live-box',
+            'messageSave' => admin_base() . '/studio/live-message',
             'fields' => $fields,
             'fieldSave' => admin_base() . '/studio/live-field',
             'fieldColors' => FormFields::COLORS,

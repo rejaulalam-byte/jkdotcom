@@ -5,12 +5,16 @@
  * ধন্যবাদ-কার্ডের লাইনগুলো (একই কী-র শুরু) একটা কার্ডে একসঙ্গে দেখায়।
  */
 
+use App\Core\AdminAuth;
 use App\Models\LiveMessages;
+use App\Models\MessageSwitch;
 
 $liveGroups = LiveMessages::groups(LiveMessages::pageFor((string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH)));
 if ($liveGroups === []) {
     return;
 }
+$liveAdmin = AdminAuth::current();
+$liveSuper = $liveAdmin !== null && AdminAuth::isSuper($liveAdmin);
 
 /** একটা বার্তা (বা একসঙ্গে কয়েক লাইনের ধন্যবাদ-কার্ড) তার বাক্সে। @param list<string> $keys */
 $liveBox = static function (string $kind, array $keys): string {
@@ -28,7 +32,7 @@ $liveBox = static function (string $kind, array $keys): string {
 ?>
 <section class="live-msgs" aria-label="এই পেইজের বার্তা">
     <div class="container">
-        <p class="live-msgs__hint">নিচের বার্তাগুলো দর্শক শুধু কোনো কাজের পরে দেখেন (ভুল হলে, জমা দিলে, পপ-আপে)। এখানে সব একসঙ্গে আসল চেহারায় দেখানো হলো; যেকোনো লেখায় ক্লিক করে বদলান। {name}-ধাঁচের শব্দ থাকলে রাখুন, সেখানে দর্শকের নাম বসে। এই অংশ সাধারণ দর্শক দেখেন না।</p>
+        <p class="live-msgs__hint">নিচের বার্তাগুলো দর্শক শুধু কোনো কাজের পরে দেখেন (ভুল হলে, জমা দিলে, পপ-আপে)। এখানে সব একসঙ্গে আসল চেহারায় দেখানো হলো; যেকোনো লেখায় ক্লিক করে বদলান। {name}-ধাঁচের শব্দ থাকলে রাখুন, সেখানে দর্শকের নাম বসে। সফলতার বার্তা ও ধন্যবাদ-কার্ড সুপার অ্যাডমিন চালু-বন্ধ করতে পারেন; ভুল-বার্তা সবসময় চালু থাকে। এই অংশ সাধারণ দর্শক দেখেন না।</p>
         <?php foreach ($liveGroups as $group): ?>
             <?php if ($group['folded']): ?><details class="live-msgs__group"><summary class="live-msgs__title"><?= e($group['title']) ?></summary>
             <?php else: ?><div class="live-msgs__group"><h2 class="live-msgs__title"><?= e($group['title']) ?></h2><?php endif; ?>
@@ -45,9 +49,21 @@ $liveBox = static function (string $kind, array $keys): string {
                 }
             }
             ?>
-            <?php foreach ($runs as $run): ?>
-                <div class="live-msgs__item">
+            <?php foreach ($runs as $run):
+                // চালু-বন্ধের নাম: ধন্যবাদ-কার্ডে লাইনগুলোর শুরু, অন্যটিতে কী নিজেই
+                $switch = $run['kind'] === 'card' ? $run['stem'] : $run['keys'][0];
+                $switchable = MessageSwitch::switchable($switch);
+                $on = MessageSwitch::isOn($switch);
+            ?>
+                <div class="live-msgs__item<?= $on ? '' : ' is-off' ?>">
                     <span class="live-msgs__kind"><?= e(LiveMessages::KINDS[$run['kind']]) ?></span>
+                    <?php if ($switchable): ?>
+                        <span class="live-msgs__state"><?= $on ? 'চালু' : 'বন্ধ — দর্শক এটা দেখেন না' ?></span>
+                        <?php if ($liveSuper): ?>
+                            <button type="button" class="live-msgs__switch" data-jk-msg-switch="<?= e($switch) ?>" data-on="<?= $on ? '0' : '1' ?>"
+                                <?= $on ? 'data-warn="' . e(MessageSwitch::SWITCHABLE[$switch]) . '"' : '' ?>><?= $on ? 'বার্তা বন্ধ করুন' : 'বার্তা চালু করুন' ?></button>
+                        <?php endif; ?>
+                    <?php endif; ?>
                     <?= $liveBox($run['kind'], $run['keys']) ?>
                 </div>
             <?php endforeach; ?>

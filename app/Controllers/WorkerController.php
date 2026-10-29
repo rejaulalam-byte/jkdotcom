@@ -94,19 +94,23 @@ final class WorkerController
             redirect($id > 0 ? '/workers/' . $id : '/services');
         }
         if (RateLimiter::tooMany('worker_rate', 10, 3600)) {
-            Session::flash('rating_message', ['error', content('worker.rate.limit')]);
+            Session::flash('rating_message', ['error', msg('worker.rate.limit')]);
             redirect($back);
         }
 
         $rating = RatingRepository::parse($_POST['rating'] ?? null);
         if ($rating === null) {
-            Session::flash('rating_message', ['error', content('worker.rate.invalid')]);
+            Session::flash('rating_message', ['error', msg('worker.rate.invalid')]);
             redirect($back);
         }
 
         $_SESSION['voter'] ??= bin2hex(random_bytes(16));
         $ok = RatingRepository::submit($id, (string) $_SESSION['voter'], $rating);
-        Session::flash('rating_message', $ok ? ['ok', content('worker.rate.thanks')] : ['error', content('worker.rate.error')]);
+        if (!$ok) {
+            Session::flash('rating_message', ['error', msg('worker.rate.error')]);
+        } elseif (msg_on('worker.rate.thanks')) {
+            Session::flash('rating_message', ['ok', msg('worker.rate.thanks')]);
+        }
         redirect($back);
     }
     /**
