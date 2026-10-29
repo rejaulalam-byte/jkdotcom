@@ -28,6 +28,7 @@ $nav = [
     [admin_base() . '/ads', 'বিজ্ঞাপন', false, 'ads'],
     [admin_base() . '/services', 'সেবার তালিকা', false, 'services'],
     [admin_base() . '/studio', 'লাইভ পেইজ এডিট', false, 'pages'],
+    [admin_base() . '/pages', 'নতুন পেইজ', false, 'pages'],
     [admin_base() . '/mails', 'ইমেইলের লেখা', false, 'email'],
     [admin_base() . '/locks', 'আটকানো লগইন', false, 'locks'],
 ];

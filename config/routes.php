@@ -14,6 +14,7 @@ use App\Controllers\Admin\MailsController as AdminMails;
 use App\Controllers\Admin\MemberEditController as AdminMemberEdit;
 use App\Controllers\Admin\StudioController as AdminStudio;
 use App\Controllers\Admin\MembersController as AdminMembers;
+use App\Controllers\Admin\PagesController as AdminPages;
 use App\Controllers\Admin\PanelController as AdminPanel;
 use App\Controllers\Admin\ServicesController as AdminServices;
 use App\Controllers\AccountSetupController;
@@ -44,6 +45,7 @@ return [
 
     // Figma-তে নকশা করা পেইজ; একটা একটা করে বানানো হচ্ছে (PROGRESS.md দেখুন)
     ['GET',  '/about',           [PageController::class, 'about']],
+    ['GET',  '/page/{slug}',     [PageController::class, 'custom']],
     ['GET',  '/services',        [ServiceController::class, 'index']],
     ['GET',  '/services/{slug}', [ServiceController::class, 'show']],
     ['GET',  '/workers/{slug}',  [WorkerController::class, 'show']],
@@ -135,6 +137,8 @@ return [
     ['POST', admin_base() . '/services/action',     [AdminServices::class, 'action']],
     ['GET',  admin_base() . '/mails',               [AdminMails::class, 'index']],
     ['POST', admin_base() . '/mails',               [AdminMails::class, 'action']],
+    ['GET',  admin_base() . '/pages',               [AdminPages::class, 'index']],
+    ['POST', admin_base() . '/pages/action',        [AdminPages::class, 'action']],
     ['GET',  admin_base() . '/studio',              [AdminStudio::class, 'index']],
     ['POST', admin_base() . '/studio/save',         [AdminStudio::class, 'save']],
     ['POST', admin_base() . '/studio/image',        [AdminStudio::class, 'image']],

@@ -36,6 +36,11 @@ final class PageMap
             }
         };
         $walk($tree);
+        // অ্যাডমিনের বানানো নতুন পেইজ: মেনুতে না থাকলে লাইভ পেইজ এডিটের "অন্যান্য"-তে আসে (LivePages)
+        foreach (CustomPages::all() as $custom) {
+            $tree[] = ['id' => 'cp-' . $custom['slug'], 'title' => $custom['name'] . ($custom['hidden'] ? ' (লুকানো)' : ''),
+                'url' => CustomPages::url($custom['slug']), 'open' => CustomPages::OPEN_PREFIX . $custom['slug'], 'parts' => []];
+        }
         $rest = array_values(array_filter(SiteTexts::keys(), static fn (string $k): bool => !isset($used[$k])));
         if ($rest !== []) {
             $tree[] = ['id' => 'other', 'title' => 'অন্যান্য লেখা', 'parts' => [['বাকি লেখা', $rest]]];

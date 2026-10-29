@@ -24,9 +24,10 @@ final class OpenPages
         'registration-agent' => ['title' => 'প্রতিনিধি রেজিস্ট্রেশন নির্দেশিকা', 'url' => '/registration/agent'],
     ];
 
+    /** সাইটের নিজের খোলা পেইজ, অথবা অ্যাডমিনের বানানো নতুন পেইজ ("custom-<slug>", App\Models\CustomPages)। */
     public static function exists(string $slug): bool
     {
-        return isset(self::ALL[$slug]);
+        return isset(self::ALL[$slug]) || CustomPages::slugFromOpen($slug) !== null;
     }
 
     /** সংরক্ষিত (বা শুরুর) লেখা, ছাঁকনির আগে — এডিটরে খোলার জন্য। */
@@ -47,9 +48,12 @@ final class OpenPages
     /** সাইটের সঙ্গে আসা শুরুর লেখা। */
     public static function original(string $slug): string
     {
+        if (CustomPages::slugFromOpen($slug) !== null) {
+            return CustomPages::STARTER;
+        }
         $file = BASE_PATH . '/app/Content/pages/' . $slug . '.html';
 
-        return self::exists($slug) && is_file($file) ? (string) file_get_contents($file) : '';
+        return isset(self::ALL[$slug]) && is_file($file) ? (string) file_get_contents($file) : '';
     }
 
     /** অ্যাডমিন কি লেখাটা বদলেছেন (শুরুর লেখা নয়)? */

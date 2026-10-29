@@ -1431,3 +1431,20 @@ input.adm-short {
     font: inherit;
     font-weight: 400;
 }
+
+/* ---- নতুন পেইজ (admin/pages.php) ---- */
+.adm-badge--ok {
+    background: #d9f0e0;
+    color: #0b5a2a;
+}
+.adm-details {
+    margin-top: 14px;
+}
+.adm-details > summary {
+    color: var(--teal);
+    font-weight: 600;
+    cursor: pointer;
+}
+.adm-details > form {
+    margin-top: 12px;
+}

@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\Content;
 use App\Core\Session;
 use App\Core\View;
+use App\Models\CustomPages;
 use App\Models\OpenPages;
 
 /** নকশা-করা কিন্তু এখনও না-বানানো পেইজে একটা ভদ্র "coming soon" পেইজ দেখায়; সঙ্গে সাধারণ লেখার পেইজ। */
@@ -114,6 +115,29 @@ final class PageController
             'description' => 'মানুষের প্রয়োজনে, মানুষের পাশে — Jorurikaj.com-এর পরিচয় ও লক্ষ্য।',
             'heading' => 'আমাদের পরিচয়, আমাদের লক্ষ্য',
             'bodyHtml' => OpenPages::html('about'),
+        ]);
+    }
+
+    /**
+     * অ্যাডমিনের বানানো নতুন পেইজ (/page/<slug>, App\Models\CustomPages): দেখতে আইনি পেইজের মতো (ব্যানার + খোলা লেখা)।
+     * লুকানো পেইজ সাধারণ দর্শক পান না ("পাওয়া যায়নি"); শুধু অ্যাডমিনের লাইভ পেইজ এডিটের ফ্রেমে দেখা যায়, যাতে আগে লেখা যায়।
+     */
+    public function custom(array $meta = []): void
+    {
+        $page = CustomPages::find((string) ($meta['slug'] ?? ''));
+        if ($page === null || ($page['hidden'] && !live_preview())) {
+            http_response_code(404);
+            View::render('pages/error', ['title' => msg('msg.not_found'), 'code' => 404]);
+            return;
+        }
+
+        View::render('pages/legal', [
+            'bodyClass' => 'page-legal',
+            'title' => $page['name'] . ' — Jorurikaj.com',
+            'description' => $page['description'] !== '' ? $page['description'] : Content::get('site.description'),
+            'heading' => $page['heading'],
+            'crumb' => $page['name'],
+            'bodyHtml' => OpenPages::html(CustomPages::OPEN_PREFIX . $page['slug']),
         ]);
     }
 }
