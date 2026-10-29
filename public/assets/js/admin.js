@@ -306,3 +306,33 @@
         dirty = false;
     });
 })();
+
+/* ---- থিমের নমুনা (admin/theme.php): রং-ঘর আর কোডের ঘর একে অপরকে মেলায়, আর ডানের নমুনা সঙ্গে সঙ্গে নতুন রং নেয়
+   (নমুনার --p-* মানে বসে; সাইটে কিছু বদলায় না, সংরক্ষণ করলে তবেই) ---- */
+(function () {
+    var preview = document.querySelector("[data-theme-preview]");
+    if (!preview) {
+        return;
+    }
+    document.querySelectorAll("[data-swatch]").forEach(function (s) {
+        s.style.backgroundColor = s.getAttribute("data-swatch");
+    });
+    function apply(name, value) {
+        preview.style.setProperty("--p-" + name, value);
+    }
+    document.querySelectorAll("[data-theme-color]").forEach(function (picker) {
+        var name = picker.getAttribute("data-theme-color");
+        var hex = document.querySelector('[data-theme-hex="' + name + '"]');
+        apply(name, picker.value);
+        picker.addEventListener("input", function () {
+            hex.value = picker.value;
+            apply(name, picker.value);
+        });
+        hex.addEventListener("input", function () {
+            if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) {
+                picker.value = hex.value.toLowerCase();
+                apply(name, picker.value);
+            }
+        });
+    });
+})();

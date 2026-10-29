@@ -1462,3 +1462,118 @@ input.adm-short {
     border-radius: 8px;
     background: #f1f4f2;
 }
+
+/* ---- রং ও আকার (admin/theme.php): বাঁয়ে রং-ঘর, ডানে সাইটের মতো নমুনা (--p-* মান admin.js বসায়) ---- */
+.adm-theme {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+@media (max-width: 1000px) {
+    .adm-theme {
+        grid-template-columns: 1fr;
+    }
+}
+.adm-theme__row {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+}
+.adm-theme__pick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 6px;
+}
+.adm-theme__pick input[type="color"] {
+    width: 56px;
+    height: 40px;
+    padding: 2px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+}
+.adm-theme__pick input[type="text"] {
+    width: 110px;
+    font-family: monospace;
+}
+.adm-theme__orig {
+    color: var(--muted);
+    font-size: 17px;
+}
+.adm-theme__swatch {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    vertical-align: middle;
+}
+.adm-warn {
+    border-left: 6px solid #c0392b;
+    background: #fdecec;
+}
+.adm-theme__preview {
+    --p-teal: #125a6c;
+    --p-amber: #d08a00;
+    --p-gold: #f0d772;
+    --p-ink: #222222;
+    position: sticky;
+    top: 16px;
+}
+.tp-banner {
+    padding: 22px 16px;
+    border-radius: 10px 10px 0 0;
+    background: var(--p-teal);
+    color: #fff;
+    text-align: center;
+}
+.tp-banner p {
+    margin: 4px 0;
+}
+.tp-brand {
+    color: var(--p-gold);
+    font-weight: 700;
+}
+.tp-title {
+    font-size: 24px;
+}
+.tp-crumb {
+    color: var(--p-gold);
+    font-size: 16px;
+}
+.tp-body {
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-top: 0;
+    border-radius: 0 0 10px 10px;
+    background: #fff;
+    color: var(--p-ink);
+}
+.tp-menu span {
+    margin-right: 14px;
+}
+.tp-menu__hover {
+    border-bottom: 3px solid var(--p-amber);
+    color: var(--p-amber);
+}
+.tp-card {
+    margin: 12px 0;
+    padding: 14px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--p-teal) 20%, #fff);
+    color: var(--p-teal);
+}
+.tp-btn {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 999px;
+    background: var(--p-teal);
+    color: #fff;
+}
+.tp-btn--soft {
+    background: color-mix(in srgb, var(--p-teal) 35%, #fff);
+    color: var(--p-teal);
+}

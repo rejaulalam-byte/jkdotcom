@@ -18,6 +18,7 @@ use App\Controllers\Admin\MembersController as AdminMembers;
 use App\Controllers\Admin\PagesController as AdminPages;
 use App\Controllers\Admin\PanelController as AdminPanel;
 use App\Controllers\Admin\ServicesController as AdminServices;
+use App\Controllers\Admin\ThemeController as AdminTheme;
 use App\Controllers\AccountSetupController;
 use App\Controllers\AdImageController;
 use App\Controllers\PageImageController;
@@ -30,6 +31,7 @@ use App\Controllers\ProfileController;
 use App\Controllers\RegistrationController;
 use App\Controllers\ServiceController;
 use App\Controllers\SubscribeController;
+use App\Controllers\ThemeController;
 use App\Controllers\TodayController;
 use App\Controllers\WorkerController;
 
@@ -47,6 +49,7 @@ return [
     // Figma-তে নকশা করা পেইজ; একটা একটা করে বানানো হচ্ছে (PROGRESS.md দেখুন)
     ['GET',  '/about',           [PageController::class, 'about']],
     ['GET',  '/page/{slug}',     [PageController::class, 'custom']],
+    ['GET',  '/site-theme',      [ThemeController::class, 'css']],
     ['GET',  '/services',        [ServiceController::class, 'index']],
     ['GET',  '/services/{slug}', [ServiceController::class, 'show']],
     ['GET',  '/workers/{slug}',  [WorkerController::class, 'show']],
@@ -143,6 +146,8 @@ return [
     ['POST', admin_base() . '/studio/home-section', [AdminHomeSections::class, 'live']],
     ['GET',  admin_base() . '/home-section/{slug}', [AdminHomeSections::class, 'edit']],
     ['POST', admin_base() . '/home-section/{slug}', [AdminHomeSections::class, 'save']],
+    ['GET',  admin_base() . '/theme',               [AdminTheme::class, 'index']],
+    ['POST', admin_base() . '/theme',               [AdminTheme::class, 'save']],
     ['GET',  admin_base() . '/studio',              [AdminStudio::class, 'index']],
     ['POST', admin_base() . '/studio/save',         [AdminStudio::class, 'save']],
     ['POST', admin_base() . '/studio/image',        [AdminStudio::class, 'image']],

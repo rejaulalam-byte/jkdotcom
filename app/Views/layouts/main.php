@@ -16,7 +16,7 @@ $pageDescription = $description ?? content('site.description');
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($pageTitle) ?></title>
     <meta name="description" content="<?= e($pageDescription) ?>">
-    <meta name="theme-color" content="#125a6c">
+    <meta name="theme-color" content="<?= e(\App\Models\SiteTheme::color('teal')) ?>">
     <meta property="og:type" content="website">
     <meta property="og:title" content="<?= e($pageTitle) ?>">
     <meta property="og:description" content="<?= e($pageDescription) ?>">
@@ -24,6 +24,9 @@ $pageDescription = $description ?? content('site.description');
     <link rel="icon" type="image/png" href="<?= e(asset('img/site/logo-figma.png')) ?>">
     <link rel="preload" href="<?= e(asset('fonts/hind-siliguri-400.woff2')) ?>" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
+    <?php if (\App\Models\SiteTheme::anyChanged()): // অ্যাডমিনের বাছা থিমের রং (app.css-এর মান বদলে দেয়) ?>
+        <link rel="stylesheet" href="/site-theme?v=<?= e(\App\Models\SiteTheme::version()) ?>">
+    <?php endif; ?>
     <?php if (live_preview()): // অ্যাডমিনের লাইভ পেইজ এডিট: app.js-এর আগে চলে (লেখার চিহ্ন খুঁজে নিয়ে মুছে দেয়) ?>
         <link rel="stylesheet" href="<?= e(asset('css/live-edit.css')) ?>">
         <script src="<?= e(asset('js/live-edit.js')) ?>" defer></script>
