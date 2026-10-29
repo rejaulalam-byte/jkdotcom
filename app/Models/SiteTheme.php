@@ -89,16 +89,16 @@ final class SiteTheme
         return $vars === [] ? '' : ":root {\n    " . implode(";\n    ", $vars) . ";\n}\n";
     }
 
-    /** /site-theme-এর পুরো লেখা: বদলানো রং ও লেখার আকার (App\Models\SiteSizes)। */
+    /** /site-theme-এর পুরো লেখা: বদলানো রং, লেখার আকার (App\Models\SiteSizes) ও বাংলা ফন্ট (SiteFonts)। */
     public static function stylesheet(): string
     {
-        return self::css() . SiteSizes::css();
+        return self::css() . SiteSizes::css() . SiteFonts::css();
     }
 
-    /** রং বা আকারের কিছু বদলানো আছে কি না (না থাকলে /site-theme লিংকই বসে না)। */
+    /** রং, আকার বা ফন্টের কিছু বদলানো আছে কি না (না থাকলে /site-theme লিংকই বসে না)। */
     public static function anyCustom(): bool
     {
-        return self::anyChanged() || SiteSizes::anyChanged();
+        return self::anyChanged() || SiteSizes::anyChanged() || SiteFonts::current() !== '';
     }
 
     /** লিংকের সংস্করণ (রং বা আকার বদলালে ঠিকানা বদলায়, তাই ব্রাউজার পুরনো ফাইল রাখে না)। */

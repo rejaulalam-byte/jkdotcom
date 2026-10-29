@@ -389,6 +389,10 @@ summary.live-msgs__title {
     transform: none;
     animation: none;
 }
+/* নমুনা কার্ড ফ্রেমের বাক্সের চেয়ে চওড়া না হয় */
+.live-msgs .msg-static {
+    max-width: 100%;
+}
 .live-msgs .post-toast--popup.msg-static {
     margin-top: 1rem;
 }
@@ -486,4 +490,9 @@ summary.live-msgs__title {
 }
 .jk-home-slot.is-jk-hidden > :not(.jk-home-bar) {
     opacity: 0.35;
+}
+
+/* লাইভ ফ্রেমে সম্মতির লেখার <span> চিহ্নের সঙ্গে সরে যায়; লেখা ও লিংক তখন আলাদা টুকরো, তাই সারি ভাঙতে দেওয়া */
+.consent__label {
+    flex-wrap: wrap;
 }

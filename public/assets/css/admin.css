@@ -1583,11 +1583,67 @@ input.adm-short {
 }
 .adm-theme__preview {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
 }
 @media (max-width: 1000px) {
     .adm-theme__preview {
         grid-column: 1;
         grid-row: auto;
     }
+}
+
+/* ---- বাংলা ফন্টের নমুনা (admin/theme.php): সাইটের মতো একই ফাইল ---- */
+/* অ্যাডমিন যে বাংলা ফন্ট বাছতে পারেন (App\Models\SiteFonts; শুরুর ফন্ট Hind Siliguri)। প্রতিটি একটাই variable ফাইল
+   (৪০০-৬০০ ওজন), শুধু বাংলা অক্ষর; ব্যবহার না হলে ব্রাউজার ফাইলটা নামায়ই না। লাইসেন্স fonts ফোল্ডারে। */
+@font-face {
+    font-family: "Noto Sans Bengali";
+    font-weight: 400 600;
+    font-display: swap;
+    src: url("../fonts/noto-sans-bengali.woff2") format("woff2");
+    unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+1CD0, U+1CD2, U+1CD5-1CD6, U+1CD8, U+1CE1, U+1CEA, U+1CED, U+1CF2, U+1CF5-1CF7, U+200C-200D, U+20B9, U+25CC, U+A8F1, U+11DF0-11DF1;
+}
+@font-face {
+    font-family: "Anek Bangla";
+    font-weight: 400 600;
+    font-display: swap;
+    src: url("../fonts/anek-bangla.woff2") format("woff2");
+    unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+1CD0, U+1CD2, U+1CD5-1CD6, U+1CD8, U+1CE1, U+1CEA, U+1CED, U+1CF2, U+1CF5-1CF7, U+200C-200D, U+20B9, U+25CC, U+A8F1, U+11DF0-11DF1;
+}
+@font-face {
+    font-family: "Baloo Da 2";
+    font-weight: 400 600;
+    font-display: swap;
+    src: url("../fonts/baloo-da-2.woff2") format("woff2");
+    unicode-range: U+0951-0952, U+0964-0965, U+0980-09FE, U+1CD0, U+1CD2, U+1CD5-1CD6, U+1CD8, U+1CE1, U+1CEA, U+1CED, U+1CF2, U+1CF5-1CF7, U+200C-200D, U+20B9, U+25CC, U+A8F1, U+11DF0-11DF1;
+}
+.tf-sample {
+    margin: 6px 0 0;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 22px;
+    line-height: 1.7;
+}
+.tf-sample b {
+    font-weight: 600;
+}
+.tf-sample--hind {
+    font-family: "Hind Siliguri", sans-serif;
+}
+.tf-sample--noto {
+    font-family: "Noto Sans Bengali", sans-serif;
+}
+.tf-sample--anek {
+    font-family: "Anek Bangla", sans-serif;
+}
+.tf-sample--baloo {
+    font-family: "Baloo Da 2", sans-serif;
+}
+.adm-theme__font {
+    display: block;
+    cursor: pointer;
+}
+.adm-theme__font .tf-sample {
+    display: block;
 }

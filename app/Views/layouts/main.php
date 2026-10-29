@@ -22,7 +22,8 @@ $pageDescription = $description ?? content('site.description');
     <meta property="og:description" content="<?= e($pageDescription) ?>">
     <meta property="og:locale" content="bn_BD">
     <link rel="icon" type="image/png" href="<?= e(asset('img/site/logo-figma.png')) ?>">
-    <link rel="preload" href="<?= e(asset('fonts/hind-siliguri-400.woff2')) ?>" as="font" type="font/woff2" crossorigin>
+    <?php // বাংলা ফন্ট আগেভাগে নামানো: অ্যাডমিনের বাছা ফন্ট (App\Models\SiteFonts), নইলে Hind Siliguri ?>
+    <link rel="preload" href="<?= e(asset('fonts/' . \App\Models\SiteFonts::preloadFile())) ?>" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
     <?php if (\App\Models\SiteTheme::anyCustom()): // অ্যাডমিনের বাছা থিমের রং ও লেখার আকার (app.css-এর মান বদলে দেয়) ?>
         <link rel="stylesheet" href="/site-theme?v=<?= e(\App\Models\SiteTheme::version()) ?>">

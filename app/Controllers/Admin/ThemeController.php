@@ -9,6 +9,7 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminRepository;
+use App\Models\SiteFonts;
 use App\Models\SiteSizes;
 use App\Models\SiteTheme;
 
@@ -36,6 +37,7 @@ final class ThemeController
             'title' => 'রং ও আকার',
             'colors' => $colors,
             'sizes' => $sizes,
+            'font' => SiteFonts::current(),
             'warnings' => SiteTheme::warnings($colors),
             'errors' => Session::pull('admin_errors', []),
             'ok' => Session::pull('admin_ok'),
@@ -51,6 +53,22 @@ final class ThemeController
             $this->fail($back, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
         }
         $log = static fn (string $detail) => AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'theme_colors', $detail);
+
+        // বাংলা ফন্টের ফর্ম (আলাদা বাক্স)
+        if (($_POST['font_form'] ?? '') === '1') {
+            $font = (string) ($_POST['font'] ?? '');
+            if (!isset(SiteFonts::FONTS[$font])) {
+                $this->fail($back, 'ফন্ট শুধু তালিকা থেকে বাছা যায়।');
+            }
+            if ($font !== SiteFonts::current()) {
+                if (!SiteFonts::set($font)) {
+                    $this->fail($back, 'সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।');
+                }
+                AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'theme_font', SiteFonts::FONTS[$font][1]);
+            }
+            Session::flash('admin_ok', 'বাংলা ফন্ট এখন "' . SiteFonts::FONTS[$font][1] . '"; পুরো সাইটে এখনই। লাইভ পেইজ এডিটে কয়েকটা পেইজ দেখে নিন।');
+            redirect($back);
+        }
 
         // লেখার আকারের ফর্ম (আলাদা বাক্স)
         if (($_POST['sizes'] ?? '') === '1') {

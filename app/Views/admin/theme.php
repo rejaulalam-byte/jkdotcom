@@ -7,8 +7,10 @@
  * @var array<string,string> $colors   নাম => বর্তমান #rrggbb
  * @var list<string> $warnings
  * @var array<string,int> $sizes    দল => শতাংশ (App\Models\SiteSizes)
+ * @var string $font                 বাছা বাংলা ফন্ট ('' = Hind Siliguri; App\Models\SiteFonts)
  */
 
+use App\Models\SiteFonts;
 use App\Models\SiteSizes;
 use App\Models\SiteTheme;
 
@@ -69,6 +71,20 @@ $base = admin_base() . '/theme';
             <button class="adm-btn" type="submit">আকার সংরক্ষণ করুন</button>
             <button class="adm-small adm-small--warn" type="submit" name="sizes_reset" value="1">সব আকার ১০০%-এ ফিরুন</button>
         </p>
+    </form>
+
+    <form class="adm-box adm-theme__fonts" action="<?= e($base) ?>" method="post">
+        <?= csrf_field() ?>
+        <input type="hidden" name="font_form" value="1">
+        <h2 class="adm-card__title">বাংলা ফন্ট</h2>
+        <p class="adm-muted">শুরুর ফন্ট Hind Siliguri; বাকি তিনটি তার কাছাকাছি চেহারার, খোলা লাইসেন্সের। একটা বাছলে পুরো সাইটের বাংলা লেখা সেই ফন্টে আসে (ইংরেজি লেখা সবসময় Poppins)। ফন্টের মাপ একটু আলাদা, তাই বদলের পরে কয়েকটা পেইজ দেখে নিন; পছন্দ না হলে শুরুর ফন্টে ফিরুন।</p>
+        <?php foreach (SiteFonts::FONTS as $key => [$label, $family, , $about]): ?>
+            <label class="adm-theme__row adm-theme__font">
+                <span><input type="radio" name="font" value="<?= e($key) ?>"<?= $font === $key ? ' checked' : '' ?>> <b><?= e($label) ?></b> — <?= e($about) ?></span>
+                <span class="tf-sample tf-sample--<?= e($key === '' ? 'hind' : $key) ?>">আপনার প্রয়োজন, আমাদের অগ্রাধিকার। <b>দক্ষ ইলেকট্রিক মিস্ত্রি</b> খুঁজুন — ঢাকা, চট্টগ্রাম, সিলেট; যুক্তাক্ষর: ক্ষ, ঙ্গ, ন্ত্র, স্ক।</span>
+            </label>
+        <?php endforeach; ?>
+        <p class="adm-commonrow"><button class="adm-btn" type="submit">ফন্ট সংরক্ষণ করুন</button></p>
     </form>
 
     <aside class="adm-box adm-theme__preview" aria-label="নমুনা" data-theme-preview>
