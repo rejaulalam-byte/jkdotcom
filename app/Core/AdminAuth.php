@@ -36,13 +36,28 @@ final class AdminAuth
         if ($row !== null && ($row['status'] !== 'active' || time() - (int) ($_SESSION['admin_seen'] ?? 0) > self::IDLE_SECONDS)) {
             $row = null;
         }
+        // দুই দরজা চালু থাকলে: সেশনের দরজা ভূমিকার সঙ্গে না মিললে লগইন নেই ধরা হয়
+        if ($row !== null && self::doorKey((string) $row['role']) !== (string) ($_SESSION['admin_door'] ?? '')) {
+            $row = null;
+        }
         if ($row === null) {
-            unset($_SESSION['admin_id'], $_SESSION['admin_seen']);
+            unset($_SESSION['admin_id'], $_SESSION['admin_seen'], $_SESSION['admin_door']);
+        } elseif (Router::door() !== null && self::doorKey((string) $row['role']) !== Router::door()) {
+            // ভুল দরজা দিয়ে এসেছে (যেমন সাব-অ্যাডমিন সুপারের পথে): সেশন না মুছে শুধু ঢুকতে দেওয়া হয় না
+            return self::$admin = null;
         } else {
             $_SESSION['admin_seen'] = time();
         }
 
         return self::$admin = $row;
+    }
+
+    /**
+     * এই ভূমিকা যে দরজা দিয়ে ঢোকে: কর্মীদের দরজা চালু থাকলে সুপার = 'super', বাকিরা = 'staff'; চালু না থাকলে সবাই 'super'।
+     */
+    public static function doorKey(string $role): string
+    {
+        return admin_staff_base() !== '' && $role !== 'super' ? 'staff' : 'super';
     }
 
     /** সফল লগইনের পর: সেশন-id বদলে অ্যাডমিনকে লগইন-করা রাখে এবং লগে লেখে। @param array<string,mixed> $admin */
@@ -51,6 +66,7 @@ final class AdminAuth
         session_regenerate_id(true);
         $_SESSION['admin_id'] = (int) $admin['id'];
         $_SESSION['admin_seen'] = time();
+        $_SESSION['admin_door'] = self::doorKey((string) $admin['role']);
         self::$admin = false;
         AdminRepository::update((int) $admin['id'], ['last_login_at' => date('Y-m-d H:i:s')]);
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'login');
@@ -62,7 +78,7 @@ final class AdminAuth
         if ($admin !== null) {
             AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'logout');
         }
-        unset($_SESSION['admin_id'], $_SESSION['admin_seen']);
+        unset($_SESSION['admin_id'], $_SESSION['admin_seen'], $_SESSION['admin_door']);
         session_regenerate_id(true);
         self::$admin = false;
     }

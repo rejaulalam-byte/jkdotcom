@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers\Admin;
 
 use App\Core\AdminAuth;
+use App\Core\Content;
 use App\Core\RichText;
 use App\Core\Security;
 use App\Core\Session;
@@ -26,7 +27,7 @@ final class JobsController
     public function index(): void
     {
         $admin = AdminAuth::require('inbox');
-        $tab = isset(JobPostRepository::TABS[$_GET['t'] ?? '']) ? (string) $_GET['t'] : '';
+        $tab = isset(JobPostRepository::TABS[$_GET['t'] ?? '']) ? (string) ($_GET['t'] ?? '') : '';
         $q = mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 100);
         $page = max(1, (int) ($_GET['p'] ?? 1));
         $found = JobPostRepository::adminList($tab, $q, self::PER_PAGE, ($page - 1) * self::PER_PAGE);
@@ -155,6 +156,25 @@ final class JobsController
         }
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], $id === 0 ? 'job_add' : 'job_edit', $data['title'] . ' — ' . $data['contact_name']);
         $this->ok(admin_base() . '/jobs?open=' . $saved, $data['title'] . ($id === 0 ? ' — বিজ্ঞপ্তি যোগ হয়েছে' : ' — সংরক্ষণ হয়েছে') . ($data['status'] === 'approved' ? '; সাইটে দেখা যাচ্ছে।' : ' (লুকানো)।'));
+    }
+
+    /** POST: days (১–৩০) — শেষ তারিখ না থাকা বিজ্ঞপ্তি শুরুর তারিখ থেকে কত দিন "আজকের কাজ"-এ দেখাবে। */
+    public function days(): void
+    {
+        $admin = AdminAuth::require('inbox');
+        $back = admin_base() . '/jobs';
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            $this->fail($back, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+        $days = (string) ($_POST['days'] ?? '');
+        if (!ctype_digit($days) || (int) $days < 1 || (int) $days > 30) {
+            $this->fail($back, 'দিনের সংখ্যা ১ থেকে ৩০-এর মধ্যে দিন।');
+        }
+        if (!Content::set('settings.jobs_visible_days', (string) (int) $days)) {
+            $this->fail($back, 'সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।');
+        }
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'jobs_days', bn((int) $days) . ' দিন');
+        $this->ok($back, 'এখন থেকে বিজ্ঞপ্তি ' . bn((int) $days) . ' দিন দেখানো হবে।');
     }
 
     /** POST: id, do (hide | show | title | delete), title (do=title হলে), back। */

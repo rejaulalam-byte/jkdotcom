@@ -432,3 +432,26 @@
     });
     paint();
 })();
+
+/* ---- প্রিন্ট বোতাম: <button data-print> ব্রাউজারের প্রিন্ট-বাক্স খোলে (inline onclick CSP-তে বন্ধ) ---- */
+(function () {
+    document.addEventListener("click", function (event) {
+        var button = event.target.closest ? event.target.closest("[data-print]") : null;
+        if (button) {
+            window.print();
+        }
+    });
+})();
+
+/* ---- "লাইভ পেইজ এডিট": ফ্রেমে হোমের সেবা-কার্ডে ক্লিক (live-edit.js পাঠায় {jk: "open-services"}) = সেবার তালিকা পেইজে যাওয়া ---- */
+(function () {
+    var frame = document.querySelector(".adm-live__frame[data-services-url]");
+    if (!frame) {
+        return;
+    }
+    window.addEventListener("message", function (e) {
+        if (e.origin === window.location.origin && e.data && e.data.jk === "open-services") {
+            window.location.href = frame.getAttribute("data-services-url");
+        }
+    });
+})();

@@ -24,7 +24,7 @@ final class LegacyController
     public function index(): void
     {
         $admin = AdminAuth::require('registrations');
-        $state = isset(LegacyActivation::STATES[$_GET['state'] ?? '']) ? (string) $_GET['state'] : '';
+        $state = isset(LegacyActivation::STATES[$_GET['state'] ?? '']) ? (string) ($_GET['state'] ?? '') : '';
         $filter = ['state' => $state, 'q' => mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 100)];
         $page = max(1, (int) ($_GET['p'] ?? 1));
         $found = UserRepository::legacyList($filter, self::PER_PAGE, ($page - 1) * self::PER_PAGE);

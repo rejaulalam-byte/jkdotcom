@@ -26,11 +26,44 @@ function bn(int|string $number): string
  * অ্যাডমিন প্যানেলের গোপন প্রবেশপথ (যেমন "/self-pakundi")। সার্ভারের .env-এর ADMIN_PATH থেকে আসে, যাতে সাধারণ
  * "/admin" দিয়ে কেউ খুঁজে না পায়। .env-এ না থাকলে বা ভুল ধাঁচের হলে "/admin" (শুধু লোকাল পরীক্ষার জন্য)।
  */
-function admin_base(): string
+function admin_route_base(): string
 {
     $path = trim((string) Env::get('ADMIN_PATH', ''), " \t/");
 
     return preg_match('/^[a-z0-9][a-z0-9_-]{2,60}$/i', $path) === 1 ? '/' . $path : '/admin';
+}
+
+/**
+ * কর্মীদের (সুপার ছাড়া সবার) আলাদা দরজা, .env-এর ADMIN_PATH_STAFF থেকে। ঠিক ধাঁচের না হলে, খালি হলে বা সুপারের পথের সমান হলে ''
+ * (তখন সবাই একই দরজা ব্যবহার করে)।
+ */
+function admin_staff_base(): string
+{
+    $path = trim((string) Env::get('ADMIN_PATH_STAFF', ''), " \t/");
+    $base = preg_match('/^[a-z0-9][a-z0-9_-]{2,60}$/i', $path) === 1 ? '/' . $path : '';
+
+    return $base !== '' && strcasecmp($base, admin_route_base()) !== 0 ? $base : '';
+}
+
+/**
+ * এই অনুরোধের অ্যাডমিন দরজার পথ: কর্মীদের দরজা দিয়ে এলে সেটা, নইলে (বা অ্যাডমিন-পথের বাইরের পেইজে, যেমন লাইভ ফ্রেমে)
+ * লগইন-করা অ্যাডমিনের নিজের দরজা। লিংক ও রিডাইরেক্টে সবসময় এটাই বসে, যাতে কেউ অন্যের দরজার পথ না দেখে।
+ */
+function admin_base(): string
+{
+    return admin_door_for_key(Router::door() ?? (string) ($_SESSION['admin_door'] ?? 'super'));
+}
+
+/** 'staff' হলে কর্মীদের দরজা (থাকলে), নইলে সুপারের। */
+function admin_door_for_key(string $door): string
+{
+    return $door === 'staff' && admin_staff_base() !== '' ? admin_staff_base() : admin_route_base();
+}
+
+/** এই ভূমিকার মানুষ যে দরজা দিয়ে ঢোকে (ইমেইলের লিংকের জন্য): সুপার = প্রথমটা, বাকিরা = কর্মীদেরটা (থাকলে)। */
+function admin_base_for_role(string $role): string
+{
+    return admin_door_for_key($role === 'super' ? 'super' : 'staff');
 }
 
 /** public/assets-এর ভেতরের ফাইলের URL; ফাইল বদলালে ব্রাউজার যেন নতুনটা নেয় সেজন্য ভার্সন-সহ। */

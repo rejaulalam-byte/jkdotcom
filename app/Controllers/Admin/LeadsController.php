@@ -22,7 +22,7 @@ final class LeadsController
     public function index(): void
     {
         $admin = AdminAuth::require('inbox');
-        $type = isset(self::TABS[$_GET['t'] ?? '']) ? (string) $_GET['t'] : '';
+        $type = isset(self::TABS[$_GET['t'] ?? '']) ? (string) ($_GET['t'] ?? '') : '';
         $q = mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 100);
         $page = max(1, (int) ($_GET['p'] ?? 1));
         $found = ContactTrackingRepository::leadsList($type, $q, self::PER_PAGE, ($page - 1) * self::PER_PAGE);

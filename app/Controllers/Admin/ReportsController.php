@@ -6,6 +6,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\AdminAuth;
 use App\Core\View;
+use App\Models\AdminRepository;
 use App\Models\ReportData;
 
 /**
@@ -41,6 +42,11 @@ final class ReportsController
         if ($note !== null) {
             $report['summary'][] = $note;
         }
+        if (($_GET['csv'] ?? '') === '1') {
+            $this->csv($admin, $id, $from, $to, $report);
+
+            return;
+        }
         header('Cache-Control: no-store');
         View::render('admin/report', [
             'admin' => $admin,
@@ -51,6 +57,28 @@ final class ReportsController
             'today' => date('Y-m-d'),
             'report' => $report,
         ], 'layouts/admin');
+    }
+
+    /**
+     * টেবিলটা CSV হিসেবে নামায় (এক্সেলে বাংলা ঠিক দেখাতে শুরুতে BOM)। সূত্র হিসেবে চলে এমন শুরু (=, +, -, @) আটকাতে সামনে ' বসে।
+     *
+     * @param array<string,mixed> $admin
+     * @param array{head:list<string>,rows:list<array{cells:list<string>,type:string}>,summary:list<string>} $report
+     */
+    private function csv(array $admin, string $id, string $from, string $to, array $report): void
+    {
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'report_csv', ReportData::REPORTS[$id][0] . ' ' . $from . ' – ' . $to);
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="report-' . $id . '-' . $from . '_' . $to . '.csv"');
+        header('Cache-Control: no-store');
+        $safe = static fn (string $v): string => preg_match('/^[=+\-@]/', $v) === 1 ? "'" . $v : $v;
+        $out = fopen('php://output', 'w');
+        fwrite($out, "\xEF\xBB\xBF");
+        fputcsv($out, array_map($safe, $report['head']));
+        foreach ($report['rows'] as $row) {
+            fputcsv($out, array_map($safe, $row['cells']));
+        }
+        fclose($out);
     }
 
     /**

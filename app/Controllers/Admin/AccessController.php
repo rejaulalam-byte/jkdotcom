@@ -7,6 +7,7 @@ namespace App\Controllers\Admin;
 use App\Core\AdminAuth;
 use App\Core\Env;
 use App\Core\RateLimiter;
+use App\Core\Router;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
@@ -110,7 +111,9 @@ final class AccessController
 
         $admin = $email !== '' && strlen($password) <= 200 ? AdminRepository::findByEmail($email) : null;
         $hash = $admin !== null && (string) $admin['password_hash'] !== '' ? (string) $admin['password_hash'] : self::DUMMY_HASH;
-        $ok = password_verify($password, $hash) && $admin !== null && (string) $admin['password_hash'] !== '';
+        // ভুল দরজায় ঠিক পাসওয়ার্ডও "ভুল" দেখায়, যাতে অন্য দরজার অস্তিত্ব বোঝা না যায়
+        $ok = password_verify($password, $hash) && $admin !== null && (string) $admin['password_hash'] !== ''
+            && AdminAuth::doorKey((string) $admin['role']) === (Router::door() ?? 'super');
         if (!$ok) {
             RateLimiter::hit('adm_login_ip', self::WINDOW);
             RateLimiter::hit($bucket, self::WINDOW);
@@ -207,9 +210,10 @@ final class AccessController
         $this->guardPost('adm_forgot', 6, admin_base() . '/forgot');
         $email = mb_strtolower(clean_input($_POST['email'] ?? '', 150));
         $admin = filter_var($email, FILTER_VALIDATE_EMAIL) !== false ? AdminRepository::findByEmail($email) : null;
-        if ($admin !== null && $admin['status'] === 'active' && !RateLimiter::tooMany('adm_forgot_' . $admin['id'], 3, 3600)) {
+        // নিজের দরজা ছাড়া অন্য দরজায় চাইলে কিছু পাঠানো হয় না (উত্তর একই থাকে)
+        if ($admin !== null && $admin['status'] === 'active' && AdminAuth::doorKey((string) $admin['role']) === (Router::door() ?? 'super') && !RateLimiter::tooMany('adm_forgot_' . $admin['id'], 3, 3600)) {
             $token = AdminAuth::newToken((int) $admin['id'], 3600);
-            AdminAuth::mail((string) $admin['email'], 'পাসওয়ার্ড বদলের লিংক — jorurikaj.com', "অ্যাডমিন প্যানেলের পাসওয়ার্ড বদলাতে এই লিংকে যান (১ ঘণ্টা কাজ করবে, একবারই):\n\n" . AdminAuth::baseUrl() . admin_base() . '/set-password/' . $token . "\n\nআপনি চেয়ে না থাকলে এই ইমেইল উপেক্ষা করুন।\n\n— jorurikaj.com");
+            AdminAuth::mail((string) $admin['email'], 'পাসওয়ার্ড বদলের লিংক — jorurikaj.com', "অ্যাডমিন প্যানেলের পাসওয়ার্ড বদলাতে এই লিংকে যান (১ ঘণ্টা কাজ করবে, একবারই):\n\n" . AdminAuth::baseUrl() . admin_base_for_role((string) $admin['role']) . '/set-password/' . $token . "\n\nআপনি চেয়ে না থাকলে এই ইমেইল উপেক্ষা করুন।\n\n— jorurikaj.com");
             AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'forgot_password');
         }
         Session::flash('admin_ok', 'ইমেইলটি নিবন্ধিত থাকলে পাসওয়ার্ড বদলের লিংক পাঠানো হয়েছে। ইনবক্স (ও স্প্যাম) দেখুন।');

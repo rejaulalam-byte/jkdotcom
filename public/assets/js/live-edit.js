@@ -1011,6 +1011,15 @@
             window.parent.postMessage({ jk: "open-menu" }, window.location.origin);
             return;
         }
+        // হোমের সেবা-কার্ড: সেবার তালিকার অ্যাডমিন-পেইজে নিয়ে যায় (অনুমতি না থাকলে প্যারেন্ট কিছু করে না, কার্ডের লিংকও বন্ধ থাকে)
+        var card = e.target.closest(".service-card");
+        if (card) {
+            e.preventDefault();
+            e.stopPropagation();
+            close();
+            window.parent.postMessage({ jk: "open-services" }, window.location.origin);
+            return;
+        }
         var el = e.target.closest("[data-jk-key]");
         var rich = e.target.closest("[data-jk-rich]");
         if (rich && (!el || rich.contains(el))) {

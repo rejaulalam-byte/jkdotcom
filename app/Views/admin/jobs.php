@@ -27,6 +27,14 @@ $url = static function (array $override = []) use ($base, $tab, $q, $page): stri
     বিজ্ঞপ্তি জমা দেওয়ামাত্র সাইটে প্রকাশ হয়ে যায়। অনুচিত বা ভুল কিছু হলে এখানে "লুকান" দিলে তালিকা থেকে সরে যায় (তথ্য থাকে)।
     দর্শক নিজের লেখা "কাজের ধরন" দিলে সেটা "নিজের লেখা ধরন" ট্যাবে আসে; বানান দেখে ঠিক করে নিতে পারেন।
 </p>
+<form class="adm-filter" action="<?= e($base) ?>/days" method="post">
+    <?= csrf_field() ?>
+    <label>"আজকের কাজ"-এ বিজ্ঞপ্তি কত দিন দেখাবে (শেষের তারিখ না দেওয়া হলে)?
+        <input type="number" name="days" min="1" max="30" value="<?= e(max(1, min(30, (int) \App\Core\Content::get('settings.jobs_visible_days', '3')))) ?>">
+    </label>
+    <span class="adm-muted">দিন (১–৩০)। শেষের তারিখ দেওয়া বিজ্ঞপ্তি সেই তারিখ পর্যন্ত থাকে।</span>
+    <button class="adm-small adm-small--go" type="submit">সংরক্ষণ</button>
+</form>
 
 <p><a class="adm-small adm-small--go" href="<?= e(admin_base() . '/job-add') ?>">+ নতুন বিজ্ঞপ্তি যোগ করুন</a></p>
 

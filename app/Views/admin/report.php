@@ -32,6 +32,11 @@ $isToday = $from === $today && $to === $today;
     <?php endif; ?>
 </p>
 
+<div class="adm-reportactions">
+    <a class="adm-small adm-small--go" href="<?= e($base . '?' . http_build_query(['from' => $from, 'to' => $to, 'csv' => '1'])) ?>">⬇ CSV ডাউনলোড</a>
+    <button class="adm-small" type="button" data-print>🖨 প্রিন্ট</button>
+</div>
+
 <?php if ($report['summary'] !== []): ?>
     <ul class="adm-reportsummary">
         <?php foreach ($report['summary'] as $line): ?><li><?= e($line) ?></li><?php endforeach; ?>

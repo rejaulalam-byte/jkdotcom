@@ -194,6 +194,7 @@ final class AdminRepository
         'member_purged' => 'সদস্য চিরতরে মোছা',
         'job_delete' => 'কাজের বিজ্ঞপ্তি মোছা',
         'feedback_delete' => 'মতামত মোছা',
+        'subscriber_delete' => 'গ্রাহকের ইমেইল মোছা',
         'ad_delete' => 'বিজ্ঞাপন মোছা',
         'popup_image_removed' => 'পপ-আপ বিজ্ঞাপনের ছবি মোছা',
         'page_delete' => 'পেইজ মোছা',

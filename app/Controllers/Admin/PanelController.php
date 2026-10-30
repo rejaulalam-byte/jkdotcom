@@ -134,7 +134,7 @@ final class PanelController
         if ($id === null) {
             $this->back(admin_base() . '/admins', ['এই ইমেইল ব্যবহার করা যাচ্ছে না, অথবা সংরক্ষণ করা যায়নি।']);
         }
-        $sent = $this->sendInvite($id, $name, $email);
+        $sent = $this->sendInvite($id, $name, $email, $role);
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'admin_created', $name . ' (' . AdminAuth::roleLabel($role) . ')');
         $sent
             ? $this->ok(admin_base() . '/admins', 'তৈরি হয়েছে। ' . $email . '-এ পাসওয়ার্ড বসানোর লিংক পাঠানো হয়েছে (৩ দিন কাজ করবে)।')
@@ -149,8 +149,8 @@ final class PanelController
         if ($target === null || $target['status'] !== 'active' || !($this->mayManage($admin, $target) || (int) $target['id'] === (int) $admin['id'])) {
             $this->back(admin_base() . '/admins', ['অ্যাকাউন্টটি পাওয়া যায়নি বা বন্ধ আছে।']);
         }
-        $this->sendInvite((int) $target['id'], (string) $target['name'], (string) $target['email'])
-            ? $this->ok(admin_base() . '/admins', 'লিংক আবার পাঠানো হয়েছে।')
+        $this->sendInvite((int) $target['id'], (string) $target['name'], (string) $target['email'], (string) $target['role'])
+            ?$this->ok(admin_base() . '/admins', 'লিংক আবার পাঠানো হয়েছে।')
             : $this->back(admin_base() . '/admins', ['ইমেইল পাঠানো যায়নি।']);
     }
 
@@ -309,11 +309,11 @@ final class PanelController
     }
 
     /** নতুন অ্যাডমিনকে (বা লিংক হারানো অ্যাডমিনকে) পাসওয়ার্ড বসানোর এককালীন লিংক ইমেইল করে (৩ দিন)। */
-    private function sendInvite(int $id, string $name, string $email): bool
+    private function sendInvite(int $id, string $name, string $email, string $role): bool
     {
         $token = AdminAuth::newToken($id, 3 * 86400);
 
-        return AdminAuth::mail($email, 'অ্যাডমিন প্যানেলে আপনাকে আমন্ত্রণ — jorurikaj.com', "{$name}, jorurikaj.com-এর অ্যাডমিন প্যানেলে আপনার অ্যাকাউন্ট খোলা হয়েছে।\nআপনার পাসওয়ার্ড বসাতে এই লিংকে যান (৩ দিন কাজ করবে, একবারই):\n\n" . AdminAuth::baseUrl() . admin_base() . '/set-password/' . $token . "\n\nতারপর " . AdminAuth::baseUrl() . admin_base() . " থেকে লগইন করবেন। লগইনে ইমেইলে একটি ৬ সংখ্যার কোড আসবে।\n\n— jorurikaj.com");
+        return AdminAuth::mail($email, 'অ্যাডমিন প্যানেলে আপনাকে আমন্ত্রণ — jorurikaj.com', "{$name}, jorurikaj.com-এর অ্যাডমিন প্যানেলে আপনার অ্যাকাউন্ট খোলা হয়েছে।\nআপনার পাসওয়ার্ড বসাতে এই লিংকে যান (৩ দিন কাজ করবে, একবারই):\n\n" . AdminAuth::baseUrl() . admin_base_for_role($role) . '/set-password/' . $token . "\n\nতারপর " . AdminAuth::baseUrl() . admin_base_for_role($role) . " থেকে লগইন করবেন। লগইনে ইমেইলে একটি ৬ সংখ্যার কোড আসবে।\n\n— jorurikaj.com");
     }
 
     /** @param list<string> $errors */

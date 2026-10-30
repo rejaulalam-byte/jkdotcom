@@ -24,7 +24,7 @@ final class IncompleteController
     public function index(): void
     {
         $admin = AdminAuth::require('registrations');
-        $filter = isset(IncompleteInfo::LABELS[$_GET['f'] ?? '']) ? (string) $_GET['f'] : '';
+        $filter = isset(IncompleteInfo::LABELS[$_GET['f'] ?? '']) ? (string) ($_GET['f'] ?? '') : '';
         $q = mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 100);
         $page = max(1, (int) ($_GET['p'] ?? 1));
         $found = UserRepository::incompleteList($filter, $q, self::PER_PAGE, ($page - 1) * self::PER_PAGE);

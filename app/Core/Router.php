@@ -9,6 +9,14 @@ final class Router
 {
     private static string $path = '/';
 
+    /** 'super' | 'staff' = অ্যাডমিন দরজার কোনটা দিয়ে অনুরোধ এসেছে; null = অ্যাডমিন-পথ নয় (সাধারণ পেইজ)। */
+    private static ?string $door = null;
+
+    public static function door(): ?string
+    {
+        return self::$door;
+    }
+
     public static function currentPath(): string
     {
         return self::$path;
@@ -23,6 +31,16 @@ final class Router
 
         $raw = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
         $path = '/' . trim(rawurldecode($raw), '/');
+        // অ্যাডমিন দরজা: কর্মীদের পথ ভেতরে সুপারের পথে বদলে নেওয়া হয় (রুট একটাই), আর কোন দরজা দিয়ে এল মনে রাখা হয়
+        self::$door = null;
+        $super = admin_route_base();
+        $staff = admin_staff_base();
+        if ($staff !== '' && ($path === $staff || str_starts_with($path, $staff . '/'))) {
+            self::$door = 'staff';
+            $path = $super . substr($path, strlen($staff));
+        } elseif ($path === $super || str_starts_with($path, $super . '/')) {
+            self::$door = 'super';
+        }
         self::$path = $path;
 
         // পাথে শুধু সাধারণ অক্ষর চলবে; অদ্ভুত কিছু থাকলে সোজা "পাওয়া যায়নি"

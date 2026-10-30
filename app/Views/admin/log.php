@@ -16,7 +16,7 @@ $labels = [
     'lock_release' => 'আটকানো লগইন খোলা', 'lock_release_device' => 'আটকানো ডিভাইস খোলা', 'lock_release_typed' => 'আটকানো লগইন খোলা (লিখে)',
     'legacy_common_password' => 'পুরনো কর্মীর কমন পাসওয়ার্ড', 'legacy_called' => 'পুরনো কর্মীকে ফোন করা হয়েছে', 'legacy_call_undone' => 'ফোনের টিক তোলা',
     'member_fill' => 'অসম্পূর্ণ তথ্য পূরণ', 'member_fill_mail' => 'তথ্য পূর্ণ করার ইমেইল',
-    'feedback_read' => 'মতামত পড়া', 'feedback_unread' => 'মতামত আবার নতুন', 'feedback_keep' => 'মতামত রাখা', 'feedback_unkeep' => 'মতামতের "রাখা" তোলা', 'feedback_delete' => 'মতামত মোছা',
+    'feedback_read' => 'মতামত পড়া', 'feedback_unread' => 'মতামত আবার নতুন', 'feedback_keep' => 'মতামত রাখা', 'feedback_unkeep' => 'মতামতের "রাখা" তোলা', 'feedback_delete' => 'মতামত মোছা',  'subscriber_delete' => 'গ্রাহকের ইমেইল মোছা', 'subscribers_csv' => 'গ্রাহকের ইমেইলের CSV নামানো',  'jobs_days' => 'আজকের কাজ দেখানোর দিন বদলানো',  'report_csv' => 'রিপোর্টের CSV নামানো',
     'job_title' => 'কাজের ধরন ঠিক করা', 'job_hide' => 'কাজের বিজ্ঞপ্তি লুকানো', 'job_show' => 'কাজের বিজ্ঞপ্তি প্রকাশ', 'job_delete' => 'কাজের বিজ্ঞপ্তি মোছা',
     'service_add' => 'নতুন সেবা', 'service_rename' => 'সেবার নাম বদল', 'service_icon' => 'সেবার আইকন বদল', 'service_icon_reset' => 'সেবার আইকন শুরুতে ফেরা', 'service_on' => 'সেবা চালু', 'service_off' => 'সেবা বন্ধ', 'service_up' => 'সেবা ওপরে', 'service_down' => 'সেবা নিচে', 'service_custom_assign' => 'কর্মীর নিজের লেখা পেশা বসানো',
     'menu_save' => 'মেনু ও ফুটার সংরক্ষণ', 'menu_reset' => 'মেনু শুরুতে ফেরা', 'box_color' => 'ক্যাপসুলের রং', 'field_color' => 'ফর্মের ঘরের রং', 'field_hide' => 'ফর্মের ঘর লুকানো', 'field_show' => 'ফর্মের ঘর দেখানো',

@@ -1916,3 +1916,22 @@ input.adm-short {
     color: var(--muted);
     text-align: center;
 }
+
+/* ---- রিপোর্ট প্রিন্ট: মেনু, বোতাম ও তারিখের ফর্ম বাদ, শুধু শিরোনাম-লেখা ও টেবিল ---- */
+@media print {
+    .adm-top,
+    .adm-reporthead,
+    .adm-reportactions,
+    .adm-btn--close {
+        display: none !important;
+    }
+    .adm-reporttable {
+        font-size: 12px;
+    }
+}
+.adm-reportactions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 10px;
+}

@@ -21,7 +21,7 @@ final class FeedbackInboxController
     public function index(): void
     {
         $admin = AdminAuth::require('inbox');
-        $tab = isset(FeedbackRepository::TABS[$_GET['t'] ?? '']) ? (string) $_GET['t'] : '';
+        $tab = isset(FeedbackRepository::TABS[$_GET['t'] ?? '']) ? (string) ($_GET['t'] ?? '') : '';
         $q = mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 100);
         $page = max(1, (int) ($_GET['p'] ?? 1));
         $found = FeedbackRepository::adminList($tab, $q, self::PER_PAGE, ($page - 1) * self::PER_PAGE);
