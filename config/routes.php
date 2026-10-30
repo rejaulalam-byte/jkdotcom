@@ -26,6 +26,7 @@ use App\Controllers\PageImageController;
 use App\Controllers\AuthController;
 use App\Controllers\FeedbackController;
 use App\Controllers\HomeController;
+use App\Controllers\LegacyRedirectController;
 use App\Controllers\PasswordResetController;
 use App\Controllers\PageController;
 use App\Controllers\ProfileController;
@@ -38,12 +39,30 @@ use App\Controllers\TodayController;
 use App\Controllers\WorkerController;
 
 /*
+ * পুরনো সাইটের নাম্বার-ঠিকানার স্থায়ী রিডাইরেক্ট (SEO ও সংরক্ষিত লিংকের জন্য): /2001, /3000, /3001?service_id=N, /5001, /6002–/6005, /7000;
+ * প্রতিটি /index/<নাম্বার> রূপেও, আর /index নিজে হোমে।
+ */
+// নিজের ফাংশনের ভেতরে, কারণ এই ফাইল Router::dispatch()-এর ভেতরে require হয়; বাইরের ভেরিয়েবল ($path ইত্যাদি) বদলে গেলে রাউটার ভুল পথ দেখে।
+$legacyRoutes = (static function (): array {
+    $list = [['GET', '/index', [LegacyRedirectController::class, 'go', ['to' => '/']]]];
+    foreach (array_merge(LegacyRedirectController::MAP, ['/3001' => '']) as $old => $new) {
+        foreach ([$old, '/index' . $old] as $from) {
+            $list[] = ['GET', $from, $new === ''
+                ? [LegacyRedirectController::class, 'service']
+                : [LegacyRedirectController::class, 'go', ['to' => $new]]];
+        }
+    }
+
+    return $list;
+})();
+
+/*
  * ওয়েবসাইটের প্রতিটি সর্বজনীন URL।
  * ধরন: [HTTP মেথড, পাথ, [Controller::class, 'মেথড', ঐচ্ছিক বাড়তি তথ্য]]
  * (বাড়তি তথ্য যেমন ['role' => 'agent'] কন্ট্রোলারের মেথডে $meta হয়ে পৌঁছায়।)
  * নতুন পেইজ যোগ করতে: কন্ট্রোলারের মেথড + ভিউ বানান, তারপর এখানে এক লাইন যোগ করুন।
  */
-return [
+return array_merge($legacyRoutes, [
     ['GET',  '/',                [HomeController::class, 'index']],
     ['POST', '/feedback',        [FeedbackController::class, 'store']],
     ['POST', '/subscribe',       [SubscribeController::class, 'store']],
@@ -175,4 +194,4 @@ return [
     ['GET',  '/stats',           [PageController::class, 'soon', ['title' => 'এক নজরে আমাদের পরিসংখ্যান', 'notice' => 'শিগগিরই যুক্ত হচ্ছে', 'text' => 'এই পেইজে Jorurikaj.com-এর পরিসংখ্যান শিগগিরই যুক্ত হচ্ছে। ততক্ষণ হোম পেইজ ঘুরে দেখুন।']]],
     ['GET',  '/privacy',         [PageController::class, 'legal', ['page' => 'privacy']]],
     ['GET',  '/terms',           [PageController::class, 'legal', ['page' => 'terms']]],
-];
+]);
