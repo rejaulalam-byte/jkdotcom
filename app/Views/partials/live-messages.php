@@ -15,6 +15,7 @@ if ($liveGroups === []) {
 }
 $liveAdmin = AdminAuth::current();
 $liveSuper = $liveAdmin !== null && AdminAuth::isSuper($liveAdmin);
+$liveTop = $liveAdmin !== null && AdminAuth::isTop($liveAdmin); // বার্তা চালু-বন্ধ: সুপার ও মেইন অ্যাডমিন
 
 /** একটা বার্তা (বা একসঙ্গে কয়েক লাইনের ধন্যবাদ-কার্ড) তার বাক্সে। @param list<string> $keys */
 $liveBox = static function (string $kind, array $keys): string {
@@ -59,7 +60,7 @@ $liveBox = static function (string $kind, array $keys): string {
                     <span class="live-msgs__kind"><?= e(LiveMessages::KINDS[$run['kind']]) ?></span>
                     <?php if ($switchable): ?>
                         <span class="live-msgs__state"><?= $on ? 'চালু' : 'বন্ধ — দর্শক এটা দেখেন না' ?></span>
-                        <?php if ($liveSuper): ?>
+                        <?php if ($liveTop): ?>
                             <button type="button" class="live-msgs__switch" data-jk-msg-switch="<?= e($switch) ?>" data-on="<?= $on ? '0' : '1' ?>"
                                 <?= $on ? 'data-warn="' . e(MessageSwitch::SWITCHABLE[$switch]) . '"' : '' ?>><?= $on ? 'বার্তা বন্ধ করুন' : 'বার্তা চালু করুন' ?></button>
                         <?php endif; ?>

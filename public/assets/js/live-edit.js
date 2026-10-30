@@ -493,8 +493,8 @@
         iconPanel.querySelector(".jk-live-icon__file").value = "";
         iconPanel.querySelector(".jk-live-panel__msg").textContent = "";
         iconPanel.querySelector('[data-icon-act="reset"]').hidden = info.state !== "custom";
-        iconPanel.querySelector('[data-icon-act="hide"]').hidden = !data.super || hidden;
-        iconPanel.querySelector('[data-icon-act="show"]').hidden = !data.super || !hidden;
+        iconPanel.querySelector('[data-icon-act="hide"]').hidden = !data.top || hidden;
+        iconPanel.querySelector('[data-icon-act="show"]').hidden = !data.top || !hidden;
         iconPanel.querySelector('[data-icon-act="upload"]').hidden = hidden;
         iconPanel.querySelector(".jk-live-icon__pick").hidden = hidden;
         iconPanel.querySelector(".jk-live-icon__rule").hidden = hidden;

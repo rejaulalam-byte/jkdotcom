@@ -243,9 +243,9 @@ final class StudioController
             http_response_code(422);
             $answer(false, 'এই ছবি এখানে বদলানো যায় না।');
         }
-        if (in_array($action, ['hide', 'show'], true) && !AdminAuth::isSuper($admin)) {
+        if (in_array($action, ['hide', 'show'], true) && !AdminAuth::isTop($admin)) {
             http_response_code(403);
-            $answer(false, 'ছবি লুকানো বা দেখানো শুধু সুপার অ্যাডমিন পারেন।');
+            $answer(false, 'ছবি লুকানো বা দেখানো শুধু সুপার ও মেইন অ্যাডমিন পারেন।');
         }
 
         $key = 'image.' . $slot;
@@ -380,13 +380,17 @@ final class StudioController
             http_response_code(403);
             $answer(false, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। অ্যাডমিন পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
         }
-        if (!AdminAuth::isSuper($admin)) {
+        if (!AdminAuth::isTop($admin)) {
             http_response_code(403);
-            $answer(false, 'বার্তা চালু-বন্ধ শুধু সুপার অ্যাডমিন পারেন।');
+            $answer(false, 'বার্তা চালু-বন্ধ শুধু সুপার ও মেইন অ্যাডমিন পারেন।');
         }
         $name = (string) ($_POST['name'] ?? '');
         if (isset($_POST['design'])) {
-            // বাক্সের ডিজাইন, রং ও সময়
+            // বাক্সের ডিজাইন, রং ও সময়: কাঠামোর কাজ, শুধু সুপার অ্যাডমিন
+            if (!AdminAuth::isSuper($admin)) {
+                http_response_code(403);
+                $answer(false, 'বার্তার বাক্সের ডিজাইন শুধু সুপার অ্যাডমিন বদলাতে পারেন।');
+            }
             $design = (string) $_POST['design'];
             $color = (string) ($_POST['color'] ?? '');
             $seconds = (int) ($_POST['seconds'] ?? MessageSwitch::DEFAULT_SECONDS);
