@@ -3097,6 +3097,11 @@ textarea {
 .job__body p {
     margin: 0 0 0.9rem;
 }
+/* অ্যাডমিনের পূর্ণ এডিটরে সাজানো বিস্তারিত: পেইজের সাধারণ লেখার মাপে */
+.job__rich {
+    font-size: inherit;
+    line-height: inherit;
+}
 .job__label {
     margin-top: 1.1rem !important;
     font-weight: 700;

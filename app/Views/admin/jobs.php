@@ -28,6 +28,8 @@ $url = static function (array $override = []) use ($base, $tab, $q, $page): stri
     দর্শক নিজের লেখা "কাজের ধরন" দিলে সেটা "নিজের লেখা ধরন" ট্যাবে আসে; বানান দেখে ঠিক করে নিতে পারেন।
 </p>
 
+<p><a class="adm-small adm-small--go" href="<?= e(admin_base() . '/job-add') ?>">+ নতুন বিজ্ঞপ্তি যোগ করুন</a></p>
+
 <div class="adm-toprow">
     <nav class="adm-tabs" aria-label="বিজ্ঞপ্তির ট্যাব">
         <?php foreach (JobPostRepository::TABS as $key => $label): ?>
@@ -92,6 +94,7 @@ $url = static function (array $override = []) use ($base, $tab, $q, $page): stri
             </form>
 
             <div class="adm-actions">
+                <a class="adm-small" href="<?= e(admin_base() . '/job-edit/' . (int) $r['id']) ?>">✎ সম্পাদনা (পূর্ণ এডিটর)</a>
                 <?= $hidden ? $action('show', 'আবার প্রকাশ করুন', 'adm-small--go') : $action('hide', 'লুকান', '', 'বিজ্ঞপ্তিটি তালিকা থেকে সরে যাবে (তথ্য থাকবে)। লুকাবেন?') ?>
                 <?= $action('delete', 'চিরতরে মুছুন', 'adm-small--warn', 'এই বিজ্ঞপ্তি চিরতরে মুছে যাবে, ফেরানো যাবে না। মুছবেন?') ?>
             </div>

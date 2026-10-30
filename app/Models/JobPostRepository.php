@@ -119,6 +119,7 @@ final class JobPostRepository
                 'id' => (int) $r['id'],
                 'title' => (string) $r['title'],
                 'details' => (string) $r['details'],
+                'details_html' => (string) ($r['details_html'] ?? ''),
                 'contact_name' => (string) $r['contact_name'],
                 'address' => (string) $r['address'],
                 'upazila' => $names['upazila'],
@@ -163,7 +164,7 @@ final class JobPostRepository
         try {
             $days = max(1, min(30, (int) Content::get('settings.jobs_visible_days', '3')));
             $stmt = $pdo->prepare(
-                "SELECT id, title, details, contact_name, phone, email, address, upazila_id, district_id, division_id,
+                "SELECT id, title, details, details_html, contact_name, phone, email, address, upazila_id, district_id, division_id,
                         start_date, created_at
                  FROM job_posts
                  WHERE status = 'approved'
@@ -348,6 +349,40 @@ final class JobPostRepository
         }
 
         return self::update($id, ['status' => $status] + ($status === 'approved' ? ['published_at' => date('Y-m-d H:i:s')] : []));
+    }
+
+    /**
+     * অ্যাডমিনের ফর্ম থেকে নতুন বিজ্ঞপ্তি ($id = 0) বা সম্পাদনা। ফেরত: বিজ্ঞপ্তির id, না পারলে null।
+     *
+     * @param array<string,mixed> $data
+     */
+    public static function adminSave(int $id, array $data): ?int
+    {
+        if ($id === 0) {
+            $id = (int) self::create($data + ['title_custom' => 0]);
+            if ($id === 0) {
+                return null;
+            }
+        }
+        $done = self::update($id, [
+            'title' => $data['title'],
+            'title_custom' => 0,
+            'details' => $data['details'],
+            'details_html' => $data['details_html'],
+            'contact_name' => $data['contact_name'],
+            'contact_gender' => $data['contact_gender'] !== '' ? $data['contact_gender'] : null,
+            'phone' => $data['phone'],
+            'email' => $data['email'] !== '' ? $data['email'] : null,
+            'address' => $data['address'],
+            'upazila_id' => $data['upazila_id'],
+            'district_id' => $data['district_id'],
+            'division_id' => $data['division_id'],
+            'start_date' => $data['start_date'],
+            'end_date' => $data['end_date'] !== '' ? $data['end_date'] : null,
+            'status' => $data['status'],
+        ]);
+
+        return $done ? $id : null;
     }
 
     /** "কাজের ধরন" ঠিক করে; অ্যাডমিন দেখে নেওয়ায় "নিজের লেখা" চিহ্ন (title_custom) উঠে যায়। */

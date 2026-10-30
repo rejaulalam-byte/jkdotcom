@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace App\Controllers\Admin;
 
 use App\Core\AdminAuth;
+use App\Core\RichText;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminRepository;
+use App\Models\GeoRepository;
 use App\Models\JobPostRepository;
+use App\Models\ServiceRepository;
 
 /**
  * কাজের বিজ্ঞপ্তির তালিকা (/admin/jobs): দর্শকের জানানো বিজ্ঞপ্তি দেখা, লুকানো/আবার প্রকাশ, "কাজের ধরন"-এর বানান ঠিক করা,
- * চিরতরে মোছা। বিজ্ঞপ্তি জমা দেওয়ামাত্র প্রকাশিত হয় (অনুমোদন লাগে না), তাই এখানে দরকারে লুকানো হয়। অনুমতি: "inbox"।
+ * চিরতরে মোছা; অ্যাডমিন থেকে নতুন বিজ্ঞপ্তি যোগ ও পূর্ণ এডিটরে সম্পাদনা (/admin/job-add, /admin/job-edit/<id>)।
+ * বিজ্ঞপ্তি জমা দেওয়ামাত্র প্রকাশিত হয় (অনুমোদন লাগে না), তাই এখানে দরকারে লুকানো হয়। অনুমতি: "inbox"।
  */
 final class JobsController
 {
@@ -42,6 +46,115 @@ final class JobsController
             'errors' => Session::pull('admin_errors', []),
             'ok' => Session::pull('admin_ok'),
         ], 'layouts/admin');
+    }
+
+    /** নতুন বিজ্ঞপ্তির ফর্ম (slug নেই) বা সম্পাদনা (slug = id)। @param array<string,mixed> $meta */
+    public function edit(array $meta = []): void
+    {
+        $admin = AdminAuth::require('inbox');
+        $id = ctype_digit((string) ($meta['slug'] ?? '')) ? (int) $meta['slug'] : 0;
+        $item = $id > 0 ? JobPostRepository::adminFind($id) : null;
+        if ($id > 0 && $item === null) {
+            $this->fail(admin_base() . '/jobs', 'বিজ্ঞপ্তিটি পাওয়া যায়নি।');
+        }
+        $old = Session::pull('admin_old', []);
+        $v = $old + ($item ?? ['status' => 'approved', 'start_date' => date('Y-m-d')]);
+        // এডিটরের লেখা: ভুলের পর লেখা মান; না হলে সাজানো রূপ; দর্শকের সাদা লেখা হলে অনুচ্ছেদে বদলে
+        $html = (string) ($old['html'] ?? (string) ($v['details_html'] ?? ''));
+        if ($html === '' && (string) ($v['details'] ?? '') !== '') {
+            $html = '<p>' . nl2br(e((string) $v['details']), false) . '</p>';
+        }
+
+        Security::sendCsp([], true); // পূর্ণ এডিটর নিজের ভেতরে style ও blob: ছবি ব্যবহার করে
+        header('Cache-Control: no-store');
+        View::render('admin/job-edit', [
+            'admin' => $admin,
+            'title' => $id > 0 ? 'বিজ্ঞপ্তি সম্পাদনা' : 'নতুন কাজের বিজ্ঞপ্তি',
+            'id' => $id,
+            'v' => $v,
+            'html' => $html,
+            'geo' => GeoRepository::all(),
+            'services' => ServiceRepository::all(),
+            'errors' => Session::pull('admin_errors', []),
+            'ok' => null,
+        ], 'layouts/admin');
+    }
+
+    /** POST: id (০ = নতুন), title, html, contact_*, phone, email, address, এলাকা, start_date, end_date, status। */
+    public function save(): void
+    {
+        $admin = AdminAuth::require('inbox');
+        $id = (int) ($_POST['id'] ?? 0);
+        $back = admin_base() . ($id > 0 ? '/job-edit/' . $id : '/job-add');
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            $this->fail($back, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+        if ($id > 0 && JobPostRepository::adminFind($id) === null) {
+            $this->fail(admin_base() . '/jobs', 'বিজ্ঞপ্তিটি পাওয়া যায়নি (হয়তো আগেই মোছা হয়েছে)।');
+        }
+
+        // পূর্ণ এডিটরের লেখা সবসময় ছেঁকে রাখা হয়; সাদা রূপটা খোঁজা ও অ্যাডমিন-তালিকার জন্য
+        $html = RichText::sanitize((string) ($_POST['html'] ?? ''));
+        $plain = trim((string) preg_replace('/\n{3,}/u', "\n\n", html_entity_decode(strip_tags(str_replace(['</p>', '<br>', '<br/>', '<br />', '</li>', '</h2>', '</h3>', '</h4>', '</tr>'], "\n", $html)), ENT_QUOTES, 'UTF-8')));
+        $data = [
+            'title' => clean_input($_POST['title'] ?? '', 190),
+            'details' => mb_substr($plain, 0, 3000),
+            'details_html' => $html,
+            'contact_name' => clean_input($_POST['contact_name'] ?? '', 100),
+            'contact_gender' => clean_gender($_POST['contact_gender'] ?? ''),
+            'phone' => normalize_phone(clean_input($_POST['phone'] ?? '', 20)),
+            'email' => mb_strtolower(clean_input($_POST['email'] ?? '', 150)),
+            'address' => clean_input($_POST['address'] ?? '', 250),
+            'upazila_id' => (int) ($_POST['upazila_id'] ?? 0),
+            'district_id' => (int) ($_POST['district_id'] ?? 0),
+            'division_id' => (int) ($_POST['division_id'] ?? 0),
+            'start_date' => (string) ($_POST['start_date'] ?? ''),
+            'end_date' => (string) ($_POST['end_date'] ?? ''),
+            'status' => ($_POST['status'] ?? '') === 'pending' ? 'pending' : 'approved',
+        ];
+
+        $errors = [];
+        if (mb_strlen($data['title']) < 2) {
+            $errors[] = '"কাজের ধরন" অন্তত ২ অক্ষরের হতে হবে।';
+        }
+        if ($plain === '' && !str_contains($html, '<img')) {
+            $errors[] = 'বিস্তারিত লিখুন।';
+        }
+        if (mb_strlen($data['contact_name']) < 2) {
+            $errors[] = 'যোগাযোগের নাম লিখুন।';
+        }
+        if (preg_match('/^01[3-9][0-9]{8}$/', $data['phone']) !== 1) {
+            $errors[] = 'মোবাইল নাম্বার ১১ সংখ্যার হতে হবে, যেমন 01712345678।';
+        }
+        if ($data['email'] !== '' && filter_var($data['email'], FILTER_VALIDATE_EMAIL) === false) {
+            $errors[] = 'ইমেইল ঠিকানাটি সঠিক নয় (না থাকলে ঘরটা ফাঁকা রাখুন)।';
+        }
+        if ($data['address'] === '') {
+            $errors[] = 'ঠিকানা লিখুন।';
+        }
+        if (!GeoRepository::isConsistent($data['division_id'], $data['district_id'], $data['upazila_id'])) {
+            $errors[] = 'বিভাগ, জেলা ও উপজেলা/থানা বেছে নিন এবং সেগুলো একে অপরের সঙ্গে মেলাতে হবে।';
+        }
+        $validDate = static fn (string $d): bool => ($t = \DateTimeImmutable::createFromFormat('!Y-m-d', $d)) !== false && $t->format('Y-m-d') === $d;
+        if (!$validDate($data['start_date'])) {
+            $errors[] = 'প্রচার শুরুর তারিখ দিন।';
+        }
+        if ($data['end_date'] !== '' && (!$validDate($data['end_date']) || $data['end_date'] < $data['start_date'])) {
+            $errors[] = 'প্রচার শেষের তারিখ শুরুর তারিখের পরে হতে হবে (না চাইলে ফাঁকা রাখুন)।';
+        }
+        if ($errors !== []) {
+            Session::flash('admin_old', $data + ['html' => $html]);
+            Session::flash('admin_errors', $errors);
+            redirect($back);
+        }
+
+        $saved = JobPostRepository::adminSave($id, $data);
+        if ($saved === null) {
+            Session::flash('admin_old', $data + ['html' => $html]);
+            $this->fail($back, 'সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।');
+        }
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], $id === 0 ? 'job_add' : 'job_edit', $data['title'] . ' — ' . $data['contact_name']);
+        $this->ok(admin_base() . '/jobs?open=' . $saved, $data['title'] . ($id === 0 ? ' — বিজ্ঞপ্তি যোগ হয়েছে' : ' — সংরক্ষণ হয়েছে') . ($data['status'] === 'approved' ? '; সাইটে দেখা যাচ্ছে।' : ' (লুকানো)।'));
     }
 
     /** POST: id, do (hide | show | title | delete), title (do=title হলে), back। */

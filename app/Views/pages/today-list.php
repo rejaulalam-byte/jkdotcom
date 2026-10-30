@@ -34,7 +34,11 @@ require BASE_PATH . '/app/Views/partials/page-banner.php';
                     </summary>
                     <div class="job__body">
                         <p class="job__label"><?= t('today.list.details') ?></p>
-                        <p><?= nl2br(e($job['details'])) ?></p>
+                        <?php if ($job['details_html'] !== ''): // অ্যাডমিনের পূর্ণ এডিটরে সাজানো (RichText ছেঁকে দেখায়) ?>
+                            <div class="rich job__rich"><?= \App\Core\RichText::show($job['details_html']) ?></div>
+                        <?php else: ?>
+                            <p><?= nl2br(e($job['details'])) ?></p>
+                        <?php endif; ?>
 
                         <p class="job__label"><?= t('today.list.contact') ?></p>
                         <p><?= e($job['contact_line']) ?></p>
