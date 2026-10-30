@@ -83,7 +83,7 @@ foreach (MemberStatus::ACTIONS as $key => [$from]) {
         $allowed[] = $key;
     }
 }
-$canPurge = $current === 'trashed' && AdminAuth::isSuper($admin);
+$canPurge = $current === 'trashed' && AdminAuth::isTop($admin);
 $daysLeft = null;
 if (in_array($current, ['reserved', 'trashed'], true) && (string) ($member['status_changed_at'] ?? '') !== '') {
     $daysLeft = max(0, UserRepository::RESERVE_DAYS - (int) floor((time() - strtotime((string) $member['status_changed_at'])) / 86400));

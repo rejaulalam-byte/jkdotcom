@@ -152,31 +152,21 @@ function t(string $key): string
 }
 
 /**
- * সোশ্যাল মিডিয়ার আইকন ও তাদের ঠিকানা (সম্পাদনাযোগ্য "site.social.*" কী থেকে)।
- * "settings.social_hide_empty" = 1 হলে (মালিক বললেই চালু হবে): ঠিকানাহীন (ফাঁকা, "#"
- * বা http/https নয়) আইকন সাইটে দেখানো হয় না।
- * ০ থাকলে (ডিফল্ট) সব আইকন দেখায়; ঠিকানাহীনটা "#"-এ যায়।
+ * সোশ্যাল মিডিয়ার আইকন, ক্রমসহ (App\Models\SiteMenus::social(), অ্যাডমিন "মেনু সম্পাদনা" থেকে বদলান)।
+ * "settings.social_hide_empty" = 1 হলে ঠিকানাহীন আইকন সাইটে দেখানো হয় না; ০ থাকলে (ডিফল্ট) সব দেখায়, ঠিকানাহীনটা "#"-এ যায়।
  *
- * @return list<array{key:string,label:string,href:string}>
+ * @return list<array{key:string,label:string,href:string,icon:string}>
  */
 function social_links(): array
 {
-    $labels = [
-        'facebook'  => 'ফেসবুক',
-        'whatsapp'  => 'হোয়াটসঅ্যাপ',
-        'instagram' => 'ইনস্টাগ্রাম',
-        'telegram'  => 'টেলিগ্রাম',
-        'twitter'   => 'টুইটার',
-        'linkedin'  => 'লিংকডইন',
-    ];
-    $hideEmpty = content('settings.social_hide_empty', '0') === '1';
+    $hideEmpty = Content::get('settings.social_hide_empty', '0') === '1';
     $links = [];
-    foreach ($labels as $key => $label) {
-        $href = Security::safeUrl(content('site.social.' . $key));
+    foreach (\App\Models\SiteMenus::social() as $item) {
+        $href = Security::safeUrl($item['url']);
         if ($href === null && $hideEmpty) {
             continue;
         }
-        $links[] = ['key' => $key, 'label' => $label, 'href' => $href ?? '#'];
+        $links[] = ['key' => $item['key'], 'label' => $item['name'], 'href' => $href ?? '#', 'icon' => \App\Models\SiteMenus::socialIcon($item)];
     }
 
     return $links;

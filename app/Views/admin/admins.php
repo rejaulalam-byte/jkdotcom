@@ -1,16 +1,17 @@
 <?php
 /**
- * অ্যাডমিনদের তালিকা ও নতুন অ্যাডমিন (শুধু সুপার অ্যাডমিন)। অনুমতি শুধু অ্যাডমিনিস্ট্রেটরের বদলানো যায়;
- * সুপার অ্যাডমিনের সব অনুমতি আছে।
+ * অ্যাকাউন্ট তৈরি: তালিকা ও নতুন অ্যাকাউন্ট। সুপার অ্যাডমিন সব ভূমিকা দেখেন ও বানান; মেইন অ্যাডমিন শুধু সাব-অ্যাডমিন
+ * (তালিকাও শুধু তাঁদের ও নিজের)। অনুমতি শুধু সাব-অ্যাডমিনের বদলানো যায়; সুপার ও মেইনের সব অনুমতি আছে।
  *
  * @var array<string,mixed> $admin
  * @var list<array<string,mixed>> $admins
+ * @var bool $hasMain চালু মেইন অ্যাডমিন আছেন কি না
  */
 use App\Core\AdminAuth;
 use App\Models\AdminPermissions;
 ?>
 <section class="adm-box">
-    <h2>অ্যাডমিন তালিকা</h2>
+    <h2>অ্যাকাউন্টের তালিকা</h2>
     <div class="adm-tablewrap">
         <table class="adm-table">
             <thead><tr><th>নাম</th><th>ইমেইল</th><th>ভূমিকা</th><th>অবস্থা</th><th>শেষ লগইন</th><th>কাজ</th></tr></thead>
@@ -61,7 +62,7 @@ use App\Models\AdminPermissions;
 </section>
 
 <section class="adm-box">
-    <h2>নতুন অ্যাডমিন যোগ করুন</h2>
+    <h2>নতুন অ্যাকাউন্ট তৈরি করুন</h2>
     <p>নতুন ব্যক্তির ইমেইলে পাসওয়ার্ড বসানোর লিংক যাবে (৩ দিন কাজ করবে)। পাসওয়ার্ড তিনি নিজে বসাবেন; আপনি জানবেন না।</p>
     <form action="<?= admin_base() ?>/admins/create" method="post" novalidate>
         <?= csrf_field() ?>
@@ -69,13 +70,20 @@ use App\Models\AdminPermissions;
         <input id="na-name" type="text" name="name" required maxlength="100">
         <label for="na-email">ইমেইল</label>
         <input id="na-email" type="email" name="email" required autocapitalize="none" maxlength="150">
-        <label for="na-role">ভূমিকা</label>
-        <select id="na-role" name="role">
-            <option value="admin">অ্যাডমিনিস্ট্রেটর (নিচের অনুমতিগুলো পাবেন)</option>
-            <option value="super">সুপার অ্যাডমিন (সব অনুমতি, কাঠামোও বদলাতে পারবেন)</option>
-        </select>
+        <?php if (AdminAuth::isSuper($admin)): ?>
+            <label for="na-role">ভূমিকা</label>
+            <select id="na-role" name="role">
+                <option value="admin">সাব-অ্যাডমিন (নিচের অনুমতিগুলো পাবেন)</option>
+                <?php if (!$hasMain): ?>
+                    <option value="main">মেইন অ্যাডমিন / ওনার (কাঠামো ছাড়া সব; একজনই)</option>
+                <?php endif; ?>
+                <option value="super">সুপার অ্যাডমিন (সব অনুমতি, কাঠামোও বদলাতে পারবেন)</option>
+            </select>
+        <?php else: ?>
+            <input type="hidden" name="role" value="admin">
+        <?php endif; ?>
         <fieldset>
-            <legend>অনুমতি (অ্যাডমিনিস্ট্রেটরের জন্য)</legend>
+            <legend>অনুমতি (সাব-অ্যাডমিনের জন্য; সব বা কয়েকটা)</legend>
             <?php foreach (AdminPermissions::ALL as $key => $label): ?>
                 <label class="adm-check"><input type="checkbox" name="permissions[]" value="<?= e($key) ?>" checked> <?= e($label) ?></label>
             <?php endforeach; ?>

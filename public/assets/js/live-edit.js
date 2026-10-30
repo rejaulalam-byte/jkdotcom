@@ -1002,8 +1002,9 @@
             openIcon(ic);
             return;
         }
-        // মেনুর লিংক (লেখা নয়, মেনু-আইটেম): সুপার অ্যাডমিনের জন্য মেনু সম্পাদনার বাক্স
-        if (data.super && e.target.closest("[data-jk-menu] a")) {
+        // মেনুর লিংক (লেখা নয়, মেনু-আইটেম): মেনু সম্পাদনার বাক্স; ওপরের মেনু শুধু সুপার, ফুটার অনুমতি "footer" হলেই
+        var menuNav = e.target.closest("[data-jk-menu]");
+        if (menuNav && e.target.closest("a") && (data.super || (data.footerBox && menuNav.getAttribute("data-jk-menu") === "footer"))) {
             e.preventDefault();
             e.stopPropagation();
             close();

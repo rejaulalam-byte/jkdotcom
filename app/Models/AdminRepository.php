@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Core\AdminAuth;
 use App\Core\Database;
 use App\Core\Logger;
 use App\Core\Security;
 use Throwable;
 
 /**
- * অ্যাডমিন প্যানেলের ব্যবহারকারী (সুপার অ্যাডমিন, অ্যাডমিনিস্ট্রেটর) ও কার্যলগ।
+ * অ্যাডমিন প্যানেলের ব্যবহারকারী (সুপার অ্যাডমিন, মেইন অ্যাডমিন, সাব-অ্যাডমিন) ও কার্যলগ।
  * ডাটাবেস না থাকলে (লোকাল প্রিভিউ) সবকিছু storage/demo-admins.json-এ থাকে।
  */
 final class AdminRepository
@@ -174,10 +175,61 @@ final class AdminRepository
         return count(array_filter(self::all(), static fn (array $r): bool => $r['role'] === 'super' && $r['status'] === 'active'));
     }
 
+    /** চালু কোনো মেইন অ্যাডমিন আছেন? (একজনই থাকতে পারেন) */
+    public static function hasActiveMain(): bool
+    {
+        foreach (self::all() as $r) {
+            if ($r['role'] === 'main' && $r['status'] === 'active') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** যেসব কাজকে "মোছা" ধরা হয়: সুপার ছাড়া অন্য কেউ করলে সুপার অ্যাডমিনের ইমেইলে খবর যায়। কী => বাংলা নাম */
+    private const DELETE_ACTIONS = [
+        'member_reserve' => 'সদস্য মোছা (সংরক্ষিতে পাঠানো)',
+        'member_trash' => 'সদস্যকে ডাস্টবিনে পাঠানো',
+        'member_purged' => 'সদস্য চিরতরে মোছা',
+        'job_delete' => 'কাজের বিজ্ঞপ্তি মোছা',
+        'feedback_delete' => 'মতামত মোছা',
+        'ad_delete' => 'বিজ্ঞাপন মোছা',
+        'popup_image_removed' => 'পপ-আপ বিজ্ঞাপনের ছবি মোছা',
+        'page_delete' => 'পেইজ মোছা',
+        'hero_image_removed' => 'হিরোর ছবি মোছা',
+        'footer_removed' => 'ফুটারের লিংক মোছা',
+        'social_removed' => 'সামাজিক মাধ্যমের আইকন মোছা',
+        'admin_disabled' => 'অ্যাডমিন অ্যাকাউন্ট বন্ধ করা',
+    ];
+
+    /** মেইন বা সাব-অ্যাডমিন কিছু মুছলে প্রতিটি চালু সুপার অ্যাডমিনকে ইমেইল (কার্যলগেও থাকে)। */
+    private static function mailDeletion(?int $adminId, string $adminName, string $action, ?string $detail): void
+    {
+        if ($adminId === null || !isset(self::DELETE_ACTIONS[$action])) {
+            return;
+        }
+        $actor = self::findById($adminId);
+        if ($actor === null || $actor['role'] === 'super') {
+            return;
+        }
+        $body = $adminName . ' (' . AdminAuth::roleLabel((string) $actor['role']) . ') একটি জিনিস মুছেছেন।'
+            . "\n\nকাজ: " . self::DELETE_ACTIONS[$action]
+            . ($detail !== null && $detail !== '' ? "\nবিবরণ: " . $detail : '')
+            . "\nসময়: " . date('Y-m-d H:i')
+            . "\n\nপুরো তালিকা অ্যাডমিন প্যানেলের কার্যলগে আছে।\n\n— jorurikaj.com";
+        foreach (self::all() as $r) {
+            if ($r['role'] === 'super' && $r['status'] === 'active' && (string) $r['email'] !== '') {
+                AdminAuth::mail((string) $r['email'], 'মোছার খবর: ' . self::DELETE_ACTIONS[$action] . ' — jorurikaj.com', $body);
+            }
+        }
+    }
+
     /** কার্যলগে একটা লাইন যোগ করে। */
     public static function log(?int $adminId, string $adminName, string $action, ?string $detail = null): void
     {
         $detail = $detail === null ? null : mb_substr($detail, 0, 500);
+        self::mailDeletion($adminId, $adminName, $action, $detail);
         $pdo = Database::connection();
         if ($pdo === null) {
             $data = self::demoRead();

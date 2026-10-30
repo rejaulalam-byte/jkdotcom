@@ -31,10 +31,10 @@ $nav = [
     [admin_base() . '/pages', 'নতুন পেইজ', false, 'pages'],
     [admin_base() . '/mails', 'ইমেইলের লেখা', false, 'email'],
     [admin_base() . '/theme', 'রং ও আকার', true, 'pages'],
-    [admin_base() . '/hero', 'হিরো সেটিং', true, 'pages'],
+    [admin_base() . '/hero', 'হিরো সেটিং', false, 'hero'],
     [admin_base() . '/locks', 'আটকানো লগইন', false, 'locks'],
 ];
-// ওপরের সারি: বাঁয়ে ড্যাশবোর্ড; ডানে নিজের জিনিস (অ্যাকাউন্ট, অ্যাডমিন)। কার্যলগ ড্যাশবোর্ডের ডান পাশের আলাদা বাক্সে
+// ওপরের সারি: বাঁয়ে ড্যাশবোর্ড; ডানে নিজের জিনিস (নিজের অ্যাকাউন্ট; "অ্যাকাউন্ট তৈরি" সুপার ও মেইন অ্যাডমিনের)। কার্যলগ ড্যাশবোর্ডের ডান পাশের আলাদা বাক্সে
 $top = [
     [admin_base(), 'ড্যাশবোর্ড', false],
 ];
@@ -70,8 +70,8 @@ $mine = [
             </nav>
             <div class="adm-top__user">
                 <nav class="adm-top__nav" aria-label="আমার জিনিস">
-                    <?php foreach ($mine as [$href, $label, $superOnly]): ?>
-                        <?php if (!$superOnly || AdminAuth::isSuper($admin)): ?>
+                    <?php foreach ($mine as [$href, $label, $topOnly]): ?>
+                        <?php if (!$topOnly || AdminAuth::isTop($admin)): ?>
                             <a href="<?= e($href) ?>"<?= is_current($href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
                         <?php endif; ?>
                     <?php endforeach; ?>

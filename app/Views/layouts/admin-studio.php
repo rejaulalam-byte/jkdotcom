@@ -43,8 +43,8 @@ $ok = $ok ?? null;
             <?php if (!empty($page) && empty($listView)): ?>
                 <a href="<?= e((string) $page['url']) ?>" target="_blank" rel="noopener">সাইটে নতুন ট্যাবে খুলুন</a>
                 <a href="<?= e(admin_base() . '/studio?p=' . $page['id'] . '&view=list') ?>">এই পেইজের লেখার তালিকা</a>
-                <?php if (\App\Core\AdminAuth::isSuper($admin)): ?>
-                    <button type="button" data-menu-open>মেনু সম্পাদনা</button>
+                <?php if (\App\Core\AdminAuth::can($admin, 'footer')): ?>
+                    <button type="button" data-menu-open><?= \App\Core\AdminAuth::isSuper($admin) ? 'মেনু সম্পাদনা' : 'ফুটার ও সামাজিক মাধ্যম' ?></button>
                 <?php endif; ?>
             <?php endif; ?>
             <a class="adm-studio__exit" href="<?= e(admin_base()) ?>">বাহির হোন</a>

@@ -14,14 +14,14 @@ use App\Models\AdminRepository;
 use App\Models\SiteHero;
 
 /**
- * হিরো সাজানো (<admin>/hero; কাঠামোর কাজ, তাই শুধু সুপার অ্যাডমিন): লেখার অ্যানিমেশনের ধরন, পটভূমি (সাধারণ / নিজের রং / ছবি)
+ * হিরো সাজানো (<admin>/hero; অনুমতি "hero": সুপার, মেইন অ্যাডমিন ও যে সাব-অ্যাডমিনকে দেওয়া হয়): লেখার অ্যানিমেশনের ধরন, পটভূমি (সাধারণ / নিজের রং / ছবি)
  * আর ডানের "আজকের কাজের তালিকা" দেখানো-লুকানো। লাইভ পেইজ এডিটে হোমের হিরো-পট্টির "হিরো সেটিং" বাটন থেকে আসা যায়।
  */
 final class HeroController
 {
     public function index(): void
     {
-        $admin = $this->super();
+        $admin = AdminAuth::require('hero');
         header('Cache-Control: no-store');
         View::render('admin/hero', [
             'admin' => $admin,
@@ -44,7 +44,7 @@ final class HeroController
     /** POST: anim_on (1/0), anim, bg (default|color), color1, color2 (ঐচ্ছিক), dir, image_on (1/0), image (নতুন ছবি), remove_image, overlay, today (1/0)। */
     public function save(): void
     {
-        $admin = $this->super();
+        $admin = AdminAuth::require('hero');
         $back = admin_base() . '/hero';
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
             $this->fail($back, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
@@ -97,6 +97,9 @@ final class HeroController
         }
         if ($oldImage !== '' && $oldImage !== $newImage) {
             PageImage::remove($oldImage);
+            if ($newImage === '') {
+                AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'hero_image_removed', 'হিরোর পটভূমির ছবি');
+            }
         }
 
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'hero_save',
@@ -105,17 +108,6 @@ final class HeroController
         redirect($back);
     }
 
-    /** @return array<string,mixed> */
-    private function super(): array
-    {
-        $admin = AdminAuth::require('pages');
-        if (!AdminAuth::isSuper($admin)) {
-            http_response_code(403);
-            exit('হিরো সাজানো শুধু সুপার অ্যাডমিন পারেন।');
-        }
-
-        return $admin;
-    }
 
     private function fail(string $back, string $message): never
     {

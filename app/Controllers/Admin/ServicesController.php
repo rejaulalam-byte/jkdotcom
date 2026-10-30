@@ -11,6 +11,7 @@ use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminRepository;
 use App\Models\ServiceAdmin;
+use App\Models\ServiceDirectory;
 use App\Models\UserRepository;
 
 /**
@@ -64,6 +65,17 @@ final class ServicesController
         $do = (string) ($_POST['do'] ?? '');
         $id = (int) ($_POST['id'] ?? 0);
         $log = static fn (string $what, string $detail) => AdminRepository::log((int) $admin['id'], (string) $admin['name'], $what, $detail);
+
+        // "সেবা সমূহ" পেইজের শিরোনাম-বর্ণের তালিকা (অ, আ … ক, খ …): নতুন বর্ণ যোগ, বাদ, ক্রম বদল
+        if ($do === 'letters') {
+            $error = ServiceDirectory::saveLetters(clean_input($_POST['letters'] ?? '', 500));
+            if ($error !== null) {
+                $this->fail($back, $error);
+            }
+            $log('service_letters', implode(' ', ServiceDirectory::letters()));
+            Session::flash('admin_ok', 'বর্ণের তালিকা সংরক্ষণ হয়েছে; "সেবা সমূহ" পেইজে এখনই দেখা যাচ্ছে।');
+            redirect($back);
+        }
 
         if ($do === 'add' || $do === 'custom_new') {
             $name = clean_input($_POST['name'] ?? '', 120);

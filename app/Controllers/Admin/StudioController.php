@@ -497,31 +497,45 @@ final class StudioController
     }
 
     /**
-     * POST: মেনু সম্পাদনার ফর্ম (SiteMenus::save) অথবা reset = 1 (সাইটের সঙ্গে আসা মেনু ও ফুটারে ফেরা); back।
-     * মেনু সাইটের কাঠামো, তাই শুধু সুপার অ্যাডমিন।
+     * POST: মেনু সম্পাদনার ফর্ম (SiteMenus::save) অথবা reset = 1 (সাইটের সঙ্গে আসা রূপে ফেরা); back।
+     * ওপরের মেনু সাইটের কাঠামো, তাই শুধু সুপার অ্যাডমিন; ফুটার ও সামাজিক মাধ্যম অনুমতি "footer"।
      */
     public function menu(): void
     {
-        $admin = AdminAuth::require('pages', true);
+        $admin = AdminAuth::require('footer');
+        $super = AdminAuth::isSuper($admin);
         $back = $this->backPath((string) ($_POST['back'] ?? ''));
         if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
             $this->fail($back, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। কিছু সংরক্ষণ হয়নি; পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
         }
+        $log = static fn (string $what, string $detail) => AdminRepository::log((int) $admin['id'], (string) $admin['name'], $what, $detail);
         if (($_POST['reset'] ?? '') === '1') {
-            if (!SiteMenus::reset()) {
+            if (!($super ? SiteMenus::reset() : SiteMenus::resetFooter())) {
                 $this->fail($back, 'ফেরানো যায়নি।');
             }
-            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'menu_reset', 'ওপরের মেনু ও ফুটার');
-            Session::flash('admin_ok', 'ওপরের মেনু ও ফুটারের কলাম সাইটের সঙ্গে আসা রূপে ফিরেছে।');
+            $log('menu_reset', $super ? 'ওপরের মেনু ও ফুটার' : 'ফুটার');
+            Session::flash('admin_ok', $super ? 'ওপরের মেনু ও ফুটারের কলাম সাইটের সঙ্গে আসা রূপে ফিরেছে।' : 'ফুটারের কলাম সাইটের সঙ্গে আসা রূপে ফিরেছে।');
             redirect($back);
         }
-        $errors = SiteMenus::save($_POST);
+        // কী মোছা হলো (সুপার ছাড়া অন্য কেউ মুছলে সুপার অ্যাডমিনের ইমেইলে খবর যায়)
+        $labels = static fn (array $columns): array => array_column(array_merge([], ...$columns), 1);
+        $oldFooter = $labels(SiteMenus::footer());
+        $oldSocial = array_column(SiteMenus::social(), 'name');
+        $errors = SiteMenus::save($_POST, $super, is_array($_FILES['social_icon'] ?? null) ? $_FILES['social_icon'] : []);
         if ($errors !== []) {
             Session::flash('admin_errors', array_merge(['মেনু সংরক্ষণ হয়নি:'], $errors));
             redirect($back);
         }
-        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'menu_save', 'ওপরের মেনু, ফুটার ও সামাজিক মাধ্যম');
-        Session::flash('admin_ok', 'মেনু সংরক্ষণ হয়েছে; সাইটে এখনই দেখা যাচ্ছে।');
+        $goneFooter = array_diff($oldFooter, $labels(SiteMenus::footer()));
+        $goneSocial = array_diff($oldSocial, array_column(SiteMenus::social(), 'name'));
+        if ($goneFooter !== []) {
+            $log('footer_removed', implode(', ', $goneFooter));
+        }
+        if ($goneSocial !== []) {
+            $log('social_removed', implode(', ', $goneSocial));
+        }
+        $log('menu_save', $super ? 'ওপরের মেনু, ফুটার ও সামাজিক মাধ্যম' : 'ফুটার ও সামাজিক মাধ্যম');
+        Session::flash('admin_ok', 'সংরক্ষণ হয়েছে; সাইটে এখনই দেখা যাচ্ছে।');
         redirect($back);
     }
 

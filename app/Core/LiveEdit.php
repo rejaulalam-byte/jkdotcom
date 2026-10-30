@@ -149,6 +149,7 @@ final class LiveEdit
             'customSave' => admin_base() . '/studio/live-custom',
             // লুকানো/দেখানো কাঠামোর কাজ: শুধু সুপার অ্যাডমিন
             'super' => $admin !== null && AdminAuth::isSuper($admin),
+            'footerBox' => $admin !== null && AdminAuth::can($admin, 'footer'),
             'save' => admin_base() . '/studio/live-save',
             'token' => Security::csrfToken(),
             'colors' => array_keys(TEXT_COLORS),

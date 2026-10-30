@@ -1720,3 +1720,16 @@ input.adm-short {
     color: var(--teal);
     font-size: 19px;
 }
+/* সামাজিক মাধ্যমের সারি: আইকন, নাম, ঠিকানা, নতুন আইকনের ফাইল, বাটন */
+.adm-menu__row--social {
+    flex-wrap: wrap;
+    align-items: center;
+}
+.adm-menu__icon {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: var(--teal);
+    object-fit: contain;
+}

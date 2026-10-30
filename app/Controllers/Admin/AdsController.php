@@ -206,6 +206,9 @@ final class AdsController
         if (!PopupAd::save($active, $pages, $link, clean_input($_POST['title'] ?? '', 150), $seconds, $image)) {
             $this->fail('সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।');
         }
+        if ($image === '') {
+            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'popup_image_removed', 'পপ-আপ বিজ্ঞাপনের ছবি');
+        }
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'popup_save', ($active ? 'চালু' : 'বন্ধ') . ' — ' . implode(', ', $pages) . ' — ' . $seconds . ' সেকেন্ড');
         $this->ok($active ? 'পপ-আপ বিজ্ঞাপন চালু; বাছা পেইজগুলো খুললেই দেখাবে।' : 'পপ-আপ বিজ্ঞাপন সংরক্ষিত (বন্ধ আছে)।');
     }

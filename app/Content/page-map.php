@@ -17,7 +17,6 @@ return [
     ['id' => 'common', 'title' => 'সব পেইজে একই', 'parts' => [
         ['সাইটের নাম ও ওপরের পট্টি', ['site.title', 'site.description', 'site.brand', 'site.brand_suffix', 'site.tagline', 'site.top_tagline_brand', 'site.top_tagline', 'site.phone_top', 'site.email']],
         ['যোগাযোগের তথ্য (ফুটার ও যোগাযোগ পেইজ)', ['site.email_registration', 'site.phone_footer', 'site.hotline', 'site.website', 'site.address_1', 'site.address_2', 'site.address_3', 'site.coordinates']],
-        ['সামাজিক মাধ্যমের ঠিকানা', ['site.social.*']],
         ['ফুটার', ['footer.*']],
         ['লগইনের পর ছবির মেনু', ['nav.*']],
         ['সব ফর্মে একই', ['gender.*', 'geo.*', 'input.bn.*', 'form.msg.*', 'consent.error']],

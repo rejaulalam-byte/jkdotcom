@@ -51,7 +51,7 @@ $feedbackToken = Security::csrfToken();
         </div>
 
         <?php // লিংকের কলাম (App\Models\SiteMenus::footer(); প্রতিটির প্রথম লিংক মোটা শিরোনাম) ?>
-        <nav class="footer__links" aria-label="ফুটার মেনু"<?= live_preview() ? ' data-jk-menu' : '' ?>>
+        <nav class="footer__links" aria-label="ফুটার মেনু"<?= live_preview() ? ' data-jk-menu="footer"' : '' ?>>
             <?php foreach (\App\Models\SiteMenus::footer() as $column): ?>
                 <ul>
                     <?php foreach ($column as $i => [$href, $label]): ?>

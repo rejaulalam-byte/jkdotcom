@@ -95,16 +95,49 @@ final class AdminAuth
         return $admin['role'] === 'super';
     }
 
-    /** সুপার অ্যাডমিনের সব অনুমতি; অ্যাডমিনিস্ট্রেটরের শুধু তালিকায় দেওয়াগুলো। @param array<string,mixed> $admin */
+    /** @param array<string,mixed> $admin */
+    public static function isMain(array $admin): bool
+    {
+        return $admin['role'] === 'main';
+    }
+
+    /** সুপার বা মেইন অ্যাডমিন: সব দৈনন্দিন কাজ ও অ্যাকাউন্ট তৈরি (কাঠামোর কাজ শুধু সুপার)। @param array<string,mixed> $admin */
+    public static function isTop(array $admin): bool
+    {
+        return self::isSuper($admin) || self::isMain($admin);
+    }
+
+    /** সুপার ও মেইন অ্যাডমিনের সব অনুমতি; সাব-অ্যাডমিনের শুধু তালিকায় দেওয়াগুলো। @param array<string,mixed> $admin */
     public static function can(array $admin, string $permission): bool
     {
-        return self::isSuper($admin) || in_array($permission, (array) ($admin['permission_list'] ?? []), true);
+        return self::isTop($admin) || in_array($permission, (array) ($admin['permission_list'] ?? []), true);
     }
 
     /** ভূমিকার বাংলা নাম। */
     public static function roleLabel(string $role): string
     {
-        return $role === 'super' ? 'সুপার অ্যাডমিন' : 'অ্যাডমিনিস্ট্রেটর';
+        return match ($role) {
+            'super' => 'সুপার অ্যাডমিন',
+            'main' => 'মেইন অ্যাডমিন (ওনার)',
+            default => 'সাব-অ্যাডমিন',
+        };
+    }
+
+    /**
+     * অ্যাকাউন্টের পেইজের পাহারা: শুধু সুপার ও মেইন অ্যাডমিন; অন্যরা "অনুমতি নেই" দেখেন।
+     *
+     * @return array<string,mixed>
+     */
+    public static function requireTop(): array
+    {
+        $admin = self::require();
+        if (!self::isTop($admin)) {
+            http_response_code(403);
+            View::render('admin/forbidden', ['admin' => $admin, 'title' => 'অনুমতি নেই'], 'layouts/admin');
+            exit;
+        }
+
+        return $admin;
     }
 
     // ---- ইমেইলের কোড ---------------------------------------------------------------------------

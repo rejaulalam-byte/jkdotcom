@@ -128,8 +128,8 @@ final class MembersController
         $logName = (string) $admin['name'];
 
         if ($action === 'purge') {
-            if (!AdminAuth::isSuper($admin)) {
-                $this->fail($back, 'চিরতরে মোছা শুধু সুপার অ্যাডমিন পারেন।');
+            if (!AdminAuth::isTop($admin)) {
+                $this->fail($back, 'চিরতরে মোছা শুধু সুপার ও মেইন অ্যাডমিন পারেন।');
             }
             if ($current !== 'trashed') {
                 $this->fail($back, 'চিরতরে মোছা যায় শুধু ডাস্টবিনের সদস্যকে।');

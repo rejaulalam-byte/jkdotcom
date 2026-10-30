@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Core\Content;
+use App\Core\PageImage;
 use App\Core\Security;
 
 /**
  * সাইটের মেনু: ওপরের প্রধান মেনু (সাব-মেনুসহ), ফুটারের লিংকের কলাম ও সামাজিক মাধ্যমের ঠিকানা।
- * সুপার অ্যাডমিন "লাইভ পেইজ এডিট"-এর "মেনু সম্পাদনা" বাক্স থেকে বদলান। বদল থাকে লেখার টেবিলে (Content):
- * "menu.header" ও "menu.footer" (JSON), সামাজিক মাধ্যম "site.social.*" ও "settings.social_hide_empty"।
+ * "লাইভ পেইজ এডিট"-এর "মেনু সম্পাদনা" বাক্স থেকে বদলান: ওপরের মেনু শুধু সুপার অ্যাডমিন; ফুটার ও সামাজিক মাধ্যম
+ * মেইন অ্যাডমিন ও যে সাব-অ্যাডমিনকে "footer" অনুমতি দেওয়া হয়। বদল থাকে লেখার টেবিলে (Content): "menu.header" ও
+ * "menu.footer" (JSON), সামাজিক মাধ্যমের তালিকা "social.list" (JSON; না থাকলে পুরনো "site.social.*" ঠিকানা) ও "settings.social_hide_empty"।
  * বদল না থাকলে সাইটের সঙ্গে আসা মেনু: app/Content/menu.php ও নিচের FOOTER।
  */
 final class SiteMenus
@@ -21,11 +23,40 @@ final class SiteMenus
     public const MAX_LINKS = 12;
     private const MAX_LABEL = 80;
 
-    /** সামাজিক মাধ্যম: কী => নাম (আইকন public/assets/img/icons/<কী>.svg) */
+    /** সাইটের সঙ্গে আসা সামাজিক মাধ্যম: কী => নাম (আইকন public/assets/img/icons/<কী>.svg) */
     public const SOCIAL = [
-        'facebook' => 'Facebook', 'whatsapp' => 'WhatsApp', 'instagram' => 'Instagram',
-        'telegram' => 'Telegram', 'twitter' => 'X (Twitter)', 'linkedin' => 'LinkedIn',
+        'facebook' => 'ফেসবুক', 'whatsapp' => 'হোয়াটসঅ্যাপ', 'instagram' => 'ইনস্টাগ্রাম',
+        'telegram' => 'টেলিগ্রাম', 'twitter' => 'টুইটার', 'linkedin' => 'লিংকডইন',
     ];
+
+    public const MAX_SOCIAL = 12;
+
+    /**
+     * সামাজিক মাধ্যমের তালিকা, সাইটে দেখানোর ক্রমে। icon = '' হলে সাইটের সঙ্গে আসা আইকন, নইলে /page-image/<hex>।
+     *
+     * @return list<array{key:string,name:string,url:string,icon:string}>
+     */
+    public static function social(): array
+    {
+        if (Content::has('social.list')) {
+            $saved = json_decode(Content::get('social.list'), true);
+            if (is_array($saved)) {
+                return array_values(array_filter($saved, 'is_array'));
+            }
+        }
+        $list = [];
+        foreach (self::SOCIAL as $key => $name) {
+            $list[] = ['key' => $key, 'name' => $name, 'url' => Content::get('site.social.' . $key), 'icon' => ''];
+        }
+
+        return $list;
+    }
+
+    /** আইকনের ঠিকানা: নিজের তোলা ছবি, নইলে সাইটের সঙ্গে আসা SVG। @param array{key:string,icon:string} $item */
+    public static function socialIcon(array $item): string
+    {
+        return $item['icon'] !== '' ? $item['icon'] : asset('img/icons/' . $item['key'] . '.svg');
+    }
 
     /** সাইটের সঙ্গে আসা ফুটারের দুই কলাম: প্রতিটির প্রথম লিংক কলামের শিরোনাম। */
     private const FOOTER = [
@@ -56,16 +87,18 @@ final class SiteMenus
 
     /**
      * ফর্ম থেকে আসা মেনু যাচাই করে সংরক্ষণ করে। খালি নাম-লিংকের সারি বাদ যায়। ফেরত: ভুলের তালিকা (খালি = সব ঠিক)।
+     * $withHeader = false (সুপার ছাড়া অন্যরা): ওপরের মেনু যেমন আছে থাকে, ফর্মে পাঠালেও নেওয়া হয় না।
      *
-     * @param array<mixed> $post  header[i][label|href|sub][j][label|href], footer[c][j][label|href], social[কী], social_hide
+     * @param array<mixed> $post  header[i][label|href|sub][j][label|href], footer[c][j][label|href], social[i][key|name|url|icon], social_hide
+     * @param array<mixed> $files $_FILES['social_icon'] (প্রতিটি সারির নতুন আইকন)
      * @return list<string>
      */
-    public static function save(array $post): array
+    public static function save(array $post, bool $withHeader = true, array $files = []): array
     {
         $errors = [];
 
         $header = [];
-        foreach (array_slice(self::rows($post['header'] ?? null), 0, self::MAX_TOP) as $i => $row) {
+        foreach ($withHeader ? array_slice(self::rows($post['header'] ?? null), 0, self::MAX_TOP) : [] as $i => $row) {
             [$href, $label] = self::link($row, 'ওপরের মেনুর ' . bn($i + 1) . ' নম্বর আইটেম', $errors);
             if ($label === null) {
                 continue;
@@ -79,7 +112,7 @@ final class SiteMenus
             }
             $header[] = [$href, $label, $sub];
         }
-        if ($header === []) {
+        if ($withHeader && $header === []) {
             $errors[] = 'ওপরের মেনুতে অন্তত একটি আইটেম রাখুন।';
         }
 
@@ -97,36 +130,97 @@ final class SiteMenus
             }
         }
 
-        $social = [];
-        $posted = is_array($post['social'] ?? null) ? $post['social'] : [];
-        foreach (array_keys(self::SOCIAL) as $key) {
-            $url = trim((string) ($posted[$key] ?? ''));
-            if ($url === '' || $url === '#') {
-                $social[$key] = '#';
-            } elseif (Security::safeUrl($url) === null) {
-                $errors[] = self::SOCIAL[$key] . '-এর ঠিকানা সঠিক নয় (https:// দিয়ে শুরু পুরো ঠিকানা দিন, বা খালি রাখুন)।';
-            } else {
-                $social[$key] = $url;
-            }
-        }
+        $social = self::parseSocial($post['social'] ?? null, $files, $errors);
 
         if ($errors !== []) {
             return $errors;
         }
-        $ok = Content::set('menu.header', (string) json_encode($header, JSON_UNESCAPED_UNICODE))
+        $old = self::social();
+        $ok = (!$withHeader || Content::set('menu.header', (string) json_encode($header, JSON_UNESCAPED_UNICODE)))
             && Content::set('menu.footer', (string) json_encode($footer, JSON_UNESCAPED_UNICODE))
+            && Content::set('social.list', (string) json_encode($social, JSON_UNESCAPED_UNICODE))
             && Content::set('settings.social_hide_empty', !empty($post['social_hide']) ? '1' : '0');
-        foreach ($social as $key => $url) {
-            $ok = $ok && ($url === '#' ? Content::forget('site.social.' . $key) : Content::set('site.social.' . $key, $url));
+        if ($ok) {
+            // আর ব্যবহার হচ্ছে না এমন নিজের-তোলা আইকনের ফাইল মোছা
+            $kept = array_column($social, 'icon');
+            foreach ($old as $item) {
+                if ($item['icon'] !== '' && !in_array($item['icon'], $kept, true)) {
+                    PageImage::remove($item['icon']);
+                }
+            }
         }
 
         return $ok ? [] : ['সংরক্ষণ করা যায়নি।'];
     }
 
-    /** সাইটের সঙ্গে আসা মেনু ও ফুটারে ফেরা (সামাজিক মাধ্যমের ঠিকানা যেমন আছে থাকে)। */
+    /**
+     * সামাজিক মাধ্যমের সারিগুলো যাচাই করে: নাম লাগবে; ঠিকানা খালি = "#" (লিংক নেই); নতুন সারিতে আইকন লাগবে।
+     *
+     * @param array<mixed> $files $_FILES['social_icon']
+     * @param list<string> $errors
+     * @return list<array{key:string,name:string,url:string,icon:string}>
+     */
+    private static function parseSocial(mixed $rows, array $files, array &$errors): array
+    {
+        $out = [];
+        foreach (array_slice(self::rows($rows), 0, self::MAX_SOCIAL) as $i => $row) {
+            $name = clean_input($row['name'] ?? '', 40);
+            $url = trim((string) ($row['url'] ?? ''));
+            $key = preg_match('/^[a-z0-9_-]{1,30}$/', (string) ($row['key'] ?? '')) === 1 ? (string) $row['key'] : '';
+            $icon = preg_match('#^/page-image/[a-f0-9]{32}$#', (string) ($row['icon'] ?? '')) === 1 ? (string) $row['icon'] : '';
+            $file = null;
+            if (isset($files['error'][$i]) && $files['error'][$i] !== UPLOAD_ERR_NO_FILE) {
+                $file = ['name' => $files['name'][$i] ?? '', 'type' => $files['type'][$i] ?? '', 'tmp_name' => $files['tmp_name'][$i] ?? '', 'error' => $files['error'][$i], 'size' => $files['size'][$i] ?? 0];
+            }
+            if ($name === '' && ($url === '' || $url === '#') && $file === null && $key === '') {
+                continue;
+            }
+            if ($name === '') {
+                $errors[] = 'সামাজিক মাধ্যমের ' . bn($i + 1) . ' নম্বর সারি: নাম লিখুন।';
+                continue;
+            }
+            if ($url === '' || $url === '#') {
+                $url = '#';
+            } elseif (Security::safeUrl($url) === null) {
+                $errors[] = $name . '-এর ঠিকানা সঠিক নয় (https:// দিয়ে শুরু পুরো ঠিকানা দিন, বা খালি রাখুন)।';
+                continue;
+            }
+            if ($file !== null) {
+                [$stored, $error] = PageImage::store($file);
+                if ($stored === null) {
+                    $errors[] = $name . '-এর আইকন: ' . $error;
+                    continue;
+                }
+                $icon = $stored;
+            }
+            if ($key === '') {
+                if ($icon === '') {
+                    $errors[] = $name . ': নতুন মাধ্যমের জন্য একটা আইকনের ছবি দিন।';
+                    continue;
+                }
+                $key = 'custom-' . bin2hex(random_bytes(3));
+            }
+            $out[] = ['key' => $key, 'name' => $name, 'url' => $url, 'icon' => $icon];
+        }
+
+        return $out;
+    }
+
+    /** সাইটের সঙ্গে আসা মেনু ও ফুটারে ফেরা (সামাজিক মাধ্যম যেমন আছে থাকে)। */
     public static function reset(): bool
     {
         return Content::forget('menu.header') && Content::forget('menu.footer');
+    }
+
+    /** শুধু ফুটার সাইটের সঙ্গে আসা রূপে ফেরা (ওপরের মেনু যেমন আছে থাকে)। */
+    public static function resetFooter(): bool
+    {
+        return Content::forget('menu.footer');
+    }
+
+    public static function isFooterChanged(): bool
+    {
+        return Content::has('menu.footer');
     }
 
     /**

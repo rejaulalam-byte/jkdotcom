@@ -31,6 +31,18 @@ $hidden = static fn (): string => csrf_field() . '<input type="hidden" name="bac
     </form>
 </div>
 
+<details class="adm-box">
+    <summary class="adm-card__title">"সেবা সমূহ" পেইজের বর্ণের তালিকা (অ, আ … ক, খ …)</summary>
+    <form action="<?= e($base) ?>/action" method="post">
+        <?= $hidden() ?>
+        <input type="hidden" name="do" value="letters">
+        <label class="sr-only" for="svc-letters">বর্ণের তালিকা</label>
+        <textarea id="svc-letters" name="letters" rows="3" maxlength="500"><?= e(implode(' ', \App\Models\ServiceDirectory::letters())) ?></textarea>
+        <p class="adm-muted">প্রতিটি বর্ণের মাঝে একটা ফাঁক দিন; এই ক্রমেই পেইজে শিরোনাম সাজে। যে সেবার নামের প্রথম অক্ষর এই তালিকায় নেই, সে পেইজের একদম শেষে "অন্যান্য" শিরোনামে যায়; তাই নতুন বর্ণের সেবা থাকলে বর্ণটা এখানে যোগ করুন।</p>
+        <button class="adm-small adm-small--go" type="submit">সংরক্ষণ করুন</button>
+    </form>
+</details>
+
 <nav class="adm-tabs" aria-label="ভাগ">
     <?php foreach ($tabs as [$key, $label]): ?>
         <a href="<?= e($base . ($key !== '' ? '?t=' . $key : '')) ?>"<?= $tab === $key ? ' aria-current="true"' : '' ?>><?= e($label) ?> <b><?= e(bn((int) $counts[$key])) ?></b></a>

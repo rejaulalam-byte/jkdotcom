@@ -177,7 +177,7 @@
     });
 })();
 
-/* ---- "লাইভ পেইজ এডিট": মেনু সম্পাদনার বাক্স (studio-menu.php; শুধু সুপার অ্যাডমিন) ----
+/* ---- "লাইভ পেইজ এডিট": মেনু সম্পাদনার বাক্স (studio-menu.php; ওপরের মেনু শুধু সুপার, ফুটার ও সামাজিক অনুমতি "footer") ----
    খোলে "মেনু সম্পাদনা" বাটনে বা ফ্রেমের মেনু/ফুটারের লিংকে ক্লিকে (live-edit.js পাঠায় {jk: "open-menu"})।
    সারি যোগ / মোছা / ওপরে-নিচে; জমার আগে প্রতিটি ঘরের নাম পর্দার ক্রমে নতুন করে নম্বর পায়
    (header[i][label|href], header[i][sub][j][...], footer[c][j][...]), তাই সার্ভার যে ক্রমে পায় সেটাই সাইটের ক্রম। ---- */
@@ -219,7 +219,8 @@
     });
 
     function newRow(kind) {
-        var row = template.content.firstElementChild.cloneNode(true);
+        var source = kind === "social" ? document.getElementById("menu-social-template") : template;
+        var row = source.content.firstElementChild.cloneNode(true);
         row.setAttribute("data-menu-row", kind);
         row.querySelector(".adm-menu__tools").hidden = false;
         return row;
@@ -263,7 +264,7 @@
             } else {
                 var col = dialog.querySelector('[data-menu-list="' + kind + '"]');
                 col.appendChild(newRow(kind));
-                col.lastElementChild.querySelector("input").focus();
+                col.lastElementChild.querySelector('input:not([type="hidden"])').focus();
             }
             return;
         }
@@ -301,6 +302,13 @@
             var c = list.getAttribute("data-menu-list").slice(7);
             list.querySelectorAll("[data-menu-row]").forEach(function (row, j) {
                 name(row, "footer[" + c + "][" + j + "]");
+            });
+        });
+        // সামাজিক মাধ্যম: পর্দার ক্রমই সাইটের ক্রম (আইকনের ফাইলও একই নম্বরে)
+        dialog.querySelectorAll('[data-menu-list="social"] > [data-menu-row]').forEach(function (row, i) {
+            row.querySelectorAll("[data-f]").forEach(function (input) {
+                var f = input.getAttribute("data-f");
+                input.name = f === "file" ? "social_icon[" + i + "]" : "social[" + i + "][" + f + "]";
             });
         });
         dirty = false;

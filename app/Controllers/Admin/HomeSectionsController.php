@@ -13,10 +13,11 @@ use App\Models\AdminRepository;
 use App\Models\HomeSections;
 
 /**
- * হোমের সেকশন (কাঠামোর কাজ, তাই শুধু সুপার অ্যাডমিন):
+ * হোমের সেকশন:
  *   live — লাইভ পেইজ এডিটের ফ্রেমের পট্টি থেকে: ওপরে/নিচে সরানো, লুকানো/দেখানো, নতুন সেকশন যোগ, মোছা (JSON উত্তর);
+ *          এটা কাঠামোর কাজ, তাই শুধু সুপার অ্যাডমিন;
  *   edit / save — নতুন সেকশনের নিজের পাতা (<admin>/home-section/<id>): ছোট শিরোনাম ও লোগো, বড় শিরোনাম, জায়গা,
- *                 পূর্ণ এডিটরের লেখা, বাটন। সংরক্ষণের পরে লাইভ পেইজ এডিটের হোমে ফেরে।
+ *                 পূর্ণ এডিটরের লেখা, বাটন (অনুমতি "pages")। সংরক্ষণের পরে লাইভ পেইজ এডিটের হোমে ফেরে।
  */
 final class HomeSectionsController
 {
@@ -63,7 +64,7 @@ final class HomeSectionsController
 
     public function edit(array $meta = []): void
     {
-        $admin = $this->super();
+        $admin = AdminAuth::require('pages');
         $id = (string) ($meta['slug'] ?? '');
         $data = HomeSections::data($id);
         if ($data === null) {
@@ -87,7 +88,7 @@ final class HomeSectionsController
 
     public function save(array $meta = []): void
     {
-        $admin = $this->super();
+        $admin = AdminAuth::require('pages');
         $id = (string) ($meta['slug'] ?? '');
         $current = HomeSections::data($id);
         $self = admin_base() . '/home-section/' . $id;
@@ -141,15 +142,4 @@ final class HomeSectionsController
         redirect(admin_base() . '/studio?p=home');
     }
 
-    /** @return array<string,mixed> */
-    private function super(): array
-    {
-        $admin = AdminAuth::require('pages');
-        if (!AdminAuth::isSuper($admin)) {
-            Session::flash('admin_errors', ['হোমের সেকশন সাজানো শুধু সুপার অ্যাডমিন পারেন।']);
-            redirect(admin_base());
-        }
-
-        return $admin;
-    }
 }

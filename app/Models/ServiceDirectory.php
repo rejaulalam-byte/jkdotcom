@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Core\Content;
+
 /**
  * "সেবা সমূহ" পেইজের জন্য সেবা সাজায়: নামের প্রথম অক্ষরের নিচে জড়ো করে (বাংলা বর্ণক্রমে,
  * আগে স্বরবর্ণ, তারপর ব্যঞ্জনবর্ণ) এবং প্রায় সমান উচ্চতার কলামে ভাগ করে।
@@ -11,12 +13,41 @@ namespace App\Models;
  */
 final class ServiceDirectory
 {
-    /** ক্রমানুসারে শিরোনাম-বর্ণ। অ্যাডমিন পরে এই তালিকা বদলাতে পারবেন (সেটিং `services.letters`)। */
+    /** ক্রমানুসারে শিরোনাম-বর্ণ: অ্যাডমিনের "সেবার তালিকা" থেকে বদলানো (`services.letters`), না থাকলে নিচের LETTERS। */
     public const LETTERS = [
         'অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ',
         'ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ', 'ট', 'ঠ', 'ড', 'ঢ', 'ণ',
         'ত', 'থ', 'দ', 'ধ', 'ন', 'প', 'ফ', 'ব', 'ভ', 'ম', 'য', 'র', 'ল', 'শ', 'ষ', 'স', 'হ',
     ];
+
+    /** @return list<string> এখনকার শিরোনাম-বর্ণের তালিকা, ক্রমে। */
+    public static function letters(): array
+    {
+        $saved = trim(Content::get('services.letters'));
+
+        return $saved !== '' ? (preg_split('/\s+/u', $saved) ?: self::LETTERS) : self::LETTERS;
+    }
+
+    /**
+     * বর্ণের তালিকা সংরক্ষণ (ফাঁক দিয়ে আলাদা, প্রতিটি একটা অক্ষর, পুনরাবৃত্তি নয়)। ফেরত: ভুলের বার্তা বা null।
+     */
+    public static function saveLetters(string $text): ?string
+    {
+        $list = preg_split('/\s+/u', trim($text)) ?: [];
+        foreach ($list as $letter) {
+            if (mb_strlen($letter) !== 1) {
+                return '"' . $letter . '" ঠিক নয়: প্রতিটি শিরোনাম একটাই অক্ষর হবে, ফাঁক দিয়ে আলাদা করে লিখুন।';
+            }
+        }
+        if ($list === [] || $list === ['']) {
+            return 'অন্তত একটা বর্ণ রাখুন।';
+        }
+        if (count($list) !== count(array_unique($list))) {
+            return 'একই বর্ণ দুবার লেখা হয়েছে।';
+        }
+
+        return Content::set('services.letters', implode(' ', $list)) ? null : 'সংরক্ষণ করা যায়নি।';
+    }
 
     /** একটা দলের শিরোনাম + ফাঁক প্রায় এতগুলো সেবা-সারির উচ্চতার সমান ধরা হয়। */
     private const HEADING_WEIGHT = 1.8;
@@ -27,7 +58,8 @@ final class ServiceDirectory
      */
     public static function group(array $services): array
     {
-        $order = array_flip(self::LETTERS);
+        $letters = self::letters();
+        $order = array_flip($letters);
         $buckets = [];
         foreach ($services as $service) {
             $letter = mb_substr(trim($service['name']), 0, 1);
@@ -38,7 +70,7 @@ final class ServiceDirectory
         }
 
         $groups = [];
-        foreach (array_merge(self::LETTERS, ['#']) as $letter) {
+        foreach (array_merge($letters, ['#']) as $letter) {
             if (empty($buckets[$letter])) {
                 continue;
             }

@@ -31,7 +31,7 @@ $registrationPaths = ['/login', '/welcome'];
             <span class="nav-toggle__bars" aria-hidden="true"></span>
         </button>
 
-        <nav id="site-nav" class="nav" aria-label="প্রধান মেনু"<?= live_preview() ? ' data-jk-menu' : '' ?>>
+        <nav id="site-nav" class="nav" aria-label="প্রধান মেনু"<?= live_preview() ? ' data-jk-menu="header"' : '' ?>>
             <ul class="nav__list">
                 <?php foreach ($menu as [$href, $label, $children]):
                     $active = $current === $href || ($href !== '/' && str_starts_with($current, $href . '/'))

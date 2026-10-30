@@ -103,30 +103,36 @@ final class PanelController
         $this->ok(admin_base() . '/account', 'ইমেইল বদলানো হয়েছে।');
     }
 
-    // ---- অ্যাডমিনদের তালিকা (শুধু সুপার অ্যাডমিন) ----------------------------------------------
+    // ---- অ্যাকাউন্ট তৈরি: সুপার সবাইকে দেখেন ও বানান; মেইন অ্যাডমিন শুধু সাব-অ্যাডমিনকে; সাব-অ্যাডমিন এই পেইজই পান না ----
 
     public function admins(): void
     {
-        $admin = AdminAuth::require(null, true);
-        $this->render('admin/admins', $admin, 'অ্যাডমিন', ['admins' => AdminRepository::all()]);
+        $admin = AdminAuth::requireTop();
+        $visible = array_values(array_filter(AdminRepository::all(), fn (array $a): bool => $this->mayManage($admin, $a) || (int) $a['id'] === (int) $admin['id']));
+        $this->render('admin/admins', $admin, 'অ্যাকাউন্ট তৈরি', ['admins' => $visible, 'hasMain' => AdminRepository::hasActiveMain()]);
     }
 
     public function adminsCreate(): void
     {
-        $admin = $this->post(admin_base() . '/admins', true);
+        $admin = $this->postTop();
         $name = clean_input($_POST['name'] ?? '', 100);
         $email = mb_strtolower(clean_input($_POST['email'] ?? '', 150));
-        $role = ($_POST['role'] ?? '') === 'super' ? 'super' : 'admin';
+        $wanted = (string) ($_POST['role'] ?? 'admin');
+        // মেইন অ্যাডমিন যা-ই পাঠান, শুধু সাব-অ্যাডমিন বানাতে পারেন
+        $role = AdminAuth::isSuper($admin) && in_array($wanted, ['super', 'main', 'admin'], true) ? $wanted : 'admin';
         $permissions = AdminPermissions::clean($_POST['permissions'] ?? []);
         if (mb_strlen($name) < 2 || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             $this->back(admin_base() . '/admins', ['নাম ও সঠিক ইমেইল দিন।']);
         }
+        if ($role === 'main' && AdminRepository::hasActiveMain()) {
+            $this->back(admin_base() . '/admins', ['মেইন অ্যাডমিন একজনই থাকতে পারেন। নতুন কাউকে দিতে হলে আগেরজনের অ্যাকাউন্ট বন্ধ করুন।']);
+        }
         if ($role === 'admin' && $permissions === []) {
-            $this->back(admin_base() . '/admins', ['অ্যাডমিনিস্ট্রেটরের জন্য অন্তত একটি অনুমতি বাছুন।']);
+            $this->back(admin_base() . '/admins', ['সাব-অ্যাডমিনের জন্য অন্তত একটি অনুমতি বাছুন।']);
         }
         $id = AdminRepository::create($name, $email, $role, $permissions, null);
         if ($id === null) {
-            $this->back(admin_base() . '/admins', ['এই ইমেইলে আগেই একজন আছেন, অথবা সংরক্ষণ করা যায়নি।']);
+            $this->back(admin_base() . '/admins', ['এই ইমেইল ব্যবহার করা যাচ্ছে না, অথবা সংরক্ষণ করা যায়নি।']);
         }
         $sent = $this->sendInvite($id, $name, $email);
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'admin_created', $name . ' (' . AdminAuth::roleLabel($role) . ')');
@@ -138,9 +144,9 @@ final class PanelController
     /** পাসওয়ার্ড বসানোর লিংক আবার পাঠানো (যিনি এখনও লিংক ব্যবহার করেননি বা হারিয়ে ফেলেছেন)। */
     public function adminsInvite(): void
     {
-        $admin = $this->post(admin_base() . '/admins', true);
+        $admin = $this->postTop();
         $target = AdminRepository::findById((int) ($_POST['id'] ?? 0));
-        if ($target === null || $target['status'] !== 'active') {
+        if ($target === null || $target['status'] !== 'active' || !($this->mayManage($admin, $target) || (int) $target['id'] === (int) $admin['id'])) {
             $this->back(admin_base() . '/admins', ['অ্যাকাউন্টটি পাওয়া যায়নি বা বন্ধ আছে।']);
         }
         $this->sendInvite((int) $target['id'], (string) $target['name'], (string) $target['email'])
@@ -150,14 +156,17 @@ final class PanelController
 
     public function adminsStatus(): void
     {
-        $admin = $this->post(admin_base() . '/admins', true);
+        $admin = $this->postTop();
         $target = AdminRepository::findById((int) ($_POST['id'] ?? 0));
         $disable = ($_POST['action'] ?? '') === 'disable';
-        if ($target === null) {
+        if ($target === null || !$this->mayManage($admin, $target)) {
             $this->back(admin_base() . '/admins', ['অ্যাকাউন্টটি পাওয়া যায়নি।']);
         }
         if ($disable && (int) $target['id'] === (int) $admin['id']) {
             $this->back(admin_base() . '/admins', ['নিজের অ্যাকাউন্ট নিজে বন্ধ করা যায় না। অন্য সুপার অ্যাডমিনকে দিয়ে বন্ধ করান।']);
+        }
+        if (!$disable && $target['role'] === 'main' && AdminRepository::hasActiveMain()) {
+            $this->back(admin_base() . '/admins', ['মেইন অ্যাডমিন একজনই থাকতে পারেন; আগে চালু জনের অ্যাকাউন্ট বন্ধ করুন।']);
         }
         if ($disable && $target['role'] === 'super' && AdminRepository::activeSuperCount() <= 1) {
             $this->back(admin_base() . '/admins', ['শেষ চালু সুপার অ্যাডমিনকে বন্ধ করা যাবে না।']);
@@ -169,11 +178,11 @@ final class PanelController
 
     public function adminsPermissions(): void
     {
-        $admin = $this->post(admin_base() . '/admins', true);
+        $admin = $this->postTop();
         $target = AdminRepository::findById((int) ($_POST['id'] ?? 0));
         $permissions = AdminPermissions::clean($_POST['permissions'] ?? []);
         if ($target === null || $target['role'] !== 'admin') {
-            $this->back(admin_base() . '/admins', ['শুধু অ্যাডমিনিস্ট্রেটরের অনুমতি বদলানো যায়।']);
+            $this->back(admin_base() . '/admins', ['শুধু সাব-অ্যাডমিনের অনুমতি বদলানো যায়।']);
         }
         if ($permissions === []) {
             $this->back(admin_base() . '/admins', ['অন্তত একটি অনুমতি রাখুন। কাউকে একেবারে আটকাতে চাইলে অ্যাকাউন্ট বন্ধ করুন।']);
@@ -207,6 +216,29 @@ final class PanelController
             'errors' => Session::pull('admin_errors', []),
             'ok' => Session::pull('admin_ok'),
         ], 'layouts/admin');
+    }
+
+    /**
+     * এই অ্যাডমিন কি ওই অ্যাকাউন্ট দেখতে ও বদলাতে পারেন? সুপার সবাইকে; মেইন শুধু সাব-অ্যাডমিনকে
+     * (মেইন বা সাব-অ্যাডমিন সুপারের অ্যাকাউন্ট কখনও দেখেন না, সাব-অ্যাডমিন মেইনেরটাও না)।
+     *
+     * @param array<string,mixed> $admin
+     * @param array<string,mixed> $target
+     */
+    private function mayManage(array $admin, array $target): bool
+    {
+        return AdminAuth::isSuper($admin) || (AdminAuth::isMain($admin) && $target['role'] === 'admin');
+    }
+
+    /** অ্যাকাউন্টের POST-এর পাহারা: সুপার বা মেইন অ্যাডমিন + CSRF। @return array<string,mixed> */
+    private function postTop(): array
+    {
+        $admin = AdminAuth::requireTop();
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            $this->back(admin_base() . '/admins', ['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+        }
+
+        return $admin;
     }
 
     /**

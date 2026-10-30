@@ -75,7 +75,8 @@ $fields = static function (array $list) use ($base): string {
         <?php endif; ?>
         <iframe class="adm-live__frame" src="<?= e($frame) ?>" title="<?= e((string) $page['title']) ?> — সাইটে যেমন দেখায়" sandbox="allow-same-origin allow-scripts allow-modals allow-top-navigation-by-user-activation"></iframe>
     </section>
-    <?php if (\App\Core\AdminAuth::isSuper($admin)): ?>
+    <?php if (\App\Core\AdminAuth::can($admin, 'footer')): ?>
+        <?php $menuHeader = \App\Core\AdminAuth::isSuper($admin); ?>
         <?php require __DIR__ . '/studio-menu.php'; ?>
     <?php endif; ?>
     <?php if ($open !== null): ?>

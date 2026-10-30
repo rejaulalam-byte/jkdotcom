@@ -24,11 +24,33 @@ $sectionHtml = static function () use ($section, $blocks, $sectionId): void {
         require BASE_PATH . '/app/Views/partials/home-extra.php';
     }
 };
+$isHero = $sectionId === 'hero';
 if (!$slotSuper) {
-    $sectionHtml();
+    // মেইন/সাব-অ্যাডমিন: কাঠামোর বাটন নেই, শুধু এই সেকশনের লেখা-ছবি বদলানোর পাতায় যাওয়ার বাটন
+    $editUrl = null;
+    $editLabel = '';
+    if ($slotAdmin !== null && $isHero && AdminAuth::can($slotAdmin, 'hero')) {
+        $editUrl = admin_base() . '/hero';
+        $editLabel = '✎ হিরো সেটিং (অ্যানিমেশন, পটভূমি, তালিকা)';
+    } elseif ($slotAdmin !== null && !$section['builtin'] && AdminAuth::can($slotAdmin, 'pages')) {
+        $editUrl = admin_base() . '/home-section/' . $sectionId;
+        $editLabel = '✎ সম্পাদনা';
+    }
+    if ($editUrl === null) {
+        $sectionHtml();
+        return;
+    }
+    ?>
+    <div class="jk-home-slot" data-jk-home="<?= e($sectionId) ?>">
+        <div class="jk-home-bar" role="toolbar" aria-label="সেকশনের লেখা">
+            <span class="jk-home-bar__name"><?= e(HomeSections::label($sectionId)) ?></span>
+            <button type="button" data-act="edit" data-url="<?= e($editUrl) ?>"><?= e($editLabel) ?></button>
+        </div>
+        <?php $sectionHtml(); ?>
+    </div>
+    <?php
     return;
 }
-$isHero = $sectionId === 'hero';
 ?>
 <div class="jk-home-slot<?= $section['hidden'] ? ' is-jk-hidden' : '' ?>" data-jk-home="<?= e($sectionId) ?>">
     <div class="jk-home-bar" role="toolbar" aria-label="সেকশন সাজান">
