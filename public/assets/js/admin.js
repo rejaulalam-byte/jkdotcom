@@ -336,3 +336,31 @@
         });
     });
 })();
+
+/* ---- রঙের প্লেট (admin/home-section.php): select[data-palette] লুকিয়ে তার জায়গায় রঙের খোপ; বাছা মান select-এই থাকে, তাই ফর্ম জমা আগের মতোই ---- */
+(function () {
+    if (!window.jkPalette) {
+        return;
+    }
+    document.querySelectorAll("select[data-palette]").forEach(function (select) {
+        var colors = {};
+        try {
+            colors = JSON.parse(select.getAttribute("data-palette")) || {};
+        } catch (e) {
+            return;
+        }
+        var pal = window.jkPalette({
+            items: Array.prototype.map.call(select.options, function (o) {
+                return { value: o.value, label: o.textContent.trim(), color: colors[o.value] || "#ffffff" };
+            }),
+            value: select.value,
+            kind: "fill",
+            title: "রং বাছুন",
+            onPick: function (v) {
+                select.value = v;
+            }
+        });
+        select.hidden = true;
+        select.parentNode.insertBefore(pal.el, select.nextSibling);
+    });
+})();

@@ -51,6 +51,8 @@ $mine = [
     <title><?= e($pageTitle) ?></title>
     <link rel="icon" type="image/png" href="<?= e(asset('img/site/logo-figma.png')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/admin.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset('css/palette.css')) ?>">
+    <script src="<?= e(asset('js/palette.js')) ?>" defer></script>
     <script src="<?= e(asset('js/admin.js')) ?>" defer></script>
 </head>
 <body class="<?= $admin !== null ? 'adm-shell' : 'adm-plain' ?>">

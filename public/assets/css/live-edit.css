@@ -111,31 +111,6 @@
     border-color: #125a6c;
     outline: 2px solid #f0d772;
 }
-.jk-live-panel__colors {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 4px;
-}
-.jk-live-panel__tools .jk-sw {
-    width: 28px;
-    min-width: 28px;
-    height: 28px;
-    min-height: 28px;
-    padding: 0;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    box-shadow: 0 0 0 1px #8fa5ab;
-}
-.jk-sw--gold { background: #f0d772; }
-.jk-sw--amber { background: #ffb11f; }
-.jk-sw--white { background: #fff; }
-.jk-sw--red { background: #ff8a8a; }
-.jk-sw--teal { background: #125a6c; }
-.jk-sw--orange { background: #c96a00; }
-.jk-sw--maroon { background: #6d1b2f; }
-.jk-sw--darkred { background: #870a0a; }
-.jk-sw--brown { background: #582a0d; }
-.jk-sw--black { background: #222; }
 .jk-live-panel__preview {
     margin: 0 0 8px;
     padding: 8px 12px;
@@ -194,11 +169,6 @@
     color: #125a6c;
     font-weight: 600;
 }
-.jk-live-panel__boxcolors {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 4px;
-}
 .jk-live-panel__box button {
     min-height: 32px;
     padding: 0 10px;
@@ -210,23 +180,6 @@
     font-size: 15px;
     cursor: pointer;
 }
-.jk-live-panel__box .jk-bsw {
-    width: 34px;
-    padding: 0;
-}
-.jk-live-panel__box .jk-bsw.is-on {
-    border: 3px solid #125a6c;
-}
-.jk-live-panel__box .jk-bsw--olive { background: rgba(106, 93, 16, 0.1); }
-.jk-live-panel__box .jk-bsw--amber { background: rgba(192, 122, 0, 0.3); }
-.jk-live-panel__box .jk-bsw--social { background: rgba(192, 122, 0, 0.5); }
-.jk-live-panel__box .jk-bsw--tealsoft { background: rgba(18, 90, 108, 0.1); }
-.jk-live-panel__box .jk-bsw--teal { background: #125a6c; }
-.jk-live-panel__box .jk-bsw--gold { background: #f0d772; }
-.jk-live-panel__box .jk-bsw--orange { background: #c96a00; }
-.jk-live-panel__box .jk-bsw--maroon { background: #6d1b2f; }
-.jk-live-panel__box .jk-bsw--white { background: #fff; }
-.jk-live-panel__box .jk-bsw--none { background: repeating-linear-gradient(45deg, #fff 0 4px, #d5e0e3 4px 8px); }
 
 /* খোলা পেইজের মূল লেখা: পুরো ঘর একসঙ্গে (ক্লিক = অ্যাডমিনের পর্দায় পূর্ণ এডিটর) */
 [data-jk-rich] {
@@ -265,16 +218,6 @@
 .jk-field.is-jk-hidden {
     opacity: 1;
 }
-
-/* ঘরের রঙের সারির বাটন (রং = app.css-এর .fc--*) */
-.jk-live-panel__box .jk-fsw--white { background: #fff; }
-.jk-live-panel__box .jk-fsw--cream { background: #fff8e6; }
-.jk-live-panel__box .jk-fsw--gold { background: #fbf1c7; }
-.jk-live-panel__box .jk-fsw--green { background: #e6f4ea; }
-.jk-live-panel__box .jk-fsw--blue { background: #e7f0fb; }
-.jk-live-panel__box .jk-fsw--pink { background: #fbe9ee; }
-.jk-live-panel__box .jk-fsw--grey { background: #eef0f1; }
-.jk-live-panel__box .jk-fsw--teal { background: #d7e7eb; }
 
 /* ফর্মে অ্যাডমিনের যোগ করা ঘর: কোণের চিহ্ন অন্য রঙে; "+ নতুন ঘর যোগ করুন" বাটন; বাক্সের ঘরগুলো */
 [data-jk-custom] {

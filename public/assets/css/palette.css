@@ -1,0 +1,156 @@
+/* রঙের প্লেট (জেএস: palette.js): লাইভ পেইজ এডিটের বাক্স ও অ্যাডমিনের পেইজ দুই জায়গাতেই লাগে */
+/* ---- রঙের প্লেট: একটা আইকন (লেখার রং = নিচে রঙের দাগসহ "A", বাক্স/ঘর/বার্তা = বর্তমান রঙের চারকোনা);
+   ক্লিকে রঙের খোপগুলো খোলে, প্রতিটার নাম নিচের লাইনে দেখা যায়। রং = app.css-এর .tc-* / .pill--* / .fc--* / .msgc--*-এর মতো ---- */
+.jk-pal {
+    position: relative;
+    display: inline-block;
+}
+.jk-pal__btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 40px;
+    min-height: 38px;
+    padding: 2px 8px;
+    border: 1px solid #b9cbd0;
+    border-radius: 6px;
+    background: #fff;
+    color: #125a6c;
+    font: 700 18px/1 "Hind Siliguri", "Nirmala UI", system-ui, sans-serif;
+    cursor: pointer;
+}
+.jk-pal__btn:hover,
+.jk-pal__btn:focus-visible,
+.jk-pal__btn[aria-expanded="true"] {
+    border-color: #125a6c;
+    outline: 2px solid #f0d772;
+}
+.jk-pal__bar {
+    display: block;
+    width: 22px;
+    height: 5px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px #8fa5ab;
+}
+.jk-pal__btn--fill {
+    flex-direction: row;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 400;
+}
+.jk-pal__btn--fill .jk-pal__bar {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+}
+.jk-pal__pop {
+    position: absolute;
+    z-index: 5;
+    top: calc(100% + 4px);
+    left: 0;
+    box-sizing: border-box;
+    width: 232px;
+    padding: 10px;
+    border: 2px solid #125a6c;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+.jk-pal__pop--up {
+    top: auto;
+    bottom: calc(100% + 4px);
+}
+.jk-pal__pop[hidden] {
+    display: none;
+}
+.jk-pal__grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+}
+.jk-pal__sw {
+    width: 100%;
+    aspect-ratio: 1;
+    min-height: 34px;
+    padding: 0;
+    border: 1px solid #8fa5ab;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.jk-pal__sw:hover,
+.jk-pal__sw:focus-visible {
+    outline: 2px solid #e08a1e;
+    outline-offset: 1px;
+}
+.jk-pal__sw.is-on {
+    border: 3px solid #125a6c;
+    box-shadow: inset 0 0 0 2px #fff;
+}
+.jk-pal__name {
+    min-height: 1.5em;
+    margin: 8px 0 0;
+    color: #125a6c;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+}
+/* বাক্সের সাধারণ বাটন-নিয়ম (.jk-live-panel__tools/__box button) যেন প্লেটের খোপ ও আইকনকে বিগড়ে না দেয় */
+.jk-live-panel .jk-pal__btn {
+    min-width: 40px;
+    min-height: 38px;
+    padding: 2px 8px;
+    font-size: 18px;
+}
+.jk-live-panel .jk-pal__btn--fill {
+    font-size: 15px;
+}
+.jk-live-panel .jk-pal__sw {
+    min-width: 0;
+    min-height: 34px;
+    padding: 0;
+    border: 1px solid #8fa5ab;
+    border-radius: 6px;
+}
+.jk-live-panel .jk-pal__sw.is-on {
+    border: 3px solid #125a6c;
+}
+/* লেখার রং (.tc-*) */
+.jk-pal .jk-sw--gold, .jk-pal__bar.jk-sw--gold { background: #f0d772; }
+.jk-pal .jk-sw--amber, .jk-pal__bar.jk-sw--amber { background: #ffb11f; }
+.jk-pal .jk-sw--white, .jk-pal__bar.jk-sw--white { background: #fff; }
+.jk-pal .jk-sw--red, .jk-pal__bar.jk-sw--red { background: #ff8a8a; }
+.jk-pal .jk-sw--teal, .jk-pal__bar.jk-sw--teal { background: #125a6c; }
+.jk-pal .jk-sw--orange, .jk-pal__bar.jk-sw--orange { background: #c96a00; }
+.jk-pal .jk-sw--maroon, .jk-pal__bar.jk-sw--maroon { background: #6d1b2f; }
+.jk-pal .jk-sw--darkred, .jk-pal__bar.jk-sw--darkred { background: #870a0a; }
+.jk-pal .jk-sw--brown, .jk-pal__bar.jk-sw--brown { background: #582a0d; }
+.jk-pal .jk-sw--black, .jk-pal__bar.jk-sw--black { background: #222; }
+/* বাক্সের (ক্যাপসুল) রং */
+.jk-pal .jk-bsw--olive, .jk-pal__bar.jk-bsw--olive { background: rgba(106, 93, 16, 0.1); }
+.jk-pal .jk-bsw--amber, .jk-pal__bar.jk-bsw--amber { background: rgba(192, 122, 0, 0.3); }
+.jk-pal .jk-bsw--social, .jk-pal__bar.jk-bsw--social { background: rgba(192, 122, 0, 0.5); }
+.jk-pal .jk-bsw--tealsoft, .jk-pal__bar.jk-bsw--tealsoft { background: rgba(18, 90, 108, 0.1); }
+.jk-pal .jk-bsw--teal, .jk-pal__bar.jk-bsw--teal { background: #125a6c; }
+.jk-pal .jk-bsw--gold, .jk-pal__bar.jk-bsw--gold { background: #f0d772; }
+.jk-pal .jk-bsw--orange, .jk-pal__bar.jk-bsw--orange { background: #c96a00; }
+.jk-pal .jk-bsw--maroon, .jk-pal__bar.jk-bsw--maroon { background: #6d1b2f; }
+.jk-pal .jk-bsw--white, .jk-pal__bar.jk-bsw--white { background: #fff; }
+.jk-pal .jk-bsw--none, .jk-pal__bar.jk-bsw--none { background: repeating-linear-gradient(45deg, #fff 0 4px, #d5e0e3 4px 8px); }
+/* ফর্মের ঘরের রং (.fc--*) */
+.jk-pal .jk-fsw--white, .jk-pal__bar.jk-fsw--white { background: #fff; }
+.jk-pal .jk-fsw--cream, .jk-pal__bar.jk-fsw--cream { background: #fff8e6; }
+.jk-pal .jk-fsw--gold, .jk-pal__bar.jk-fsw--gold { background: #fbf1c7; }
+.jk-pal .jk-fsw--green, .jk-pal__bar.jk-fsw--green { background: #e6f4ea; }
+.jk-pal .jk-fsw--blue, .jk-pal__bar.jk-fsw--blue { background: #e7f0fb; }
+.jk-pal .jk-fsw--pink, .jk-pal__bar.jk-fsw--pink { background: #fbe9ee; }
+.jk-pal .jk-fsw--grey, .jk-pal__bar.jk-fsw--grey { background: #eef0f1; }
+.jk-pal .jk-fsw--teal, .jk-pal__bar.jk-fsw--teal { background: #d7e7eb; }
+/* বার্তার বাক্সের রং (.msgc--*): ভেতরের রং + পাড়ের রং */
+.jk-pal .jk-msw--green, .jk-pal__bar.jk-msw--green { background: #e3f4ea; border: 3px solid #319b07; }
+.jk-pal .jk-msw--teal, .jk-pal__bar.jk-msw--teal { background: #e0f0f3; border: 3px solid #125a6c; }
+.jk-pal .jk-msw--blue, .jk-pal__bar.jk-msw--blue { background: #e6effb; border: 3px solid #2b62b8; }
+.jk-pal .jk-msw--amber, .jk-pal__bar.jk-msw--amber { background: #fff3dc; border: 3px solid #d98a1e; }
+.jk-pal .jk-msw--grey, .jk-pal__bar.jk-msw--grey { background: #eef0f1; border: 3px solid #767676; }
+.jk-pal .jk-msw--default, .jk-pal__bar.jk-msw--default { background: repeating-linear-gradient(45deg, #fff 0 4px, #d5e0e3 4px 8px); }

@@ -151,8 +151,12 @@
         mark.remove();
     });
 
+    var palette = window.jkPalette;
+
     /* ---- ৩. বদলানোর বাক্স ---- */
     var panel = null;
+    var textPal = null;
+    var boxPal = null;
     var current = null;
 
     function build() {
@@ -184,15 +188,19 @@
             "</div>";
         document.body.appendChild(panel);
         var colors = panel.querySelector(".jk-live-panel__colors");
-        (data.colors || []).forEach(function (name) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "jk-sw jk-sw--" + name;
-            b.setAttribute("data-wrap", "color:" + name);
-            b.title = (COLOR_NAMES[name] || name) + " রং";
-            b.setAttribute("aria-label", b.title);
-            colors.appendChild(b);
+        var textItems = (data.colors || []).map(function (name) {
+            return { value: name, label: (COLOR_NAMES[name] || name) + " রং", cls: "jk-sw--" + name };
         });
+        textPal = palette({
+            items: textItems,
+            value: textItems.length ? textItems[textItems.length - 1].value : "",
+            kind: "text",
+            title: "লেখার রং (বাছা অংশে বসে; কিছু না বাছলে পুরো লেখায়)",
+            onPick: function (name) {
+                wrap("color:" + name);
+            }
+        });
+        colors.appendChild(textPal.el);
         panel.querySelector(".jk-live-panel__tools").addEventListener("click", function (e) {
             var b = e.target.closest("[data-wrap]");
             if (b) {
@@ -201,15 +209,17 @@
         });
         panel.querySelector(".jk-live-panel__text").addEventListener("input", preview);
         var boxColors = panel.querySelector(".jk-live-panel__boxcolors");
-        Object.keys(data.boxColors || {}).forEach(function (name) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "jk-bsw jk-bsw--" + name;
-            b.setAttribute("data-box", name);
-            b.title = data.boxColors[name];
-            b.setAttribute("aria-label", "বক্সের রং: " + data.boxColors[name]);
-            boxColors.appendChild(b);
+        boxPal = palette({
+            items: Object.keys(data.boxColors || {}).map(function (name) {
+                return { value: name, label: data.boxColors[name], cls: "jk-bsw--" + name };
+            }),
+            value: "",
+            kind: "fill",
+            emptyCls: "jk-bsw--none",
+            title: "বক্সের রং বাছুন",
+            onPick: sendBox
         });
+        boxColors.appendChild(boxPal.el);
         panel.querySelector(".jk-live-panel__box").addEventListener("click", function (e) {
             var b = e.target.closest("[data-box]");
             if (b) {
@@ -270,9 +280,7 @@
         current.box = boxInfo ? box.getAttribute("data-jk-box") : null;
         panel.querySelector(".jk-live-panel__box").hidden = !boxInfo || !data.super;
         if (boxInfo) {
-            panel.querySelectorAll(".jk-bsw").forEach(function (b) {
-                b.classList.toggle("is-on", b.getAttribute("data-box") === boxInfo.color);
-            });
+            boxPal.set(boxInfo.color);
             panel.querySelector(".jk-live-panel__boxreset").hidden = boxInfo.color === boxInfo.original;
         }
         place(panel, el);
@@ -558,6 +566,7 @@
     /* ---- ৭. ফর্মের ঘর: রং ও লুকানো/দেখানো (শুধু সুপার অ্যাডমিন; অন্যদের কাছে চিহ্নই আসে না) ---- */
     var fieldPanel = null;
     var fieldCurrent = null;
+    var fieldPal = null;
 
     function buildField() {
         fieldPanel = document.createElement("div");
@@ -578,15 +587,19 @@
             "</div>";
         document.body.appendChild(fieldPanel);
         var colors = fieldPanel.querySelector(".jk-live-field__colors");
-        Object.keys(data.fieldColors || {}).forEach(function (name) {
-            var b = document.createElement("button");
-            b.type = "button";
-            b.className = "jk-bsw jk-fsw--" + name;
-            b.setAttribute("data-field-color", name);
-            b.title = data.fieldColors[name];
-            b.setAttribute("aria-label", "ঘরের রং: " + data.fieldColors[name]);
-            colors.appendChild(b);
+        fieldPal = palette({
+            items: Object.keys(data.fieldColors || {}).map(function (name) {
+                return { value: name, label: data.fieldColors[name], cls: "jk-fsw--" + name };
+            }),
+            value: "",
+            kind: "fill",
+            emptyCls: "jk-bsw--none",
+            title: "ঘরের রং বাছুন",
+            onPick: function (name) {
+                sendField({ color: name });
+            }
         });
+        colors.appendChild(fieldPal.el);
         fieldPanel.querySelector(".jk-live-panel__box").addEventListener("click", function (e) {
             var b = e.target.closest("[data-field-color]");
             if (b) {
@@ -627,9 +640,7 @@
             : info.hidden
                 ? "এখন লুকানো: দর্শক ঘরটি দেখেন না, তাই এটা পূরণ করতেও হয় না।"
                 : "এখন দেখা যাচ্ছে। লুকালে দর্শক ঘরটি দেখবেন না, আর এটা আবশ্যকও থাকবে না (খালি জমা হবে)।";
-        fieldPanel.querySelectorAll(".jk-live-field__colors .jk-bsw").forEach(function (b) {
-            b.classList.toggle("is-on", b.getAttribute("data-field-color") === info.color);
-        });
+        fieldPal.set(info.color);
         fieldPanel.querySelector(".jk-live-field__colorreset").hidden = info.color === "";
         fieldPanel.querySelector(".jk-live-panel__msg").textContent = "";
         fieldPanel.querySelector('[data-field-act="1"]').hidden = !info.hideable || info.hidden;
@@ -884,6 +895,23 @@
     /* ---- "এই পেইজের বার্তা": বাক্সের ডিজাইন, রং ও সময় ঠিক করা (সুপার অ্যাডমিন; ঘরগুলো partials/live-messages.php-তে) ---- */
     document.querySelectorAll("[data-jk-msg-style]").forEach(function (box) {
         var save = box.querySelector("[data-jk-msg-style-save]");
+        // রঙের তালিকা (select) লুকিয়ে তার জায়গায় রঙের প্লেট; বাছা মান select-এই থাকে, তাই নিচের সংরক্ষণ-কোড বদলায়নি
+        var colorSelect = box.querySelector('select[name="color"]');
+        if (colorSelect) {
+            var pal = palette({
+                items: Array.prototype.map.call(colorSelect.options, function (o) {
+                    return { value: o.value, label: o.textContent.trim(), cls: "jk-msw--" + (o.value || "default") };
+                }),
+                value: colorSelect.value,
+                kind: "fill",
+                title: "বার্তার বাক্সের রং বাছুন",
+                onPick: function (v) {
+                    colorSelect.value = v;
+                }
+            });
+            colorSelect.hidden = true;
+            colorSelect.parentNode.appendChild(pal.el);
+        }
         save.addEventListener("click", function () {
             var body = new FormData();
             body.append("_token", data.token);

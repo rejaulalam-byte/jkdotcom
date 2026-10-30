@@ -19,9 +19,29 @@ $radios = static function (string $name, string $current): string {
 
     return $out;
 };
-/** @param array<string,string> $options মান => নাম */
-$select = static function (string $name, string $id, array $options, string $current): string {
-    $out = '<select id="' . e($id) . '" name="' . e($name) . '">';
+// রঙের প্লেটের খোপের রং (app.css-এর .pill--* / .hx-bg--* / .btn--*-এর মতো)
+$colors = [
+    'pill' => [
+        'olive' => 'rgba(106, 93, 16, 0.1)', 'amber' => 'rgba(192, 122, 0, 0.3)', 'social' => 'rgba(192, 122, 0, 0.5)',
+        'tealsoft' => 'rgba(18, 90, 108, 0.1)', 'teal' => '#125a6c', 'gold' => '#f0d772', 'orange' => '#c96a00',
+        'maroon' => '#6d1b2f', 'white' => '#ffffff',
+        'none' => 'repeating-linear-gradient(45deg, #fff 0 4px, #d5e0e3 4px 8px)',
+    ],
+    'bg' => [
+        '' => '#ffffff', 'tealsoft' => '#e7eef0', 'grey' => '#eef0f1', 'olive' => '#f0eee3', 'gold' => '#fcf5dc', 'teal' => '#125a6c',
+    ],
+    'button' => [
+        'teal-soft' => '#a5bfc6', 'teal' => '#125a6c', 'white' => '#ffffff',
+        'light' => 'linear-gradient(135deg, #125a6c 50%, rgba(255, 255, 255, 0.45) 50%)', 'orange' => '#c96a00',
+    ],
+];
+/**
+ * রঙের তালিকা: আসলে select (সার্ভারে এটাই জমা পড়ে), তবে admin.js লুকিয়ে তার জায়গায় রঙের প্লেট বসায় ([data-palette] = মান => CSS রং)।
+ * @param array<string,string> $options মান => নাম
+ * @param array<string,string> $colors মান => CSS রং
+ */
+$select = static function (string $name, string $id, array $options, string $current, array $colors): string {
+    $out = '<select id="' . e($id) . '" name="' . e($name) . '" data-palette="' . e((string) json_encode($colors)) . '">';
     foreach ($options as $value => $label) {
         $out .= '<option value="' . e((string) $value) . '"' . ((string) $value === $current ? ' selected' : '') . '>' . e($label) . '</option>';
     }
@@ -58,10 +78,10 @@ $select = static function (string $name, string $id, array $options, string $cur
             <div><?= $radios('align', $data['align']) ?></div>
 
             <label for="hs-pill">ছোট শিরোনামের ক্যাপসুলের রং</label>
-            <?= $select('pill', 'hs-pill', array_map(static fn (array $c): string => $c[0], SiteBoxes::COLORS), $data['pill']) ?>
+            <?= $select('pill', 'hs-pill', array_map(static fn (array $c): string => $c[0], SiteBoxes::COLORS), $data['pill'], $colors['pill']) ?>
 
             <label for="hs-bg">সেকশনের পটভূমির রং</label>
-            <?= $select('bg', 'hs-bg', HomeSections::BACKGROUNDS, $data['bg']) ?>
+            <?= $select('bg', 'hs-bg', HomeSections::BACKGROUNDS, $data['bg'], $colors['bg']) ?>
         </div>
     </div>
 
@@ -84,7 +104,7 @@ $select = static function (string $name, string $id, array $options, string $cur
             <span>বাটনের জায়গা</span>
             <div><?= $radios('button_align', $data['button_align']) ?></div>
             <label for="hs-bstyle">বাটনের রং</label>
-            <?= $select('button_style', 'hs-bstyle', HomeSections::BUTTONS, $data['button_style']) ?>
+            <?= $select('button_style', 'hs-bstyle', HomeSections::BUTTONS, $data['button_style'], $colors['button']) ?>
         </div>
     </div>
 

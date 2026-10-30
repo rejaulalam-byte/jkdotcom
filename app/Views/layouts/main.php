@@ -29,7 +29,9 @@ $pageDescription = $description ?? content('site.description');
         <link rel="stylesheet" href="/site-theme?v=<?= e(\App\Models\SiteTheme::version()) ?>">
     <?php endif; ?>
     <?php if (live_preview()): // অ্যাডমিনের লাইভ পেইজ এডিট: app.js-এর আগে চলে (লেখার চিহ্ন খুঁজে নিয়ে মুছে দেয়) ?>
+        <link rel="stylesheet" href="<?= e(asset('css/palette.css')) ?>">
         <link rel="stylesheet" href="<?= e(asset('css/live-edit.css')) ?>">
+        <script src="<?= e(asset('js/palette.js')) ?>" defer></script>
         <script src="<?= e(asset('js/live-edit.js')) ?>" defer></script>
     <?php endif; ?>
     <script src="<?= e(asset('js/app.js')) ?>" defer></script>
