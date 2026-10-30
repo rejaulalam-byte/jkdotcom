@@ -103,7 +103,7 @@ final class HeroController
         }
 
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'hero_save',
-            'অ্যানিমেশন: ' . (!empty($_POST['anim_on']) ? $anim : 'বন্ধ') . ' — রং: ' . $bg . ' — ছবি: ' . ($imageOn ? 'চালু' : 'বন্ধ') . ' — আজকের কাজের তালিকা: ' . (!empty($_POST['today']) ? 'দেখায়' : 'লুকানো'));
+            'অ্যানিমেশন: ' . (!empty($_POST['anim_on']) ? ['scatter' => 'চারদিক থেকে', 'right' => 'ডান থেকে', 'left' => 'বাঁ থেকে'][$anim] : 'বন্ধ') . ' — রং: ' . ($bg === 'color' ? 'নিজের রং' : 'সাধারণ') . ' — ছবি: ' . ($imageOn ? 'চালু' : 'বন্ধ') . ' — আজকের কাজের তালিকা: ' . (!empty($_POST['today']) ? 'দেখায়' : 'লুকানো'));
         Session::flash('admin_ok', 'হিরোর সেটিং সংরক্ষিত; লাইভ পেইজ এডিটে হোম পেইজে দেখে নিন।');
         redirect($back);
     }

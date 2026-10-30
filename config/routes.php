@@ -115,6 +115,7 @@ return [
     ['POST', admin_base() . '/admins/invite',       [AdminPanel::class, 'adminsInvite']],
     ['POST', admin_base() . '/admins/status',       [AdminPanel::class, 'adminsStatus']],
     ['POST', admin_base() . '/admins/permissions',  [AdminPanel::class, 'adminsPermissions']],
+    ['POST', admin_base() . '/admins/role',         [AdminPanel::class, 'adminsRole']],
     ['GET',  admin_base() . '/log',                 [AdminPanel::class, 'log']],
     ['GET',  admin_base() . '/workers',             [AdminMembers::class, 'list', ['role' => 'worker']]],
     ['GET',  admin_base() . '/agents',              [AdminMembers::class, 'list', ['role' => 'agent']]],

@@ -40,6 +40,28 @@ use App\Models\AdminPermissions;
                                 <button class="adm-small" type="submit">পাসওয়ার্ডের লিংক পাঠান</button>
                             </form>
                         <?php endif; ?>
+                        <?php if (!$self && AdminAuth::isSuper($admin)): // ভূমিকা বদল: সাব-অ্যাডমিন বাছলে নিচের অনুমতিগুলো কাজে লাগে ?>
+                            <details>
+                                <summary class="adm-small">ভূমিকা বদলান</summary>
+                                <form action="<?= admin_base() ?>/admins/role" method="post" data-confirm="এই অ্যাকাউন্টের ভূমিকা বদলাবেন? পরের ক্লিক থেকেই নতুন ভূমিকা কাজ করবে।">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
+                                    <label for="role-<?= (int) $a['id'] ?>">নতুন ভূমিকা</label>
+                                    <select id="role-<?= (int) $a['id'] ?>" name="role">
+                                        <?php foreach (['admin', 'main', 'super'] as $roleOption): ?>
+                                            <?php if ($roleOption !== 'main' || !$hasMain || $a['role'] === 'main'): ?>
+                                                <option value="<?= $roleOption ?>"<?= $a['role'] === $roleOption ? ' selected' : '' ?>><?= e(AdminAuth::roleLabel($roleOption)) ?></option>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <p class="adm-hint">সাব-অ্যাডমিন বাছলে এই অনুমতিগুলো পাবেন:</p>
+                                    <?php foreach (AdminPermissions::ALL as $key => $label): ?>
+                                        <label class="adm-check"><input type="checkbox" name="permissions[]" value="<?= e($key) ?>"<?= $a['permission_list'] === [] || in_array($key, $a['permission_list'], true) ? ' checked' : '' ?>> <?= e($label) ?></label>
+                                    <?php endforeach; ?>
+                                    <button class="adm-small" type="submit">ভূমিকা বদলান</button>
+                                </form>
+                            </details>
+                        <?php endif; ?>
                         <?php if ($a['role'] === 'admin'): ?>
                             <details>
                                 <summary class="adm-small">অনুমতি</summary>

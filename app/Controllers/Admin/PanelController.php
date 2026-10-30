@@ -192,6 +192,43 @@ final class PanelController
         $this->ok(admin_base() . '/admins', 'অনুমতি বদলানো হয়েছে।');
     }
 
+    /**
+     * অ্যাকাউন্টের ভূমিকা বদল (শুধু সুপার অ্যাডমিন)। নিজের ভূমিকা বদলানো যায় না; শেষ চালু সুপার নামানো যায় না; চালু মেইন অ্যাডমিন একজনই।
+     * সাব-অ্যাডমিন করলে অন্তত একটি অনুমতি লাগে। পরের অনুরোধ থেকেই নতুন ভূমিকা কাজ করে (ভূমিকা সেশনে জমা থাকে না)।
+     */
+    public function adminsRole(): void
+    {
+        $admin = $this->postTop();
+        if (!AdminAuth::isSuper($admin)) {
+            $this->back(admin_base() . '/admins', ['ভূমিকা বদলানো শুধু সুপার অ্যাডমিন পারেন।']);
+        }
+        $target = AdminRepository::findById((int) ($_POST['id'] ?? 0));
+        $role = (string) ($_POST['role'] ?? '');
+        if ($target === null || !in_array($role, ['super', 'main', 'admin'], true)) {
+            $this->back(admin_base() . '/admins', ['অ্যাকাউন্ট বা ভূমিকা পাওয়া যায়নি।']);
+        }
+        if ((int) $target['id'] === (int) $admin['id']) {
+            $this->back(admin_base() . '/admins', ['নিজের ভূমিকা নিজে বদলানো যায় না। অন্য সুপার অ্যাডমিনকে দিয়ে বদলান।']);
+        }
+        if ($target['role'] === 'super' && $role !== 'super' && $target['status'] === 'active' && AdminRepository::activeSuperCount() <= 1) {
+            $this->back(admin_base() . '/admins', ['শেষ চালু সুপার অ্যাডমিনের ভূমিকা বদলানো যাবে না।']);
+        }
+        if ($role === 'main' && $target['role'] !== 'main' && AdminRepository::hasActiveMain()) {
+            $this->back(admin_base() . '/admins', ['মেইন অ্যাডমিন একজনই থাকতে পারেন। আগে চালু জনের ভূমিকা বদলান বা অ্যাকাউন্ট বন্ধ করুন।']);
+        }
+        $fields = ['role' => $role];
+        if ($role === 'admin') {
+            $permissions = AdminPermissions::clean($_POST['permissions'] ?? []);
+            if ($permissions === []) {
+                $this->back(admin_base() . '/admins', ['সাব-অ্যাডমিনের জন্য অন্তত একটি অনুমতি বাছুন।']);
+            }
+            $fields['permissions'] = json_encode($permissions);
+        }
+        AdminRepository::update((int) $target['id'], $fields);
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'admin_role_changed', (string) $target['name'] . ': ' . AdminAuth::roleLabel((string) $target['role']) . ' → ' . AdminAuth::roleLabel($role));
+        $this->ok(admin_base() . '/admins', (string) $target['name'] . ' এখন ' . AdminAuth::roleLabel($role) . '।');
+    }
+
     // ---- কার্যলগ (শুধু সুপার অ্যাডমিন) ---------------------------------------------------------
 
     public function log(): void
