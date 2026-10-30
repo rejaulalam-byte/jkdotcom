@@ -54,6 +54,12 @@ final class MailTemplates
             'vars' => ['{code}' => '৬ সংখ্যার কোড'],
             'required' => ['{code}'],
         ],
+        'member_message' => [
+            'title' => 'সদস্যকে অ্যাডমিনের বার্তা',
+            'when' => 'অ্যাডমিন কোনো কর্মী বা প্রতিনিধির পেইজের "বার্তা পাঠান" বাক্স থেকে লিখে পাঠালে।',
+            'vars' => ['{name}' => 'সদস্যের নাম (মি:/মিস সহ)', '{subject}' => 'অ্যাডমিনের লেখা বিষয়', '{message}' => 'অ্যাডমিনের লেখা বার্তা', '{helpline}' => 'হেল্পলাইন নাম্বার'],
+            'required' => ['{subject}', '{message}'],
+        ],
         'fill_info' => [
             'title' => '"তথ্য পূর্ণ করুন" অনুরোধের ইমেইল',
             'when' => 'অ্যাডমিন "অসম্পূর্ণ তথ্য" পেইজ থেকে কোনো কর্মীকে অনুরোধ পাঠালে।',
@@ -65,7 +71,7 @@ final class MailTemplates
     /** পরীক্ষার ইমেইলে বসানো নমুনা মান। */
     private const SAMPLE = [
         '{name}' => 'মি: নমুনা সদস্য', '{login_id}' => '01712 345 678 অথবা sample@example.com', '{login_url}' => '/login', '{profile_url}' => '/profile',
-        '{public_url}' => '/workers/1', '{helpline}' => '', '{reason}' => 'নমুনা কারণ', '{code}' => '123456', '{missing_list}' => "• ঠিকানা\n• ইমেইল",
+        '{public_url}' => '/workers/1', '{helpline}' => '', '{reason}' => 'নমুনা কারণ', '{code}' => '123456', '{missing_list}' => "• ঠিকানা\n• ইমেইল", '{subject}' => 'নমুনা বিষয়', '{message}' => 'এটি একটি নমুনা বার্তা।',
     ];
 
     public static function exists(string $id): bool

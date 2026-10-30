@@ -143,6 +143,25 @@ $back = admin_base() . '/members/' . (int) $member['id'];
         </div>
     </div>
 </section>
+<?php // সদস্যকে বার্তা: শুধু ইমেইলে (এসএমএস নেই); ইমেইল না থাকলে ফোনের কথা বলে ?>
+<?php $oldMessage = \App\Core\Session::pull('admin_old_message', []); ?>
+<details class="adm-box"<?= $oldMessage !== [] ? ' open' : '' ?>>
+    <summary class="adm-card__title">✉ <?= $isWorker ? 'কর্মীকে' : 'প্রতিনিধিকে' ?> বার্তা পাঠান</summary>
+    <?php if ((string) ($member['email'] ?? '') === ''): ?>
+        <p class="adm-muted">এই সদস্যের ইমেইল নেই, তাই বার্তা পাঠানো যায় না। ফোনে জানান<?= (string) ($member['phone'] ?? '') !== '' ? ' (' . e(format_phone((string) $member['phone'])) . ')' : '' ?>, অথবা "সম্পাদনা করুন" থেকে ইমেইল বসান।</p>
+    <?php else: ?>
+        <form action="<?= admin_base() ?>/members/message" method="post">
+            <?= csrf_field() ?>
+            <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
+            <p class="adm-muted">ইমেইলে যাবে: <?= e((string) $member['email']) ?>। শুরুতে নাম ও শেষে হেল্পলাইন নিজে বসে ("ইমেইলের লেখা" পেইজ থেকে বদলানো যায়)।</p>
+            <label for="mm-subject">বিষয়</label>
+            <input id="mm-subject" type="text" name="subject" maxlength="150" required value="<?= e((string) ($oldMessage['subject'] ?? '')) ?>">
+            <label for="mm-message">বার্তা</label>
+            <textarea id="mm-message" name="message" rows="6" maxlength="3000" required><?= e((string) ($oldMessage['message'] ?? '')) ?></textarea>
+            <button class="adm-small adm-small--go" type="submit">পাঠান</button>
+        </form>
+    <?php endif; ?>
+</details>
 <div class="adm-detail">
     <aside class="adm-detail__photo">
         <p><a class="adm-btn adm-btn--edit" href="<?= admin_base() ?>/member-edit/<?= (int) $member['id'] ?>">✎ সম্পাদনা করুন</a></p>

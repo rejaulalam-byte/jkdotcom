@@ -6,6 +6,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\AdminAuth;
 use App\Core\PhotoUpload;
+use App\Core\RateLimiter;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
@@ -168,6 +169,49 @@ final class MembersController
                 : ((string) ($member['email'] ?? '') === '' ? ' (ইমেইল নেই, তাই ইমেইল যায়নি; ফোনে জানান।)' : ' (ইমেইল পাঠানো যায়নি।)');
         }
         $this->ok($back, $message);
+    }
+
+    /**
+     * POST /admin/members/message: id, subject, message — সদস্যকে অ্যাডমিনের লেখা বার্তা ইমেইলে পাঠায় (এসএমএস নেই)।
+     * ইমেইল না থাকলে পাঠানো যায় না, তখন ফোনে জানাতে হয়। কী পাঠানো হলো তার বিষয় কার্যলগে থাকে।
+     */
+    public function message(): void
+    {
+        $admin = AdminAuth::require('registrations');
+        $member = UserRepository::findById((int) ($_POST['id'] ?? 0));
+        if ($member === null) {
+            $this->fail(admin_base() . '/workers', 'সদস্যকে পাওয়া যায়নি।');
+        }
+        $back = admin_base() . '/members/' . (int) $member['id'];
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            $this->fail($back, 'নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
+        }
+        $email = (string) ($member['email'] ?? '');
+        $subject = clean_input($_POST['subject'] ?? '', 150);
+        $message = clean_input($_POST['message'] ?? '', 3000, true);
+        if ($email === '') {
+            $this->fail($back, 'এই সদস্যের ইমেইল নেই, তাই বার্তা পাঠানো যায় না। ফোনে জানান, অথবা সম্পাদনায় ইমেইল বসান।');
+        }
+        if ($subject === '' || $message === '') {
+            Session::flash('admin_old_message', ['subject' => $subject, 'message' => $message]);
+            $this->fail($back, 'বিষয় ও বার্তা দুটোই লিখুন।');
+        }
+        if (RateLimiter::tooMany('adm_msg_' . $admin['id'], 30, 3600)) {
+            Session::flash('admin_old_message', ['subject' => $subject, 'message' => $message]);
+            $this->fail($back, 'এক ঘণ্টায় অনেক বার্তা পাঠানো হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।');
+        }
+        $mail = MailTemplates::render('member_message', [
+            '{name}' => honorific_name($member['gender'] ?? null, (string) $member['name']),
+            '{subject}' => $subject,
+            '{message}' => $message,
+            '{helpline}' => content('today.post.helpline'),
+        ]);
+        if (!AdminAuth::mail($email, $mail['subject'], $mail['body'])) {
+            Session::flash('admin_old_message', ['subject' => $subject, 'message' => $message]);
+            $this->fail($back, 'ইমেইল পাঠানো যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।');
+        }
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'member_message', (string) $member['name'] . ' — ' . $subject);
+        $this->ok($back, 'বার্তা ' . $email . '-এ পাঠানো হয়েছে।');
     }
 
     /**

@@ -711,6 +711,15 @@ jorurikaj.com',
 আপনি এটি চেয়ে না থাকলে এই ইমেইল উপেক্ষা করুন।
 
 — jorurikaj.com',
+    'mail.member_message.subject' => '{subject} — jorurikaj.com',
+    'mail.member_message.body' => 'প্রিয় {name},
+
+{message}
+
+কোনো প্রশ্ন থাকলে হেল্পলাইনে ফোন করুন: {helpline}
+
+— jorurikaj.com',
+
     'mail.fill_info.subject' => 'আপনার তথ্য পূর্ণ করুন — jorurikaj.com',
     'mail.fill_info.body' => 'প্রিয় {name},
 
