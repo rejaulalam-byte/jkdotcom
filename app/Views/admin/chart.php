@@ -1,7 +1,7 @@
 <?php
 /**
  * ড্যাশবোর্ডের একটা বার গ্রাফ (SVG, সার্ভারেই আঁকা; স্টাইল admin.css-এ, তাই CSP আটকায় না)। মাউস রাখলে সংখ্যা দেখায় (<title>)।
- * ছোট গ্রাফে বারের নিচে আড়াআড়ি নাম ও ওপরে সংখ্যা; চওড়া গ্রাফে সেবার নাম খাড়া (শুরু নিচে, শেষ ওপরে), সংখ্যা নিচের টেবিলে।
+ * ছোট গ্রাফে বারের নিচে আড়াআড়ি নাম ও ওপরে সংখ্যা; চওড়া গ্রাফে সেবার নাম নিচে ও সংখ্যা বারের ওপরে খাড়া (শুরু নিচে, শেষ ওপরে); সংখ্যা নিচের টেবিলেও।
  *
  * @var array{title:string,sub:string,wide:bool,groups:list<array{label:string,items:list<array{kind:string,n:int}>}>,empty:?string} $chart
  */
@@ -17,7 +17,7 @@ $width = $wide ? 720 : 380;
 // একটা দলের পুরো জায়গা: চওড়া গ্রাফে সেবা কম থাকলে ছড়িয়ে বসে, বেশি হলে গ্রাফ চওড়া হয়
 $band = $wide ? max(32, min(90, ($width - $left) / max(1, count($groups)))) : 150;
 $width = max($width, (int) ceil($left + count($groups) * $band + 8));
-$top = 26;
+$top = $wide ? 52 : 26;   // চওড়া গ্রাফে বারের ওপরে খাড়া সংখ্যার জায়গা
 $plot = 170;                 // বারের উচ্চতার সীমা
 $below = $wide ? 190 : 34;   // নিচের নামের জায়গা
 $height = $top + $plot + $below;
@@ -80,6 +80,8 @@ $y = static fn (int $n): float => $base - $plot * $n / $yMax;
                         <?php endif; ?>
                         <?php if (!$wide): ?>
                             <text class="adm-chart__value" x="<?= $x + $bar / 2 ?>" y="<?= $by - 8 ?>" text-anchor="middle"><?= e(bn($item['n'])) ?></text>
+                        <?php else: // চওড়া গ্রাফে সংখ্যা বারের ওপরে খাড়া (নিচ থেকে ওপরে পড়া), নামের মতো ?>
+                            <text class="adm-chart__value" x="<?= $x + $bar / 2 + 4 ?>" y="<?= $by - 6 ?>" text-anchor="start" transform="rotate(-90 <?= $x + $bar / 2 + 4 ?> <?= $by - 6 ?>)"><?= e(bn($item['n'])) ?></text>
                         <?php endif; ?>
                         <?php // মাউসের জায়গা বারের চেয়ে বড়, যাতে ছোট বারেও সংখ্যা দেখা যায় ?>
                         <rect class="adm-chart__hit" x="<?= $x - 1 ?>" y="<?= $top ?>" width="<?= $bar + $gap ?>" height="<?= $plot ?>"><title><?= e($group['label'] . ': ' . bn($item['n']) . ' ' . ($kinds[$item['kind']] ?? '')) ?></title></rect>
