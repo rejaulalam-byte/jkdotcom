@@ -16,19 +16,24 @@ $faqKeys = [1, 2, 3, 4, 5];
 
 <?php ob_start(); ?>
 <!-- 1. HERO ---------------------------------------------------------- -->
-<?php $heroToday = \App\Models\SiteHero::showToday(); ?>
-<section class="hero" aria-labelledby="hero-title" data-anim="<?= e(\App\Models\SiteHero::anim()) ?>">
+<?php
+$heroToday = \App\Models\SiteHero::showToday();
+// অ্যানিমেশন বন্ধ থাকলে data-fly থাকে না, লেখা সাধারণ স্থির দেখায় (app.js শুধু data-fly ভাঙে)
+$heroAnimating = \App\Models\SiteHero::animating();
+$fly = $heroAnimating ? ' data-fly' : '';
+?>
+<section class="hero<?= $heroAnimating ? '' : ' hero--static' ?>" aria-labelledby="hero-title" data-anim="<?= $heroAnimating ? e(\App\Models\SiteHero::anim()) : 'none' ?>">
     <div class="container hero__inner<?= $heroToday ? '' : ' hero__inner--solo' ?>">
         <div class="hero__copy">
             <p <?= pill_attrs('home.hero') ?>>
                 <?= section_icon('home.hero', 50, 32) ?>
-                <span data-fly><?= t('home.hero.badge') ?></span>
+                <span<?= $fly ?>><?= t('home.hero.badge') ?></span>
             </p>
             <h1 id="hero-title" class="hero__title">
-                <span class="hero__title-1" data-fly><?= t('home.hero.title_1') ?></span>
-                <span class="hero__title-2" data-fly><?= t('home.hero.title_2') ?></span>
+                <span class="hero__title-1"<?= $fly ?>><?= t('home.hero.title_1') ?></span>
+                <span class="hero__title-2"<?= $fly ?>><?= t('home.hero.title_2') ?></span>
             </h1>
-            <p class="hero__text" data-fly><?= t('home.hero.text') ?></p>
+            <p class="hero__text"<?= $fly ?>><?= t('home.hero.text') ?></p>
             <a class="btn btn--light" href="/services"><?= t('home.hero.button') ?></a>
         </div>
 

@@ -1714,3 +1714,9 @@ input.adm-short {
     border: 1px solid var(--line);
     border-radius: 6px;
 }
+
+.adm-hero-sub {
+    margin: 1rem 0 0.3rem;
+    color: var(--teal);
+    font-size: 19px;
+}

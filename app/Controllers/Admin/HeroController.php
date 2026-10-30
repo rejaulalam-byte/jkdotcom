@@ -26,9 +26,10 @@ final class HeroController
         View::render('admin/hero', [
             'admin' => $admin,
             'title' => 'হিরো সেটিং',
+            'animOn' => SiteHero::animating(),
             'anim' => SiteHero::anim(),
-            'mode' => SiteHero::mode(),
-            'bgSaved' => Content::get('hero.bg', 'default'),
+            'colorSource' => SiteHero::colorSource(),
+            'imageOn' => SiteHero::imageOn(),
             'color1' => SiteHero::color1() !== '' ? SiteHero::color1() : '#125a6c',
             'color2' => SiteHero::color2(),
             'direction' => SiteHero::direction(),
@@ -40,7 +41,7 @@ final class HeroController
         ], 'layouts/admin');
     }
 
-    /** POST: anim, bg (default|color|image), color1, color2 (ঐচ্ছিক), dir, image (নতুন ছবি), remove_image, overlay, today (1/0)। */
+    /** POST: anim_on (1/0), anim, bg (default|color), color1, color2 (ঐচ্ছিক), dir, image_on (1/0), image (নতুন ছবি), remove_image, overlay, today (1/0)। */
     public function save(): void
     {
         $admin = $this->super();
@@ -53,7 +54,7 @@ final class HeroController
         $bg = (string) ($_POST['bg'] ?? 'default');
         $dir = (string) ($_POST['dir'] ?? 'down');
         $overlay = (int) ($_POST['overlay'] ?? 30);
-        if (!isset(SiteHero::ANIMS[$anim]) || !in_array($bg, ['default', 'color', 'image'], true)
+        if (!isset(SiteHero::ANIMS[$anim]) || !in_array($bg, ['default', 'color'], true)
             || !isset(SiteHero::DIRECTIONS[$dir]) || !in_array($overlay, SiteHero::OVERLAYS, true)) {
             $this->fail($back, 'অনুমোদিত তালিকার বাইরের মান পাঠানো হয়েছে; পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।');
         }
@@ -76,16 +77,19 @@ final class HeroController
         } elseif (!empty($_POST['remove_image'])) {
             $newImage = '';
         }
-        if ($bg === 'image' && $newImage === '') {
-            $this->fail($back, 'পটভূমিতে ছবি রাখতে হলে আগে একটা ছবি বাছুন।');
+        $imageOn = !empty($_POST['image_on']);
+        if ($imageOn && $newImage === '') {
+            $this->fail($back, 'ছবি চালু করতে হলে আগে একটা ছবি বাছুন।');
         }
 
-        $ok = Content::set('hero.anim', $anim)
+        $ok = Content::set('hero.anim_on', !empty($_POST['anim_on']) ? '1' : '0')
+            && Content::set('hero.anim', $anim)
             && Content::set('hero.bg', $bg)
             && Content::set('hero.color1', $color1)
             && Content::set('hero.color2', $color2)
             && Content::set('hero.dir', $dir)
             && Content::set('hero.image', $newImage)
+            && Content::set('hero.image_on', $imageOn ? '1' : '0')
             && Content::set('hero.overlay', (string) $overlay)
             && Content::set('hero.today_show', !empty($_POST['today']) ? '1' : '0');
         if (!$ok) {
@@ -96,7 +100,7 @@ final class HeroController
         }
 
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'hero_save',
-            'অ্যানিমেশন: ' . $anim . ' — পটভূমি: ' . $bg . ' — আজকের কাজের তালিকা: ' . (!empty($_POST['today']) ? 'দেখায়' : 'লুকানো'));
+            'অ্যানিমেশন: ' . (!empty($_POST['anim_on']) ? $anim : 'বন্ধ') . ' — রং: ' . $bg . ' — ছবি: ' . ($imageOn ? 'চালু' : 'বন্ধ') . ' — আজকের কাজের তালিকা: ' . (!empty($_POST['today']) ? 'দেখায়' : 'লুকানো'));
         Session::flash('admin_ok', 'হিরোর সেটিং সংরক্ষিত; লাইভ পেইজ এডিটে হোম পেইজে দেখে নিন।');
         redirect($back);
     }

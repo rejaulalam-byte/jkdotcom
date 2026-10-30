@@ -602,6 +602,11 @@ textarea {
     gap: 4rem;
     align-items: start;
 }
+/* অ্যানিমেশন বন্ধ: বাটন ও ডানের তালিকাও স্থির */
+.hero.hero--static .btn,
+.hero.hero--static .today {
+    animation: none;
+}
 /* ডানের তালিকা লুকানো হলে হিরোর লেখা পুরো প্রস্থ নেয় */
 .hero__inner--solo {
     grid-template-columns: minmax(0, 1fr);

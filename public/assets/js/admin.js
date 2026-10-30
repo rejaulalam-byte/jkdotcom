@@ -419,7 +419,7 @@
     });
     box.querySelector(".adm-hero-image").addEventListener("change", function (e) {
         if (e.target.type === "file") {
-            box.querySelector('input[name="bg"][value="image"]').checked = true;
+            box.querySelector('input[name="image_on"]').checked = true;
         }
     });
     paint();

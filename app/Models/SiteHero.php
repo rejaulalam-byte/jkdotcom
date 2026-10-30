@@ -8,8 +8,9 @@ use App\Core\Content;
 
 /**
  * হোমের হিরো (একদম ওপরের বড় অংশ) সাজানো — শুধু সুপার অ্যাডমিন (<admin>/hero):
- *   ১) লেখার অ্যানিমেশনের ধরন (তিনটির একটা);
- *   ২) পটভূমি: সাধারণ (থিমের প্রধান রং) / নিজের বাছা রং (একটা বা দুটো রঙের গ্র্যাডিয়েন্ট) / একটা ছবি;
+ *   ১) লেখার অ্যানিমেশন চালু/বন্ধ (বন্ধ = সাধারণ স্থির লেখা) এবং চালু থাকলে তিন ধরনের একটা;
+ *   ২) পটভূমি: রং = সাধারণ (থিমের প্রধান রং) বা নিজের বাছা রং (একটা বা দুটো রঙের গ্র্যাডিয়েন্ট); তার ওপর আলাদা "ছবি চালু":
+ *      ছবি চালু থাকলে রঙের জায়গায় ছবি বসে, বন্ধ করলে রং ফিরে আসে (দুটোই সংরক্ষিত থাকে);
  *   ৩) ডানের "আজকের কাজের তালিকা" দেখানো না লুকানো।
  * সেটিং content_blocks-এর "hero.*" কী; পটভূমির CSS /site-theme-এর সঙ্গে যায় (SiteTheme::stylesheet()),
  * কারণ ইনলাইন style CSP আটকায়।
@@ -38,7 +39,13 @@ final class SiteHero
         . 'ফরমেট JPG, PNG বা WebP। ওজন সর্বোচ্চ ২ MB; সাইট দ্রুত খুলতে ৫০০ KB-এর নিচে রাখা ভালো (JPG/WebP ছোট হয়)। '
         . 'লেখা আর ডানের তালিকা ছবির ওপরে বসে, তাই বেশি ব্যস্ত ছবি না নিয়ে শান্ত ছবি নিন।';
 
-    /** @return 'scatter'|'right'|'left' */
+    /** অ্যানিমেশন চালু কি (শুরুতে চালু)? */
+    public static function animating(): bool
+    {
+        return Content::get('hero.anim_on', '1') !== '0';
+    }
+
+    /** @return 'scatter'|'right'|'left' চালু থাকলে কোন ধরন। */
     public static function anim(): string
     {
         $v = Content::get('hero.anim', 'scatter');
@@ -46,15 +53,22 @@ final class SiteHero
         return isset(self::ANIMS[$v]) ? $v : 'scatter';
     }
 
-    /** @return 'default'|'color'|'image' */
+    /** রঙের উৎস: 'default' (থিমের প্রধান রং) বা 'color' (নিজের রং; কোড ঠিক থাকলে)। */
+    public static function colorSource(): string
+    {
+        return Content::get('hero.bg', 'default') === 'color' && self::color1() !== '' ? 'color' : 'default';
+    }
+
+    /** ছবি কি চালু (ছবি আছে ও চালু বাছা)? */
+    public static function imageOn(): bool
+    {
+        return self::image() !== '' && Content::get('hero.image_on', '0') === '1';
+    }
+
+    /** আসলে যা দেখানো হচ্ছে: ছবি চালু থাকলে ছবি, নইলে রং ('color' বা 'default')। @return 'default'|'color'|'image' */
     public static function mode(): string
     {
-        $mode = Content::get('hero.bg', 'default');
-        if ($mode === 'color' && self::color1() !== '') {
-            return 'color';
-        }
-
-        return $mode === 'image' && self::image() !== '' ? 'image' : 'default';
+        return self::imageOn() ? 'image' : self::colorSource();
     }
 
     public static function color1(): string
