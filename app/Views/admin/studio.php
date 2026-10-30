@@ -73,7 +73,7 @@ $fields = static function (array $list) use ($base): string {
         <?php if ($open !== null): ?>
             <p class="adm-live__note">পেইজের মূল লেখার (বড় লেখা) যেকোনো জায়গায় ক্লিক করলে পূর্ণ এডিটর খুলবে।</p>
         <?php endif; ?>
-        <iframe class="adm-live__frame" src="<?= e($frame) ?>" title="<?= e((string) $page['title']) ?> — সাইটে যেমন দেখায়" sandbox="allow-same-origin allow-scripts"></iframe>
+        <iframe class="adm-live__frame" src="<?= e($frame) ?>" title="<?= e((string) $page['title']) ?> — সাইটে যেমন দেখায়" sandbox="allow-same-origin allow-scripts allow-modals"></iframe>
     </section>
     <?php if (\App\Core\AdminAuth::isSuper($admin)): ?>
         <?php require __DIR__ . '/studio-menu.php'; ?>
