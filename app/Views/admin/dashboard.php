@@ -1,10 +1,11 @@
 <?php
 /**
- * ড্যাশবোর্ড: মাঝখানে সাজানো স্বাগতম-ব্যানার; নিচে বাঁয়ে খালি জায়গা (পরে দুটি গ্রাফ), ডানে সংখ্যার কার্ড (কাজ অনুযায়ী ভাগ-করা)।
+ * ড্যাশবোর্ড: মাঝখানে সাজানো স্বাগতম-ব্যানার; নিচে বাঁয়ে তিনটি বার গ্রাফ (পাশাপাশি দুটি, নিচে চওড়া একটি), ডানে সংখ্যার কার্ড (কাজ অনুযায়ী ভাগ-করা)।
  *
  * @var array<string,mixed> $admin
  * @var array<string,array<string,int>> $counts  ['worker' => ['pending' => n, ...], 'agent' => [...]]
  * @var array<string,int> $stats                 AdminStats::overview()
+ * @var array<string,mixed> $charts               AdminStats::charts()
  */
 use App\Core\AdminAuth;
 
@@ -51,6 +52,38 @@ $cards = [
         ['নিউজলেটারের গ্রাহক', (int) $stats['subscribers'], false],
     ]],
 ];
+// গ্রাফের তারিখ বাংলায়: "২৯ অক্টোবর"
+$dayLabel = static fn (string $date): string => bn((int) date('j', strtotime($date))) . ' ' . $months[(int) date('n', strtotime($date)) - 1];
+$twoBars = static fn (int $visits, int $clicks): array => [
+    ['label' => 'সেবায় ভিজিট', 'items' => [['kind' => 'visits', 'n' => $visits]]],
+    ['label' => 'ফোন বা ইমেইলে ক্লিক', 'items' => [['kind' => 'clicks', 'n' => $clicks]]],
+];
+$chartList = [
+    [
+        'title' => 'গতকাল',
+        'sub' => $dayLabel($charts['yesterday']['date']),
+        'wide' => false,
+        'groups' => $twoBars($charts['yesterday']['visits'], $charts['yesterday']['clicks']),
+        'empty' => null,
+    ],
+    [
+        'title' => 'গত মাস',
+        'sub' => $months[(int) date('n', strtotime($charts['month']['first'])) - 1] . ' ' . bn((int) date('Y', strtotime($charts['month']['first']))),
+        'wide' => false,
+        'groups' => $twoBars($charts['month']['visits'], $charts['month']['clicks']),
+        'empty' => null,
+    ],
+    [
+        'title' => 'গত ৭ দিনে কোন সেবায় খোঁজ ও ফোন',
+        'sub' => $dayLabel($charts['week']['from']) . ' থেকে ' . $dayLabel($charts['week']['to']) . ($charts['week']['more'] > 0 ? ' · সবচেয়ে বেশিগুলো; আরও ' . bn($charts['week']['more']) . 'টি সেবা আছে' : ''),
+        'wide' => true,
+        'groups' => array_map(static fn (array $r): array => [
+            'label' => $r['name'],
+            'items' => [['kind' => 'visits', 'n' => $r['visits']], ['kind' => 'clicks', 'n' => $r['clicks']]],
+        ], $charts['week']['rows']),
+        'empty' => 'গত ৭ দিনে এখনও কোনো সেবায় ভিজিট বা ক্লিক নেই।',
+    ],
+];
 ?>
 <section class="adm-hero">
     <p class="adm-hero__greet"><?= e($greeting) ?></p>
@@ -61,8 +94,11 @@ $cards = [
 
 <div class="adm-dash">
     <div class="adm-dash__main">
-        <?php // এই জায়গায় পরে দুটি গ্রাফ বসবে (বিষয় ঠিক হলে) ?>
-        <div class="adm-reserved" aria-hidden="true">এই জায়গায় দুটি গ্রাফ আসবে</div>
+        <div class="adm-charts">
+            <?php foreach ($chartList as $chart): ?>
+                <?php require __DIR__ . '/chart.php'; ?>
+            <?php endforeach; ?>
+        </div>
     </div>
     <aside class="adm-dash__side" aria-label="সংখ্যার সারাংশ">
         <?php // নতুন আবেদনের খবর: ডানের কার্ডগুলোর ওপরে আলাদা বাক্সে, যাতে চোখে পড়ে ?>

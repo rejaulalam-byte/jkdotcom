@@ -402,13 +402,106 @@ ul.adm-notice {
     gap: 24px;
     align-items: start;
 }
-.adm-reserved {
+/* ড্যাশবোর্ডের বার গ্রাফ (admin/chart.php): পাশাপাশি দুটি, তৃতীয়টি নিচে পুরো চওড়া */
+.adm-charts {
     display: grid;
-    min-height: 260px;
-    place-items: center;
-    border: 2px dashed var(--line);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+.adm-chart {
+    min-width: 0;
+    margin: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
     border-radius: 14px;
+    background: #fff;
+}
+.adm-chart--wide {
+    grid-column: 1 / -1;
+}
+.adm-chart h3 {
+    margin: 0;
+    color: var(--teal);
+    font-size: 19px;
+}
+.adm-chart figcaption p {
+    margin: 0 0 6px;
     color: var(--muted);
+    font-size: 16px;
+}
+.adm-chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.adm-chart__grid {
+    stroke: #e4e8ea;
+    stroke-width: 1;
+}
+.adm-chart__grid--base {
+    stroke: #8fa5ab;
+}
+.adm-chart__axis {
+    fill: var(--muted);
+    font-size: 14px;
+}
+.adm-chart__value {
+    fill: var(--ink);
+    font-size: 17px;
+    font-weight: 600;
+}
+.adm-chart__label {
+    fill: var(--ink);
+    font-size: 15px;
+}
+.adm-chart__bar--visits,
+.adm-chart__key--visits {
+    fill: #007c99;
+    background: #007c99;
+}
+.adm-chart__bar--clicks,
+.adm-chart__key--clicks {
+    fill: #c96a00;
+    background: #c96a00;
+}
+.adm-chart__hit {
+    fill: transparent;
+}
+.adm-chart__hit:hover {
+    fill: rgba(18, 90, 108, 0.08);
+}
+.adm-chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin: 0 0 6px;
+    padding: 0;
+    list-style: none;
+    font-size: 16px;
+}
+.adm-chart__legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.adm-chart__key {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+}
+.adm-chart__empty {
+    margin: 0;
+    padding: 40px 10px;
+    color: var(--muted);
+    text-align: center;
+}
+.adm-chart__table {
+    margin-top: 8px;
+    font-size: 16px;
+}
+.adm-chart__table summary {
+    color: var(--teal);
+    cursor: pointer;
 }
 .adm-dash__side {
     display: flex;
@@ -470,8 +563,8 @@ ul.adm-notice {
     .adm-dash {
         grid-template-columns: 1fr;
     }
-    .adm-reserved {
-        display: none;
+    .adm-charts {
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 

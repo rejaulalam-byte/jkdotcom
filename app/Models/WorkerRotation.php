@@ -120,6 +120,72 @@ final class WorkerRotation
         }
     }
 
+    /** সেবার পেইজ দেখা হলো। একই দর্শকের একই সেবায় একদিনের একাধিকবার ও সার্চ-বট বাদ। */
+    public static function recordServiceVisit(string $slug): void
+    {
+        if (preg_match('/bot|crawl|spider|slurp|facebookexternalhit|preview/i', (string) ($_SERVER['HTTP_USER_AGENT'] ?? '')) === 1) {
+            return;
+        }
+        $key = $slug . '|' . date('Y-m-d');
+        if (!empty($_SESSION['service_visit_done'][$key])) {
+            return;
+        }
+        $_SESSION['service_visit_done'][$key] = true;
+
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            self::demoWrite(static function (array $d) use ($key): array {
+                $d['service_visits'][$key] = (int) ($d['service_visits'][$key] ?? 0) + 1;
+
+                return $d;
+            });
+
+            return;
+        }
+
+        try {
+            $pdo->prepare(
+                'INSERT INTO service_visits (service_slug, visit_date, visits) VALUES (:s, :d, 1)
+                 ON DUPLICATE KEY UPDATE visits = visits + 1'
+            )->execute([':s' => $slug, ':d' => date('Y-m-d')]);
+        } catch (Throwable $e) {
+            Logger::error('WorkerRotation::recordServiceVisit failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * দুই তারিখের মধ্যে (দুটোসহ) সেবা অনুযায়ী ভিজিট।
+     *
+     * @return array<string,int> সেবার slug => ভিজিট
+     */
+    public static function serviceVisitsBetween(string $from, string $to): array
+    {
+        $out = [];
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            foreach ((array) (self::demoRead()['service_visits'] ?? []) as $key => $n) {
+                [$slug, $day] = explode('|', (string) $key) + [1 => ''];
+                if ($day >= $from && $day <= $to) {
+                    $out[$slug] = ($out[$slug] ?? 0) + (int) $n;
+                }
+            }
+
+            return $out;
+        }
+
+        try {
+            $stmt = $pdo->prepare('SELECT service_slug, SUM(visits) AS n FROM service_visits WHERE visit_date BETWEEN :a AND :b GROUP BY service_slug');
+            $stmt->execute([':a' => $from, ':b' => $to]);
+            foreach ($stmt->fetchAll() as $row) {
+                $out[(string) $row['service_slug']] = (int) $row['n'];
+            }
+        } catch (Throwable $e) {
+            Logger::error('WorkerRotation::serviceVisitsBetween failed: ' . $e->getMessage());
+        }
+
+        return $out;
+    }
+
     /**
      * এই পেশার তালিকায় কর্মীর সর্বশেষ কল-এর সময় (কর্মীর id => Unix সময়)। কখনও কল না পেলে নেই।
      *

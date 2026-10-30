@@ -43,6 +43,11 @@ final class ServiceController
             return;
         }
 
+        // ড্যাশবোর্ডের গ্রাফের জন্য গোনা; অ্যাডমিনের লাইভ পেইজ এডিটের ফ্রেম বাদ
+        if (!live_preview()) {
+            WorkerRotation::recordServiceVisit($service['slug']);
+        }
+
         $query = mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 100);
         $perPage = WorkerDirectory::perPage($_GET['n'] ?? null);
 

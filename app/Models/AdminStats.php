@@ -28,6 +28,56 @@ final class AdminStats
         ];
     }
 
+    /** তৃতীয় গ্রাফে সর্বোচ্চ কতটি সেবা। */
+    private const WEEK_SERVICES = 20;
+
+    /**
+     * ড্যাশবোর্ডের তিন গ্রাফের তথ্য: গতকাল, গত মাস (ক্যালেন্ডারের আগের মাস) ও গত ৭ দিন (গতকাল পর্যন্ত) সেবা অনুযায়ী।
+     *
+     * @return array{yesterday:array{date:string,visits:int,clicks:int},month:array{first:string,visits:int,clicks:int},
+     *               week:array{from:string,to:string,rows:list<array{name:string,visits:int,clicks:int}>,more:int}}
+     */
+    public static function charts(): array
+    {
+        $yesterday = date('Y-m-d', strtotime('-1 day'));
+        $monthFirst = date('Y-m-01', strtotime('first day of last month'));
+        $monthLast = date('Y-m-t', strtotime('first day of last month'));
+        $weekFrom = date('Y-m-d', strtotime('-7 days'));
+
+        $names = [];
+        foreach (ServiceRepository::all() as $service) {
+            $names[$service['slug']] = $service['name'];
+        }
+        $weekVisits = WorkerRotation::serviceVisitsBetween($weekFrom, $yesterday);
+        $weekClicks = ContactTrackingRepository::clicksBetween($weekFrom, $yesterday)['by_slug'];
+        $rows = [];
+        foreach (array_unique(array_merge(array_keys($weekVisits), array_keys($weekClicks))) as $slug) {
+            if (isset($names[$slug])) {
+                $rows[] = ['name' => $names[$slug], 'visits' => (int) ($weekVisits[$slug] ?? 0), 'clicks' => (int) ($weekClicks[$slug] ?? 0)];
+            }
+        }
+        usort($rows, static fn (array $a, array $b): int => ($b['visits'] + $b['clicks']) <=> ($a['visits'] + $a['clicks']));
+
+        return [
+            'yesterday' => [
+                'date' => $yesterday,
+                'visits' => array_sum(WorkerRotation::serviceVisitsBetween($yesterday, $yesterday)),
+                'clicks' => ContactTrackingRepository::clicksBetween($yesterday, $yesterday)['total'],
+            ],
+            'month' => [
+                'first' => $monthFirst,
+                'visits' => array_sum(WorkerRotation::serviceVisitsBetween($monthFirst, $monthLast)),
+                'clicks' => ContactTrackingRepository::clicksBetween($monthFirst, $monthLast)['total'],
+            ],
+            'week' => [
+                'from' => $weekFrom,
+                'to' => $yesterday,
+                'rows' => array_slice($rows, 0, self::WEEK_SERVICES),
+                'more' => max(0, count($rows) - self::WEEK_SERVICES),
+            ],
+        ];
+    }
+
     /** একটা COUNT/SUM প্রশ্ন চালিয়ে পূর্ণসংখ্যা দেয়; ব্যর্থ হলে ০। */
     private static function count(string $sql): int
     {

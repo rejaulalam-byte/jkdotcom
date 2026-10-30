@@ -38,6 +38,61 @@ final class ContactTrackingRepository
         }
     }
 
+    /**
+     * দুই তারিখের মধ্যে (দুটোসহ) ফোন/ইমেইলে ক্লিক: মোট, আর সেবা অনুযায়ী। কর্মীর ক্লিক তাঁর প্রধান পেশায়; কাজের বিজ্ঞপ্তির ক্লিক
+     * বিজ্ঞপ্তির "কাজের ধরন" কোনো সেবার নামের সঙ্গে মিললে সেই সেবায়; নিজের লেখা পেশা বা ধরন মোটে গোনা হয়, সেবায় নয়।
+     *
+     * @return array{total:int,by_slug:array<string,int>}
+     */
+    public static function clicksBetween(string $from, string $to): array
+    {
+        $out = ['total' => 0, 'by_slug' => []];
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $file = BASE_PATH . self::DEMO_FILE;
+            $data = is_file($file) ? json_decode((string) file_get_contents($file), true) : [];
+            foreach ((array) ($data['clicks'] ?? []) as $c) {
+                $day = substr((string) ($c['at'] ?? ''), 0, 10);
+                if ($day < $from || $day > $to) {
+                    continue;
+                }
+                $out['total']++;
+                if (($c['type'] ?? '') === 'worker') {
+                    $slug = (string) (UserRepository::findById((int) $c['target_id'])['service_slug'] ?? '');
+                    if ($slug !== '') {
+                        $out['by_slug'][$slug] = ($out['by_slug'][$slug] ?? 0) + 1;
+                    }
+                }
+            }
+
+            return $out;
+        }
+
+        $args = [':a' => $from . ' 00:00:00', ':b' => date('Y-m-d', strtotime($to . ' +1 day')) . ' 00:00:00'];
+        try {
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM contact_clicks WHERE clicked_at >= :a AND clicked_at < :b');
+            $stmt->execute($args);
+            $out['total'] = (int) $stmt->fetchColumn();
+            $stmt = $pdo->prepare(
+                "SELECT slug, COUNT(*) AS n FROM (
+                    SELECT u.service_slug AS slug FROM contact_clicks c JOIN users u ON u.id = c.target_id
+                     WHERE c.target_type = 'worker' AND c.clicked_at >= :a AND c.clicked_at < :b AND u.service_slug IS NOT NULL
+                    UNION ALL
+                    SELECT s.slug FROM contact_clicks c JOIN job_posts j ON j.id = c.target_id JOIN services s ON s.name = j.title
+                     WHERE c.target_type = 'job' AND c.clicked_at >= :a2 AND c.clicked_at < :b2
+                 ) x GROUP BY slug"
+            );
+            $stmt->execute($args + [':a2' => $args[':a'], ':b2' => $args[':b']]);
+            foreach ($stmt->fetchAll() as $row) {
+                $out['by_slug'][(string) $row['slug']] = (int) $row['n'];
+            }
+        } catch (Throwable $e) {
+            Logger::error('ContactTrackingRepository::clicksBetween failed: ' . $e->getMessage());
+        }
+
+        return $out;
+    }
+
     /** একজন দর্শক "আমি আগ্রহী" বলে নিজের নাম ও মোবাইল নাম্বার দিয়েছেন। */
     public static function lead(string $type, int $targetId, string $kind, string $name, string $phone): bool
     {
