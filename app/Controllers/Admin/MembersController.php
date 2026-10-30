@@ -176,7 +176,7 @@ final class MembersController
      *
      * @param array<string,mixed> $member
      */
-    private function sendApprovalMail(array $member): bool
+    public function sendApprovalMail(array $member): bool
     {
         $email = (string) ($member['email'] ?? '');
         if ($email === '') {

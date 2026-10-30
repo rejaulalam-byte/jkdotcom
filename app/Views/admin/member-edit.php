@@ -1,7 +1,7 @@
 <?php
 /**
- * কর্মী বা প্রতিনিধির তথ্য সম্পাদনা (অ্যাডমিন)। সব ঘর এখনকার মানে ভরা। খালি মোবাইল/ইমেইল রাখা যায় (পুরনো কর্মীদের জন্য)।
- * বিভাগ → জেলা → উপজেলা একটা অন্যটাকে ছাঁকে (admin.js [data-geo])।
+ * কর্মী বা প্রতিনিধির তথ্য সম্পাদনা (অ্যাডমিন), অথবা নতুন কর্মী যোগ (id = 0, সব ঘর খালি; তখন মোবাইল আবশ্যক ও "লগইন" অংশ দেখায়)।
+ * সম্পাদনায় খালি মোবাইল/ইমেইল রাখা যায় (পুরনো কর্মীদের জন্য)। বিভাগ → জেলা → উপজেলা একটা অন্যটাকে ছাঁকে (admin.js [data-geo])।
  *
  * @var array<string,mixed> $member    এখনকার সারি
  * @var array<string,mixed> $v         ফর্মের মান (ভুলের পর লেখা মান, নইলে সংরক্ষিত)
@@ -18,10 +18,12 @@ $extra = array_values((array) ($v['extra_services'] ?? []));
 $workIds = array_values((array) ($v['work_district_ids'] ?? []));
 $list = $isWorker ? admin_base() . '/workers' : admin_base() . '/agents';
 $gender = (string) ($v['gender'] ?? '');
+$isNew = (int) $member['id'] === 0;
+$cancelUrl = $isNew ? $list : admin_base() . '/members/' . (int) $member['id'];
 ?>
-<p><a class="adm-link" href="<?= admin_base() ?>/members/<?= (int) $member['id'] ?>">← বিস্তারিত পেইজে ফিরুন (কিছু না বদলে)</a></p>
+<p><a class="adm-link" href="<?= e($cancelUrl) ?>"><?= $isNew ? '← কর্মীর তালিকায় ফিরুন (যোগ না করে)' : '← বিস্তারিত পেইজে ফিরুন (কিছু না বদলে)' ?></a></p>
 
-<form class="adm-editform" action="<?= admin_base() ?>/member-edit" method="post" enctype="multipart/form-data" novalidate>
+<form class="adm-editform" action="<?= admin_base() ?>/<?= $isNew ? 'member-add' : 'member-edit' ?>" method="post" enctype="multipart/form-data" novalidate>
     <?= csrf_field() ?>
     <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
 
@@ -39,9 +41,9 @@ $gender = (string) ($v['gender'] ?? '');
                 <option value="other"<?= $selected($gender, 'other') ?>>অন্যান্য</option>
             </select>
 
-            <label for="ed-phone">মোবাইল (১১ সংখ্যা)</label>
+            <label for="ed-phone">মোবাইল (১১ সংখ্যা)<?= $isNew ? ' <span class="adm-red">*</span>' : '' ?></label>
             <div>
-                <input id="ed-phone" type="text" name="phone" inputmode="numeric" maxlength="14" value="<?= $val('phone') ?>" placeholder="01XXXXXXXXX (না থাকলে ফাঁকা)">
+                <input id="ed-phone" type="text" name="phone" inputmode="numeric" maxlength="14" value="<?= $val('phone') ?>" placeholder="01XXXXXXXXX<?= $isNew ? '' : ' (না থাকলে ফাঁকা)' ?>">
                 <?php if ((string) ($member['phone_raw'] ?? '') !== ''): ?>
                     <p class="adm-hint">পুরনো ডাটায় লেখা ছিল: <strong><?= e((string) $member['phone_raw']) ?></strong> (মোবাইল বসালে এই লেখা মুছে যাবে)</p>
                 <?php endif; ?>
@@ -49,6 +51,14 @@ $gender = (string) ($v['gender'] ?? '');
 
             <label for="ed-email">ইমেইল</label>
             <input id="ed-email" type="email" name="email" value="<?= $val('email') ?>" maxlength="150" autocapitalize="none" placeholder="না থাকলে ফাঁকা">
+
+            <?php if ($isNew): ?>
+                <label for="ed-pass">প্রাথমিক পাসওয়ার্ড</label>
+                <div>
+                    <input id="ed-pass" type="text" name="password" maxlength="72" autocomplete="new-password" spellcheck="false" placeholder="কমপক্ষে ৮ অক্ষর">
+                    <p class="adm-hint">ইমেইল দিলে এটা ফাঁকা রাখুন: কর্মী লগইন পেইজের "পাসওয়ার্ড মনে নেই" দিয়ে নিজে পাসওয়ার্ড বসাবেন। ইমেইল না থাকলে একটা পাসওয়ার্ড লিখে ফোনে জানান; প্রথম লগইনে তাঁকে বদলাতে হবে। সংরক্ষণের পরে এটা আর কোথাও দেখা যায় না।</p>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
 
@@ -170,7 +180,7 @@ $gender = (string) ($v['gender'] ?? '');
     </section>
 
     <p>
-        <button class="adm-btn" type="submit">সংরক্ষণ করুন</button>
-        <a class="adm-link" href="<?= admin_base() ?>/members/<?= (int) $member['id'] ?>">বাতিল (কিছু বদলাবেন না)</a>
+        <button class="adm-btn" type="submit"><?= $isNew ? 'কর্মী যোগ করুন' : 'সংরক্ষণ করুন' ?></button>
+        <a class="adm-link" href="<?= e($cancelUrl) ?>"><?= $isNew ? 'বাতিল' : 'বাতিল (কিছু বদলাবেন না)' ?></a>
     </p>
 </form>

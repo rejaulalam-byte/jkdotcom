@@ -120,6 +120,8 @@ return [
     ['GET',  admin_base() . '/agents',              [AdminMembers::class, 'list', ['role' => 'agent']]],
     ['GET',  admin_base() . '/members/{slug}',      [AdminMembers::class, 'show']],
     ['POST', admin_base() . '/members/action',      [AdminMembers::class, 'action']],
+    ['GET',  admin_base() . '/member-add',          [AdminMemberEdit::class, 'addForm']],
+    ['POST', admin_base() . '/member-add',          [AdminMemberEdit::class, 'addSave']],
     ['GET',  admin_base() . '/member-edit/{slug}',  [AdminMemberEdit::class, 'form']],
     ['POST', admin_base() . '/member-edit',         [AdminMemberEdit::class, 'save']],
     ['GET',  admin_base() . '/old-workers',         [AdminLegacy::class, 'index']],

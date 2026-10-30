@@ -43,10 +43,10 @@ final class UserRepository
         try {
             $stmt = $pdo->prepare(
                 "INSERT INTO users
-                    (role, status, name, gender, phone, email, password_hash, service_slug, service_custom, experience_years, bio, nid_number,
+                    (role, status, name, gender, phone, email, password_hash, must_change_password, service_slug, service_custom, experience_years, bio, nid_number,
                      address, upazila_id, district_id, division_id, work_all_districts, reference_1, reference_2, photo, ip_hash, consent_at, created_at)
                  VALUES
-                    (:role, 'pending', :name, :gender, :phone, :email, :hash, :service, :custom, :experience, :bio, :nid,
+                    (:role, 'pending', :name, :gender, :phone, :email, :hash, :must_change, :service, :custom, :experience, :bio, :nid,
                      :address, :upazila, :district, :division, :work_all, :ref1, :ref2, :photo, :ip_hash, :consent_at, NOW())"
             );
             $stmt->execute([
@@ -54,8 +54,9 @@ final class UserRepository
                 ':name' => $data['name'],
                 ':gender' => $data['gender'] !== '' ? $data['gender'] : null,
                 ':phone' => $data['phone'],
-                ':email' => $data['email'],
+                ':email' => (string) ($data['email'] ?? '') !== '' ? $data['email'] : null,
                 ':hash' => $data['password_hash'],
+                ':must_change' => (int) ($data['must_change_password'] ?? 0),
                 ':service' => $data['service_slug'] ?? null,
                 ':custom' => $data['service_custom'] ?? null,
                 ':experience' => $data['experience_years'] ?? null,

@@ -15,8 +15,9 @@ use App\Models\ServiceRepository;
 use App\Models\UserRepository;
 
 /**
- * অ্যাডমিন একজন কর্মী বা প্রতিনিধির তথ্য হাতে ঠিক করে (/admin/member-edit/<id>)। অনুমতি: "registrations"।
- * সদস্যকে কোনো ইমেইল যায় না। নতুন মোবাইল/ইমেইল সেই পাশে (কর্মী/প্রতিনিধি) আর কারও না হলে তবেই চলে।
+ * অ্যাডমিন একজন কর্মী বা প্রতিনিধির তথ্য হাতে ঠিক করে (/admin/member-edit/<id>), অথবা নতুন কর্মী যোগ করে (/admin/member-add)।
+ * অনুমতি: "registrations"। সম্পাদনায় সদস্যকে কোনো ইমেইল যায় না; নতুন মোবাইল/ইমেইল সেই পাশে (কর্মী/প্রতিনিধি) আর কারও না হলে তবেই চলে।
+ * অ্যাডমিনের যোগ করা কর্মী সঙ্গে সঙ্গে অনুমোদিত ও তালিকায়; ইমেইল থাকলে অনুমোদনের ইমেইল যায় (পাসওয়ার্ড কখনও নয়)।
  * কোন কোন ঘর বদলাল তা কার্যলগে লেখা হয়।
  */
 final class MemberEditController
@@ -61,6 +62,81 @@ final class MemberEditController
         ], 'layouts/admin');
     }
 
+    /** নতুন কর্মী যোগের ফর্ম: সম্পাদনার ফর্মই, সব ঘর খালি। */
+    public function addForm(): void
+    {
+        $admin = AdminAuth::require('registrations');
+        $member = ['id' => 0, 'role' => 'worker', 'name' => '', 'photo' => null];
+        header('Cache-Control: no-store');
+        View::render('admin/member-edit', [
+            'admin' => $admin,
+            'title' => 'নতুন কর্মী যোগ করুন',
+            'member' => $member,
+            'v' => Session::pull('admin_old', []) + $member + ['extra_services' => [], 'work_district_ids' => [], 'work_all_districts' => 0],
+            'geo' => GeoRepository::all(),
+            'services' => ServiceRepository::all(),
+            'photoUrl' => null,
+            'extraSlots' => self::EXTRA_SLOTS,
+            'districtSlots' => self::DISTRICT_SLOTS,
+            'errors' => Session::pull('admin_errors', []),
+            'ok' => null,
+        ], 'layouts/admin');
+    }
+
+    /**
+     * POST নতুন কর্মী: মোবাইল আবশ্যক (লগইন ও যোগাযোগ)। পাসওয়ার্ড: ইমেইল থাকলে ফাঁকা রাখা যায় (কর্মী "পাসওয়ার্ড মনে নেই" দিয়ে
+     * নিজে বসান); ইমেইল না থাকলে অ্যাডমিন একটা প্রাথমিক পাসওয়ার্ড দেন ও ফোনে জানান। দিলে প্রথম লগইনে বদলাতে হয়।
+     */
+    public function addSave(): void
+    {
+        $admin = AdminAuth::require('registrations');
+        $back = admin_base() . '/member-add';
+        if (!Security::verifyCsrf($_POST['_token'] ?? null)) {
+            $this->fail($back, ['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
+        }
+        [$data, $errors, $newPhoto] = $this->collect(true);
+        if ($data['phone'] === '') {
+            $errors[] = 'মোবাইল নাম্বার দিন (কর্মীর লগইন ও যোগাযোগ এতেই হয়)।';
+        }
+        $password = (string) ($_POST['password'] ?? '');
+        if ($password === '' && $data['email'] === '') {
+            $errors[] = 'ইমেইল না থাকলে একটা প্রাথমিক পাসওয়ার্ড দিন (ফোনে কর্মীকে জানাবেন)।';
+        }
+        if ($password !== '' && (strlen($password) < 8 || strlen($password) > 72)) {
+            $errors[] = 'প্রাথমিক পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।';
+        }
+        if ($errors !== []) {
+            $this->discard($newPhoto);
+            Session::flash('admin_old', $this->oldValues($data));
+            $this->fail($back, $errors);
+        }
+
+        // পাসওয়ার্ড না দিলে কেউ অনুমান করতে পারবে না এমন এলোমেলো হ্যাশ; কর্মী ইমেইলের কোডে নিজের পাসওয়ার্ড বসান
+        $data += [
+            'role' => 'worker',
+            'password_hash' => password_hash($password !== '' ? $password : bin2hex(random_bytes(24)), PASSWORD_DEFAULT),
+            'must_change_password' => $password !== '' ? 1 : 0,
+        ];
+        $result = UserRepository::create($data);
+        if ($result !== 'ok') {
+            $this->discard($newPhoto);
+            Session::flash('admin_old', $this->oldValues($data));
+            $this->fail($back, [str_starts_with($result, 'duplicate_email') ? 'এই ইমেইলে আরেকজন কর্মী আছেন।' : (str_starts_with($result, 'duplicate') ? 'এই মোবাইল নাম্বারে আরেকজন কর্মী আছেন।' : 'সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।')]);
+        }
+        $member = UserRepository::findByPhone($data['phone'], 'worker');
+        if ($member === null || !UserRepository::setStatus((int) $member['id'], 'approved')) {
+            $this->fail(admin_base() . '/workers', ['কর্মী যোগ হয়েছে, কিন্তু অনুমোদন করা যায়নি; তালিকা থেকে অনুমোদন করুন।']);
+        }
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'member_added', $data['name'] . ' — ' . format_phone($data['phone']));
+
+        $mailed = $data['email'] !== '' && (new MembersController())->sendApprovalMail($member);
+        $note = $data['email'] === ''
+            ? ' ইমেইল নেই, তাই প্রাথমিক পাসওয়ার্ডটি ফোনে জানান; প্রথম লগইনে তাঁকে বদলাতে হবে।'
+            : ($mailed ? ' অনুমোদনের ইমেইল পাঠানো হয়েছে; পাসওয়ার্ড ভুলে-যাওয়ার লিংকে তিনি নিজের পাসওয়ার্ড বসাতে পারবেন।' : ' অনুমোদনের ইমেইল পাঠানো যায়নি।');
+        Session::flash('admin_ok', $data['name'] . ' যোগ হয়েছেন ও তালিকায় দেখা যাচ্ছেন।' . $note);
+        redirect(admin_base() . '/members/' . (int) $member['id']);
+    }
+
     public function save(): void
     {
         $admin = AdminAuth::require('registrations');
@@ -73,7 +149,40 @@ final class MemberEditController
             $this->fail($back, ['নিরাপত্তা যাচাই ব্যর্থ হয়েছে। পেইজটি রিফ্রেশ করে আবার চেষ্টা করুন।']);
         }
 
-        $isWorker = $member['role'] === 'worker';
+        [$data, $errors, $newPhoto] = $this->collect($member['role'] === 'worker');
+
+        if ($errors !== []) {
+            $this->discard($newPhoto);
+            Session::flash('admin_old', $this->oldValues($data));
+            $this->fail($back, $errors);
+        }
+
+        $result = UserRepository::adminUpdate((int) $member['id'], $data);
+        if ($result !== 'ok') {
+            $this->discard($newPhoto);
+            Session::flash('admin_old', $this->oldValues($data));
+            $this->fail($back, [[
+                'duplicate' => 'এই মোবাইল নাম্বার এই পাশে (কর্মী/প্রতিনিধি) আরেকজনের আছে।',
+                'duplicate_email' => 'এই ইমেইল এই পাশে (কর্মী/প্রতিনিধি) আরেকজনের আছে।',
+            ][$result] ?? 'সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।']);
+        }
+        if (array_key_exists('photo', $data) && (string) ($member['photo'] ?? '') !== '') {
+            $this->discard((string) $member['photo']); // পুরনো ছবির ফাইল আর লাগে না
+        }
+
+        $changed = $this->changedLabels($member, $data);
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'member_edit', (string) $member['name'] . ($changed !== [] ? ' — ' . implode(', ', $changed) : ' — কিছু বদলায়নি'));
+        Session::flash('admin_ok', $changed !== [] ? 'সংরক্ষণ হয়েছে। বদলেছে: ' . implode(', ', $changed) . '।' : 'সংরক্ষণ হয়েছে (কিছু বদলায়নি)।');
+        redirect(admin_base() . '/members/' . (int) $member['id']);
+    }
+
+    /**
+     * ফর্মের ঘরগুলো পড়ে যাচাই করে (সম্পাদনা ও নতুন কর্মী দুটোতেই)।
+     *
+     * @return array{0:array<string,mixed>,1:list<string>,2:?string} [মান, ভুলের তালিকা, নতুন ছবির ফাইল]
+     */
+    private function collect(bool $isWorker): array
+    {
         $data = [
             'name' => clean_input($_POST['name'] ?? '', 100),
             'gender' => clean_gender($_POST['gender'] ?? ''),
@@ -154,29 +263,7 @@ final class MemberEditController
             $data['photo'] = null;
         }
 
-        if ($errors !== []) {
-            $this->discard($newPhoto);
-            Session::flash('admin_old', $this->oldValues($data));
-            $this->fail($back, $errors);
-        }
-
-        $result = UserRepository::adminUpdate((int) $member['id'], $data);
-        if ($result !== 'ok') {
-            $this->discard($newPhoto);
-            Session::flash('admin_old', $this->oldValues($data));
-            $this->fail($back, [[
-                'duplicate' => 'এই মোবাইল নাম্বার এই পাশে (কর্মী/প্রতিনিধি) আরেকজনের আছে।',
-                'duplicate_email' => 'এই ইমেইল এই পাশে (কর্মী/প্রতিনিধি) আরেকজনের আছে।',
-            ][$result] ?? 'সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।']);
-        }
-        if (array_key_exists('photo', $data) && (string) ($member['photo'] ?? '') !== '') {
-            $this->discard((string) $member['photo']); // পুরনো ছবির ফাইল আর লাগে না
-        }
-
-        $changed = $this->changedLabels($member, $data);
-        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'member_edit', (string) $member['name'] . ($changed !== [] ? ' — ' . implode(', ', $changed) : ' — কিছু বদলায়নি'));
-        Session::flash('admin_ok', $changed !== [] ? 'সংরক্ষণ হয়েছে। বদলেছে: ' . implode(', ', $changed) . '।' : 'সংরক্ষণ হয়েছে (কিছু বদলায়নি)।');
-        redirect(admin_base() . '/members/' . (int) $member['id']);
+        return [$data, $errors, $newPhoto];
     }
 
     /** @return array<string,mixed>|null */
