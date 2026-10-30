@@ -27,6 +27,19 @@ $ok = $ok ?? null;
         <p class="adm-studio__name"><?= e((string) ($title ?? 'লাইভ পেইজ এডিট')) ?></p>
         <?php // বাছা পেইজের কাজের লিংক ওপরের সারিতেই, যাতে নিচে লেখা বদলানোর জায়গা বেশি থাকে ?>
         <div class="adm-studio__actions">
+            <?php if (!empty($live['all'])): ?>
+                <?php $allCurrent = isset($node['id']) ? (string) $node['id'] : ''; ?>
+                <form class="adm-studio__all" action="<?= e(admin_base() . '/studio') ?>" method="get" data-auto-submit>
+                    <label for="live-pick-all">সকল পেইজ</label>
+                    <select id="live-pick-all" name="p">
+                        <option value="" disabled<?= in_array($allCurrent, array_column($live['all'], 'id'), true) ? '' : ' selected' ?>>পেইজ বাছুন…</option>
+                        <?php foreach ($live['all'] as $p): ?>
+                            <option value="<?= e((string) $p['id']) ?>"<?= $p['id'] === $allCurrent ? ' selected' : '' ?>><?= e((string) $p['title']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <noscript><button type="submit">দেখুন</button></noscript>
+                </form>
+            <?php endif; ?>
             <?php if (!empty($page) && empty($listView)): ?>
                 <a href="<?= e((string) $page['url']) ?>" target="_blank" rel="noopener">সাইটে নতুন ট্যাবে খুলুন</a>
                 <a href="<?= e(admin_base() . '/studio?p=' . $page['id'] . '&view=list') ?>">এই পেইজের লেখার তালিকা</a>

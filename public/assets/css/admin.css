@@ -1113,6 +1113,25 @@ td.adm-actions form {
     justify-content: flex-end;
     gap: 8px 14px;
 }
+.adm-studio__all {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.adm-studio__all label {
+    color: var(--gold);
+    font-size: 17px;
+    font-weight: 600;
+}
+.adm-studio__all select {
+    min-height: 38px;
+    max-width: 220px;
+    padding: 2px 8px;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 16px;
+}
 .adm-studio__actions a:not(.adm-studio__exit),
 .adm-studio__actions button {
     padding: 6px 12px;
