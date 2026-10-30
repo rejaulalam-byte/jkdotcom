@@ -79,7 +79,7 @@ final class ServicesController
 
         if ($do === 'add' || $do === 'custom_new') {
             $name = clean_input($_POST['name'] ?? '', 120);
-            $error = ServiceAdmin::add($name, clean_input($_POST['slug'] ?? '', 80), $slug);
+            $error = ServiceAdmin::add($name, clean_input($_POST['slug'] ?? '', 80), $slug, !empty($_POST['confirm_similar']));
             if ($error !== null) {
                 $this->fail($back, $error);
             }

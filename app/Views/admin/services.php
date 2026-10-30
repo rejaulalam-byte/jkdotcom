@@ -27,7 +27,8 @@ $hidden = static fn (): string => csrf_field() . '<input type="hidden" name="bac
             <input type="text" name="slug" maxlength="80" placeholder="ঠিকানার নাম, ইংরেজিতে (ঐচ্ছিক), যেমন tiles-mistri" aria-label="ঠিকানার নাম">
             <button class="adm-small adm-small--go" type="submit">যোগ করুন</button>
         </div>
-        <p class="adm-muted">নতুন সেবা তালিকার শেষে, চালু অবস্থায় বসে; হোমের চলমান কার্ডে, সেবার তালিকায় ও ফর্মের পেশার তালিকায় সঙ্গে সঙ্গে আসে। ঠিকানার নাম (সাইটের ঠিকানা /services/…) একবার বসলে আর বদলায় না; খালি রাখলে নিজে বানানো হয়। আইকন যোগের পরে নিচের তালিকা থেকে দিন।</p>
+        <label class="adm-check"><input type="checkbox" name="confirm_similar" value="1"> তবুও আলাদা সেবা হিসেবে যোগ করুন (শুধু কাছাকাছি নামের সতর্কতা এলে টিক দিন)</label>
+        <p class="adm-muted">নতুন সেবা তালিকার শেষে, চালু অবস্থায় বসে (নাম আগের কোনো সেবার সঙ্গে হুবহু বা প্রায় মিললে সতর্ক করে); হোমের চলমান কার্ডে, সেবার তালিকায় ও ফর্মের পেশার তালিকায় সঙ্গে সঙ্গে আসে। ঠিকানার নাম (সাইটের ঠিকানা /services/…) একবার বসলে আর বদলায় না; খালি রাখলে নিজে বানানো হয়। আইকন যোগের পরে নিচের তালিকা থেকে দিন।</p>
     </form>
 </div>
 
@@ -72,6 +73,7 @@ $hidden = static fn (): string => csrf_field() . '<input type="hidden" name="bac
                         <input type="text" name="slug" maxlength="80" placeholder="ঠিকানার নাম, ইংরেজিতে (ঐচ্ছিক)" aria-label="ঠিকানার নাম">
                         <button class="adm-small adm-small--go" type="submit">নতুন সেবা বানান</button>
                     </div>
+                    <label class="adm-check"><input type="checkbox" name="confirm_similar" value="1"> তবুও আলাদা সেবা হিসেবে যোগ করুন (কাছাকাছি নামের সতর্কতা এলে)</label>
                 </form>
                 <form class="adm-inline" action="<?= e($base) ?>/action" method="post">
                     <?= $hidden() ?>

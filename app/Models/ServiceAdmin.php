@@ -70,11 +70,11 @@ final class ServiceAdmin
      * নতুন সেবা (তালিকার শেষে, চালু)। $slug খালি হলে নিজে বানায় (service-<নম্বর>)। ভুল থাকলে বার্তা, নইলে null।
      * সফল হলে $newSlug-এ নতুন সেবার slug।
      */
-    public static function add(string $name, string $slug, ?string &$newSlug = null): ?string
+    public static function add(string $name, string $slug, ?string &$newSlug = null, bool $confirmed = false): ?string
     {
         $name = trim($name);
         $slug = strtolower(trim($slug));
-        if ($error = self::checkName($name, null)) {
+        if ($error = self::checkName($name, null, $confirmed)) {
             return $error;
         }
         $list = self::all();
@@ -115,7 +115,7 @@ final class ServiceAdmin
     public static function rename(int $id, string $name): ?string
     {
         $name = trim($name);
-        if ($error = self::checkName($name, $id)) {
+        if ($error = self::checkName($name, $id, true)) { // নাম বদলে শুধু হুবহু-একই আটকায়, কাছাকাছি নাম নয়
             return $error;
         }
 
@@ -166,15 +166,21 @@ final class ServiceAdmin
     }
 
     /** একই নাম (ছোট-বড় অক্ষর না দেখে) দুবার চলে না। */
-    private static function checkName(string $name, ?int $exceptId): ?string
+    /**
+     * নামের যাচাই: দৈর্ঘ্য; হুবহু একই বা "করা / করার লোক / মিস্ত্রি"-জাতীয় শেষাংশ ও ফাঁক বাদ দিলে একই নাম আটকায় (App\Models\ServiceSimilarity);
+     * কাছাকাছি নাম থাকলে সতর্ক করে আটকায়, অ্যাডমিন "তবুও আলাদা সেবা" টিক দিলে ($confirmed) চলে।
+     */
+    private static function checkName(string $name, ?int $exceptId, bool $confirmed = false): ?string
     {
         if (mb_strlen($name) < 2 || mb_strlen($name) > 120) {
             return 'সেবার নাম লিখুন (২ থেকে ১২০ অক্ষর)।';
         }
-        foreach (self::all() as $s) {
-            if ($s['id'] !== $exceptId && mb_strtolower($s['name']) === mb_strtolower($name)) {
-                return 'এই নামের সেবা আগেই আছে।';
-            }
+        $found = ServiceSimilarity::find($name, self::all(), $exceptId);
+        if ($found['same'] !== []) {
+            return 'এই সেবা আগেই আছে: "' . implode('", "', $found['same']) . '" (ফাঁক বা "করা / করার লোক / মিস্ত্রি" জাতীয় তফাত ধরা হয় না)। নতুন করে যোগ না করে ওটাই ব্যবহার করুন।';
+        }
+        if ($found['near'] !== [] && !$confirmed) {
+            return 'কাছাকাছি নামের সেবা আগেই আছে: "' . implode('", "', $found['near']) . '"। একই সেবা হলে নতুন করে যোগ করবেন না। সত্যিই আলাদা সেবা হলে "তবুও আলাদা সেবা হিসেবে যোগ করুন" টিক দিয়ে আবার চেপে যোগ করুন।';
         }
 
         return null;
