@@ -5525,6 +5525,10 @@ html.popup-lock {
         --fs-body: 1.5rem;
     }
 }
+/* খোঁজার পেইজের বাটনের লেখা /services-এর চেয়ে ২px ছোট */
+body.page-search .svc-search__btn {
+    font-size: calc(1.875rem * var(--k-body));
+}
 .search-none {
     width: min(100%, 61.8rem);
     margin: 2.5rem auto 0;
