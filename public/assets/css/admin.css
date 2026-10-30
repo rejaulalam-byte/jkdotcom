@@ -450,6 +450,10 @@ ul.adm-notice {
     font-size: 17px;
     font-weight: 600;
 }
+.adm-chart--wide .adm-chart__value {
+    font-size: 15px; /* চওড়া গ্রাফে বারের ওপরের খাড়া সংখ্যা: সাধারণ ওজন, ২px ছোট */
+    font-weight: 400;
+}
 .adm-chart__label {
     fill: var(--ink);
     font-size: 15px;
