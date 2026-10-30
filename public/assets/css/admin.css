@@ -1894,6 +1894,9 @@ input.adm-short {
     padding-left: 22px;
     color: var(--muted);
 }
+.adm-reporttable {
+    font-size: 18px; /* সাধারণ টেবিলের (২০px) চেয়ে ২px ছোট, যাতে অনেক কলাম একসঙ্গে দেখা যায় */
+}
 .adm-reporttable td,
 .adm-reporttable th {
     vertical-align: top;
