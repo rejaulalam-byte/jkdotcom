@@ -29,6 +29,7 @@ use App\Controllers\PasswordResetController;
 use App\Controllers\PageController;
 use App\Controllers\ProfileController;
 use App\Controllers\RegistrationController;
+use App\Controllers\SearchController;
 use App\Controllers\ServiceController;
 use App\Controllers\SubscribeController;
 use App\Controllers\ThemeController;
@@ -50,6 +51,7 @@ return [
     ['GET',  '/about',           [PageController::class, 'about']],
     ['GET',  '/page/{slug}',     [PageController::class, 'custom']],
     ['GET',  '/site-theme',      [ThemeController::class, 'css']],
+    ['GET',  '/search',          [SearchController::class, 'index']],
     ['GET',  '/services',        [ServiceController::class, 'index']],
     ['GET',  '/services/{slug}', [ServiceController::class, 'show']],
     ['GET',  '/workers/{slug}',  [WorkerController::class, 'show']],

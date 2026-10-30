@@ -5480,3 +5480,118 @@ html.popup-lock {
 .btn--orange:focus-visible {
     filter: brightness(0.9);
 }
+
+/* ---- সাইট-জুড়ে খোঁজা: মেনুর নিচে নামা খোঁজার ঘর + /search পেইজের ফল ---- */
+.site-search {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    padding: 1rem 0;
+    background: var(--teal);
+    box-shadow: 0 0.5rem 1.5rem rgba(var(--ink-rgb), 0.25);
+}
+.site-search[hidden] {
+    display: none;
+}
+.site-search__form {
+    display: flex;
+    gap: 0.75rem;
+}
+.site-search__form input {
+    flex: 1;
+    min-width: 0;
+    height: 3.5rem;
+    padding: 0 1.5rem;
+    border: 0;
+    border-radius: 50px;
+    background: var(--white);
+    font-size: calc(1.25rem * var(--k-body));
+    color: var(--ink);
+}
+.site-search__form button {
+    flex: none;
+    padding: 0 2rem;
+    border: 0;
+    border-radius: 50px;
+    background: var(--gold);
+    color: var(--teal-dark);
+    font-size: calc(1.25rem * var(--k-btn));
+    font-weight: 600;
+    cursor: pointer;
+}
+@media (min-width: 1200px) {
+    body.page-search {
+        --fs-body: 1.5rem;
+    }
+}
+.search-none {
+    width: min(100%, 61.8rem);
+    margin: 2.5rem auto 0;
+    padding: 1.5rem 2rem;
+    border: 2px solid rgba(var(--teal-rgb), 0.39);
+    border-radius: 0.625rem;
+    background: var(--teal-10);
+    text-align: center;
+    font-size: calc(var(--fs-body) * var(--k-body));
+    line-height: 1.7;
+}
+.search-group {
+    width: min(100%, 61.8rem);
+    margin: 2.5rem auto 0;
+}
+.search-group__head {
+    margin: 0 0 0.75rem;
+    padding: 0.4rem 1rem;
+    border-radius: 0.5rem;
+    background: rgba(var(--teal-rgb), 0.12);
+    color: var(--teal);
+    font-size: calc(1.5rem * var(--k-head));
+}
+.search-list,
+.search-workers,
+.search-chips {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.search-list li,
+.search-workers li {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid rgba(var(--ink-rgb), 0.12);
+    font-size: calc(var(--fs-body) * var(--k-body));
+}
+.search-list a,
+.search-workers__name {
+    color: var(--teal);
+    font-weight: 600;
+}
+.search-list p,
+.search-workers p {
+    margin: 0.2rem 0 0;
+    color: rgba(var(--ink-rgb), 0.75);
+    font-size: calc(var(--fs-small) * var(--k-body));
+    overflow-wrap: anywhere;
+}
+.search-kind,
+.search-count {
+    margin-left: 0.5rem;
+    color: rgba(var(--ink-rgb), 0.65);
+    font-size: calc(var(--fs-small) * var(--k-body));
+}
+.search-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+.search-chips a {
+    display: block;
+    padding: 0.4rem 1rem;
+    border: 1px solid rgba(var(--teal-rgb), 0.5);
+    border-radius: 50px;
+    color: var(--teal);
+    font-size: calc(var(--fs-body) * var(--k-body));
+}
+.search-chips a:hover {
+    background: var(--teal-10);
+}

@@ -189,31 +189,50 @@ final class UserRepository
      */
     public static function listWorkersByService(string $slug): array
     {
+        return self::workerList($slug);
+    }
+
+    /**
+     * অনুমোদিত সব কর্মী (সাইট-জুড়ে খোঁজার জন্য, /search); প্রতিজনের মূল পেশার নামও থাকে।
+     *
+     * @return list<array{id:int,name:string,phone:string,address:string,upazila:string,district:string,division:string,work_all:bool,work_districts:list<string>,profession:string}>
+     */
+    public static function listApprovedWorkers(): array
+    {
+        return self::workerList(null);
+    }
+
+    /**
+     * @param string|null $slug null = সব সেবার কর্মী
+     * @return list<array<string,mixed>>
+     */
+    private static function workerList(?string $slug): array
+    {
         $pdo = Database::connection();
         if ($pdo === null) {
             $rows = array_values(array_filter(
                 self::demoRead(),
                 static fn (array $r): bool => ($r['role'] ?? '') === 'worker' && ($r['status'] ?? '') === 'approved'
-                    && ((string) ($r['service_slug'] ?? '') === $slug || in_array($slug, (array) ($r['extra_services'] ?? []), true))
+                    && ($slug === null || (string) ($r['service_slug'] ?? '') === $slug || in_array($slug, (array) ($r['extra_services'] ?? []), true))
             ));
         } else {
             try {
-                $stmt = $pdo->prepare(
-                    "SELECT id, name, phone, address, upazila_id, district_id, division_id, work_all_districts FROM users
-                     WHERE role = 'worker' AND status = 'approved'
-                       AND (service_slug = :slug OR id IN (SELECT user_id FROM worker_services WHERE service_slug = :slug2))
-                     ORDER BY name ASC, id ASC"
-                );
-                $stmt->execute([':slug' => $slug, ':slug2' => $slug]);
+                $sql = "SELECT id, name, phone, address, upazila_id, district_id, division_id, work_all_districts, service_slug, service_custom FROM users
+                        WHERE role = 'worker' AND status = 'approved'"
+                    . ($slug === null ? '' : ' AND (service_slug = :slug OR id IN (SELECT user_id FROM worker_services WHERE service_slug = :slug2))')
+                    . ' ORDER BY name ASC, id ASC';
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($slug === null ? [] : [':slug' => $slug, ':slug2' => $slug]);
                 $rows = $stmt->fetchAll();
             } catch (Throwable $e) {
-                Logger::error('UserRepository::listWorkersByService failed: ' . $e->getMessage());
+                Logger::error('UserRepository::workerList failed: ' . $e->getMessage());
 
                 return [];
             }
         }
 
         $work = self::workDistrictsOf($pdo, array_map(static fn (array $r): int => (int) $r['id'], $rows));
+        $serviceNames = array_column(ServiceRepository::all(), 'name', 'slug');
         $list = [];
         foreach ($rows as $r) {
             $geo = GeoRepository::names((int) $r['upazila_id'], (int) $r['district_id'], (int) $r['division_id']);
@@ -225,6 +244,7 @@ final class UserRepository
                 'address' => (string) $r['address'],
                 'work_all' => !empty($r['work_all_districts']),
                 'work_districts' => GeoRepository::workDistrictNames($ids),
+                'profession' => ((string) ($r['service_slug'] ?? '')) !== '' ? ($serviceNames[(string) $r['service_slug']] ?? '') : (string) ($r['service_custom'] ?? ''),
             ] + $geo;
         }
         usort($list, static fn (array $a, array $b): int => strcmp($a['name'], $b['name']));

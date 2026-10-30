@@ -32,6 +32,9 @@ return [
         ['ধাপ সেকশন', ['home.steps.*']],
         ['প্রশ্ন-উত্তর ও মতামত', ['home.faq.*', 'home.feedback.*', 'home.map.*']],
     ]],
+    ['id' => 'search', 'title' => 'সাইটে খোঁজা', 'url' => '/search', 'parts' => [
+        ['পেইজের লেখা', ['search.*']],
+    ]],
     ['id' => 'about', 'title' => 'আমাদের সম্পর্কে', 'url' => '/about', 'open' => 'about', 'parts' => []],
     ['id' => 'services', 'title' => 'সেবা সমূহ', 'url' => '/services', 'parts' => [
         ['পেইজের লেখা', ['services.*']],

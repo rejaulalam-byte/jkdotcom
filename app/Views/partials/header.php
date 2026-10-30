@@ -53,7 +53,7 @@ $registrationPaths = ['/login', '/welcome'];
                     </li>
                 <?php endforeach; ?>
             </ul>
-            <a class="nav__search" href="/services" aria-label="সেবা খুঁজুন">
+            <a class="nav__search" href="/search" aria-label="<?= e(content('search.aria')) ?>" aria-expanded="false" aria-controls="site-search">
                 <img src="<?= e(asset('img/icons/search.svg')) ?>" alt="" width="42" height="42">
             </a>
             <?php if ($member !== null):
@@ -80,5 +80,13 @@ $registrationPaths = ['/login', '/welcome'];
                 </details>
             <?php endif; ?>
         </nav>
+    </div>
+    <?php // খোঁজার আইকনে ক্লিকে নামে (app.js); JavaScript ছাড়া আইকন সরাসরি /search পেইজে নেয় ?>
+    <div class="site-search" id="site-search" hidden>
+        <form class="container site-search__form" action="/search" method="get" role="search">
+            <label class="sr-only" for="header-q"><?= e(content('search.aria')) ?></label>
+            <input id="header-q" type="search" name="q" maxlength="100" placeholder="<?= e(content('search.placeholder')) ?>" autocomplete="off">
+            <button type="submit"><?= e(content('search.button')) ?></button>
+        </form>
     </div>
 </header>

@@ -2,7 +2,7 @@
    jorurikaj.com — ছোট ছোট উন্নতি (JavaScript ছাড়াও সাইট চলে; এটা শুধু বাড়তি আরাম দেয়)
 
    সূচিপত্র (এই নামে খুঁজুন):
-     মেনু (মোবাইল মেনু, সাব-মেনু) · বার্তা-বক্স · তারিখ ঘর · Hero অক্ষরের অ্যানিমেশন
+     মেনু (মোবাইল মেনু, সাব-মেনু) · খোঁজার আইকন · বার্তা-বক্স · তারিখ ঘর · Hero অক্ষরের অ্যানিমেশন
      ওপরে-যাওয়ার বাটন · FAQ · আজকের কাজের তালিকা · Marquee · Services সারি
      Advertisement strip · কাজের ধরন ড্রপডাউন · এলাকার তিন ড্রপডাউন
      Banglish টাইপিং · লুকানো ফোন/ইমেইল ও আগ্রহের পপ-আপ · কর্মী-তালিকা · কাজের জেলার ট্যাগ · পাসওয়ার্ড দেখা/লুকানো · রেজিস্ট্রেশনের ছবি · ফর্মের ভুল-বার্তা · পপ-আপ বিজ্ঞাপন
@@ -67,6 +67,34 @@
         document.addEventListener("keydown", function (e) {
             if (e.key === "Escape") {
                 userMenu.removeAttribute("open");
+            }
+        });
+    }
+    /* ---- খোঁজার আইকন (মেনুর ডানে): ক্লিকে মেনুর নিচে খোঁজার ঘর নামে; আবার ক্লিক বা Esc-এ বন্ধ। JavaScript ছাড়া আইকন /search পেইজে নেয় ---- */
+    var searchIcon = document.querySelector(".nav__search");
+    var searchBox = document.getElementById("site-search");
+    if (searchIcon && searchBox) {
+        var searchInput = searchBox.querySelector("input");
+        var setSearch = function (open) {
+            searchBox.hidden = !open;
+            searchIcon.setAttribute("aria-expanded", open ? "true" : "false");
+            if (open) {
+                searchInput.focus();
+            }
+        };
+        searchIcon.addEventListener("click", function (e) {
+            e.preventDefault();
+            setSearch(searchBox.hidden);
+        });
+        document.addEventListener("click", function (e) {
+            if (!searchBox.hidden && !searchBox.contains(e.target) && !searchIcon.contains(e.target)) {
+                setSearch(false);
+            }
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && !searchBox.hidden) {
+                setSearch(false);
+                searchIcon.focus();
             }
         });
     }
