@@ -123,6 +123,8 @@ return [
     ['POST', admin_base() . '/members/message',     [AdminMembers::class, 'message']],
     ['GET',  admin_base() . '/member-add',          [AdminMemberEdit::class, 'addForm']],
     ['POST', admin_base() . '/member-add',          [AdminMemberEdit::class, 'addSave']],
+    ['GET',  admin_base() . '/member-add/agent',    [AdminMemberEdit::class, 'addForm', ['role' => 'agent']]],
+    ['POST', admin_base() . '/member-add/agent',    [AdminMemberEdit::class, 'addSave', ['role' => 'agent']]],
     ['GET',  admin_base() . '/member-edit/{slug}',  [AdminMemberEdit::class, 'form']],
     ['POST', admin_base() . '/member-edit',         [AdminMemberEdit::class, 'save']],
     ['GET',  admin_base() . '/old-workers',         [AdminLegacy::class, 'index']],

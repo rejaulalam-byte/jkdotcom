@@ -21,9 +21,9 @@ $gender = (string) ($v['gender'] ?? '');
 $isNew = (int) $member['id'] === 0;
 $cancelUrl = $isNew ? $list : admin_base() . '/members/' . (int) $member['id'];
 ?>
-<p><a class="adm-link" href="<?= e($cancelUrl) ?>"><?= $isNew ? '← কর্মীর তালিকায় ফিরুন (যোগ না করে)' : '← বিস্তারিত পেইজে ফিরুন (কিছু না বদলে)' ?></a></p>
+<p><a class="adm-link" href="<?= e($cancelUrl) ?>"><?= $isNew ? '← ' . ($isWorker ? 'কর্মীর' : 'প্রতিনিধির') . ' তালিকায় ফিরুন (যোগ না করে)' : '← বিস্তারিত পেইজে ফিরুন (কিছু না বদলে)' ?></a></p>
 
-<form class="adm-editform" action="<?= admin_base() ?>/<?= $isNew ? 'member-add' : 'member-edit' ?>" method="post" enctype="multipart/form-data" novalidate>
+<form class="adm-editform" action="<?= admin_base() ?>/<?= $isNew ? ($isWorker ? 'member-add' : 'member-add/agent') : 'member-edit' ?>" method="post" enctype="multipart/form-data" novalidate>
     <?= csrf_field() ?>
     <input type="hidden" name="id" value="<?= (int) $member['id'] ?>">
 
@@ -180,7 +180,7 @@ $cancelUrl = $isNew ? $list : admin_base() . '/members/' . (int) $member['id'];
     </section>
 
     <p>
-        <button class="adm-btn" type="submit"><?= $isNew ? 'কর্মী যোগ করুন' : 'সংরক্ষণ করুন' ?></button>
+        <button class="adm-btn" type="submit"><?= $isNew ? ($isWorker ? 'কর্মী যোগ করুন' : 'প্রতিনিধি যোগ করুন') : 'সংরক্ষণ করুন' ?></button>
         <a class="adm-link" href="<?= e($cancelUrl) ?>"><?= $isNew ? 'বাতিল' : 'বাতিল (কিছু বদলাবেন না)' ?></a>
     </p>
 </form>

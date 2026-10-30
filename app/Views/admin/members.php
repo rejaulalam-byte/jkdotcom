@@ -29,9 +29,7 @@ foreach (MemberStatus::LABELS as $key => $label) {
     $tabs[] = [$key, $label, (int) ($counts[$key] ?? 0)];
 }
 ?>
-<?php if ($role === 'worker'): ?>
-    <p><a class="adm-small adm-small--go" href="<?= admin_base() ?>/member-add">+ নতুন কর্মী যোগ করুন</a></p>
-<?php endif; ?>
+<p><a class="adm-small adm-small--go" href="<?= admin_base() ?>/member-add<?= $role === 'agent' ? '/agent' : '' ?>">+ নতুন <?= $role === 'agent' ? 'প্রতিনিধি' : 'কর্মী' ?> যোগ করুন</a></p>
 <nav class="adm-tabs" aria-label="অবস্থা">
     <?php foreach ($tabs as [$key, $label, $count]): ?>
         <a href="<?= e($url(['status' => $key, 'p' => ''])) ?>"<?= $filter['status'] === $key ? ' aria-current="true"' : '' ?>><?= e($label) ?> <b><?= e(bn($count)) ?></b></a>
