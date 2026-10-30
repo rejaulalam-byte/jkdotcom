@@ -1907,3 +1907,9 @@ input.adm-short {
     color: #fff;
     font-weight: 700;
 }
+
+.adm-reportrow--empty td {
+    padding: 22px 12px;
+    color: var(--muted);
+    text-align: center;
+}

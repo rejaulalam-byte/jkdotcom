@@ -38,21 +38,21 @@ $isToday = $from === $today && $to === $today;
     </ul>
 <?php endif; ?>
 
-<?php if ($report['rows'] === []): ?>
-    <p class="adm-box">এই তারিখে এই রিপোর্টে দেখানোর মতো কিছু নেই।</p>
-<?php else: ?>
-    <div class="adm-tablewrap">
-        <table class="adm-table adm-reporttable">
-            <thead><tr><?php foreach ($report['head'] as $h): ?><th><?= e($h) ?></th><?php endforeach; ?></tr></thead>
-            <tbody>
-                <?php foreach ($report['rows'] as $row): ?>
-                    <tr class="adm-reportrow--<?= e($row['type']) ?>">
-                        <?php foreach ($row['cells'] as $cell): ?><td><?= e($cell) ?></td><?php endforeach; ?>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-<?php endif; ?>
+<?php // টেবিল সবসময় আঁকা হয় (কলামের নামসহ); তথ্য না থাকলে এক সারিতে সেটা লেখা থাকে ?>
+<div class="adm-tablewrap">
+    <table class="adm-table adm-reporttable">
+        <thead><tr><?php foreach ($report['head'] as $h): ?><th><?= e($h) ?></th><?php endforeach; ?></tr></thead>
+        <tbody>
+            <?php foreach ($report['rows'] as $row): ?>
+                <tr class="adm-reportrow--<?= e($row['type']) ?>">
+                    <?php foreach ($row['cells'] as $cell): ?><td><?= e($cell) ?></td><?php endforeach; ?>
+                </tr>
+            <?php endforeach; ?>
+            <?php if ($report['rows'] === []): ?>
+                <tr class="adm-reportrow--empty"><td colspan="<?= count($report['head']) ?>">এই তারিখে এই রিপোর্টে দেখানোর মতো কিছু নেই। ওপরের "থেকে" ও "পর্যন্ত" ঘরে অন্য তারিখ বেছে "দেখান" চাপুন।</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
 <p><a class="adm-btn adm-btn--close" href="<?= e(admin_base() . '/reports') ?>">✕ বন্ধ করুন</a></p>
