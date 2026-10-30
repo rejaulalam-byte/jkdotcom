@@ -602,6 +602,10 @@ textarea {
     gap: 4rem;
     align-items: start;
 }
+/* ডানের তালিকা লুকানো হলে হিরোর লেখা পুরো প্রস্থ নেয় */
+.hero__inner--solo {
+    grid-template-columns: minmax(0, 1fr);
+}
 .hero__title {
     margin-top: 3.75rem;
     font-size: calc(var(--fs-h1) * var(--k-head));
@@ -713,6 +717,27 @@ textarea {
     from {
         opacity: 0;
         transform: translate(var(--dx, 0), var(--dy, 0)) rotate(var(--rot, 0deg)) scale(0.35);
+    }
+}
+/* অ্যানিমেশন "ডান থেকে": প্রতিটি অক্ষর পর্দার ডান দিক থেকে সোজা উড়ে এসে নিজের জায়গায় বসে */
+.fly-letter--right {
+    animation-name: fly-letter-right;
+    animation-duration: 1.2s;
+}
+@keyframes fly-letter-right {
+    from {
+        opacity: 0;
+        transform: translateX(var(--dx, 60vw));
+    }
+}
+/* অ্যানিমেশন "বাঁ থেকে": লেখার প্রতিটি লাইন বাঁ দিকের ভেতর থেকে ধীরে বেরিয়ে নিজের জায়গায় আসে */
+.fly-line {
+    animation: fly-line 1.8s cubic-bezier(.25, .6, .2, 1) backwards;
+}
+@keyframes fly-line {
+    from {
+        opacity: 0;
+        transform: translateX(-70vw);
     }
 }
 @media (scripting: enabled) {
@@ -1949,6 +1974,7 @@ textarea {
         overflow-x: auto;
     }
     .fly-letter,
+    .fly-line,
     .hero__copy .btn,
     .hero .today {
         animation: none;
@@ -5233,6 +5259,7 @@ html.popup-lock {
 }
 /* পপ-আপ বন্ধ না হওয়া পর্যন্ত হিরোর শুরুর অ্যানিমেশন থেমে থাকে (app.js ক্লাস দেয়-নেয়) */
 .hero.is-waiting .fly-letter,
+.hero.is-waiting .fly-line,
 .hero.is-waiting .hero__copy .btn,
 .hero.is-waiting .today {
     animation-play-state: paused;

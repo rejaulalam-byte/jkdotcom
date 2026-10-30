@@ -42,6 +42,9 @@ $isHero = $sectionId === 'hero';
             <button type="button" data-act="add-above">＋ ওপরে নতুন সেকশন</button>
         <?php endif; ?>
         <button type="button" data-act="add-below">＋ নিচে নতুন সেকশন</button>
+        <?php if ($isHero): ?>
+            <button type="button" data-act="edit" data-url="<?= e(admin_base() . '/hero') ?>">✎ হিরো সেটিং (অ্যানিমেশন, পটভূমি, তালিকা)</button>
+        <?php endif; ?>
         <?php if (!$section['builtin']): ?>
             <button type="button" data-act="edit" data-url="<?= e(admin_base() . '/home-section/' . $sectionId) ?>">✎ সম্পাদনা</button>
             <button type="button" data-act="delete" data-confirm="এই সেকশন ও তার পুরো লেখা চিরতরে মুছে যাবে। মুছবেন?">মুছুন</button>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Controllers\Admin\AccessController as AdminAccess;
 use App\Controllers\Admin\AdsController as AdminAds;
 use App\Controllers\Admin\FeedbackInboxController as AdminFeedback;
+use App\Controllers\Admin\HeroController as AdminHero;
 use App\Controllers\Admin\HomeSectionsController as AdminHomeSections;
 use App\Controllers\Admin\IncompleteController as AdminIncomplete;
 use App\Controllers\Admin\JobsController as AdminJobs;
@@ -148,6 +149,8 @@ return [
     ['POST', admin_base() . '/studio/home-section', [AdminHomeSections::class, 'live']],
     ['GET',  admin_base() . '/home-section/{slug}', [AdminHomeSections::class, 'edit']],
     ['POST', admin_base() . '/home-section/{slug}', [AdminHomeSections::class, 'save']],
+    ['GET',  admin_base() . '/hero',                [AdminHero::class, 'index']],
+    ['POST', admin_base() . '/hero',                [AdminHero::class, 'save']],
     ['GET',  admin_base() . '/theme',               [AdminTheme::class, 'index']],
     ['POST', admin_base() . '/theme',               [AdminTheme::class, 'save']],
     ['GET',  admin_base() . '/studio',              [AdminStudio::class, 'index']],

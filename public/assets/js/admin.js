@@ -378,3 +378,49 @@
     fit();
     window.addEventListener("resize", fit);
 })();
+
+/* ---- হিরোর পটভূমি (admin/hero.php): রঙের প্লেট ও কোডের ঘর একে অপরকে মেলায়, নিচের নমুনা সঙ্গে সঙ্গে নতুন রং নেয় ---- */
+(function () {
+    var box = document.querySelector("[data-hero-bg]");
+    if (!box) {
+        return;
+    }
+    var sample = box.querySelector("[data-hero-sample]");
+    var use2 = box.querySelector("[data-hero-use2]");
+    var dir = box.querySelector("[data-hero-dir]");
+    var DIRS = { down: "to bottom", right: "to right", diagonal: "135deg" };
+    function value(n) {
+        return box.querySelector('[data-hero-color="' + n + '"]').value;
+    }
+    function paint() {
+        sample.style.background = use2.checked
+            ? "linear-gradient(" + (DIRS[dir.value] || "to bottom") + ", " + value(1) + ", " + value(2) + ")"
+            : value(1);
+    }
+    ["1", "2"].forEach(function (n) {
+        var picker = box.querySelector('[data-hero-color="' + n + '"]');
+        var hex = box.querySelector('[data-hero-hex="' + n + '"]');
+        picker.addEventListener("input", function () {
+            hex.value = picker.value;
+            paint();
+        });
+        hex.addEventListener("input", function () {
+            if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) {
+                picker.value = hex.value.toLowerCase();
+                paint();
+            }
+        });
+    });
+    use2.addEventListener("change", paint);
+    dir.addEventListener("change", paint);
+    // রং বা ছবির ঘর ছুঁলে সংশ্লিষ্ট বাছাইটা নিজে টিক হয়
+    box.querySelector(".adm-hero-color").addEventListener("input", function () {
+        box.querySelector('input[name="bg"][value="color"]').checked = true;
+    });
+    box.querySelector(".adm-hero-image").addEventListener("change", function (e) {
+        if (e.target.type === "file") {
+            box.querySelector('input[name="bg"][value="image"]').checked = true;
+        }
+    });
+    paint();
+})();

@@ -1685,3 +1685,32 @@ input.adm-short {
 .adm-theme__font .tf-sample {
     display: block;
 }
+
+/* ---- হিরো সেটিং (admin/hero.php) ---- */
+.adm-hero-color,
+.adm-hero-image {
+    margin: 0.4rem 0 1rem 1.7rem;
+    padding: 0.8rem 1rem;
+    border-left: 3px solid var(--line);
+}
+.adm-hero-color label select,
+.adm-hero-image label select {
+    margin-left: 0.4rem;
+}
+.adm-hero-sample {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 90px;
+    margin-top: 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: #fff;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+}
+.adm-hero-thumb {
+    max-width: 240px;
+    height: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+}

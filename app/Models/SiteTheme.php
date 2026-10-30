@@ -92,13 +92,13 @@ final class SiteTheme
     /** /site-theme-এর পুরো লেখা: বদলানো রং, লেখার আকার (App\Models\SiteSizes) ও বাংলা ফন্ট (SiteFonts)। */
     public static function stylesheet(): string
     {
-        return self::css() . SiteSizes::css() . SiteFonts::css();
+        return self::css() . SiteSizes::css() . SiteFonts::css() . SiteHero::css();
     }
 
     /** রং, আকার বা ফন্টের কিছু বদলানো আছে কি না (না থাকলে /site-theme লিংকই বসে না)। */
     public static function anyCustom(): bool
     {
-        return self::anyChanged() || SiteSizes::anyChanged() || SiteFonts::current() !== '';
+        return self::anyChanged() || SiteSizes::anyChanged() || SiteFonts::current() !== '' || SiteHero::anyChanged();
     }
 
     /** লিংকের সংস্করণ (রং বা আকার বদলালে ঠিকানা বদলায়, তাই ব্রাউজার পুরনো ফাইল রাখে না)। */

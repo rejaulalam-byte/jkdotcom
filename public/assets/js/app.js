@@ -158,7 +158,16 @@
 
     /* ---- Hero: প্রতিটি অক্ষর নিজের দিক থেকে উড়ে আসে (স্টাইল: CSS-এর "Hero entrance") ---- */
     var heroEl = document.querySelector(".hero");
-    if (heroEl && !reduceMotion) {
+    var heroAnim = heroEl ? heroEl.getAttribute("data-anim") || "scatter" : "scatter";
+    if (heroEl && !reduceMotion && heroAnim === "left") {
+        // "বাঁ থেকে": অক্ষর না ভেঙে প্রতিটি লাইন বাঁ দিকের ভেতর থেকে ধীরে এসে বসে (লাইনের পর লাইন)
+        var lines = heroEl.querySelectorAll("[data-fly]");
+        Array.prototype.forEach.call(lines, function (el, i) {
+            el.classList.add("is-split", "fly-line");
+            el.style.animationDelay = (i * 0.45).toFixed(2) + "s";
+        });
+        heroEl.style.setProperty("--btn-delay", (lines.length * 0.45 + 1.2).toFixed(2) + "s");
+    } else if (heroEl && !reduceMotion) {
         var segmenter = window.Intl && Intl.Segmenter ? new Intl.Segmenter("bn", { granularity: "grapheme" }) : null;
         var flyLetters = [];
         Array.prototype.forEach.call(heroEl.querySelectorAll("[data-fly]"), function (el) {
@@ -208,6 +217,13 @@
         var reach = Math.max(window.innerWidth, 600);
         var step = Math.min(0.03, 2.4 / Math.max(1, flyLetters.length)); // the whole stream takes about 2.4 s
         flyLetters.forEach(function (letter, i) {
+            if (heroAnim === "right") {
+                // "ডান থেকে": পর্দার ডান দিক থেকে সোজা, এক-একটা করে পরপর
+                letter.classList.add("fly-letter--right");
+                letter.style.setProperty("--dx", Math.round(reach * 0.8) + "px");
+                letter.style.animationDelay = (i * step).toFixed(3) + "s";
+                return;
+            }
             var angle = Math.random() * Math.PI * 2;
             var dist = reach * (0.25 + Math.random() * 0.5);
             letter.style.setProperty("--dx", Math.round(Math.cos(angle) * dist) + "px");

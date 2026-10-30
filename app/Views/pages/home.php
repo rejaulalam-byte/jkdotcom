@@ -16,8 +16,9 @@ $faqKeys = [1, 2, 3, 4, 5];
 
 <?php ob_start(); ?>
 <!-- 1. HERO ---------------------------------------------------------- -->
-<section class="hero" aria-labelledby="hero-title">
-    <div class="container hero__inner">
+<?php $heroToday = \App\Models\SiteHero::showToday(); ?>
+<section class="hero" aria-labelledby="hero-title" data-anim="<?= e(\App\Models\SiteHero::anim()) ?>">
+    <div class="container hero__inner<?= $heroToday ? '' : ' hero__inner--solo' ?>">
         <div class="hero__copy">
             <p <?= pill_attrs('home.hero') ?>>
                 <?= section_icon('home.hero', 50, 32) ?>
@@ -31,6 +32,7 @@ $faqKeys = [1, 2, 3, 4, 5];
             <a class="btn btn--light" href="/services"><?= t('home.hero.button') ?></a>
         </div>
 
+        <?php if ($heroToday): ?>
         <aside class="today" aria-labelledby="today-title">
             <h2 id="today-title" class="today__head"><?= t('home.today.title') ?></h2>
             <div class="today__body">
@@ -46,6 +48,7 @@ $faqKeys = [1, 2, 3, 4, 5];
                 <p class="today__note"><span><?= t('home.today.note') ?></span></p>
             </div>
         </aside>
+        <?php endif; ?>
     </div>
 </section>
 
