@@ -364,3 +364,17 @@
         select.parentNode.insertBefore(pal.el, select.nextSibling);
     });
 })();
+
+/* ---- লাইভ পেইজ এডিটের ফ্রেম: ওপরের সারিগুলো যতই লম্বা হোক, ফ্রেম পর্দার বাকি পুরো জায়গা নেয় (নিচে স্ক্রল ছাড়াই) ---- */
+(function () {
+    var frame = document.querySelector(".adm-live__frame");
+    if (!frame) {
+        return;
+    }
+    function fit() {
+        var top = frame.getBoundingClientRect().top + window.scrollY;
+        frame.style.height = Math.max(360, window.innerHeight - top - 12) + "px";
+    }
+    fit();
+    window.addEventListener("resize", fit);
+})();

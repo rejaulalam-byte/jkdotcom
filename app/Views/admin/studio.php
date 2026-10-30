@@ -69,15 +69,7 @@ $fields = static function (array $list) use ($base): string {
 <?php if (!$listView && $page !== null): ?>
     <?php $frame = (string) $page['url'] . (str_contains((string) $page['url'], '?') ? '&' : '?') . 'live=1'; ?>
     <section class="adm-live">
-        <div class="adm-live__head">
-            <h1><?= e((string) $page['title']) ?></h1>
-            <a class="adm-link" href="<?= e((string) $page['url']) ?>" target="_blank" rel="noopener">সাইটে নতুন ট্যাবে খুলুন</a>
-            <a class="adm-link" href="<?= e($base . '?p=' . $page['id'] . '&view=list') ?>">এই পেইজের লেখার তালিকা</a>
-            <?php if (\App\Core\AdminAuth::isSuper($admin)): ?>
-                <button class="adm-small" type="button" data-menu-open>মেনু সম্পাদনা</button>
-            <?php endif; ?>
-        </div>
-        <p class="adm-live__note">যে লেখার ওপর মাউস রাখলে কমলা দাগ আসে, সেটায় ক্লিক করুন: সেখানেই বাক্স খুলবে, বদলে "সংরক্ষণ করুন" চাপুন। লিংক ও বাটন এখানে কাজ করে না; অন্য পেইজ ওপরের ড্রপডাউন থেকে খুলুন।</p>
+        <p class="adm-live__note"><strong class="adm-live__title"><?= e((string) $page['title']) ?></strong> — যে লেখার ওপর মাউস রাখলে কমলা দাগ আসে, সেটায় ক্লিক করুন: সেখানেই বাক্স খুলবে, বদলে "সংরক্ষণ করুন" চাপুন। লিংক ও বাটন এখানে কাজ করে না; অন্য পেইজ ওপরের ড্রপডাউন থেকে খুলুন।</p>
         <?php if ($open !== null): ?>
             <p class="adm-live__note">পেইজের মূল লেখার (বড় লেখা) যেকোনো জায়গায় ক্লিক করলে পূর্ণ এডিটর খুলবে।</p>
         <?php endif; ?>

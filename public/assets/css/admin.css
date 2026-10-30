@@ -1106,6 +1106,31 @@ td.adm-actions form {
     font-size: 26px;
     font-weight: 600;
 }
+.adm-studio__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px 14px;
+}
+.adm-studio__actions a:not(.adm-studio__exit),
+.adm-studio__actions button {
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 17px;
+    text-decoration: none;
+    cursor: pointer;
+}
+.adm-studio__actions a:not(.adm-studio__exit):hover,
+.adm-studio__actions button:hover,
+.adm-studio__actions a:not(.adm-studio__exit):focus-visible,
+.adm-studio__actions button:focus-visible {
+    background: rgba(255, 255, 255, 0.18);
+}
 .adm-studio__exit {
     padding: 8px 20px;
     border-radius: 8px;
@@ -1271,15 +1296,9 @@ input.adm-short {
     padding: 0 12px;
     font-size: 15px;
 }
-.adm-live__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 6px 24px;
-}
-.adm-live__head h1 {
-    margin: 0;
-    font-size: 26px;
+.adm-live__title {
+    color: var(--teal);
+    font-size: 22px;
 }
 .adm-live__note {
     margin: 4px 0 10px;

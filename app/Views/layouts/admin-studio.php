@@ -1,6 +1,6 @@
 <?php
 /**
- * "সাইটের লেখা"-র নিজস্ব পুরো পর্দা: মূল অ্যাডমিন মেনু নেই; ওপরে বাঁয়ে নাম, ডানে "বাহির হোন" (মূল প্যানেলে ফেরা)।
+ * "সাইটের লেখা"-র নিজস্ব পুরো পর্দা: মূল অ্যাডমিন মেনু নেই; ওপরে বাঁয়ে নাম, ডানে বাছা পেইজের কাজের লিংক ও "বাহির হোন" (মূল প্যানেলে ফেরা)।
  * পর্দাটা খোলার সময় ওপর থেকে নেমে আসে (নড়াচড়া কমানোর পছন্দ থাকলে নয়)।
  *
  * @var string $content
@@ -25,7 +25,17 @@ $ok = $ok ?? null;
 <body class="adm-studio">
     <header class="adm-studio__bar">
         <p class="adm-studio__name"><?= e((string) ($title ?? 'লাইভ পেইজ এডিট')) ?></p>
-        <a class="adm-studio__exit" href="<?= e(admin_base()) ?>">বাহির হোন</a>
+        <?php // বাছা পেইজের কাজের লিংক ওপরের সারিতেই, যাতে নিচে লেখা বদলানোর জায়গা বেশি থাকে ?>
+        <div class="adm-studio__actions">
+            <?php if (!empty($page) && empty($listView)): ?>
+                <a href="<?= e((string) $page['url']) ?>" target="_blank" rel="noopener">সাইটে নতুন ট্যাবে খুলুন</a>
+                <a href="<?= e(admin_base() . '/studio?p=' . $page['id'] . '&view=list') ?>">এই পেইজের লেখার তালিকা</a>
+                <?php if (\App\Core\AdminAuth::isSuper($admin)): ?>
+                    <button type="button" data-menu-open>মেনু সম্পাদনা</button>
+                <?php endif; ?>
+            <?php endif; ?>
+            <a class="adm-studio__exit" href="<?= e(admin_base()) ?>">বাহির হোন</a>
+        </div>
     </header>
     <div class="adm-studio__body">
         <?php if ($errors !== []): ?>
