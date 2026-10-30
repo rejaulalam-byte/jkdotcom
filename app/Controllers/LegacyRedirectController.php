@@ -6,11 +6,11 @@ namespace App\Controllers;
 
 /**
  * পুরনো সাইটের নাম্বার-ঠিকানা (/2001, /3000, /3001?service_id=N …) নতুন ঠিকানায় স্থায়ী (301) পাঠায়, যাতে গুগলে জমা ও
- * সংরক্ষিত পুরনো লিংক কাজ করে। তালিকা: config/routes.php-এর `legacy_routes()`; প্রতিটি /index/<নাম্বার> রূপেও চলে।
+ * সংরক্ষিত পুরনো লিংক কাজ করে। তালিকা: MAP ও config/routes.php; প্রতিটি /index/<নাম্বার> রূপেও চলে।
  */
 final class LegacyRedirectController
 {
-    /** পুরনো ঠিকানা => নতুন ঠিকানা। '/3001' আলাদা (service_id দেখে ঠিক হয়)। */
+    /** পুরনো ঠিকানা => নতুন ঠিকানা (পুরনো সাইটে শেষে / থাকত; রাউটার তা সরিয়ে মেলায়)। '/3001' আলাদা (service_id দেখে ঠিক হয়)। */
     public const MAP = [
         '/2001' => '/about',
         '/3000' => '/services',
@@ -28,10 +28,20 @@ final class LegacyRedirectController
         $this->redirect((string) ($meta['to'] ?? '/'));
     }
 
-    /** পুরনো /3001?service_id=N: N পুরনো সেবা-নাম্বার (সেবার তালিকার `legacy_sl`); চেনা না গেলে সব সেবার পেইজ। */
+    /** পুরনো সাইটের service_id = এই সংখ্যা + সেবার নাম্বার (sl): ২০২৩০৩০৩১১০৭৩০ = ১ নম্বর "অনুবাদক", …৭৩৭ = ৮ নম্বর "ইলেকট্রিক মিস্ত্রি"। */
+    private const OLD_ID_BASE = 20230303110729;
+
+    /**
+     * পুরনো /3001/?service_id=<দীর্ঘ নাম্বার> (পুরনো সাইটের লিংক এভাবেই ছিল), আর ছোট সেবা-নাম্বার হলে সেটাও;
+     * সেবা চেনা না গেলে সব সেবার পেইজ।
+     */
     public function service(): void
     {
-        $id = (int) ($_GET['service_id'] ?? 0);
+        $raw = (string) ($_GET['service_id'] ?? '');
+        $id = ctype_digit($raw) ? (int) $raw : 0;
+        if ($id > self::OLD_ID_BASE) {
+            $id -= self::OLD_ID_BASE;
+        }
         $slug = '';
         foreach ((array) require BASE_PATH . '/database/seeds/services.php' as [$sl, , $candidate]) {
             if ((int) $sl === $id) {
