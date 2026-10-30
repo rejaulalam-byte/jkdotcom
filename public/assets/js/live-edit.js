@@ -561,6 +561,17 @@
         var below = r.bottom + 8;
         var h = box.offsetHeight;
         box.style.top = (below + h > window.innerHeight && r.top - h - 8 > 0 ? r.top - h - 8 : Math.max(12, Math.min(below, window.innerHeight - h - 12))) + "px";
+        // লেখা বা নমুনা বাড়লে বাক্স লম্বা হয়: নিচ পর্দার বাইরে গেলে ওপরে তুলে আনা
+        if (!box.jkFit && window.ResizeObserver) {
+            box.jkFit = true;
+            new ResizeObserver(function () {
+                var top = parseFloat(box.style.top) || 12;
+                var over = top + box.offsetHeight + 12 - window.innerHeight;
+                if (!box.hidden && over > 0) {
+                    box.style.top = Math.max(12, top - over) + "px";
+                }
+            }).observe(box);
+        }
     }
 
     /* ---- ৭. ফর্মের ঘর: রং ও লুকানো/দেখানো (শুধু সুপার অ্যাডমিন; অন্যদের কাছে চিহ্নই আসে না) ---- */
