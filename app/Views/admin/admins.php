@@ -1,6 +1,6 @@
 <?php
 /**
- * অ্যাকাউন্ট তৈরি: তালিকা ও নতুন অ্যাকাউন্ট। সুপার অ্যাডমিন সব ভূমিকা দেখেন ও বানান; মেইন অ্যাডমিন শুধু সাব-অ্যাডমিন
+ * অ্যাকাউন্ট তৈরি: তালিকা ও নতুন অ্যাকাউন্ট। সুপার অ্যাডমিন সব ভূমিকা দেখেন ও বানান; মেইন অ্যাডমিন ও অ্যাডমিনিস্ট্রেটর শুধু সাব-অ্যাডমিন
  * (তালিকাও শুধু তাঁদের ও নিজের)। অনুমতি শুধু সাব-অ্যাডমিনের বদলানো যায়; সুপার ও মেইনের সব অনুমতি আছে।
  *
  * @var array<string,mixed> $admin
@@ -48,7 +48,7 @@ use App\Models\AdminPermissions;
                                     <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
                                     <label for="role-<?= (int) $a['id'] ?>">নতুন ভূমিকা</label>
                                     <select id="role-<?= (int) $a['id'] ?>" name="role">
-                                        <?php foreach (['admin', 'main', 'super'] as $roleOption): ?>
+                                        <?php foreach (['admin', 'administrator', 'main', 'super'] as $roleOption): ?>
                                             <?php if ($roleOption !== 'main' || !$hasMain || $a['role'] === 'main'): ?>
                                                 <option value="<?= $roleOption ?>"<?= $a['role'] === $roleOption ? ' selected' : '' ?>><?= e(AdminAuth::roleLabel($roleOption)) ?></option>
                                             <?php endif; ?>
@@ -96,6 +96,7 @@ use App\Models\AdminPermissions;
             <label for="na-role">ভূমিকা</label>
             <select id="na-role" name="role">
                 <option value="admin">সাব-অ্যাডমিন (নিচের অনুমতিগুলো পাবেন)</option>
+                <option value="administrator">অ্যাডমিনিস্ট্রেটর (মেইন অ্যাডমিনের সমান অনুমতি; যতজন দরকার)</option>
                 <?php if (!$hasMain): ?>
                     <option value="main">মেইন অ্যাডমিন / ওনার (কাঠামো ছাড়া সব; একজনই)</option>
                 <?php endif; ?>

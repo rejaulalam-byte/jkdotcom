@@ -101,10 +101,21 @@ final class AdminAuth
         return $admin['role'] === 'main';
     }
 
-    /** সুপার বা মেইন অ্যাডমিন: সব দৈনন্দিন কাজ ও অ্যাকাউন্ট তৈরি (কাঠামোর কাজ শুধু সুপার)। @param array<string,mixed> $admin */
+    /** @param array<string,mixed> $admin */
+    public static function isAdministrator(array $admin): bool
+    {
+        return $admin['role'] === 'administrator';
+    }
+
+    /**
+     * সুপার, মেইন অথবা অ্যাডমিনিস্ট্রেটর: সব দৈনন্দিন কাজ ও সাব-অ্যাডমিন তৈরি (কাঠামোর কাজ শুধু সুপার)।
+     * অ্যাডমিনিস্ট্রেটর = মেইন অ্যাডমিনের সমান অনুমতি, যতজন দরকার।
+     *
+     * @param array<string,mixed> $admin
+     */
     public static function isTop(array $admin): bool
     {
-        return self::isSuper($admin) || self::isMain($admin);
+        return self::isSuper($admin) || self::isMain($admin) || self::isAdministrator($admin);
     }
 
     /** সুপার ও মেইন অ্যাডমিনের সব অনুমতি; সাব-অ্যাডমিনের শুধু তালিকায় দেওয়াগুলো। @param array<string,mixed> $admin */
@@ -119,6 +130,7 @@ final class AdminAuth
         return match ($role) {
             'super' => 'সুপার অ্যাডমিন',
             'main' => 'মেইন অ্যাডমিন (ওনার)',
+            'administrator' => 'অ্যাডমিনিস্ট্রেটর',
             default => 'সাব-অ্যাডমিন',
         };
     }

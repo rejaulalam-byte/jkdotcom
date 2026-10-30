@@ -103,7 +103,7 @@ final class PanelController
         $this->ok(admin_base() . '/account', 'ইমেইল বদলানো হয়েছে।');
     }
 
-    // ---- অ্যাকাউন্ট তৈরি: সুপার সবাইকে দেখেন ও বানান; মেইন অ্যাডমিন শুধু সাব-অ্যাডমিনকে; সাব-অ্যাডমিন এই পেইজই পান না ----
+    // ---- অ্যাকাউন্ট তৈরি: সুপার সবাইকে দেখেন ও বানান; মেইন অ্যাডমিন ও অ্যাডমিনিস্ট্রেটর শুধু সাব-অ্যাডমিনকে; সাব-অ্যাডমিন এই পেইজই পান না ----
 
     public function admins(): void
     {
@@ -119,7 +119,7 @@ final class PanelController
         $email = mb_strtolower(clean_input($_POST['email'] ?? '', 150));
         $wanted = (string) ($_POST['role'] ?? 'admin');
         // মেইন অ্যাডমিন যা-ই পাঠান, শুধু সাব-অ্যাডমিন বানাতে পারেন
-        $role = AdminAuth::isSuper($admin) && in_array($wanted, ['super', 'main', 'admin'], true) ? $wanted : 'admin';
+        $role = AdminAuth::isSuper($admin) && in_array($wanted, ['super', 'main', 'administrator', 'admin'], true) ? $wanted : 'admin';
         $permissions = AdminPermissions::clean($_POST['permissions'] ?? []);
         if (mb_strlen($name) < 2 || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
             $this->back(admin_base() . '/admins', ['নাম ও সঠিক ইমেইল দিন।']);
@@ -204,7 +204,7 @@ final class PanelController
         }
         $target = AdminRepository::findById((int) ($_POST['id'] ?? 0));
         $role = (string) ($_POST['role'] ?? '');
-        if ($target === null || !in_array($role, ['super', 'main', 'admin'], true)) {
+        if ($target === null || !in_array($role, ['super', 'main', 'administrator', 'admin'], true)) {
             $this->back(admin_base() . '/admins', ['অ্যাকাউন্ট বা ভূমিকা পাওয়া যায়নি।']);
         }
         if ((int) $target['id'] === (int) $admin['id']) {
@@ -264,7 +264,8 @@ final class PanelController
      */
     private function mayManage(array $admin, array $target): bool
     {
-        return AdminAuth::isSuper($admin) || (AdminAuth::isMain($admin) && $target['role'] === 'admin');
+        // মেইন ও অ্যাডমিনিস্ট্রেটর শুধু সাব-অ্যাডমিন সামলান; একে অন্যকে বা সুপারকে দেখেন না
+        return AdminAuth::isSuper($admin) || (AdminAuth::isTop($admin) && $target['role'] === 'admin');
     }
 
     /** অ্যাকাউন্টের POST-এর পাহারা: সুপার বা মেইন অ্যাডমিন + CSRF। @return array<string,mixed> */
