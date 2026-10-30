@@ -40,7 +40,7 @@ $top = [
 ];
 $mine = [
     [admin_base() . '/account', 'আমার অ্যাকাউন্ট', false],
-    [admin_base() . '/admins', 'অ্যাডমিন', true],
+    [admin_base() . '/admins', 'অ্যাকাউন্ট তৈরি', true],
 ];
 ?>
 <!doctype html>
