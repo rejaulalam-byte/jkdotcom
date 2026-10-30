@@ -119,6 +119,47 @@ final class ContactTrackingRepository
     }
 
     /**
+     * দুই তারিখের মধ্যে (দুটোসহ) জমা-পড়া "আগ্রহী" (দর্শকের নাম-মোবাইল), পুরনো আগে; সর্বোচ্চ ৫০০০। রিপোর্টের জন্য।
+     *
+     * @return list<array{type:string,target_id:int,kind:string,visitor_name:string,visitor_phone:string,at:string}>
+     */
+    public static function leadsBetween(string $from, string $to, ?string $type = null): array
+    {
+        $out = [];
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $file = BASE_PATH . self::DEMO_FILE;
+            $data = is_file($file) ? json_decode((string) file_get_contents($file), true) : [];
+            foreach ((array) ($data['leads'] ?? []) as $l) {
+                $day = substr((string) ($l['at'] ?? ''), 0, 10);
+                if ($day >= $from && $day <= $to && ($type === null || ($l['type'] ?? '') === $type)) {
+                    $out[] = ['type' => (string) $l['type'], 'target_id' => (int) $l['target_id'], 'kind' => (string) $l['kind'],
+                        'visitor_name' => (string) $l['name'], 'visitor_phone' => (string) $l['phone'], 'at' => (string) $l['at']];
+                }
+            }
+            usort($out, static fn (array $a, array $b): int => strcmp($a['at'], $b['at']));
+
+            return $out;
+        }
+
+        try {
+            $stmt = $pdo->prepare(
+                'SELECT target_type, target_id, kind, visitor_name, visitor_phone, created_at FROM contact_leads
+                 WHERE created_at >= :a AND created_at < :b' . ($type !== null ? ' AND target_type = :t' : '') . ' ORDER BY created_at ASC LIMIT 5000'
+            );
+            $stmt->execute([':a' => $from . ' 00:00:00', ':b' => date('Y-m-d', strtotime($to . ' +1 day')) . ' 00:00:00'] + ($type !== null ? [':t' => $type] : []));
+            foreach ($stmt->fetchAll() as $r) {
+                $out[] = ['type' => (string) $r['target_type'], 'target_id' => (int) $r['target_id'], 'kind' => (string) $r['kind'],
+                    'visitor_name' => (string) $r['visitor_name'], 'visitor_phone' => (string) $r['visitor_phone'], 'at' => (string) $r['created_at']];
+            }
+        } catch (Throwable $e) {
+            Logger::error('ContactTrackingRepository::leadsBetween failed: ' . $e->getMessage());
+        }
+
+        return $out;
+    }
+
+    /**
      * আজ এই কর্মী/বিজ্ঞপ্তির জন্য কতগুলো "আগ্রহী" জমা পড়েছে; $phone দিলে শুধু ওই মোবাইলের। (খবর-ইমেইলের দিনের সীমার জন্য।)
      */
     public static function leadsToday(string $type, int $targetId, ?string $phone = null): int

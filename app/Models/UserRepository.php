@@ -90,6 +90,43 @@ final class UserRepository
     }
 
     /**
+     * দুই তারিখের মধ্যে (দুটোসহ) নিবন্ধিত পেশাজীবী, এখনকার অবস্থাসহ। পুরনো সাইট থেকে আনা কর্মী (legacy_id আছে) বাদ;
+     * অ্যাডমিনের হাতে যোগ করা কর্মী ধরা হয়।
+     *
+     * @return list<array{date:string,status:string}>
+     */
+    public static function registrationsBetween(string $from, string $to): array
+    {
+        $out = [];
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            foreach (self::demoRead() as $r) {
+                $day = substr((string) ($r['created_at'] ?? ''), 0, 10);
+                if (($r['role'] ?? '') === 'worker' && (string) ($r['legacy_id'] ?? '') === '' && $day >= $from && $day <= $to) {
+                    $out[] = ['date' => $day, 'status' => (string) ($r['status'] ?? 'approved')];
+                }
+            }
+
+            return $out;
+        }
+
+        try {
+            $stmt = $pdo->prepare(
+                "SELECT DATE(created_at) AS d, status FROM users
+                 WHERE role = 'worker' AND legacy_id IS NULL AND created_at >= :a AND created_at < :b"
+            );
+            $stmt->execute([':a' => $from . ' 00:00:00', ':b' => date('Y-m-d', strtotime($to . ' +1 day')) . ' 00:00:00']);
+            foreach ($stmt->fetchAll() as $r) {
+                $out[] = ['date' => (string) $r['d'], 'status' => (string) $r['status']];
+            }
+        } catch (Throwable $e) {
+            Logger::error('UserRepository::registrationsBetween failed: ' . $e->getMessage());
+        }
+
+        return $out;
+    }
+
+    /**
      * মোবাইল নাম্বার দিয়ে অ্যাকাউন্ট খোঁজে (লগইন ও দ্বিতীয়বার-নিবন্ধন আটকাতে)। $role দিলে শুধু সেই পাশের (worker|agent) অ্যাকাউন্ট।
      *
      * @return array<string,mixed>|null

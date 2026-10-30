@@ -18,6 +18,7 @@ use App\Controllers\Admin\StudioController as AdminStudio;
 use App\Controllers\Admin\MembersController as AdminMembers;
 use App\Controllers\Admin\PagesController as AdminPages;
 use App\Controllers\Admin\PanelController as AdminPanel;
+use App\Controllers\Admin\ReportsController as AdminReports;
 use App\Controllers\Admin\ServicesController as AdminServices;
 use App\Controllers\Admin\ThemeController as AdminTheme;
 use App\Controllers\AccountSetupController;
@@ -177,6 +178,8 @@ return array_merge($legacyRoutes, [
     ['POST', admin_base() . '/studio/home-section', [AdminHomeSections::class, 'live']],
     ['GET',  admin_base() . '/home-section/{slug}', [AdminHomeSections::class, 'edit']],
     ['POST', admin_base() . '/home-section/{slug}', [AdminHomeSections::class, 'save']],
+    ['GET',  admin_base() . '/reports',             [AdminReports::class, 'index']],
+    ['GET',  admin_base() . '/reports/{slug}',      [AdminReports::class, 'show']],
     ['GET',  admin_base() . '/hero',                [AdminHero::class, 'index']],
     ['POST', admin_base() . '/hero',                [AdminHero::class, 'save']],
     ['GET',  admin_base() . '/theme',               [AdminTheme::class, 'index']],
