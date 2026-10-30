@@ -121,6 +121,7 @@ final class JobPostRepository
                 'details' => (string) $r['details'],
                 'details_html' => (string) ($r['details_html'] ?? ''),
                 'contact_name' => (string) $r['contact_name'],
+                'contact_gender' => (string) ($r['contact_gender'] ?? ''),
                 'address' => (string) $r['address'],
                 'upazila' => $names['upazila'],
                 'district' => $names['district'],
@@ -164,7 +165,7 @@ final class JobPostRepository
         try {
             $days = max(1, min(30, (int) Content::get('settings.jobs_visible_days', '3')));
             $stmt = $pdo->prepare(
-                "SELECT id, title, details, details_html, contact_name, phone, email, address, upazila_id, district_id, division_id,
+                "SELECT id, title, details, details_html, contact_name, contact_gender, phone, email, address, upazila_id, district_id, division_id,
                         start_date, created_at
                  FROM job_posts
                  WHERE status = 'approved'

@@ -172,6 +172,23 @@ function social_links(): array
     return $links;
 }
 
+/** সময় বাংলায়: "৩০ অক্টোবর ২০২৬, রাত ৯:১৫"। */
+function bn_datetime(int $timestamp): string
+{
+    $months = ['জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'];
+    $hour = (int) date('G', $timestamp);
+    $period = match (true) {
+        $hour >= 5 && $hour < 12 => 'সকাল',
+        $hour >= 12 && $hour < 16 => 'দুপুর',
+        $hour >= 16 && $hour < 18 => 'বিকাল',
+        $hour >= 18 && $hour < 20 => 'সন্ধ্যা',
+        default => 'রাত',
+    };
+
+    return bn((int) date('j', $timestamp)) . ' ' . $months[(int) date('n', $timestamp) - 1] . ' ' . bn((int) date('Y', $timestamp))
+        . ', ' . $period . ' ' . bn((int) date('g', $timestamp)) . ':' . bn(date('i', $timestamp));
+}
+
 /** প্রতিটি POST ফর্মের জন্য লুকানো CSRF ঘর। */
 function csrf_field(): string
 {

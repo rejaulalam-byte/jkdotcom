@@ -19,6 +19,7 @@ $lead = static fn (string $key): string => content(($leadPrefix ?? 'today.lead')
     <form class="lead__step" data-step="form" hidden novalidate>
         <h3><?= e($lead('form_title')) ?></h3>
         <p><?= e($lead('form_text')) ?></p>
+        <p class="lead__notice"><?= e($lead('notice')) ?></p>
         <?php require BASE_PATH . '/app/Views/partials/bn-switch.php'; ?>
         <div class="pf">
             <label class="sr-only" for="lead-name"><?= e($lead('name')) ?></label>

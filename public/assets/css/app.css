@@ -3215,6 +3215,13 @@ textarea {
     font-size: calc(var(--fs-body) * var(--k-body));
     line-height: 1.7;
 }
+/* দর্শককে জানানো: তাঁর নাম-মোবাইল সংশ্লিষ্ট ব্যক্তিকে যাবে */
+.lead__notice {
+    padding: 0.6rem 0.9rem;
+    border-left: 4px solid var(--amber);
+    background: rgba(var(--teal-rgb), 0.06);
+    font-weight: 500;
+}
 .lead__actions {
     display: flex;
     flex-wrap: wrap;

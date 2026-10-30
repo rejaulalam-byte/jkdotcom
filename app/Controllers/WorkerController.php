@@ -14,6 +14,7 @@ use App\Core\Session;
 use App\Core\View;
 use App\Models\ContactTrackingRepository;
 use App\Models\GeoRepository;
+use App\Models\LeadNotice;
 use App\Models\RatingRepository;
 use App\Models\ServiceRepository;
 use App\Models\UserRepository;
@@ -186,6 +187,14 @@ final class WorkerController
         if (!Mailer::send($to, 'পেশাজীবীর যোগাযোগ দেখতে চেয়েছেন: ' . $user['name'], $body)) {
             Logger::error('Worker contact-lead e-mail could not be sent');
         }
+        // কর্মীকেও জানানো: কে তাঁর ফোন/ইমেইল দেখেছেন (ইমেইল থাকলে; লেখা "ইমেইলের লেখা" পেইজে বদলানো যায়)
+        $slug = (string) ($_SESSION['wk_service'][$id] ?? $user['service_slug'] ?? '');
+        LeadNotice::send('worker', $id, [
+            'name' => (string) $user['name'],
+            'gender' => $user['gender'] ?? null,
+            'email' => (string) ($user['email'] ?? ''),
+            'label' => $slug !== '' ? (string) (ServiceRepository::findBySlug($slug)['name'] ?? '') : (string) ($user['service_custom'] ?? ''),
+        ], $kind, $name, $phone);
 
         $this->reply($show());
     }

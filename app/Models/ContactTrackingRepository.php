@@ -119,6 +119,40 @@ final class ContactTrackingRepository
     }
 
     /**
+     * আজ এই কর্মী/বিজ্ঞপ্তির জন্য কতগুলো "আগ্রহী" জমা পড়েছে; $phone দিলে শুধু ওই মোবাইলের। (খবর-ইমেইলের দিনের সীমার জন্য।)
+     */
+    public static function leadsToday(string $type, int $targetId, ?string $phone = null): int
+    {
+        $pdo = Database::connection();
+        if ($pdo === null) {
+            $file = BASE_PATH . self::DEMO_FILE;
+            $data = is_file($file) ? json_decode((string) file_get_contents($file), true) : [];
+            $n = 0;
+            foreach ((array) ($data['leads'] ?? []) as $l) {
+                if (($l['type'] ?? '') === $type && (int) ($l['target_id'] ?? 0) === $targetId && str_starts_with((string) ($l['at'] ?? ''), date('Y-m-d'))
+                    && ($phone === null || ($l['phone'] ?? '') === $phone)) {
+                    $n++;
+                }
+            }
+
+            return $n;
+        }
+
+        try {
+            $stmt = $pdo->prepare(
+                'SELECT COUNT(*) FROM contact_leads WHERE target_type = :t AND target_id = :i AND created_at >= CURDATE()' . ($phone !== null ? ' AND visitor_phone = :p' : '')
+            );
+            $stmt->execute([':t' => $type, ':i' => $targetId] + ($phone !== null ? [':p' => $phone] : []));
+
+            return (int) $stmt->fetchColumn();
+        } catch (Throwable $e) {
+            Logger::error('ContactTrackingRepository::leadsToday failed: ' . $e->getMessage());
+
+            return 0;
+        }
+    }
+
+    /**
      * অ্যাডমিনের আগ্রহীর তালিকা, নতুন আগে। $type: '' সব, 'job' বা 'worker'; $q = আগ্রহীর নাম বা মোবাইলের অংশ।
      * প্রতিটি সারিতে target_title (বিজ্ঞপ্তির ধরন বা কর্মীর নাম, না পেলে খালি)।
      *

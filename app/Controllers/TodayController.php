@@ -16,6 +16,7 @@ use App\Models\CustomFields;
 use App\Models\FormFields;
 use App\Models\GeoRepository;
 use App\Models\JobPostRepository;
+use App\Models\LeadNotice;
 use App\Models\ServiceRepository;
 
 /** "আজকের প্রকাশিত": কাজের তালিকা (/today), লুকানো ফোন/ইমেইল দেখানো এবং কাজ জানানোর ফর্ম (/today/post)। */
@@ -146,6 +147,15 @@ final class TodayController
             . "(প্রয়োজনে কাজের মালিককে ফোন করে জেনে নিন এই নামে কেউ খোঁজ নিয়েছেন কিনা।)\n";
         if (!Mailer::send($to, 'কাজের যোগাযোগ দেখতে চেয়েছেন: ' . ($notice['title'] ?? ('#' . $id)), $body)) {
             Logger::error('Contact-lead e-mail could not be sent');
+        }
+        // বিজ্ঞপ্তিদাতাকেও জানানো (বিজ্ঞপ্তিতে ইমেইল দেওয়া থাকলে; লেখা "ইমেইলের লেখা" পেইজে বদলানো যায়)
+        if ($notice !== null) {
+            LeadNotice::send('job', $id, [
+                'name' => (string) $notice['contact_name'],
+                'gender' => ((string) ($notice['contact_gender'] ?? '')) !== '' ? (string) $notice['contact_gender'] : null,
+                'email' => (string) ($contact['email'] ?? ''),
+                'label' => (string) $notice['title'],
+            ], $kind, $name, $phone);
         }
 
         $reply($show());
