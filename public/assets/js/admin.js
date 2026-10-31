@@ -455,3 +455,33 @@
         }
     });
 })();
+
+/* ---- ফোনে মেনু ☰ বোতামের ভেতরে: ৮০০px-এর নিচে বন্ধ থাকে, বোতামে খোলে/বন্ধ হয়; বড় পর্দায় বোতাম লুকানো ও মেনু সবসময় খোলা ---- */
+(function () {
+    var top = document.getElementById("adm-top-menu");
+    var btn = top ? top.querySelector(".adm-top__toggle") : null;
+    if (!top || !btn || !window.matchMedia) {
+        return;
+    }
+    var phone = window.matchMedia("(max-width: 800px)");
+
+    function sync() {
+        btn.hidden = !phone.matches;
+        if (phone.matches) {
+            top.setAttribute("data-menu", "closed");
+        } else {
+            top.removeAttribute("data-menu");
+        }
+        btn.setAttribute("aria-expanded", "false");
+    }
+
+    btn.addEventListener("click", function () {
+        var open = top.getAttribute("data-menu") === "closed";
+        top.setAttribute("data-menu", open ? "open" : "closed");
+        btn.setAttribute("aria-expanded", String(open));
+    });
+    if (phone.addEventListener) {
+        phone.addEventListener("change", sync);
+    }
+    sync();
+})();

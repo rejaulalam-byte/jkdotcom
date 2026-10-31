@@ -612,6 +612,59 @@ ul.adm-notice {
     margin-top: 8px;
 }
 
+/* ফোন: মেনু ☰ বোতামের ভেতরে (JavaScript বোতাম দেখায় ও data-menu বসায়; JavaScript না চললে মেনু আগের মতো খোলাই থাকে) */
+.adm-top__toggle {
+    min-height: 44px;
+    margin: 0 0 0 auto;
+    padding: 4px 18px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--gold);
+    color: var(--teal-dark);
+    font-size: 19px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.adm-top__toggle[hidden] {
+    display: none;
+}
+@media (max-width: 800px) {
+    .adm-top[data-menu] {
+        max-height: 100vh;
+        overflow-y: auto;
+    }
+    .adm-top[data-menu] .adm-top__row {
+        gap: 8px;
+    }
+    .adm-top[data-menu] .adm-top__nav,
+    .adm-top[data-menu] .adm-top__user {
+        flex: 1 0 100%;
+        flex-direction: column;
+        align-items: stretch;
+        margin-left: 0;
+    }
+    .adm-top[data-menu] .adm-top__nav a,
+    .adm-top[data-menu] .adm-top__user button {
+        display: block;
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 16px;
+        text-align: left;
+    }
+    .adm-top[data-menu] .adm-top__work {
+        flex-direction: column;
+    }
+    .adm-top[data-menu] .adm-top__work a {
+        padding: 10px 16px;
+        font-size: 18px;
+    }
+    .adm-top[data-menu="closed"] .adm-top__nav,
+    .adm-top[data-menu="closed"] .adm-top__user,
+    .adm-top[data-menu="closed"] .adm-top__work {
+        display: none;
+    }
+}
+
 /* ফোন ও ছোট পর্দা: মেনু ওপরে */
 @media (max-width: 800px) {
     .adm-top__row,

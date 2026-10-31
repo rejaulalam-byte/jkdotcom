@@ -60,9 +60,10 @@ $mine = [
 </head>
 <body class="<?= $admin !== null ? 'adm-shell' : 'adm-plain' ?>">
 <?php if ($admin !== null): ?>
-    <header class="adm-top">
+    <header class="adm-top" id="adm-top-menu">
         <div class="adm-top__row">
             <p class="adm-brand adm-brand--inline">Jorurikaj.com<span>অ্যাডমিন প্যানেল</span></p>
+            <button class="adm-top__toggle" type="button" aria-expanded="false" aria-controls="adm-top-menu" hidden>☰ মেনু</button>
             <nav class="adm-top__nav" aria-label="প্যানেলের মূল মেনু">
                 <?php foreach ($top as [$href, $label, $superOnly]): ?>
                     <?php if (!$superOnly || AdminAuth::isSuper($admin)): ?>
