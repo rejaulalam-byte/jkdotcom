@@ -34,6 +34,7 @@ use App\Controllers\PageController;
 use App\Controllers\ProfileController;
 use App\Controllers\RegistrationController;
 use App\Controllers\SearchController;
+use App\Controllers\SeoController;
 use App\Controllers\ServiceController;
 use App\Controllers\SubscribeController;
 use App\Controllers\ThemeController;
@@ -73,6 +74,8 @@ return array_merge($legacyRoutes, [
     ['GET',  '/about',           [PageController::class, 'about']],
     ['GET',  '/page/{slug}',     [PageController::class, 'custom']],
     ['GET',  '/site-theme',      [ThemeController::class, 'css']],
+    ['GET',  '/robots.txt',      [SeoController::class, 'robots']],
+    ['GET',  '/sitemap.xml',     [SeoController::class, 'sitemap']],
     ['GET',  '/search',          [SearchController::class, 'index']],
     ['GET',  '/services',        [ServiceController::class, 'index']],
     ['GET',  '/services/{slug}', [ServiceController::class, 'show']],
