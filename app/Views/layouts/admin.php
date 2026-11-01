@@ -22,19 +22,20 @@ $nav = [
     [admin_base() . '/agents', 'প্রতিনিধি', false, 'registrations'],
     [admin_base() . '/old-workers', 'পুরনো কর্মী সক্রিয় করা', false, 'registrations'],
     [admin_base() . '/incomplete', 'অসম্পূর্ণ তথ্য', false, 'registrations'],
-    [admin_base() . '/feedback', 'মতামত', false, 'inbox'],
-    [admin_base() . '/subscribers', 'ইমেইল গ্রাহক', false, 'inbox'],
-    [admin_base() . '/leads', 'আগ্রহীর তালিকা', false, 'inbox'],
-    [admin_base() . '/jobs', 'কাজের বিজ্ঞপ্তি', false, 'inbox'],
-    [admin_base() . '/reports', 'রিপোর্ট', false, 'reports'],
-    [admin_base() . '/ads', 'বিজ্ঞাপন', false, 'ads'],
-    [admin_base() . '/services', 'সেবার তালিকা', false, 'services'],
-    [admin_base() . '/studio', 'লাইভ পেইজ এডিট', false, 'pages'],
-    [admin_base() . '/pages', 'নতুন পেইজ', false, 'pages'],
-    [admin_base() . '/mails', 'ইমেইলের লেখা', false, 'email'],
-    [admin_base() . '/theme', 'রং ও আকার', true, 'pages'],
-    [admin_base() . '/hero', 'হিরো সেটিং', false, 'hero'],
     [admin_base() . '/locks', 'আটকানো লগইন', false, 'locks'],
+    [admin_base() . '/jobs', 'কাজের বিজ্ঞপ্তি', false, 'inbox'],
+    [admin_base() . '/services', 'সেবার তালিকা', false, 'services'],
+    [admin_base() . '/leads', 'আগ্রহীর তালিকা', false, 'inbox'],
+    [admin_base() . '/ads', 'বিজ্ঞাপন', false, 'ads'],
+    [admin_base() . '/subscribers', 'ইমেইল গ্রাহক', false, 'inbox'],
+    [admin_base() . '/mails', 'ইমেইলের লেখা', false, 'email'],
+    [admin_base() . '/feedback', 'মতামত', false, 'inbox'],
+    [admin_base() . '/theme', 'রং ও আকার', true, 'pages'],
+    [admin_base() . '/pages', 'নতুন পেইজ', false, 'pages'],
+    [admin_base() . '/reports', 'রিপোর্ট', false, 'reports'],
+    [admin_base() . '/hero', 'হিরো সেটিং', false, 'hero'],
+    // নতুন মেনু এই লাইনের ওপরে বসাতে হবে: "লাইভ পেইজ এডিট" সবসময় সবার শেষে, বারের ডান প্রান্তে (নিচের adm-top__last)
+    [admin_base() . '/studio', 'লাইভ পেইজ এডিট', false, 'pages'],
 ];
 // ওপরের সারি: বাঁয়ে ড্যাশবোর্ড; ডানে নিজের জিনিস (নিজের অ্যাকাউন্ট; "অ্যাকাউন্ট তৈরি" সুপার ও মেইন অ্যাডমিনের)। কার্যলগ ড্যাশবোর্ডের ডান পাশের আলাদা বাক্সে
 $top = [
@@ -86,7 +87,7 @@ $mine = [
         <nav class="adm-top__work" aria-label="কাজের মেনু">
             <?php foreach ($nav as [$href, $label, $superOnly, $need]): ?>
                 <?php if ((!$superOnly || AdminAuth::isSuper($admin)) && ($need === null || AdminAuth::can($admin, $need))): ?>
-                    <a href="<?= e($href) ?>"<?= is_current($href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
+                    <a<?= $href === admin_base() . '/studio' ? ' class="adm-top__last"' : '' ?> href="<?= e($href) ?>"<?= is_current($href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
                 <?php endif; ?>
             <?php endforeach; ?>
         </nav>

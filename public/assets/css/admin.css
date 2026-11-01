@@ -356,6 +356,11 @@ ul.adm-notice {
     font-size: 17px;
     text-decoration: none;
 }
+/* "লাইভ পেইজ এডিট": সারির একদম ডান প্রান্তে, সবসময় সবার শেষে */
+.adm-top__work a.adm-top__last {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.12);
+}
 .adm-top__work a:hover,
 .adm-top__work a[aria-current="page"] {
     background: rgba(255, 255, 255, 0.2);
