@@ -1896,6 +1896,8 @@
     }
     var pixels = null;
     var natural = null;
+    var label = null;
+    var LABEL_MARGIN = 50;
 
     function load() {
         if (pixels !== null) {
@@ -1912,6 +1914,7 @@
                 ctx.drawImage(probe, 0, 0);
                 pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
                 natural = { w: canvas.width, h: canvas.height };
+                label = findLabel();
             } catch (err) {
                 pixels = false;
             }
@@ -1928,15 +1931,59 @@
         if (px < 0 || py < 0 || px >= natural.w || py >= natural.h) {
             return false;
         }
-        // লাল বিন্দু, অথবা (মানচিত্রের সাদা "Dhaka" লেখার মতো) চারপাশে লালে ঘেরা বিন্দু
-        if (redAt(px, py)) {
+        if (redAt(px, py) || enclosed(px, py)) {
             return true;
         }
+        // লেখার চারপাশে LABEL_MARGIN পিক্সেল (পর্দার মাপে) জায়গা
+        var m = LABEL_MARGIN / scale;
+        return !!label && px >= label.x0 - m && px <= label.x1 + m && py >= label.y0 - m && py <= label.y1 + m;
+    }
+
+    /* লালে ঘেরা অ-লাল বিন্দু: চারদিকে ৭ পিক্সেল দূরে অন্তত তিনটা লাল (মানচিত্রের সাদা "Dhaka" লেখার মতো) */
+    function enclosed(px, py) {
         var around = 0;
         [[-7, 0], [7, 0], [0, -7], [0, 7]].forEach(function (d) {
             around += redAt(px + d[0], py + d[1]) ? 1 : 0;
         });
         return around >= 3;
+    }
+
+    /* লেখার জায়গা: লালে ঘেরা সাদা বিন্দুগুলোর মধ্যে সবচেয়ে ঘন গোছা (মানচিত্রের "Dhaka" লেখা); না পেলে null */
+    function findLabel() {
+        var pts = [];
+        for (var y = 0; y < natural.h; y++) {
+            for (var x = 0; x < natural.w; x++) {
+                var i = (y * natural.w + x) * 4;
+                if (pixels[i] > 200 && pixels[i + 1] > 200 && pixels[i + 2] > 200 && enclosed(x, y)) {
+                    pts.push([x, y]);
+                }
+            }
+        }
+        if (!pts.length || pts.length > 4000) {
+            return null;
+        }
+        var best = null;
+        var bestCount = 0;
+        pts.forEach(function (p) {
+            var n = near(pts, p, 25, 10).length;
+            if (n > bestCount) {
+                bestCount = n;
+                best = p;
+            }
+        });
+        var group = near(pts, best, 30, 14);
+        return {
+            x0: Math.min.apply(null, group.map(function (q) { return q[0]; })),
+            x1: Math.max.apply(null, group.map(function (q) { return q[0]; })),
+            y0: Math.min.apply(null, group.map(function (q) { return q[1]; })),
+            y1: Math.max.apply(null, group.map(function (q) { return q[1]; }))
+        };
+    }
+
+    function near(pts, p, dx, dy) {
+        return pts.filter(function (q) {
+            return Math.abs(q[0] - p[0]) <= dx && Math.abs(q[1] - p[1]) <= dy;
+        });
     }
 
     function redAt(px, py) {
