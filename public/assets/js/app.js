@@ -1885,3 +1885,74 @@
         e.preventDefault();
     }, true);
 })();
+
+/* ---- হোমের বাংলাদেশ-মানচিত্র (.about__map): লাল রঙের অংশের (ঢাকা) ওপর কার্সর এলে হাতের চিহ্ন, অন্য জায়গায় সাধারণ কার্সর ----
+   ছবির যে বিন্দুর নিচে মাউস, তার রং ক্যানভাসে পড়ে দেখা হয় (ছবি একই সাইটের, তাই পড়া যায়); ছবি বদলালেও কোড একই চলে।
+   ক্লিকে এখনো কিছু হয় না। শুধু কার্সর। */
+(function () {
+    var img = document.querySelector(".about__map");
+    if (!img || !window.matchMedia("(hover: hover)").matches) {
+        return;
+    }
+    var pixels = null;
+    var natural = null;
+
+    function load() {
+        if (pixels !== null) {
+            return;
+        }
+        pixels = false;
+        var probe = new Image();
+        probe.onload = function () {
+            try {
+                var canvas = document.createElement("canvas");
+                canvas.width = probe.naturalWidth;
+                canvas.height = probe.naturalHeight;
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(probe, 0, 0);
+                pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                natural = { w: canvas.width, h: canvas.height };
+            } catch (err) {
+                pixels = false;
+            }
+        };
+        probe.src = img.currentSrc || img.src;
+    }
+
+    function isRed(x, y) {
+        var rect = img.getBoundingClientRect();
+        // object-fit: cover: ছবি বাক্সটা ভরে, বাড়তি অংশ কাটা যায়
+        var scale = Math.max(rect.width / natural.w, rect.height / natural.h);
+        var px = Math.floor((x - rect.left - (rect.width - natural.w * scale) / 2) / scale);
+        var py = Math.floor((y - rect.top - (rect.height - natural.h * scale) / 2) / scale);
+        if (px < 0 || py < 0 || px >= natural.w || py >= natural.h) {
+            return false;
+        }
+        // লাল বিন্দু, অথবা (মানচিত্রের সাদা "Dhaka" লেখার মতো) চারপাশে লালে ঘেরা বিন্দু
+        if (redAt(px, py)) {
+            return true;
+        }
+        var around = 0;
+        [[-7, 0], [7, 0], [0, -7], [0, 7]].forEach(function (d) {
+            around += redAt(px + d[0], py + d[1]) ? 1 : 0;
+        });
+        return around >= 3;
+    }
+
+    function redAt(px, py) {
+        if (px < 0 || py < 0 || px >= natural.w || py >= natural.h) {
+            return false;
+        }
+        var i = (py * natural.w + px) * 4;
+        return pixels[i] > 140 && pixels[i + 1] < 90 && pixels[i + 2] < 90;
+    }
+
+    img.addEventListener("mouseenter", load);
+    img.addEventListener("mousemove", function (e) {
+        load();
+        img.classList.toggle("is-hot", !!pixels && isRed(e.clientX, e.clientY));
+    });
+    img.addEventListener("mouseleave", function () {
+        img.classList.remove("is-hot");
+    });
+})();

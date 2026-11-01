@@ -5643,3 +5643,8 @@ body.page-search .svc-search__btn {
 .search-chips a:hover {
     background: var(--teal-10);
 }
+
+/* হোমের মানচিত্রে লাল (ঢাকা) অংশের ওপর হাতের কার্সর (app.js "হোমের বাংলাদেশ-মানচিত্র") */
+.about__map.is-hot {
+    cursor: pointer;
+}
