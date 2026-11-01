@@ -506,3 +506,34 @@
     }
     sync();
 })();
+
+/* ---- "কপি করুন" বোতাম ([data-copy-from] = যে লেখার ঘরের লেখা কপি হবে তার id): ইমেইল-ছাড়া সদস্যের বার্তা ফোনে পাঠানোর জন্য ---- */
+(function () {
+    document.querySelectorAll("[data-copy-from]").forEach(function (btn) {
+        var box = document.getElementById(btn.getAttribute("data-copy-from"));
+        if (!box) {
+            return;
+        }
+        var label = btn.textContent;
+        btn.addEventListener("click", function () {
+            box.select();
+            var done = function () {
+                btn.textContent = btn.getAttribute("data-copied");
+                window.setTimeout(function () {
+                    btn.textContent = label;
+                }, 2000);
+            };
+            // নতুন পথ না চললে (অনুমতি নেই বা পুরনো ব্রাউজার) পুরনো কপি-কমান্ড
+            var fallback = function () {
+                if (document.execCommand("copy")) {
+                    done();
+                }
+            };
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(box.value).then(done, fallback);
+            } else {
+                fallback();
+            }
+        });
+    });
+})();

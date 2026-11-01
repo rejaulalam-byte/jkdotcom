@@ -148,7 +148,11 @@ $back = admin_base() . '/members/' . (int) $member['id'];
 <details class="adm-box"<?= $oldMessage !== [] ? ' open' : '' ?>>
     <summary class="adm-card__title">✉ <?= $isWorker ? 'কর্মীকে' : 'প্রতিনিধিকে' ?> বার্তা পাঠান</summary>
     <?php if ((string) ($member['email'] ?? '') === ''): ?>
-        <p class="adm-muted">এই সদস্যের ইমেইল নেই, তাই বার্তা পাঠানো যায় না। ফোনে জানান<?= (string) ($member['phone'] ?? '') !== '' ? ' (' . e(format_phone((string) $member['phone'])) . ')' : '' ?>, অথবা "সম্পাদনা করুন" থেকে ইমেইল বসান।</p>
+        <?php $mobile = (string) ($member['phone'] ?? ''); ?>
+        <p class="adm-muted">এই সদস্যের ইমেইল নেই, তাই সাইট থেকে বার্তা যায় না। নিচে বার্তা লিখে কপি করে নিজের ফোনের মেসেজ বা হোয়াটসঅ্যাপে পাঠান<?= $mobile !== '' ? ' (<a href="tel:+88' . e($mobile) . '">' . e(format_phone($mobile)) . '</a>)' : '' ?>। ইমেইল বসিয়ে নিলে সাইট থেকেই পাঠানো যাবে: <a href="<?= admin_base() ?>/member-edit/<?= (int) $member['id'] ?>">✎ সম্পাদনা করুন</a>।</p>
+        <label for="mm-copy">বার্তা (সাইট এটা পাঠায় না, শুধু কপি করার জন্য)</label>
+        <textarea id="mm-copy" rows="6" maxlength="3000"></textarea>
+        <button class="adm-small adm-small--go" type="button" data-copy-from="mm-copy" data-copied="কপি হয়েছে ✓">কপি করুন</button>
     <?php else: ?>
         <form action="<?= admin_base() ?>/members/message" method="post">
             <?= csrf_field() ?>
