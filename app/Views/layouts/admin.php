@@ -87,7 +87,7 @@ $mine = [
         <nav class="adm-top__work" aria-label="কাজের মেনু">
             <?php foreach ($nav as [$href, $label, $superOnly, $need]): ?>
                 <?php if ((!$superOnly || AdminAuth::isSuper($admin)) && ($need === null || AdminAuth::can($admin, $need))): ?>
-                    <a<?= $href === admin_base() . '/studio' ? ' class="adm-top__last"' : '' ?> href="<?= e($href) ?>"<?= is_current($href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
+                    <a<?= $href === admin_base() . '/studio' ? ' class="adm-top__last"' : ($href === admin_base() . '/hero' ? ' class="adm-top__pre"' : '') ?> href="<?= e($href) ?>"<?= is_current($href) ? ' aria-current="page"' : '' ?>><?= e($label) ?></a>
                 <?php endif; ?>
             <?php endforeach; ?>
         </nav>

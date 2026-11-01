@@ -356,10 +356,17 @@ ul.adm-notice {
     font-size: 17px;
     text-decoration: none;
 }
-/* "লাইভ পেইজ এডিট": সারির একদম ডান প্রান্তে, সবসময় সবার শেষে */
-.adm-top__work a.adm-top__last {
-    margin-left: auto;
+/* ডান প্রান্তের জোড়া: "হিরো সেটিং" ও তার ডানে "লাইভ পেইজ এডিট" (সবসময় সবার শেষে); হিরো না থাকলে লাইভ পেইজ এডিট একাই ডানে */
+.adm-top__work a.adm-top__last,
+.adm-top__work a.adm-top__pre {
     background: rgba(255, 255, 255, 0.12);
+}
+.adm-top__work a.adm-top__last,
+.adm-top__work a.adm-top__pre {
+    margin-left: auto;
+}
+.adm-top__work a.adm-top__pre + a.adm-top__last {
+    margin-left: 0;
 }
 .adm-top__work a:hover,
 .adm-top__work a[aria-current="page"] {
