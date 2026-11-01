@@ -158,22 +158,43 @@
    প্রথমবার খোলার সময় এডিটর শুরু হয় (admin-editor.js, "jk:open-rich")। বন্ধ করার আগে না-সংরক্ষিত বদল থাকলে জিজ্ঞেস। ---- */
 (function () {
     var dialog = document.getElementById("rich-dialog");
-    if (!dialog || typeof dialog.showModal !== "function") {
+    if (!dialog || typeof dialog.show !== "function") {
         return;
     }
-    window.addEventListener("message", function (e) {
-        if (e.origin !== window.location.origin || !e.data || e.data.jk !== "open-rich" || dialog.open) {
-            return;
-        }
-        dialog.showModal();
-        document.dispatchEvent(new CustomEvent("jk:open-rich"));
-    });
-    dialog.querySelector("[data-rich-close]").addEventListener("click", function () {
+    // বাক্সটা showModal() নয়, show() দিয়ে খোলা হয় (পর্দা-ঢাকা আলাদা): modal বাক্সের বাইরের সবকিছু অচল হয়ে যায়,
+    // আর এডিটরের ড্রপডাউন/ডায়ালগ (রং, ফন্ট সাইজ, টেবিল, ছবি) পাতার ওপরের স্তরে বসে বলে তখন ক্লিক ধরত না
+    var backdrop = document.createElement("div");
+    backdrop.className = "adm-rich-backdrop";
+    backdrop.hidden = true;
+    document.body.appendChild(backdrop);
+
+    function closeBox() {
         var editor = window.tinymce ? window.tinymce.get("rich-editor") : null;
         if (editor && editor.isDirty() && !window.confirm("লেখার বদল সংরক্ষণ হয়নি। তবুও বন্ধ করবেন?")) {
             return;
         }
         dialog.close();
+    }
+
+    window.addEventListener("message", function (e) {
+        if (e.origin !== window.location.origin || !e.data || e.data.jk !== "open-rich" || dialog.open) {
+            return;
+        }
+        backdrop.hidden = false;
+        document.body.classList.add("adm-noscroll");
+        dialog.show();
+        document.dispatchEvent(new CustomEvent("jk:open-rich"));
+    });
+    dialog.addEventListener("close", function () {
+        backdrop.hidden = true;
+        document.body.classList.remove("adm-noscroll");
+    });
+    dialog.querySelector("[data-rich-close]").addEventListener("click", closeBox);
+    // Esc: এডিটরের নিজের খোলা মেনু/ডায়ালগ থাকলে সেটাই বন্ধ হয়, নইলে বাক্স বন্ধ
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && dialog.open && !document.querySelector(".tox-menu, .tox-dialog, .tox-collection")) {
+            closeBox();
+        }
     });
 })();
 
