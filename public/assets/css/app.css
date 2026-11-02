@@ -2697,19 +2697,19 @@ textarea {
     border: 1px dashed var(--teal-35);
     border-radius: 0.625rem;
     background: var(--teal-05);
-    font-size: calc(1.0625rem * var(--k-body));
+    font-size: calc(1.3rem * var(--k-body));
     line-height: 1.5;
     color: var(--teal);
 }
 .bn-switch__btn {
     flex: none;
-    min-width: 4.5rem;
-    padding: 0.2rem 1rem;
+    min-width: 7.5rem;
+    padding: 0.3rem 2rem;
     border: 2px solid var(--teal);
     border-radius: 50px;
     background: var(--teal);
     color: var(--white);
-    font-size: calc(1.0625rem * var(--k-body));
+    font-size: calc(1.3rem * var(--k-body));
     font-weight: 600;
     cursor: pointer;
 }
@@ -3255,7 +3255,7 @@ textarea {
 .lead .bn-switch {
     margin-bottom: 1rem;
     padding: 0.4rem 0.8rem;
-    font-size: calc(0.9375rem * var(--k-body));
+    font-size: calc(1.1rem * var(--k-body));
 }
 .lead__error {
     margin: 0 0 0.4rem !important;
@@ -5672,7 +5672,7 @@ body.page-search .svc-search__btn {
     border-radius: 0.5rem;
     background: transparent;
     font: inherit;
-    font-size: calc(1.25rem * var(--k-body));
+    font-size: calc(1.6rem * var(--k-body));
     line-height: 1.5;
     text-align: left;
     color: var(--ink);
