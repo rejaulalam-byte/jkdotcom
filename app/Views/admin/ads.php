@@ -178,6 +178,8 @@ $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 
                 </span>
             </div>
             <div class="adm-actions adm-ad__buttons">
+                <?= $action('up', '▲ আগে আনুন') ?>
+                <?= $action('down', '▼ পরে নিন') ?>
                 <?= $isActive ? $action('deactivate', 'বন্ধ করুন') : $action('activate', 'চালু করুন', 'adm-small--go') ?>
                 <?= $action('delete', 'মুছুন', 'adm-small--warn', 'এই বিজ্ঞাপন ও তার ছবি চিরতরে মুছে যাবে। মুছবেন?') ?>
             </div>

@@ -139,6 +139,9 @@ final class AdsController
         }
         $title = (string) $ad['title'];
         $do = (string) ($_POST['do'] ?? '');
+        if ($do === 'up' || $do === 'down') {
+            $this->move($ad, $do === 'up' ? -1 : 1);
+        }
 
         [$done, $log, $message] = match ($do) {
             'activate' => [AdRepository::update((int) $ad['id'], ['is_active' => 1]), 'ad_activate', 'চালু করা হলো।'],
@@ -157,6 +160,23 @@ final class AdsController
         }
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], $log, $title);
         $this->ok('"' . $title . '" — ' . $message);
+    }
+
+    /** বিজ্ঞাপনটিকে ক্রমে এক ধাপ ওপরে (-1) বা নিচে (+1) সরায়; সবার ক্রম নতুন করে ১, ২, ৩… বসে। */
+    private function move(array $ad, int $step): never
+    {
+        $ids = array_map(static fn (array $r): int => (int) $r['id'], AdRepository::all());
+        $from = array_search((int) $ad['id'], $ids, true);
+        $to = $from === false ? false : $from + $step;
+        if ($from === false || $to < 0 || $to >= count($ids)) {
+            $this->fail('আর সরানো যাবে না।');
+        }
+        [$ids[$from], $ids[$to]] = [$ids[$to], $ids[$from]];
+        foreach ($ids as $i => $id) {
+            AdRepository::update($id, ['sort_order' => $i + 1]);
+        }
+        AdminRepository::log((int) AdminAuth::require('ads')['id'], (string) AdminAuth::require('ads')['name'], 'ad_update', (string) $ad['title'] . ' — ক্রম বদল');
+        $this->ok('"' . $ad['title'] . '" — ক্রম বদলেছে।');
     }
 
     /** POST: on (1 = হোমে বিজ্ঞাপন-স্ট্রিপ দেখাও, 0 = লুকাও) — `home.ads.show`। */
