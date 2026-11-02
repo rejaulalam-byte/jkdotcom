@@ -21,6 +21,9 @@ use App\Models\PopupAd;
  */
 final class AdsController
 {
+    /** বার্তা কোন ফর্মের কাছে দেখাবে (popup | strip | new | list | ad-<id>); ফাঁকা হলে পেইজের মাথায়। */
+    private string $where = '';
+
     public function index(): void
     {
         $admin = AdminAuth::require('ads');
@@ -32,8 +35,12 @@ final class AdsController
             'ads' => AdRepository::all(),
             'stripOn' => Content::get('home.ads.show', '1') !== '0',
             'popup' => PopupAd::settings(),
-            'errors' => Session::pull('admin_errors', []),
-            'ok' => Session::pull('admin_ok'),
+            // বার্তা লেআউটে নয়, যে ফর্ম থেকে এসেছে তার কাছে দেখানো হয় (ভিউতে)
+            'errors' => [],
+            'ok' => null,
+            'adErrors' => Session::pull('admin_errors', []),
+            'adOk' => Session::pull('admin_ok'),
+            'adWhere' => (string) Session::pull('admin_where', ''),
             'old' => Session::pull('admin_old', []),
         ], 'layouts/admin');
     }
@@ -45,6 +52,7 @@ final class AdsController
         $this->checkCsrf();
 
         $id = (int) ($_POST['id'] ?? 0);
+        $this->where = $id > 0 ? 'ad-' . $id : 'new';
         $ad = $id > 0 ? AdRepository::find($id) : null;
         if ($id > 0 && $ad === null) {
             $this->fail('বিজ্ঞাপনটি পাওয়া যায়নি।');
@@ -125,6 +133,7 @@ final class AdsController
         $this->checkCsrf();
 
         $ad = AdRepository::find((int) ($_POST['id'] ?? 0));
+        $this->where = 'list';
         if ($ad === null) {
             $this->fail('বিজ্ঞাপনটি পাওয়া যায়নি (হয়তো আগেই মোছা হয়েছে)।');
         }
@@ -156,6 +165,7 @@ final class AdsController
         $admin = AdminAuth::require('ads');
         $this->checkCsrf();
 
+        $this->where = 'strip';
         $on = ($_POST['on'] ?? '') === '1';
         if (!Content::set('home.ads.show', $on ? '1' : '0')) {
             $this->fail('সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।');
@@ -169,6 +179,7 @@ final class AdsController
     {
         $admin = AdminAuth::require('ads');
         $this->checkCsrf();
+        $this->where = 'popup';
 
         $linkRaw = clean_input($_POST['link'] ?? '', 500);
         $link = $linkRaw === '' ? '' : (string) Security::safeUrl($linkRaw);
@@ -235,12 +246,14 @@ final class AdsController
     private function fail(string $message): never
     {
         Session::flash('admin_errors', [$message]);
-        redirect(admin_base() . '/ads');
+        Session::flash('admin_where', $this->where);
+        redirect(admin_base() . '/ads' . ($this->where !== '' ? '#ads-msg-' . $this->where : ''));
     }
 
     private function ok(string $message): never
     {
         Session::flash('admin_ok', $message);
-        redirect(admin_base() . '/ads');
+        Session::flash('admin_where', $this->where);
+        redirect(admin_base() . '/ads' . ($this->where !== '' ? '#ads-msg-' . $this->where : ''));
     }
 }

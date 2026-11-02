@@ -5,6 +5,9 @@
  * @var list<array<string,mixed>> $ads
  * @var bool $stripOn
  * @var array{active:bool,image:string,width:int,height:int,link:string,title:string,pages:list<string>,seconds:int} $popup
+ * @var list<string> $adErrors
+ * @var string|null $adOk
+ * @var string $adWhere  বার্তা কোন ফর্মের কাছে দেখাবে
  * @var array<string,mixed> $old   জমা ব্যর্থ হলে আগের লেখা (id, title, link, start, end)
  */
 use App\Core\AdImage;
@@ -22,10 +25,40 @@ $rules = static function (): string {
         . '</ul>';
 };
 // তারিখের ঘরের মান: "Y-m-d H:i:s" থেকে "Y-m-d"
+// বার্তা (ত্রুটি/সফল) যে ফর্ম থেকে এসেছে তার শিরোনামের ঠিক নিচে দেখানো হয়; চেনা জায়গা না মিললে পেইজের মাথায়
+$slots = ['popup', 'strip', 'new', 'list'];
+foreach ($ads as $a) {
+    $slots[] = 'ad-' . (int) $a['id'];
+}
+$message = static function (string $slot) use ($adWhere, $adErrors, $adOk, $slots): string {
+    if ($adErrors === [] && ($adOk === null || $adOk === '')) {
+        return '';
+    }
+    $known = in_array($adWhere, $slots, true);
+    if ($slot === 'top' ? $known : $adWhere !== $slot) {
+        return '';
+    }
+    $html = '<div id="ads-msg-' . e($slot) . '" tabindex="-1">';
+    if ($adErrors !== []) {
+        $html .= '<ul class="adm-notice adm-notice--error" role="alert">';
+        foreach ($adErrors as $error) {
+            $html .= '<li>' . e($error) . '</li>';
+        }
+        $html .= '</ul>';
+    }
+    if ($adOk !== null && $adOk !== '') {
+        $html .= '<p class="adm-notice adm-notice--ok" role="status">' . e($adOk) . '</p>';
+    }
+
+    return $html . '</div>';
+};
 $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 0, 10) : '';
 ?>
+<?php /* বার্তা চেনা জায়গায় না মিললে এখানে */ ?>
+<?= $message('top') ?>
 <div class="adm-box">
     <h2 class="adm-card__title">পপ-আপ বিজ্ঞাপন</h2>
+    <?= $message('popup') ?>
     <p>
         অবস্থা: <b><?= $popup['active'] && $popup['image'] !== '' ? 'চালু' : 'বন্ধ' ?></b>
         <span class="adm-muted">— বাছা পেইজ খুললেই (প্রতিবার, রিফ্রেশেও) মেনুর ঠিক নিচে পেইজের মাঝখানে দেখায়; ওপরের ডান কোনার (×) চাপলে বা নিচে দেওয়া সময় (এখন <?= e(bn($popup['seconds'])) ?> সেকেন্ড) পরে নিজে সরে যায়।</span>
@@ -64,6 +97,7 @@ $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 
 
 <div class="adm-box">
     <h2 class="adm-card__title">হোমের বিজ্ঞাপন-স্ট্রিপ</h2>
+    <?= $message('strip') ?>
     <p>
         অবস্থা: <b><?= $stripOn ? 'চালু — সক্রিয় বিজ্ঞাপন থাকলে হোমে দেখাবে' : 'বন্ধ — হোমে কিছুই দেখাবে না' ?></b>
         <span class="adm-muted">(সক্রিয় বিজ্ঞাপন একটাও না থাকলে সাদা বক্স নিজেই থাকে না।)</span>
@@ -80,6 +114,7 @@ $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 
 
 <div class="adm-box">
     <h2 class="adm-card__title">নতুন বিজ্ঞাপন যোগ করুন</h2>
+    <?= $message('new') ?>
     <form action="<?= $post('save') ?>" method="post" enctype="multipart/form-data" novalidate>
         <?= csrf_field() ?>
         <input type="hidden" name="id" value="0">
@@ -109,6 +144,7 @@ $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 
 </div>
 
 <h2 class="adm-card__title">এখনকার বিজ্ঞাপন (<?= e(bn(count($ads))) ?>টি)</h2>
+<?= $message('list') ?>
 <p class="adm-muted">ক্রম ছোট সংখ্যা আগে। একটা বিজ্ঞাপন হোমে তখনই দেখায় যখন সেটা চালু এবং তারিখের মধ্যে।</p>
 
 <?php foreach ($ads as $ad): ?>
@@ -148,6 +184,7 @@ $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 
         </div>
         <details class="adm-ad__edit"<?= $mine ? ' open' : '' ?>>
             <summary class="adm-small">বদলান</summary>
+            <?= $message('ad-' . $id) ?>
             <form action="<?= $post('save') ?>" method="post" enctype="multipart/form-data" novalidate>
                 <?= csrf_field() ?>
                 <input type="hidden" name="id" value="<?= $id ?>">
