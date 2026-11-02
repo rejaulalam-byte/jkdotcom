@@ -174,6 +174,7 @@ return array_merge($legacyRoutes, [
     ['GET',  admin_route_base() . '/ads',                 [AdminAds::class, 'index']],
     ['POST', admin_route_base() . '/ads/save',            [AdminAds::class, 'save']],
     ['POST', admin_route_base() . '/ads/action',          [AdminAds::class, 'action']],
+    ['POST', admin_route_base() . '/ads/order',           [AdminAds::class, 'order']],
     ['POST', admin_route_base() . '/ads/show',            [AdminAds::class, 'show']],
     ['POST', admin_route_base() . '/ads/popup',           [AdminAds::class, 'popup']],
     ['GET',  admin_route_base() . '/services',            [AdminServices::class, 'index']],

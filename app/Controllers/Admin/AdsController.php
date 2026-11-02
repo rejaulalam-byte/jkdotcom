@@ -139,9 +139,6 @@ final class AdsController
         }
         $title = (string) $ad['title'];
         $do = (string) ($_POST['do'] ?? '');
-        if ($do === 'up' || $do === 'down') {
-            $this->move($ad, $do === 'up' ? -1 : 1);
-        }
 
         [$done, $log, $message] = match ($do) {
             'activate' => [AdRepository::update((int) $ad['id'], ['is_active' => 1]), 'ad_activate', 'চালু করা হলো।'],
@@ -162,21 +159,26 @@ final class AdsController
         $this->ok('"' . $title . '" — ' . $message);
     }
 
-    /** বিজ্ঞাপনটিকে ক্রমে এক ধাপ ওপরে (-1) বা নিচে (+1) সরায়; সবার ক্রম নতুন করে ১, ২, ৩… বসে। */
-    private function move(array $ad, int $step): never
+    /** POST: ids[] — বিজ্ঞাপনগুলোর নতুন ক্রম (পেইজে ▲▼ দিয়ে সাজিয়ে একবারে সংরক্ষণ); সবার ক্রম ১, ২, ৩… বসে। */
+    public function order(): void
     {
-        $ids = array_map(static fn (array $r): int => (int) $r['id'], AdRepository::all());
-        $from = array_search((int) $ad['id'], $ids, true);
-        $to = $from === false ? false : $from + $step;
-        if ($from === false || $to < 0 || $to >= count($ids)) {
-            $this->fail('আর সরানো যাবে না।');
+        $admin = AdminAuth::require('ads');
+        $this->checkCsrf();
+        $this->where = 'order';
+
+        $ids = array_map('intval', is_array($_POST['ids'] ?? null) ? $_POST['ids'] : []);
+        $known = array_map(static fn (array $r): int => (int) $r['id'], AdRepository::all());
+        $sameSet = count($ids) === count($known) && array_diff($ids, $known) === [] && count(array_unique($ids)) === count($ids);
+        if (!$sameSet) {
+            $this->fail('ক্রম সংরক্ষণ করা যায়নি (তালিকা বদলে গেছে)। পেইজ নতুন করে খুলে আবার চেষ্টা করুন।');
         }
-        [$ids[$from], $ids[$to]] = [$ids[$to], $ids[$from]];
         foreach ($ids as $i => $id) {
-            AdRepository::update($id, ['sort_order' => $i + 1]);
+            if (!AdRepository::update($id, ['sort_order' => $i + 1])) {
+                $this->fail('সংরক্ষণ করা যায়নি। আবার চেষ্টা করুন।');
+            }
         }
-        AdminRepository::log((int) AdminAuth::require('ads')['id'], (string) AdminAuth::require('ads')['name'], 'ad_update', (string) $ad['title'] . ' — ক্রম বদল');
-        $this->ok('"' . $ad['title'] . '" — ক্রম বদলেছে।');
+        AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'ad_update', 'বিজ্ঞাপনের ক্রম');
+        $this->ok('সফলভাবে সংরক্ষণ হয়েছে।');
     }
 
     /** POST: on (1 = হোমে বিজ্ঞাপন-স্ট্রিপ দেখাও, 0 = লুকাও) — `home.ads.show`। */

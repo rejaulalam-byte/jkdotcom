@@ -537,3 +537,44 @@
         });
     });
 })();
+
+/* ---- বিজ্ঞাপনের ক্রম: ▲ ▼ বোতামে তালিকা পেইজেই সরে; "ক্রম সংরক্ষণ করুন" চাপলে তবেই সার্ভারে যায় ---- */
+(function () {
+    var form = document.querySelector("[data-ad-order]");
+    var rows = document.querySelectorAll("[data-ad-id]");
+    if (!form || rows.length < 2) {
+        return;
+    }
+    var button = form.querySelector("button");
+    var first = button.textContent;
+    form.hidden = false;
+    document.querySelectorAll("[data-ad-move]").forEach(function (b) {
+        b.hidden = false;
+        b.addEventListener("click", function () {
+            var row = b.closest("[data-ad-id]");
+            var other = b.getAttribute("data-ad-move") === "-1" ? row.previousElementSibling : row.nextElementSibling;
+            if (!other || !other.hasAttribute("data-ad-id")) {
+                return;
+            }
+            if (b.getAttribute("data-ad-move") === "-1") {
+                row.parentNode.insertBefore(row, other);
+            } else {
+                row.parentNode.insertBefore(other, row);
+            }
+            button.textContent = button.getAttribute("data-saved");
+            button.classList.add("adm-small--warn");
+            row.scrollIntoView({block: "nearest"});
+        });
+    });
+    form.addEventListener("submit", function () {
+        form.querySelectorAll("input[name='ids[]']").forEach(function (i) { i.remove(); });
+        document.querySelectorAll("[data-ad-id]").forEach(function (row) {
+            var input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "ids[]";
+            input.value = row.getAttribute("data-ad-id");
+            form.appendChild(input);
+        });
+        button.textContent = first;
+    });
+})();

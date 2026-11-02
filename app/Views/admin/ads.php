@@ -26,7 +26,7 @@ $rules = static function (): string {
 };
 // তারিখের ঘরের মান: "Y-m-d H:i:s" থেকে "Y-m-d"
 // বার্তা (ত্রুটি/সফল) যে ফর্ম থেকে এসেছে তার শিরোনামের ঠিক নিচে দেখানো হয়; চেনা জায়গা না মিললে পেইজের মাথায়
-$slots = ['popup', 'strip', 'new', 'list'];
+$slots = ['popup', 'strip', 'new', 'list', 'order'];
 foreach ($ads as $a) {
     $slots[] = 'ad-' . (int) $a['id'];
 }
@@ -145,6 +145,12 @@ $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 
 
 <h2 class="adm-card__title">এখনকার বিজ্ঞাপন (<?= e(bn(count($ads))) ?>টি)</h2>
 <?= $message('list') ?>
+<form class="adm-ad-order" action="<?= $post('order') ?>" method="post" data-ad-order hidden>
+    <?= csrf_field() ?>
+    <button class="adm-btn" type="submit" data-saved="সংরক্ষণ বাকি আছে — এখানে চাপুন">ক্রম সংরক্ষণ করুন</button>
+    <span class="adm-muted">▲ ▼ দিয়ে সাজিয়ে এই বোতামে চাপলে তবেই ক্রম সংরক্ষিত হয়।</span>
+</form>
+<?= $message('order') ?>
 <p class="adm-muted">ক্রম ছোট সংখ্যা আগে। একটা বিজ্ঞাপন হোমে তখনই দেখায় যখন সেটা চালু এবং তারিখের মধ্যে।</p>
 
 <?php foreach ($ads as $ad): ?>
@@ -159,7 +165,7 @@ $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 
             . '<button class="adm-small' . ($class !== '' ? ' ' . $class : '') . '" type="submit" name="do" value="' . e($do) . '">' . e($label) . '</button></form>';
     };
     ?>
-    <div class="adm-ad">
+    <div class="adm-ad" data-ad-id="<?= $id ?>">
         <div class="adm-ad__row">
             <img class="adm-ad__thumb" src="<?= e(AdImage::url((string) $ad['image_path'])) ?>" alt="<?= e((string) $ad['title']) ?>" height="90">
             <div class="adm-ad__info">
@@ -178,8 +184,8 @@ $day = static fn (mixed $v): string => (string) $v !== '' ? substr((string) $v, 
                 </span>
             </div>
             <div class="adm-actions adm-ad__buttons">
-                <?= $action('up', '▲ আগে আনুন') ?>
-                <?= $action('down', '▼ পরে নিন') ?>
+                <button class="adm-small" type="button" data-ad-move="-1" hidden>▲ আগে আনুন</button>
+                <button class="adm-small" type="button" data-ad-move="1" hidden>▼ পরে নিন</button>
                 <?= $isActive ? $action('deactivate', 'বন্ধ করুন') : $action('activate', 'চালু করুন', 'adm-small--go') ?>
                 <?= $action('delete', 'মুছুন', 'adm-small--warn', 'এই বিজ্ঞাপন ও তার ছবি চিরতরে মুছে যাবে। মুছবেন?') ?>
             </div>
