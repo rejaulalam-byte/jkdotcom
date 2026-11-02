@@ -15,10 +15,10 @@ final class AdImage
     /** সাইটে সব বিজ্ঞাপন এই উচ্চতায় (px) দেখায় (CSS --ad-h)। */
     public const HEIGHT = 278;
 
-    /** ধারালো (রেটিনা) পর্দার জন্য দ্বিগুণ উচ্চতার ছবিও চলে। */
+    /** ছবির সর্বোচ্চ উচ্চতা (ধারালো পর্দার জন্য দ্বিগুণ); এর চেয়ে লম্বা ছবি আপনা-আপনি এই উচ্চতায় ছোট হয়। */
     public const HEIGHT_2X = 556;
 
-    /** উচ্চতা ২৭৮px ধরে চওড়ার সীমা (px); ৫৫৬px ছবির বেলায় দ্বিগুণ। */
+    /** ২৭৮px উচ্চতায় বসানোর পর দেখানো চওড়ার সীমা (px)। */
     public const MIN_WIDTH = 150;
     public const MAX_WIDTH = 1500;
 
@@ -54,12 +54,13 @@ final class AdImage
         }
 
         [$width, $height] = [(int) $info[0], (int) $info[1]];
-        if ($height !== self::HEIGHT && $height !== self::HEIGHT_2X) {
-            return [null, 0, 0, 'ছবির উচ্চতা অবশ্যই ঠিক ' . bn(self::HEIGHT) . ' পিক্সেল (বা ধারালো করতে ' . bn(self::HEIGHT_2X) . ' পিক্সেল) হতে হবে; আপনার ছবির উচ্চতা ' . bn($height) . ' পিক্সেল।'];
+        if ($height < self::HEIGHT) {
+            return [null, 0, 0, 'ছবির উচ্চতা কমপক্ষে ' . bn(self::HEIGHT) . ' পিক্সেল হতে হবে; আপনার ছবির উচ্চতা ' . bn($height) . ' পিক্সেল।'];
         }
-        $scale = $height === self::HEIGHT_2X ? 2 : 1;
-        if ($width < self::MIN_WIDTH * $scale || $width > self::MAX_WIDTH * $scale) {
-            return [null, 0, 0, 'ছবির চওড়া ' . bn(self::MIN_WIDTH * $scale) . ' থেকে ' . bn(self::MAX_WIDTH * $scale) . ' পিক্সেলের মধ্যে হতে হবে; আপনার ছবির চওড়া ' . bn($width) . ' পিক্সেল।'];
+        // স্ট্রিপে ছবি সবসময় ২৭৮px উচ্চতায় বসে; তাই চওড়া এই উচ্চতার অনুপাতে মাপা হয়
+        $shownWidth = (int) round($width * self::HEIGHT / $height);
+        if ($shownWidth < self::MIN_WIDTH || $shownWidth > self::MAX_WIDTH) {
+            return [null, 0, 0, 'ছবির চওড়া উচ্চতার তুলনায় অতিরিক্ত কম বা বেশি; ' . bn(self::HEIGHT) . ' পিক্সেল উচ্চতায় চওড়া ' . bn(self::MIN_WIDTH) . ' থেকে ' . bn(self::MAX_WIDTH) . ' পিক্সেলের মধ্যে হতে হবে।'];
         }
 
         $dir = self::directory();
@@ -69,14 +70,41 @@ final class AdImage
             return [null, 0, 0, 'ছবিটি সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।'];
         }
         $name = bin2hex(random_bytes(16)) . '.' . self::TYPES[$mime];
-        if (!@move_uploaded_file($tmp, $dir . '/' . $name)) {
-            Logger::error('Ad image could not be written: ' . $dir . '/' . $name);
+        $target = $dir . '/' . $name;
+        $saved = $height > self::HEIGHT_2X
+            ? self::shrink($tmp, $mime, (int) round($width * self::HEIGHT_2X / $height), self::HEIGHT_2X, $target)
+            : @move_uploaded_file($tmp, $target);
+        if (!$saved) {
+            Logger::error('Ad image could not be written: ' . $target);
 
             return [null, 0, 0, 'ছবিটি সংরক্ষণ করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।'];
         }
 
-        // স্ট্রিপে প্রকৃত উচ্চতা সবসময় ২৭৮px, তাই মাপ ২৭৮px-ভিত্তিকে এনে রাখা
-        return [$name, (int) round($width / $scale), self::HEIGHT, null];
+        return [$name, $shownWidth, self::HEIGHT, null];
+    }
+
+    /** ৫৫৬px-এর চেয়ে লম্বা ছবি অনুপাত ঠিক রেখে ৫৫৬px উচ্চতায় ছোট করে লেখে (স্বচ্ছতা বজায় থাকে)। */
+    private static function shrink(string $source, string $mime, int $width, int $height, string $target): bool
+    {
+        if (!function_exists('imagecreatefromstring')) {
+            return false;
+        }
+        $raw = @file_get_contents($source);
+        $from = $raw === false ? false : @imagecreatefromstring($raw);
+        if ($from === false) {
+            return false;
+        }
+        $to = imagecreatetruecolor($width, $height);
+        imagealphablending($to, false);
+        imagesavealpha($to, true);
+        imagefill($to, 0, 0, imagecolorallocatealpha($to, 0, 0, 0, 127));
+        imagecopyresampled($to, $from, 0, 0, 0, 0, $width, $height, imagesx($from), imagesy($from));
+
+        return match ($mime) {
+            'image/png' => imagepng($to, $target, 6),
+            'image/webp' => imagewebp($to, $target, 88),
+            default => imagejpeg($to, $target, 88),
+        };
     }
 
     public static function directory(): string
