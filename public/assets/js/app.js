@@ -1214,6 +1214,205 @@
             setState(el, null);
         }, true);
     });
+
+    /* ---- শব্দ-সাজেশন: লেখার সময় যে শব্দ চলছে তার সম্ভাব্য শব্দ ঘরের নিচে ভেসে ওঠে; ক্লিক বা ▼ ▲ + Enter/Tab দিয়ে বসে ----
+       শব্দভান্ডার (vendor/bnwords) প্রথমবার কোনো ঘরে ফোকাস করলে লোড হয়। সাজেশন ইংরেজি অক্ষরে লেখা (Avro-তে
+       বদলানো) শব্দেও আসে, সরাসরি বাংলা কীবোর্ডে লেখা শব্দেও। মিলানোর সময় ই/ঈ, উ/ঊ, শ/ষ/স, ত/ট ইত্যাদির
+       তফাত ধরা হয় না, তাই বানান নিশ্চিত না থাকলেও সঠিক শব্দ মেলে। নিজের তালিকা-থাকা ঘরে (combobox) সাজেশন আসে না। */
+    var WORDS_URL = "/assets/vendor/bnwords/bn-words-v1.txt";
+    var MAX_SUGGESTIONS = 6;
+    var words = null; // { list: [শব্দ], keys: [মিলানোর-চাবি], priority: প্রথম কয়টা "আগের শব্দ" }
+    var wordsLoading = false;
+    var box = null;
+    var boxField = null;
+    var items = [];
+    var active = -1;
+
+    // বানানের ছোট তফাত মুছে চাবি বানায় (ই=ঈ, ি=ী, উ=ঊ, ু=ূ, শ/ষ=স, ণ=ন, ট=ত, ঠ=থ, ড=দ, ঢ=ধ, য=জ, ৎ=ত ...)
+    var FOLD = { "ঈ": "ই", "ী": "ি", "ঊ": "উ", "ূ": "ু", "ঋ": "রি", "শ": "স", "ষ": "স", "ণ": "ন", "ট": "ত", "ঠ": "থ", "ড": "দ", "ঢ": "ধ", "য": "জ", "ৎ": "ত", "ড়": "র", "ঢ়": "র", "য়": "য", "ঁ": "", "ঃ": "", "্": "" };
+    function fold(s) {
+        var out = "";
+        for (var i = 0; i < s.length; i++) {
+            var c = s.charAt(i);
+            out += Object.prototype.hasOwnProperty.call(FOLD, c) ? FOLD[c] : c;
+        }
+        return out;
+    }
+
+    function loadWords() {
+        if (words || wordsLoading || !window.fetch) {
+            return;
+        }
+        wordsLoading = true;
+        fetch(WORDS_URL, { credentials: "same-origin" })
+            .then(function (r) { return r.ok ? r.text() : ""; })
+            .then(function (text) {
+                var cut = text.indexOf("\n\n");
+                var list = text.split("\n");
+                var keys = [];
+                for (var i = 0; i < list.length; i++) {
+                    keys.push(fold(list[i]));
+                }
+                words = { list: list, keys: keys, priority: cut < 0 ? 0 : text.slice(0, cut).split("\n").length };
+            })
+            .catch(function () { wordsLoading = false; });
+    }
+
+    function suggest(prefix) {
+        var key = fold(prefix);
+        var found = [];
+        for (var i = 0; i < words.list.length; i++) {
+            if (words.list[i] !== "" && words.keys[i].indexOf(key) === 0 && words.list[i] !== prefix) {
+                found.push(i);
+                if (found.length > 400) {
+                    break;
+                }
+            }
+        }
+        // আগের শব্দ (সাইটের/চালু শব্দ) আগে; তারপর হুবহু শুরু মিললে; তারপর ছোট শব্দ আগে
+        found.sort(function (a, b) {
+            var pa = a < words.priority ? 0 : 1;
+            var pb = b < words.priority ? 0 : 1;
+            if (pa !== pb) { return pa - pb; }
+            if (pa === 0) { return a - b; }
+            var ea = words.list[a].indexOf(prefix) === 0 ? 0 : 1;
+            var eb = words.list[b].indexOf(prefix) === 0 ? 0 : 1;
+            if (ea !== eb) { return ea - eb; }
+            return words.list[a].length - words.list[b].length || a - b;
+        });
+        return found.slice(0, MAX_SUGGESTIONS).map(function (i) { return words.list[i]; });
+    }
+
+    function hideBox() {
+        if (box) {
+            box.hidden = true;
+        }
+        items = [];
+        active = -1;
+    }
+
+    function placeBox() {
+        if (!box || box.hidden || !boxField) {
+            return;
+        }
+        var r = boxField.getBoundingClientRect();
+        box.style.left = Math.max(4, r.left) + "px";
+        // নিচে জায়গা না থাকলে (যেমন ফোনের কীবোর্ড খোলা) ঘরের ওপরে দেখায়
+        var h = box.offsetHeight;
+        var below = r.bottom + 4;
+        box.style.top = (below + h > window.innerHeight && r.top - 4 - h > 0 ? r.top - 4 - h : below) + "px";
+        box.style.minWidth = Math.min(r.width, 360) + "px";
+    }
+
+    function paintActive() {
+        Array.prototype.forEach.call(box.children, function (b, i) {
+            b.classList.toggle("is-active", i === active);
+            b.setAttribute("aria-selected", i === active ? "true" : "false");
+        });
+    }
+
+    function pick(word) {
+        var el = boxField;
+        if (!el) {
+            return;
+        }
+        var caret = el.selectionStart;
+        var m = /[\u0980-\u09FF]+$/.exec(el.value.slice(0, caret));
+        var start = m ? caret - m[0].length : caret;
+        var after = el.value.slice(caret);
+        var insert = word + (after.charAt(0) === " " ? "" : " ");
+        el.value = el.value.slice(0, start) + insert + after;
+        var pos = start + insert.length + (after.charAt(0) === " " ? 1 : 0);
+        el.setSelectionRange(pos, pos);
+        setState(el, null);
+        hideBox();
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+        el.focus();
+    }
+
+    function showFor(el) {
+        if (!words || !enabled || document.activeElement !== el) {
+            hideBox();
+            return;
+        }
+        var caret = el.selectionStart;
+        var m = typeof caret === "number" ? /[\u0980-\u09FF]+$/.exec(el.value.slice(0, caret)) : null;
+        var list = m ? suggest(m[0]) : [];
+        if (!list.length) {
+            hideBox();
+            return;
+        }
+        if (!box) {
+            box = document.createElement("div");
+            box.className = "bn-sug";
+            box.setAttribute("role", "listbox");
+            box.addEventListener("pointerdown", function (e) {
+                var b = e.target.closest("button");
+                if (b) {
+                    e.preventDefault(); // ঘরের ফোকাস না হারাতে
+                    pick(b.textContent);
+                }
+            });
+        }
+        var host = el.closest("dialog") || document.body;
+        if (box.parentNode !== host) {
+            host.appendChild(box);
+        }
+        boxField = el;
+        items = list;
+        active = -1;
+        box.textContent = "";
+        list.forEach(function (w) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.setAttribute("role", "option");
+            b.tabIndex = -1;
+            b.textContent = w;
+            box.appendChild(b);
+        });
+        box.hidden = false;
+        placeBox();
+    }
+
+    function suggestible(el) {
+        return el && el.hasAttribute && el.hasAttribute("data-bn") && !el.hasAttribute("role") && !el.hasAttribute("data-ss");
+    }
+
+    document.addEventListener("focusin", function (e) {
+        if (suggestible(e.target) && enabled) {
+            loadWords();
+        }
+    });
+    // capture-এ Avro-র রূপান্তরের পরে (bubble ধাপে) চলে, তাই ঘরের মান তখন বাংলা
+    document.addEventListener("input", function (e) {
+        if (suggestible(e.target)) {
+            loadWords();
+            showFor(e.target);
+        }
+    });
+    document.addEventListener("keydown", function (e) {
+        if (!box || box.hidden || e.target !== boxField) {
+            return;
+        }
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            e.preventDefault();
+            active = (active + (e.key === "ArrowDown" ? 1 : -1) + items.length + 1) % (items.length + 1);
+            if (active === items.length) { active = -1; }
+            paintActive();
+        } else if ((e.key === "Enter" || e.key === "Tab") && active >= 0) {
+            e.preventDefault();
+            pick(items[active]);
+        } else if (e.key === "Escape") {
+            hideBox();
+        }
+    });
+    document.addEventListener("focusout", function (e) {
+        if (e.target === boxField) {
+            hideBox();
+        }
+    });
+    window.addEventListener("scroll", placeBox, true);
+    window.addEventListener("resize", placeBox);
 })();
 
 /* ---- লুকানো ফোন নাম্বার / ইমেইল ("আজকের প্রকাশিত" তালিকা ও কর্মীর বিস্তারিত তথ্য) --------------------------

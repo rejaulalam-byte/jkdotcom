@@ -5648,3 +5648,38 @@ body.page-search .svc-search__btn {
 .about__map.is-hot {
     cursor: pointer;
 }
+
+/* শব্দ-সাজেশন (app.js): লেখার ঘরের নিচে ভেসে ওঠা শব্দের তালিকা */
+.bn-sug {
+    position: fixed;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    max-width: calc(100vw - 8px);
+    padding: 0.25rem;
+    border: 1px solid var(--teal-35);
+    border-radius: 0.625rem;
+    background: var(--white);
+    box-shadow: 0 0.5rem 1.5rem rgba(var(--ink-rgb), 0.18);
+}
+.bn-sug[hidden] {
+    display: none;
+}
+.bn-sug button {
+    min-height: 2.75rem;
+    padding: 0.35rem 0.9rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    font: inherit;
+    font-size: calc(1.25rem * var(--k-body));
+    line-height: 1.5;
+    text-align: left;
+    color: var(--ink);
+    cursor: pointer;
+}
+.bn-sug button:hover,
+.bn-sug button.is-active {
+    background: var(--teal);
+    color: var(--white);
+}
