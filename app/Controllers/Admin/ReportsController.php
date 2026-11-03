@@ -9,6 +9,7 @@ use App\Core\View;
 use App\Models\AdminRepository;
 use App\Models\GeoRepository;
 use App\Models\ManpowerReport;
+use App\Models\MultiPlaceReport;
 use App\Models\ReportData;
 
 /**
@@ -41,6 +42,11 @@ final class ReportsController
 
         if ($id === 'manpower') {
             $this->manpower($admin);
+
+            return;
+        }
+        if ($id === 'multi') {
+            $this->multi($admin);
 
             return;
         }
@@ -103,6 +109,28 @@ final class ReportsController
             'services' => ManpowerReport::serviceNames(),
         ], 'layouts/admin');
     }
+    /**
+     * "একজন পেশাজীবির একাধিক স্থান ও সেবার নামের তালিকা": ফর্ম নেই, খুললেই তৈরি; CSV ও প্রিন্ট আছে।
+     *
+     * @param array<string,mixed> $admin
+     */
+    private function multi(array $admin): void
+    {
+        $report = MultiPlaceReport::build();
+        if (($_GET['csv'] ?? '') === '1') {
+            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'report_csv', ReportData::REPORTS['multi'][0]);
+            $this->csvOut('report-multi-' . date('Y-m-d') . '.csv', $report);
+
+            return;
+        }
+        header('Cache-Control: no-store');
+        View::render('admin/report-multi', [
+            'admin' => $admin,
+            'title' => ReportData::REPORTS['multi'][0],
+            'report' => $report,
+        ], 'layouts/admin');
+    }
+
     /**
      * টেবিলটা CSV হিসেবে নামায় (এক্সেলে বাংলা ঠিক দেখাতে শুরুতে BOM)। সূত্র হিসেবে চলে এমন শুরু (=, +, -, @) আটকাতে সামনে ' বসে।
      *
