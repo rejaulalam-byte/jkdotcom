@@ -7,6 +7,8 @@ namespace App\Controllers\Admin;
 use App\Core\AdminAuth;
 use App\Core\View;
 use App\Models\AdminRepository;
+use App\Models\GeoRepository;
+use App\Models\ManpowerReport;
 use App\Models\ReportData;
 
 /**
@@ -37,6 +39,12 @@ final class ReportsController
             return;
         }
 
+        if ($id === 'manpower') {
+            $this->manpower($admin);
+
+            return;
+        }
+
         [$from, $to, $note] = $this->range();
         $report = ReportData::build($id, $from, $to);
         if ($note !== null) {
@@ -60,6 +68,37 @@ final class ReportsController
     }
 
     /**
+     * লোকবলের রিপোর্ট: তারিখ নয়, পাঁচটি দিকের একটা বেছে (GET by = দিক; division / district / upazila / service / name = বাছাই)।
+     *
+     * @param array<string,mixed> $admin
+     */
+    private function manpower(array $admin): void
+    {
+        $by = (string) ($_GET['by'] ?? '');
+        $by = isset(ManpowerReport::DIMENSIONS[$by]) ? $by : '';
+        $value = $by === '' ? '' : (string) ($_GET[$by] ?? '');
+        $report = $by === '' ? null : ManpowerReport::build($by, $value);
+        if ($report !== null && ($_GET['csv'] ?? '') === '1') {
+            AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'report_csv', ReportData::REPORTS['manpower'][0] . ' — ' . $by);
+            $this->csvOut('report-manpower-' . $by . '-' . date('Y-m-d') . '.csv', $report);
+
+            return;
+        }
+
+        $geo = GeoRepository::all();
+        header('Cache-Control: no-store');
+        View::render('admin/report-manpower', [
+            'admin' => $admin,
+            'title' => ReportData::REPORTS['manpower'][0],
+            'by' => $by,
+            'picked' => $_GET,
+            'report' => $report,
+            'geo' => $geo,
+            'services' => ManpowerReport::serviceNames(),
+        ], 'layouts/admin');
+    }
+
+    /**
      * টেবিলটা CSV হিসেবে নামায় (এক্সেলে বাংলা ঠিক দেখাতে শুরুতে BOM)। সূত্র হিসেবে চলে এমন শুরু (=, +, -, @) আটকাতে সামনে ' বসে।
      *
      * @param array<string,mixed> $admin
@@ -68,8 +107,16 @@ final class ReportsController
     private function csv(array $admin, string $id, string $from, string $to, array $report): void
     {
         AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'report_csv', ReportData::REPORTS[$id][0] . ' ' . $from . ' – ' . $to);
+        $this->csvOut('report-' . $id . '-' . $from . '_' . $to . '.csv', $report);
+    }
+
+    /**
+     * @param array{head:list<string>,rows:list<array{cells:list<string>,type:string}>,summary:list<string>} $report
+     */
+    private function csvOut(string $file, array $report): void
+    {
         header('Content-Type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename="report-' . $id . '-' . $from . '_' . $to . '.csv"');
+        header('Content-Disposition: attachment; filename="' . $file . '"');
         header('Cache-Control: no-store');
         $safe = static fn (string $v): string => preg_match('/^[=+\-@]/', $v) === 1 ? "'" . $v : $v;
         $out = fopen('php://output', 'w');
