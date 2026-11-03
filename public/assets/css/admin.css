@@ -2021,37 +2021,52 @@ input.adm-short {
     margin: 0 0 10px;
 }
 
-/* ---- লোকবলের রিপোর্টের ফর্ম: প্রতি দিকের নিজের ঘর ও নিজের বোতাম ---- */
+/* ---- লোকবলের রিপোর্টের ফর্ম: এক সারিতে পাঁচ ঘর + মোট সংখ্যা + একটাই "দেখান" বোতাম ---- */
+.adm-reporthead--keep {
+    min-height: 64px;
+    padding: 10px 0;
+    align-items: center;
+}
 .adm-reporttitle {
     margin: 0;
     font-size: 24px;
+    line-height: 1.4;
+}
+.adm-reportnote {
+    margin: 4px 0 14px;
+    color: #555;
 }
 .adm-mp {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    align-items: end;
     gap: 12px;
-    margin: 18px 0;
+    margin: 0 0 18px;
 }
-.adm-mp__row {
+.adm-mp__field {
     display: grid;
-    grid-template-columns: 180px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 12px;
-}
-.adm-mp__row label {
-    font-weight: 600;
-}
-.adm-mp__row select {
+    gap: 6px;
     min-width: 0;
 }
-.adm-btn--on {
-    outline: 3px solid #f0a020;
-    outline-offset: 2px;
+.adm-mp__field label,
+.adm-mp__label {
+    font-weight: 600;
 }
-@media (max-width: 700px) {
-    .adm-mp__row {
-        grid-template-columns: 1fr;
-        gap: 6px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-    }
+.adm-mp__field select {
+    width: 100%;
+    min-width: 0;
+}
+.adm-mp__total {
+    display: block;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 6px;
+    background: #f1f5f6;
+    font-weight: 600;
+    line-height: 1.6;
+}
+.adm-reportrow--sum td {
+    background: #dfeaec;
+    font-weight: 700;
 }

@@ -68,32 +68,51 @@ final class ReportsController
     }
 
     /**
-     * লোকবলের রিপোর্ট: তারিখ নয়, পাঁচটি দিকের একটা বেছে (GET by = দিক; division / district / upazila / service / name = বাছাই)।
+     * লোকবলের রিপোর্ট: তারিখ নয়। ফর্মে পাঁচটি ঘর (বিভাগ / জেলা / উপজেলা-থানা / সেবা / পেশাজীবীর নাম), একটাই "দেখান" বোতাম।
+     * যে ঘরে "বাছাই করুন" ছাড়া কিছু বাছা, তার দিকের রিপোর্ট আসে (একাধিক বাছা হলে ক্রমের প্রথমটা); কিছু না বাছলে খালি টেবিল।
      *
      * @param array<string,mixed> $admin
      */
     private function manpower(array $admin): void
     {
-        $by = (string) ($_GET['by'] ?? '');
-        $by = isset(ManpowerReport::DIMENSIONS[$by]) ? $by : '';
-        $value = $by === '' ? '' : (string) ($_GET[$by] ?? '');
-        $report = $by === '' ? null : ManpowerReport::build($by, $value);
-        if ($report !== null && ($_GET['csv'] ?? '') === '1') {
+        $by = '';
+        $value = '';
+        $chosen = 0;
+        foreach (array_keys(ManpowerReport::DIMENSIONS) as $dim) {
+            $v = (string) ($_GET[$dim] ?? '');
+            if ($v === '') {
+                continue;
+            }
+            if (++$chosen === 1) {
+                [$by, $value] = [$dim, $v];
+            }
+        }
+        $searched = isset($_GET['go']);
+        if (!$searched) {
+            $by = '';
+        }
+        $report = ManpowerReport::build($by, $value);
+        if ($searched && $by === '') {
+            $report['summary'][] = 'কোনো ঘর বাছাই করা হয়নি। যেকোনো একটা ঘরে "সকল ..." বা নির্দিষ্ট নাম বেছে "দেখান" চাপুন।';
+        } elseif ($chosen > 1) {
+            $report['summary'][] = 'একসঙ্গে একটার বেশি ঘর বাছা হয়েছে; ক্রমের প্রথমটার (' . ManpowerReport::DIMENSIONS[$by][0] . ') রিপোর্ট দেখানো হলো।';
+        }
+        if ($by !== '' && ($_GET['csv'] ?? '') === '1') {
             AdminRepository::log((int) $admin['id'], (string) $admin['name'], 'report_csv', ReportData::REPORTS['manpower'][0] . ' — ' . $by);
             $this->csvOut('report-manpower-' . $by . '-' . date('Y-m-d') . '.csv', $report);
 
             return;
         }
 
-        $geo = GeoRepository::all();
         header('Cache-Control: no-store');
         View::render('admin/report-manpower', [
             'admin' => $admin,
             'title' => ReportData::REPORTS['manpower'][0],
             'by' => $by,
-            'picked' => $_GET,
+            'value' => $value,
+            'searched' => $searched,
             'report' => $report,
-            'geo' => $geo,
+            'geo' => GeoRepository::all(),
             'services' => ManpowerReport::serviceNames(),
         ], 'layouts/admin');
     }

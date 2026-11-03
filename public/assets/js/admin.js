@@ -578,3 +578,20 @@
         button.textContent = first;
     });
 })();
+
+/* ---- লোকবলের রিপোর্ট: একবারে একটা ঘর বাছা হয়; একটায় কিছু বাছলে বাকিগুলো "বাছাই করুন"-এ ফিরে যায় ---- */
+(function () {
+    var selects = document.querySelectorAll("select[data-mp]");
+    selects.forEach(function (one) {
+        one.addEventListener("change", function () {
+            if (one.value === "") {
+                return;
+            }
+            selects.forEach(function (other) {
+                if (other !== one) {
+                    other.value = "";
+                }
+            });
+        });
+    });
+})();
