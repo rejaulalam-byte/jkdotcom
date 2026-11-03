@@ -579,19 +579,65 @@
     });
 })();
 
-/* ---- লোকবলের রিপোর্ট: একবারে একটা ঘর বাছা হয়; একটায় কিছু বাছলে বাকিগুলো "বাছাই করুন"-এ ফিরে যায় ---- */
+/* ---- লোকবলের রিপোর্ট: বিভাগ → জেলা → উপজেলা/থানা ঘর একটার সাথে আরেকটা জোড়া ----
+   বিভাগ বাছলে জেলার ঘরে শুধু সেই বিভাগের জেলা, জেলা বাছলে উপজেলার ঘরে শুধু সেই জেলার উপজেলা থাকে (অন্য নাম লুকানো)।
+   পরের ঘরে এমন কিছু বাছা থাকলে যা আর মেলে না, সেটা "বাছাই করুন"-এ ফেরে; আগের ঘরের বাছাই কখনও ছুটে যায় না।
+   পরের ঘর (জেলা/উপজেলা) আগে বাছলে তার বিভাগ/জেলা নিজে বসে যায়। */
 (function () {
-    var selects = document.querySelectorAll("select[data-mp]");
-    selects.forEach(function (one) {
-        one.addEventListener("change", function () {
-            if (one.value === "") {
+    var division = document.querySelector("select[data-mp='division']");
+    var district = document.querySelector("select[data-mp='district']");
+    var upazila = document.querySelector("select[data-mp='upazila']");
+    if (!division || !district || !upazila) {
+        return;
+    }
+
+    function specific(value) {
+        return value !== "" && value !== "all";
+    }
+
+    function hideUnmatched(select, matches) {
+        Array.prototype.forEach.call(select.options, function (option) {
+            if (!option.hasAttribute("data-division")) {
                 return;
             }
-            selects.forEach(function (other) {
-                if (other !== one) {
-                    other.value = "";
-                }
-            });
+            var show = matches(option);
+            option.hidden = !show;
+            option.disabled = !show;
+            if (!show && option.selected) {
+                select.value = "";
+            }
         });
+    }
+
+    function refilter() {
+        hideUnmatched(district, function (o) {
+            return !specific(division.value) || o.getAttribute("data-division") === division.value;
+        });
+        hideUnmatched(upazila, function (o) {
+            return (!specific(division.value) || o.getAttribute("data-division") === division.value)
+                && (!specific(district.value) || o.getAttribute("data-district") === district.value);
+        });
+    }
+
+    division.addEventListener("change", refilter);
+    district.addEventListener("change", function () {
+        var picked = district.options[district.selectedIndex];
+        if (specific(district.value) && !specific(division.value)) {
+            division.value = picked.getAttribute("data-division");
+        }
+        refilter();
     });
+    upazila.addEventListener("change", function () {
+        var picked = upazila.options[upazila.selectedIndex];
+        if (specific(upazila.value)) {
+            if (!specific(district.value)) {
+                district.value = picked.getAttribute("data-district");
+            }
+            if (!specific(division.value)) {
+                division.value = picked.getAttribute("data-division");
+            }
+        }
+        refilter();
+    });
+    refilter();
 })();

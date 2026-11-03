@@ -10,15 +10,16 @@ use Throwable;
 
 /**
  * রিপোর্ট "চাহিদাভিত্তিক বিভিন্ন সেবার লোকবলের তথ্য": অনুমোদিত পেশাজীবী কতজন, কোন এলাকায়, কোন সেবায়।
- * তারিখ-নির্ভর নয়; পাঁচটি দিকের (বিভাগ / জেলা / উপজেলা-থানা / সেবা / পেশাজীবীর নাম) যেকোনো একটা বেছে তার রিপোর্ট হয়।
- * একজন কর্মী একাধিক পেশায় থাকলে প্রতিটি পেশায় একবার করে গোনা হয়; নিজে-লেখা পেশা (তালিকায় নেই) আলাদা সারিতে আসে।
+ * তারিখ-নির্ভর নয়। পাঁচটি ঘরের বাছাই একসঙ্গে খাটে ("এবং"): বিভাগ → জেলা → উপজেলা/থানা → সেবা, আর পেশাজীবীর নামের ঘর
+ * ঠিক করে নামসহ তালিকা হবে, নাকি শুধু সংখ্যা। একজন একাধিক পেশায় থাকলে প্রতিটি পেশায় একবার করে গোনা হয়;
+ * নিজে-লেখা পেশা (তালিকায় নেই) আলাদা সারিতে আসে।
  * ফল: ['head', 'rows' => [['cells','type'],...], 'summary', 'people'] — type = row | sub | sum।
- * 'sub' = গোষ্ঠীর (এলাকা/সেবা) নিচের মোট-সারি; 'sum' = টেবিলের একদম নিচের যোগফল-সারি (cells = [লেখা, পেশাজীবীর সংখ্যা])।
+ * 'sub' = প্রতি উপজেলা/থানার নিচের মোট-সারি; 'sum' = টেবিলের একদম নিচের যোগফল-সারি (cells = [লেখা, পেশাজীবীর সংখ্যা])।
  * 'people' = ফলে আলাদা কতজন পেশাজীবী (একজন একাধিক পেশায় থাকলেও একবার)।
  */
 final class ManpowerReport
 {
-    /** দিক => [ঘরের শিরোনাম, "সব"-এর লেখা]; ক্রম = ফর্মের ঘরের ক্রম */
+    /** ঘর => [শিরোনাম, "সব"-এর লেখা]; ক্রম = ফর্মের ঘরের ক্রম */
     public const DIMENSIONS = [
         'division' => ['বিভাগ', 'সকল বিভাগ'],
         'district' => ['জেলা', 'সকল জেলা'],
@@ -27,21 +28,22 @@ final class ManpowerReport
         'name' => ['পেশাজীবির নাম', 'সকল নাম'],
     ];
 
-    /** ঘরের মান: ফাঁকা = "বাছাই করুন" (কিছু বাছা হয়নি), ALL = "সকল ..." */
+    /** ঘরের মান: ফাঁকা = "বাছাই করুন" (বাছা হয়নি), ALL = "সকল ..." */
     public const ALL = 'all';
 
     private const CUSTOM_LABEL = 'নিজের লেখা পেশা (তালিকায় নেই)';
 
     /**
-     * একটা দিক বেছে রিপোর্ট। $by ফাঁকা বা অজানা হলে শুধু হেডিং + একটা খালি সারি + শূন্য যোগফল।
+     * ঘরগুলোর বাছাই মিলিয়ে রিপোর্ট। কিছুই না বাছলে শুধু হেডিং + একটা খালি সারি + শূন্য যোগফল।
+     * বিভাগ/জেলা/উপজেলা/সেবার ঘরে ফাঁকা বা ALL = ওই ঘরে বাধা নেই; নামের ঘরে ALL হলে নামসহ তালিকা, নয়তো শুধু সংখ্যা।
      *
-     * @param string $by    দিক (DIMENSIONS-এর চাবি) বা ফাঁকা
-     * @param string $value ফাঁকা বা ALL = সব; নয়তো আইডি / সেবার slug
+     * @param array<string,string> $filters চাবি = DIMENSIONS-এর চাবি; মান ফাঁকা / ALL / আইডি / সেবার slug
      * @return array{head:list<string>,rows:list<array{cells:list<string>,type:string}>,summary:list<string>,people:int}
      */
-    public static function build(string $by, string $value): array
+    public static function build(array $filters): array
     {
-        if (!isset(self::DIMENSIONS[$by])) {
+        $filters += array_fill_keys(array_keys(self::DIMENSIONS), '');
+        if (count(array_filter($filters, static fn (string $v): bool => $v !== '')) === 0) {
             return self::blank([]);
         }
         $pdo = Database::connection();
@@ -51,14 +53,14 @@ final class ManpowerReport
 
         try {
             $people = self::rows($pdo);
-            $report = $by === 'name' ? self::byName($people) : self::byCounts($people, $by, $value === self::ALL ? '' : $value);
+            $report = self::table($people, $filters);
             $total = count(array_unique(array_column($people, 'id')));
         } catch (Throwable $e) {
             Logger::error('ManpowerReport failed: ' . $e->getMessage());
 
             return self::blank(['রিপোর্ট তৈরি করা যায়নি। কিছুক্ষণ পরে আবার চেষ্টা করুন।']);
         }
-        $report['summary'][] = 'সাইটে এখন মোট অনুমোদিত পেশাজীবী (আলাদা মানুষ): ' . bn($total) . ' জন। শুধু অনুমোদিত পেশাজীবী (যাঁরা সাইটে দেখান) গোনা হয়েছে। একজন একাধিক পেশায় থাকলে প্রতিটি পেশায় একবার করে ধরা হয়, তাই সেবা অনুযায়ী সারির যোগফল মোট মানুষের চেয়ে বেশি হতে পারে; নিচের যোগফল-সারিতে আলাদা মানুষ গোনা হয়।';
+        $report['summary'][] = 'সাইটে এখন মোট অনুমোদিত পেশাজীবী (আলাদা মানুষ): ' . bn($total) . ' জন। শুধু অনুমোদিত পেশাজীবী (যাঁরা সাইটে দেখান) গোনা হয়েছে। একজন একাধিক পেশায় থাকলে প্রতিটি পেশায় একবার করে ধরা হয়, তাই উপজেলার মোট-সারির যোগফল মোট মানুষের চেয়ে বেশি হতে পারে; নিচের যোগফল-সারিতে আলাদা মানুষ গোনা হয়।';
 
         return $report;
     }
@@ -78,12 +80,14 @@ final class ManpowerReport
     private static function blank(array $summary): array
     {
         return [
-            'head' => ['নাম', 'সেবা', 'মোট সংখ্যা'],
-            'rows' => [['cells' => ['', '', ''], 'type' => 'row'], self::sumRow([])],
+            'head' => self::HEAD,
+            'rows' => [['cells' => array_fill(0, count(self::HEAD), ''), 'type' => 'row'], self::sumRow([])],
             'summary' => $summary,
             'people' => 0,
         ];
     }
+
+    private const HEAD = ['ক্রমিক নং', 'বিভাগ', 'জেলা', 'উপজেলা/থানা', 'সেবা', 'পেশাজীবির নাম', 'মোবাইল নাম্বার', 'মোট সংখ্যা'];
 
     /**
      * অনুমোদিত কর্মীর সারি: প্রধান পেশায় একটা, প্রতিটি "আরও পেশা"-য় একটা করে।
@@ -111,7 +115,7 @@ final class ManpowerReport
     /**
      * টেবিলের একদম নিচের যোগফল-সারি: কতটা বিভাগ, জেলা, উপজেলা/থানা, সেবা ও কতজন পেশাজীবী (আলাদা মানুষ)।
      *
-     * @param list<array{id:int,division_id:int,district_id:int,upazila_id:int,slug:string}> $scope এই রিপোর্টে যে সারিগুলো এসেছে
+     * @param list<array<string,mixed>> $scope এই রিপোর্টে যে সারিগুলো এসেছে
      * @return array{cells:list<string>,type:string}
      */
     private static function sumRow(array $scope): array
@@ -127,134 +131,76 @@ final class ManpowerReport
     }
 
     /**
-     * বিভাগ / জেলা / উপজেলা / সেবা দিক: গোষ্ঠীর (এলাকা বা সেবা) ভেতরে সারি, প্রতি গোষ্ঠীর নিচে মোট, একদম শেষে যোগফল।
+     * বাছাই মিলিয়ে সারি ছেঁকে টেবিল: উপজেলা/থানা ধরে গোষ্ঠী, প্রতি গোষ্ঠীর নিচে মোট-সারি, একদম শেষে যোগফল-সারি।
+     * নাম "সকল নাম" না হলে প্রতি (উপজেলা, সেবা)-র একটা সারি, নাম-মোবাইল ঘর ফাঁকা, শেষ ঘরে সংখ্যা।
      *
      * @param list<array<string,mixed>> $people
+     * @param array<string,string> $f
      * @return array{head:list<string>,rows:list<array{cells:list<string>,type:string}>,summary:list<string>,people:int}
      */
-    private static function byCounts(array $people, string $by, string $value): array
-    {
-        $services = self::serviceNames();
-        $geo = GeoRepository::all();
-        $divisions = array_column($geo['divisions'], 'name', 'id');
-        $districts = array_column($geo['districts'], 'name', 'id');
-        $districtDivision = array_column($geo['districts'], 'parent', 'id');
-        $upazilas = array_column($geo['upazilas'], 'name', 'id');
-        $unknown = 'এলাকা অজানা';
-
-        $serviceLabel = static fn (string $slug): string => $slug === '' ? self::CUSTOM_LABEL : ($services[$slug] ?? $slug);
-
-        // গোষ্ঠী => [name, items => [চাবি => [label, n]]]
-        $groups = [];
-        $scope = [];
-        foreach ($people as $r) {
-            $slug = (string) $r['slug'];
-            if ($by === 'service') {
-                if ($value !== '' && $slug !== $value) {
-                    continue;
-                }
-                $gKey = $slug;
-                $gName = $serviceLabel($slug);
-                $dId = (int) $r['district_id'];
-                $iKey = (string) $dId;
-                $iLabel = [$districts[$dId] ?? $unknown, $divisions[$districtDivision[$dId] ?? (int) $r['division_id']] ?? ''];
-            } else {
-                $id = (int) $r[$by . '_id'];
-                if ($value !== '' && (string) $id !== $value) {
-                    continue;
-                }
-                $names = ['division' => $divisions, 'district' => $districts, 'upazila' => $upazilas][$by];
-                $gKey = (string) $id;
-                $gName = $names[$id] ?? $unknown;
-                $iKey = $slug;
-                $iLabel = [$serviceLabel($slug)];
-            }
-            $scope[] = $r;
-            $groups[$gKey]['name'] = $gName;
-            $groups[$gKey]['items'][$iKey]['label'] = $iLabel;
-            $groups[$gKey]['items'][$iKey]['n'] = ($groups[$gKey]['items'][$iKey]['n'] ?? 0) + 1;
-        }
-
-        // বাছা এলাকা/সেবায় কেউ না থাকলেও গোষ্ঠীটা শূন্য দিয়ে দেখানো হয়
-        if ($value !== '' && !isset($groups[$value])) {
-            $groups[$value] = ['name' => match ($by) {
-                'service' => $serviceLabel($value),
-                'division' => $divisions[(int) $value] ?? $unknown,
-                'district' => $districts[(int) $value] ?? $unknown,
-                default => $upazilas[(int) $value] ?? $unknown,
-            }, 'items' => []];
-        }
-
-        // ক্রম: সেবা = সেবার তালিকার ক্রমে; এলাকা = নামের বর্ণানুক্রমে
-        $order = array_flip(array_keys($services));
-        if ($by === 'service') {
-            uksort($groups, static fn ($a, $b): int => ($order[$a] ?? PHP_INT_MAX) <=> ($order[$b] ?? PHP_INT_MAX));
-        } else {
-            uasort($groups, static fn (array $a, array $b): int => strcmp($a['name'], $b['name']));
-        }
-
-        $head = $by === 'service' ? ['সেবা', 'জেলা', 'বিভাগ', 'মোট সংখ্যা'] : [self::DIMENSIONS[$by][0], 'সেবা', 'মোট সংখ্যা'];
-        $last = count($head) - 1;
-        $out = [];
-        foreach ($groups as $g) {
-            $items = $g['items'] ?? [];
-            if ($by === 'service') {
-                uasort($items, static fn (array $a, array $b): int => $b['n'] <=> $a['n'] ?: strcmp($a['label'][0], $b['label'][0]));
-            } else {
-                uksort($items, static fn ($a, $b): int => ($order[$a] ?? PHP_INT_MAX) <=> ($order[$b] ?? PHP_INT_MAX));
-            }
-            $sum = 0;
-            foreach ($items as $it) {
-                $out[] = ['cells' => $by === 'service' ? [$g['name'], $it['label'][0], $it['label'][1] ?? '', bn($it['n'])] : [$g['name'], $it['label'][0], bn($it['n'])], 'type' => 'row'];
-                $sum += $it['n'];
-            }
-            if ($items === []) {
-                $out[] = ['cells' => $by === 'service' ? [$g['name'], 'কেউ নেই', '', bn(0)] : [$g['name'], 'কেউ নেই', bn(0)], 'type' => 'row'];
-            }
-            $out[] = ['cells' => array_replace(array_fill(0, $last + 1, ''), [0 => 'মোট — ' . $g['name'], $last => bn($sum)]), 'type' => 'sub'];
-        }
-        $out[] = self::sumRow($scope);
-
-        return ['head' => $head, 'rows' => $out, 'summary' => [], 'people' => count(array_unique(array_column($scope, 'id')))];
-    }
-
-    /**
-     * "সকল নাম": প্রতিটি সেবার নিচে সেই সেবার সব পেশাজীবীর নাম (ঠিকানাসহ), প্রতি সেবার নিচে মোট, একদম শেষে যোগফল।
-     *
-     * @param list<array<string,mixed>> $people
-     * @return array{head:list<string>,rows:list<array{cells:list<string>,type:string}>,summary:list<string>,people:int}
-     */
-    private static function byName(array $people): array
+    private static function table(array $people, array $f): array
     {
         $services = self::serviceNames();
         $geo = GeoRepository::all();
         $divisions = array_column($geo['divisions'], 'name', 'id');
         $districts = array_column($geo['districts'], 'name', 'id');
         $upazilas = array_column($geo['upazilas'], 'short', 'id');
+        $unknown = 'এলাকা অজানা';
+        $withNames = $f['name'] === self::ALL;
 
-        usort($people, static fn (array $a, array $b): int => strcmp($a['slug'], $b['slug']) ?: strcmp($a['name'], $b['name']));
-        $groups = [];
-        foreach ($people as $r) {
-            $groups[$r['slug']][] = $r;
-        }
-        $order = array_flip(array_keys($services));
-        uksort($groups, static fn ($a, $b): int => ($a === '' ? PHP_INT_MAX : ($order[$a] ?? PHP_INT_MAX - 1)) <=> ($b === '' ? PHP_INT_MAX : ($order[$b] ?? PHP_INT_MAX - 1)));
-
-        $head = ['সেবা', 'ক্রমিক', 'নাম', 'উপজেলা/থানা', 'জেলা', 'বিভাগ', 'মোবাইল', 'মোট সংখ্যা'];
-        $out = [];
-        foreach ($groups as $slug => $list) {
-            $label = $slug === '' ? self::CUSTOM_LABEL : ($services[$slug] ?? $slug);
-            foreach ($list as $i => $p) {
-                $out[] = ['cells' => [
-                    $label, bn($i + 1), $p['name'],
-                    $upazilas[$p['upazila_id']] ?? '—', $districts[$p['district_id']] ?? '—', $divisions[$p['division_id']] ?? '—',
-                    $p['phone'] !== '' ? format_phone($p['phone']) : '—', '',
-                ], 'type' => 'row'];
+        $scope = array_values(array_filter($people, static function (array $r) use ($f): bool {
+            foreach (['division', 'district', 'upazila'] as $dim) {
+                if ($f[$dim] !== '' && $f[$dim] !== self::ALL && (string) $r[$dim . '_id'] !== $f[$dim]) {
+                    return false;
+                }
             }
-            $out[] = ['cells' => ['মোট — ' . $label, '', '', '', '', '', '', bn(count($list))], 'type' => 'sub'];
-        }
-        $out[] = self::sumRow($people);
 
-        return ['head' => $head, 'rows' => $out, 'summary' => [], 'people' => count(array_unique(array_column($people, 'id')))];
+            return $f['service'] === '' || $f['service'] === self::ALL || $r['slug'] === $f['service'];
+        }));
+
+        $serviceLabel = static fn (string $slug): string => $slug === '' ? self::CUSTOM_LABEL : ($services[$slug] ?? $slug);
+        $order = array_flip(array_keys($services));
+        $rank = static fn (string $slug): int => $slug === '' ? PHP_INT_MAX : ($order[$slug] ?? PHP_INT_MAX - 1);
+        $key = static fn (array $r): array => [
+            $divisions[$r['division_id']] ?? $unknown, $districts[$r['district_id']] ?? $unknown, $upazilas[$r['upazila_id']] ?? $unknown,
+            $r['upazila_id'], $rank($r['slug']), $r['name'],
+        ];
+        usort($scope, static fn (array $a, array $b): int => $key($a) <=> $key($b));
+
+        // উপজেলা (আইডি) ধরে গোষ্ঠী
+        $groups = [];
+        foreach ($scope as $r) {
+            $groups[$r['upazila_id']][] = $r;
+        }
+
+        $out = [];
+        $no = 0;
+        foreach ($groups as $upazilaId => $list) {
+            $area = [$divisions[$list[0]['division_id']] ?? $unknown, $districts[$list[0]['district_id']] ?? $unknown, $upazilas[$upazilaId] ?? $unknown];
+            $count = 0;
+            if ($withNames) {
+                foreach ($list as $p) {
+                    $out[] = ['cells' => [bn(++$no), ...$area, $serviceLabel($p['slug']), $p['name'], $p['phone'] !== '' ? format_phone($p['phone']) : '—', ''], 'type' => 'row'];
+                    ++$count;
+                }
+            } else {
+                $bySlug = [];
+                foreach ($list as $p) {
+                    $bySlug[$p['slug']] = ($bySlug[$p['slug']] ?? 0) + 1;
+                }
+                uksort($bySlug, static fn ($a, $b): int => $rank((string) $a) <=> $rank((string) $b));
+                foreach ($bySlug as $slug => $n) {
+                    $out[] = ['cells' => [bn(++$no), ...$area, $serviceLabel((string) $slug), '', '', bn($n)], 'type' => 'row'];
+                    $count += $n;
+                }
+            }
+            $out[] = ['cells' => ['মোট — ' . $area[2], '', '', '', '', '', '', bn($count)], 'type' => 'sub'];
+        }
+        if ($out === []) {
+            $out[] = ['cells' => array_fill(0, count(self::HEAD), ''), 'type' => 'row'];
+        }
+        $out[] = self::sumRow($scope);
+
+        return ['head' => self::HEAD, 'rows' => $out, 'summary' => [], 'people' => count(array_unique(array_column($scope, 'id')))];
     }
 }
