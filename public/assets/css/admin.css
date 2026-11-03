@@ -2070,3 +2070,9 @@ input.adm-short {
     background: #dfeaec;
     font-weight: 700;
 }
+
+/* একাধিক নামের ঘর (লোকবল-সংক্রান্ত "একাধিক স্থান ও সেবা" রিপোর্ট): ঘরের ভেতরের লাইন-ভাঙা দেখায়, ওপর থেকে সাজানো */
+.adm-reporttable--lines td {
+    white-space: pre-line;
+    vertical-align: top;
+}
