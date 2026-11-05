@@ -27,3 +27,6 @@ Thumbs.db
 .idea/
 .vscode/
 client-preview/
+
+# ব্যক্তিগত ব্যবহারের গাইড-কপি (ছবিসহ), GitHub-এ যাবে না
+docs/guide-private/
