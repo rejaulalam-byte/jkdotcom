@@ -26,8 +26,7 @@ $option = static function (string $value, string $text, string $current, array $
     return '<option value="' . e($value) . '"' . $extra . ($value === $current ? ' selected' : '') . '>' . e($text) . '</option>';
 };
 ?>
-<div class="adm-reporthead adm-reporthead--keep">
-    <h2 class="adm-reporttitle">চাহিদাভিত্তিক বিভিন্ন সেবার লোকবলের তথ্য</h2>
+<div class="adm-reporthead adm-reporthead--keep adm-reporthead--right">
     <a class="adm-btn adm-btn--close" href="<?= e(admin_base() . '/reports') ?>">✕ বন্ধ করুন</a>
 </div>
 <p class="adm-reportnote">নিচের ঘর থেকে যে ঘরের তথ্য বাছাই করবেন তার ভিত্তিতে নিচের টেবিলে তথ্য দেখা যাবে</p>

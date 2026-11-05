@@ -2090,3 +2090,6 @@ input.adm-short {
 .adm-reporttable td {
     white-space: pre-line;
 }
+.adm-reporthead--right {
+    justify-content: flex-end;
+}

@@ -8,8 +8,7 @@
 $base = admin_base() . '/reports/multi';
 $cols = count($report['head']);
 ?>
-<div class="adm-reporthead adm-reporthead--keep">
-    <h2 class="adm-reporttitle">একজন পেশাজীবির একাধিক স্থান ও সেবার নামের তালিকা</h2>
+<div class="adm-reporthead adm-reporthead--keep adm-reporthead--right">
     <a class="adm-btn adm-btn--close" href="<?= e(admin_base() . '/reports') ?>">✕ বন্ধ করুন</a>
 </div>
 <p class="adm-reportnote">কে কোন কোন বিভাগ, জেলা, উপজেলা/থানা ও সেবার জন্য নাম দিয়েছেন তার তালিকা; একাধিক নাম ঘরের ভেতরে নিচে নিচে, প্রধান সেবা আগে।</p>
