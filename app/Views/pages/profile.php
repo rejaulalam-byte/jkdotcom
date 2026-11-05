@@ -183,7 +183,7 @@ $label = static function (string $for, string $key, bool $required = false): str
             </div>
 
             <?php if ($role === 'worker'): ?>
-                <?php // কাজ করতে আগ্রহী জেলা: সর্বোচ্চ ৫টি বা "সব জেলা" ?>
+                <?php // কাজ করতে আগ্রহী জেলা: সর্বোচ্চ ৪টি বা "সব জেলা" ?>
                 <div class="pf--wide-block">
                     <?= $label('rf-work-district', 'work_district') ?>
                     <?php $wdIds = array_map('intval', (array) ($old['work_district_ids'] ?? [])); $wdAll = !empty($old['work_all_districts']); require BASE_PATH . '/app/Views/partials/work-districts.php'; ?>

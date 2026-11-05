@@ -79,7 +79,7 @@ final class GeoRepository
     }
 
     /** একজন কর্মী সর্বোচ্চ কতটি জেলা বাছতে পারেন ("সব জেলা" আলাদা বাছাই)। */
-    public const MAX_WORK_DISTRICTS = 5;
+    public const MAX_WORK_DISTRICTS = 4;
 
     /**
      * ফর্মে আসা "কোন জেলায় কাজ করতে আগ্রহী" মান পড়ে যাচাই করে।

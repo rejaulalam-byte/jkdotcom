@@ -2215,7 +2215,13 @@
         var size = parseFloat(cs.fontSize);
         var inner = box.firstChild;
         var small = inner.querySelector("small");
-        box.style.left = cs.paddingLeft;
+        // ঘরের নিচে ট্যাগ থাকলে (কাজের জেলা) .pf লম্বা হয়; তাই নকল ইঙ্গিত ঘরের ঠিক ওপরেই বসে, পুরো .pf-এর মাঝখানে নয়
+        box.style.left = (input.offsetLeft + parseFloat(cs.paddingLeft)) + "px";
+        if (input.offsetHeight > 0) {
+            box.style.top = input.offsetTop + "px";
+            box.style.height = input.offsetHeight + "px";
+            box.style.bottom = "auto";
+        }
         box.style.color = window.getComputedStyle(input, "::placeholder").color;
         box.style.fontSize = cs.fontSize;
         box.style.fontWeight = cs.fontWeight;

@@ -164,7 +164,7 @@ $helpTel = content('today.post.helpline_tel');
                     <?= field_close() ?>
 
                     <?php if ($role === 'worker'): ?>
-                        <?php // কোন জেলায় কাজ করতে আগ্রহী (ঐচ্ছিক): সর্বোচ্চ ৫টি জেলা বা "সব জেলা", ট্যাগ হয়ে বসে; ঠিকানার তিন ঘরের সঙ্গে জোড়া নয় ?>
+                        <?php // কোন জেলায় কাজ করতে আগ্রহী (ঐচ্ছিক): সর্বোচ্চ ৪টি জেলা বা "সব জেলা", ট্যাগ হয়ে বসে; ঠিকানার তিন ঘরের সঙ্গে জোড়া নয় ?>
                         <?php if (field_on($role, 'work_districts')): ?><?= field_open($role, 'work_districts') ?>
                         <?php $wdIds = array_map('intval', (array) ($old['work_district_ids'] ?? [])); $wdAll = !empty($old['work_all_districts']); require BASE_PATH . '/app/Views/partials/work-districts.php'; ?>
                         <?= field_close() ?><?php endif; ?>
