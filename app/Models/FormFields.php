@@ -31,7 +31,7 @@ final class FormFields
             'upazila'        => ['থানা/উপজেলা', false],
             'district'       => ['জেলা', false],
             'division'       => ['বিভাগ', false],
-            'work_districts' => ['কোন জেলায় কাজ করতে আগ্রহী', true],
+            'work_districts' => ['অন্য জেলায় কাজ করতে আগ্রহী', true],
             'references'     => ['রেফারেন্স (২জন)', true],
             'password'       => ['পাসওয়ার্ড', false],
             'password2'      => ['পাসওয়ার্ড আবার', false],
