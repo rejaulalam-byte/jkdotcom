@@ -24,8 +24,15 @@ $sel = static fn (string $name, int $id): string => (int) ($old[$name] ?? 0) ===
 $ph = static fn (string $field, bool $required = true): string => e(content('regform.f.' . $field)) . ($required ? ' *' : '');
 $helpTel = content('today.post.helpline_tel');
 // ঘরের ঠিক ওপরের দৃশ্যমান নাম (ফাঁকা অবস্থায়ও কোন ঘরে কী তা বোঝা যায়); $required হলে লাল *
-$label = static fn (string $for, string $key, bool $required = false): string =>
-    '<label class="pf__label" for="' . e($for) . '">' . e(content('profile.l.' . $key)) . ($required ? ' <span class="pf__star">*</span>' : '') . '</label>';
+$label = static function (string $for, string $key, bool $required = false): string {
+    $text = content('profile.l.' . $key);
+    // ঠিকানার লেবেলে ( ) এর ভেতরের অংশ ছোট (রেজিস্ট্রেশন ফর্মের ইঙ্গিতের মতো)
+    $html = $key === 'address' && preg_match('/^(.*?)(\(.*\))(.*)$/us', $text, $m) === 1
+        ? e($m[1]) . '<small class="pf__label-note">' . e($m[2]) . '</small>' . e($m[3])
+        : e($text);
+
+    return '<label class="pf__label" for="' . e($for) . '">' . $html . ($required ? ' <span class="pf__star">*</span>' : '') . '</label>';
+};
 ?>
 <section class="section section--post-job section--regform" aria-labelledby="pf-title">
     <div class="container">

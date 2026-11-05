@@ -5743,3 +5743,9 @@ body.page-search .svc-search__btn {
         font-size: 0.875em;
     }
 }
+
+/* প্রোফাইলের লেবেলে ( ) এর ভেতরের অংশ ছোট */
+.pf__label-note {
+    font-size: 0.8em;
+    font-weight: 400;
+}
