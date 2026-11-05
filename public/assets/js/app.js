@@ -2202,3 +2202,88 @@
         img.classList.remove("is-hot");
     });
 })();
+
+/* ---- ইঙ্গিতের ব্র্যাকেট: ঘরের ইঙ্গিত-লেখায় ( ) এর ভেতরের অংশ ২px ছোট ------------------------------
+   সাধারণ placeholder-এ একই লেখার আধা অংশের আলাদা সাইজ হয় না, তাই "(...)" থাকা ইঙ্গিত লুকিয়ে ঠিক ওই জায়গায় নকল ইঙ্গিত
+   (.pf__ph) বসে; ঘরে কিছু লিখলে বা বাছলে CSS সেটা সরিয়ে দেয়। ( ) এর অংশ একলাইনে না ধরলে আরও একটু ছোট হয়; তবু না ধরলে লেখা দুই লাইনে ভাঙে (কেটে যায় না)।
+   রং, সাইজ ও বাঁ-ফাঁক ঘর থেকে নেওয়া হয়, তাই প্রতি পেইজে ঘরের নিজের ঢঙই থাকে। */
+(function () {
+    var pairs = [];
+
+    function fit(input, box) {
+        var cs = window.getComputedStyle(input);
+        var size = parseFloat(cs.fontSize);
+        var inner = box.firstChild;
+        var small = inner.querySelector("small");
+        box.style.left = cs.paddingLeft;
+        box.style.color = window.getComputedStyle(input, "::placeholder").color;
+        box.style.fontSize = cs.fontSize;
+        box.style.fontWeight = cs.fontWeight;
+        if (!size || !small) {
+            return;
+        }
+        // ( ) এর লেখা ২px ছোট; একলাইনে না ধরলে আরও ছোট, তবে খুব ছোট (পড়া যায় না এমন) নয়
+        var floor = Math.max(12, size * 0.75);
+        var step = 2;
+        box.classList.remove("pf__ph--wrap");
+        small.style.fontSize = (size - step) + "px";
+        while (inner.clientWidth > 0 && inner.scrollWidth > inner.clientWidth + 0.5 && size - step - 1 >= floor) {
+            step += 1;
+            small.style.fontSize = (size - step) + "px";
+        }
+        // তবু না ধরলে লেখা নিজেই বেশি লম্বা: ( ) অংশ ২px ছোট রেখে দুই লাইনে ভাঙতে দেওয়া, যাতে কেটে না যায়
+        if (inner.clientWidth > 0 && inner.scrollWidth > inner.clientWidth + 0.5) {
+            small.style.fontSize = (size - 2) + "px";
+            box.classList.add("pf__ph--wrap");
+        }
+    }
+
+    function build(input) {
+        if (input.getAttribute("data-ph-done") || input.type === "hidden" || input.type === "date" || input.closest(".pf--date")) {
+            return;
+        }
+        var text = input.getAttribute("placeholder") || "";
+        var m = /^([^(]*)(\([^)]*\))([\s\S]*)$/.exec(text);
+        if (!m) {
+            return;
+        }
+        input.setAttribute("data-ph-done", "1");
+        var box = document.createElement("span");
+        box.className = "pf__ph";
+        box.setAttribute("aria-hidden", "true");
+        var inner = document.createElement("span");
+        inner.className = "pf__ph-text";
+        var small = document.createElement("small");
+        small.textContent = m[2];
+        inner.appendChild(document.createTextNode(m[1]));
+        inner.appendChild(small);
+        inner.appendChild(document.createTextNode(m[3]));
+        box.appendChild(inner);
+        if (!input.getAttribute("aria-label") && !(input.labels && input.labels.length)) {
+            input.setAttribute("aria-label", text.replace(/\s*\*\s*$/, ""));
+        }
+        input.setAttribute("placeholder", " ");
+        input.insertAdjacentElement("afterend", box);
+        pairs.push([input, box]);
+    }
+
+    function refit() {
+        pairs.forEach(function (p) { fit(p[0], p[1]); });
+    }
+
+    function start() {
+        Array.prototype.forEach.call(document.querySelectorAll(".pf input"), build);
+        refit();
+    }
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(refit);
+    }
+    window.addEventListener("resize", refit);
+    document.addEventListener("focusin", function (e) {
+        if (e.target.getAttribute && e.target.getAttribute("data-ph-done")) {
+            refit();
+        }
+    });
+    start();
+})();

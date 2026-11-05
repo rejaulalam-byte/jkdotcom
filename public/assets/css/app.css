@@ -5685,7 +5685,7 @@ body.page-search .svc-search__btn {
     color: var(--white);
 }
 
-/* ---- রেজিস্ট্রেশন ফর্ম: ঘরের ভেতরের লেখা বাঁয়ে ১০px সরানো; ঠিকানার ইঙ্গিতে ( ) এর লেখা ২px ছোট (নকল ইঙ্গিত .pf__ph) ---- */
+/* ---- রেজিস্ট্রেশন ফর্ম: ঘরের ভেতরের লেখা বাঁয়ে ১০px সরানো ---- */
 .page-regform .pf input,
 .page-regform .pf select,
 .page-regform .pf textarea {
@@ -5696,27 +5696,6 @@ body.page-search .svc-search__btn {
 }
 .page-regform .pf__code {
     left: calc(4.5rem - 10px);
-}
-.pf__ph {
-    position: absolute;
-    top: 0;
-    left: calc(4.5rem - 10px);
-    right: 0.5rem;
-    height: 4.8125rem;
-    line-height: 4.8125rem;
-    overflow: hidden;
-    white-space: nowrap;
-    color: rgba(var(--ink-rgb), 0.6);
-    font-size: calc(var(--fs-body) * var(--k-body));
-    font-weight: 300;
-    pointer-events: none;
-}
-.pf__ph small {
-    margin-left: 0.25em;
-    font-size: 0.75em; /* ( ) এর লেখা ছোট, যাতে পুরো ঠিকানা-ইঙ্গিত ডেস্কটপে একলাইনে ধরে */
-}
-.pf--hint input:not(:placeholder-shown) + .pf__ph {
-    display: none;
 }
 @media (max-width: 1199px) {
     .page-regform .pf input,
@@ -5730,22 +5709,38 @@ body.page-search .svc-search__btn {
     .page-regform .pf__code {
         left: calc(1.2rem - 10px);
     }
-    /* ফোনে জায়গা কম: ইঙ্গিত দুই লাইনে ভাঙতে পারে */
-    .pf__ph {
-        left: calc(1.2rem - 10px);
-        height: 3.75rem;
-        padding-top: 0.5rem;
-        line-height: 1.3;
-        white-space: normal;
-        font-size: calc(1rem * var(--k-body));
-    }
-    .pf__ph small {
-        font-size: 0.875em;
-    }
 }
 
-/* প্রোফাইলের লেবেলে ( ) এর ভেতরের অংশ ছোট */
+/* ---- ইঙ্গিত-লেখার ( ) এর ভেতরের অংশ ২px ছোট (app.js "ইঙ্গিতের ব্র্যাকেট"): সাধারণ placeholder-এ আধা-লেখার আলাদা সাইজ
+   হয় না, তাই JS আসল ইঙ্গিত লুকিয়ে এই নকল ইঙ্গিত বসায়; ঘরে কিছু লিখলেই এটা সরে যায়। রং/সাইজ/বাঁ-ফাঁক JS ঘর থেকে নেয়। ---- */
+.pf__ph {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0.5rem;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    pointer-events: none;
+}
+.pf__ph-text {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.pf__ph-text small {
+    margin-left: 0.2em;
+    font-size: inherit;
+}
+.pf input:not(:placeholder-shown) + .pf__ph {
+    display: none;
+}
+.pf__ph--wrap .pf__ph-text {
+    white-space: normal;
+    line-height: 1.25;
+}
+
+/* প্রোফাইলের লেবেলে ( ) এর ভেতরের অংশ ২px ছোট */
 .pf__label-note {
-    font-size: 0.8em;
-    font-weight: 400;
+    font-size: calc(1em - 2px);
 }
