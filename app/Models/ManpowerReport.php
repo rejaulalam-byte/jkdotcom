@@ -87,7 +87,7 @@ final class ManpowerReport
         ];
     }
 
-    private const HEAD = ['ক্রমিক নং', 'বিভাগ', 'জেলা', 'উপজেলা/থানা', 'এলাকার নাম', 'সেবা', 'পেশাজীবির নাম', 'মোবাইল নাম্বার', 'মোট সংখ্যা'];
+    private const HEAD = ['ক্রমিক নং', 'বিভাগ', 'জেলা', 'উপজেলা/থানা', 'এলাকার নাম', 'সেবা', 'পেশাজীবির নাম ও মোবাইল', 'মোট সংখ্যা'];
 
     /**
      * অনুমোদিত কর্মীর সারি: প্রধান পেশায় একটা, প্রতিটি "আরও পেশা"-য় একটা করে।
@@ -180,7 +180,7 @@ final class ManpowerReport
             $count = 0;
             if ($withNames) {
                 foreach ($list as $p) {
-                    $out[] = ['cells' => [bn(++$no), ...$area, $p['area_name'] !== '' ? $p['area_name'] : '—', $serviceLabel($p['slug']), $p['name'], $p['phone'] !== '' ? format_phone($p['phone']) : '—', ''], 'type' => 'row'];
+                    $out[] = ['cells' => [bn(++$no), ...$area, $p['area_name'] !== '' ? $p['area_name'] : '—', $serviceLabel($p['slug']), $p['name'] . ($p['phone'] !== '' ? "\n" . format_phone($p['phone']) : ''), ''], 'type' => 'row'];
                     ++$count;
                 }
             } else {
@@ -192,11 +192,11 @@ final class ManpowerReport
                 }
                 uasort($byAreaSlug, static fn (array $a, array $b): int => [$a[0], $rank($a[1])] <=> [$b[0], $rank($b[1])]);
                 foreach ($byAreaSlug as [$areaName, $slug, $n]) {
-                    $out[] = ['cells' => [bn(++$no), ...$area, $areaName !== '' ? $areaName : '—', $serviceLabel((string) $slug), '', '', bn($n)], 'type' => 'row'];
+                    $out[] = ['cells' => [bn(++$no), ...$area, $areaName !== '' ? $areaName : '—', $serviceLabel((string) $slug), '', bn($n)], 'type' => 'row'];
                     $count += $n;
                 }
             }
-            $out[] = ['cells' => ['মোট — ' . $area[2], '', '', '', '', '', '', '', bn($count)], 'type' => 'sub'];
+            $out[] = ['cells' => ['মোট — ' . $area[2], '', '', '', '', '', '', bn($count)], 'type' => 'sub'];
         }
         if ($out === []) {
             $out[] = ['cells' => array_fill(0, count(self::HEAD), ''), 'type' => 'row'];

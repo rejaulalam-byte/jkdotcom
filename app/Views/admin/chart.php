@@ -50,7 +50,7 @@ $y = static fn (int $n): float => $base - $plot * $n / $yMax;
     <?php if ($wide): ?>
         <ul class="adm-chart__legend">
             <li><span class="adm-chart__key adm-chart__key--visits"></span>সেবার পেইজে ভিজিট</li>
-            <li><span class="adm-chart__key adm-chart__key--clicks"></span>ফোন বা ইমেইলে ক্লিক</li>
+            <li><span class="adm-chart__key adm-chart__key--clicks"></span>মোবাইল বা ইমেইলে ক্লিক</li>
         </ul>
     <?php endif; ?>
     <?php if ($groups === []): ?>

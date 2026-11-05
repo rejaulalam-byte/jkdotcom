@@ -2085,3 +2085,8 @@ input.adm-short {
     font-size: 15px;
     font-weight: 400;
 }
+
+/* রিপোর্টের ঘরে "নাম \n মোবাইল" দুই লাইনে দেখানো */
+.adm-reporttable td {
+    white-space: pre-line;
+}

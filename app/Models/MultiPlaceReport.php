@@ -20,7 +20,7 @@ final class MultiPlaceReport
     /** সর্বোচ্চ কতজনের সারি দেখানো হয় (বেশি হলে কেটে জানানো হয়) */
     public const MAX_PEOPLE = 400;
 
-    private const HEAD = ['ক্রমিক নং', 'পেশাজীবির নাম', 'মোবাইল নাম্বার', 'বিভাগ (নাম)', 'জেলা (নাম)', 'উপজেলা/থানা (নাম)', 'এলাকার নাম', 'সেবার নাম (প্রধান আগে)'];
+    private const HEAD = ['ক্রমিক নং', 'পেশাজীবির নাম ও মোবাইল', 'বিভাগ (নাম)', 'জেলা (নাম)', 'উপজেলা/থানা (নাম)', 'এলাকার নাম', 'সেবার নাম (প্রধান আগে)'];
 
     /** @return array{head:list<string>,rows:list<array{cells:list<string>,type:string}>,summary:list<string>} */
     public static function build(): array
@@ -123,7 +123,7 @@ final class MultiPlaceReport
         $rows = [];
         foreach ($people as $i => $p) {
             $rows[] = ['cells' => [
-                bn($i + 1), $p['name'], $p['phone'] !== '' ? format_phone($p['phone']) : '—',
+                bn($i + 1), $p['name'] . ($p['phone'] !== '' ? "\n" . format_phone($p['phone']) : ''),
                 self::lines($p['divisionNames']), self::lines($p['districtNames']), self::lines($p['upazilaNames']), $p['areaName'], self::lines($p['services']),
             ], 'type' => 'row'];
         }

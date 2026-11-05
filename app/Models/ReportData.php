@@ -15,8 +15,8 @@ final class ReportData
 
     /** রিপোর্টের নাম => [শিরোনাম, এক লাইনের বিবরণ]। ক্রম = মেনুর ক্রম। */
     public const REPORTS = [
-        'interest' => ['সেবা অনুযায়ী মানুষের আগ্রহ', 'কোন কোন সেবায় মানুষ আগ্রহ দেখিয়েছেন: পেইজ ভিজিট, নাম-মোবাইল দিয়ে আগ্রহ, ফোন ও ইমেইল দেখা।'],
-        'checked' => ['কোন কর্মীর ফোন-ইমেইল দেখা হয়েছে', 'সেবা অনুযায়ী: কর্মী, তাঁর এলাকা, আর যিনি দেখেছেন তাঁর নাম ও মোবাইল।'],
+        'interest' => ['সেবা অনুযায়ী মানুষের আগ্রহ', 'কোন কোন সেবায় মানুষ আগ্রহ দেখিয়েছেন: পেইজ ভিজিট, নাম-মোবাইল দিয়ে আগ্রহ, মোবাইল ও ইমেইল দেখা।'],
+        'checked' => ['কোন কর্মীর মোবাইল-ইমেইল দেখা হয়েছে', 'সেবা অনুযায়ী: কর্মী, তাঁর এলাকা, আর যিনি দেখেছেন তাঁর নাম ও মোবাইল।'],
         'jobs' => ['কাজের বিজ্ঞপ্তি কতগুলো ও কী কী', 'কতগুলো কাজ প্রকাশ পেয়েছে, কোন সেবার, কে দিয়েছেন, কোথাকার।'],
         'job-inquiries' => ['কাজের বিজ্ঞপ্তিতে কারা খোঁজ নিয়েছেন', 'প্রতিটি সেবার নিচে সারাংশ, শেষে মোট; অনুসন্ধানকারীর নাম ও মোবাইলসহ।'],
         'registrations' => ['পেশাজীবীর নিবন্ধন', 'কতজন নিবন্ধন করেছেন, কতজন অনুমোদিত, অপেক্ষায় বা বাতিল।'],
@@ -41,7 +41,7 @@ final class ReportData
         };
     }
 
-    /** ১) সেবা অনুযায়ী আগ্রহ: ভিজিট, আগ্রহ (নাম-মোবাইল), ফোন, ইমেইল। */
+    /** ১) সেবা অনুযায়ী আগ্রহ: ভিজিট, আগ্রহ (নাম-মোবাইল), মোবাইল, ইমেইল। */
     private static function interest(string $from, string $to): array
     {
         $names = self::serviceNames();
@@ -82,13 +82,13 @@ final class ReportData
         }
 
         return [
-            'head' => ['সেবা', 'সেবার পেইজ দেখা', 'আগ্রহী (নাম-মোবাইল দিয়েছেন)', 'আলাদা দর্শক', 'ফোন দেখেছেন', 'ইমেইল দেখেছেন'],
+            'head' => ['সেবা', 'সেবার পেইজ দেখা', 'আগ্রহী (নাম-মোবাইল দিয়েছেন)', 'আলাদা দর্শক', 'মোবাইল দেখেছেন', 'ইমেইল দেখেছেন'],
             'rows' => $rows,
             'summary' => ['সেবার পেইজ দেখার গণনা শুরু হয়েছে ৩০ অক্টোবর ২০২৬ থেকে; তার আগের তারিখে "সেবার পেইজ দেখা" ০ দেখাবে।'],
         ];
     }
 
-    /** ২) কোন কর্মীর ফোন/ইমেইল দেখা হয়েছে, সেবা অনুযায়ী। */
+    /** ২) কোন কর্মীর মোবাইল/ইমেইল দেখা হয়েছে, সেবা অনুযায়ী। */
     private static function checked(string $from, string $to): array
     {
         $names = self::serviceNames();
@@ -102,20 +102,20 @@ final class ReportData
                 'at' => $lead['at'],
                 'cells' => [
                     bn_datetime(strtotime($lead['at'])), $service,
-                    $w !== null ? (string) $w['name'] : '(কর্মী পাওয়া যায়নি)', $w !== null ? self::phone((string) ($w['phone'] ?? '')) : '',
-                    $w !== null ? self::area($w) : '', $lead['kind'] === 'phone' ? 'ফোন' : 'ইমেইল',
-                    $lead['visitor_name'], format_phone($lead['visitor_phone']),
+                    $w !== null ? self::nameMobile((string) $w['name'], (string) ($w['phone'] ?? '')) : '(কর্মী পাওয়া যায়নি)',
+                    $w !== null ? self::area($w) : '', $lead['kind'] === 'phone' ? 'মোবাইল' : 'ইমেইল',
+                    self::nameMobile((string) $lead['visitor_name'], (string) $lead['visitor_phone']),
                 ],
             ];
         }
         usort($list, static fn (array $a, array $b): int => [$a['service'], $a['at']] <=> [$b['service'], $b['at']]);
         $rows = array_map(static fn (array $r): array => ['cells' => $r['cells'], 'type' => 'row'], $list);
         if ($rows !== []) {
-            $rows[] = ['cells' => ['মোট ' . bn(count($rows)) . 'বার দেখা হয়েছে', '', '', '', '', '', '', ''], 'type' => 'total'];
+            $rows[] = ['cells' => ['মোট ' . bn(count($rows)) . 'বার দেখা হয়েছে', '', '', '', '', ''], 'type' => 'total'];
         }
 
         return [
-            'head' => ['সময়', 'সেবা', 'কর্মীর নাম', 'কর্মীর ফোন', 'এলাকা', 'কী দেখেছেন', 'দর্শকের নাম', 'দর্শকের মোবাইল'],
+            'head' => ['সময়', 'সেবা', 'কর্মীর নাম ও মোবাইল', 'এলাকা', 'কী দেখেছেন', 'দর্শকের নাম ও মোবাইল'],
             'rows' => self::cap($rows, $summary),
             'summary' => $summary,
         ];
@@ -135,8 +135,8 @@ final class ReportData
             }
             $perDay[$day] = ($perDay[$day] ?? 0) + 1;
             $rows[] = ['cells' => [
-                bn_datetime(strtotime((string) $job['created_at'])), (string) $job['title'], (string) $job['contact_name'],
-                self::phone((string) $job['phone']), self::area($job), (string) ($job['status'] ?? 'approved') === 'approved' ? 'প্রকাশিত' : 'লুকানো',
+                bn_datetime(strtotime((string) $job['created_at'])), (string) $job['title'], self::nameMobile((string) $job['contact_name'], (string) $job['phone']),
+                self::area($job), (string) ($job['status'] ?? 'approved') === 'approved' ? 'প্রকাশিত' : 'লুকানো',
             ], 'type' => 'row'];
         }
         $summary = [];
@@ -147,7 +147,7 @@ final class ReportData
             }
         }
 
-        return ['head' => ['সময়', 'কাজ (সেবা)', 'বিজ্ঞপ্তিদাতার নাম', 'ফোন', 'এলাকা', 'অবস্থা'], 'rows' => self::cap($rows, $summary), 'summary' => $summary];
+        return ['head' => ['সময়', 'কাজ (সেবা)', 'বিজ্ঞপ্তিদাতার নাম ও মোবাইল', 'এলাকা', 'অবস্থা'], 'rows' => self::cap($rows, $summary), 'summary' => $summary];
     }
 
     /** ৪) কাজের বিজ্ঞপ্তিতে কারা খোঁজ নিয়েছেন: প্রতিটি সেবার নিচে সারাংশ, শেষে মোট। */
@@ -159,8 +159,8 @@ final class ReportData
             $title = $job !== null ? (string) $job['title'] : '(মোছা বা পাওয়া যায়নি)';
             $groups[$title][] = ['cells' => [
                 bn_datetime(strtotime($lead['at'])), $title,
-                $job !== null ? (string) $job['contact_name'] : '', $job !== null ? self::phone((string) $job['phone']) : '', $job !== null ? self::area($job) : '',
-                $lead['visitor_name'], format_phone($lead['visitor_phone']), $lead['kind'] === 'phone' ? 'ফোন' : 'ইমেইল',
+                $job !== null ? self::nameMobile((string) $job['contact_name'], (string) $job['phone']) : '', $job !== null ? self::area($job) : '',
+                self::nameMobile((string) $lead['visitor_name'], (string) $lead['visitor_phone']), $lead['kind'] === 'phone' ? 'মোবাইল' : 'ইমেইল',
             ], 'type' => 'row'];
         }
         ksort($groups);
@@ -170,14 +170,14 @@ final class ReportData
             foreach ($items as $item) {
                 $rows[] = $item;
             }
-            $rows[] = ['cells' => ['সারাংশ — ' . $title, 'মোট ' . bn(count($items)) . ' বার খোঁজ নেওয়া হয়েছে', '', '', '', '', '', ''], 'type' => 'sub'];
+            $rows[] = ['cells' => ['সারাংশ — ' . $title, 'মোট ' . bn(count($items)) . ' বার খোঁজ নেওয়া হয়েছে', '', '', '', ''], 'type' => 'sub'];
             $count += count($items);
         }
         if ($rows !== []) {
-            $rows[] = ['cells' => ['মোট সারাংশ', bn($count) . ' বার খোঁজ, ' . bn(count($groups)) . 'টি সেবা/কাজে', '', '', '', '', '', ''], 'type' => 'total'];
+            $rows[] = ['cells' => ['মোট সারাংশ', bn($count) . ' বার খোঁজ, ' . bn(count($groups)) . 'টি সেবা/কাজে', '', '', '', ''], 'type' => 'total'];
         }
 
-        return ['head' => ['সময়', 'কাজ (সেবা)', 'বিজ্ঞপ্তিদাতার নাম', 'ফোন', 'এলাকা', 'অনুসন্ধানকারীর নাম', 'অনুসন্ধানকারীর মোবাইল', 'কী দেখেছেন'], 'rows' => self::cap($rows, $summary), 'summary' => $summary];
+        return ['head' => ['সময়', 'কাজ (সেবা)', 'বিজ্ঞপ্তিদাতার নাম ও মোবাইল', 'এলাকা', 'অনুসন্ধানকারীর নাম ও মোবাইল', 'কী দেখেছেন'], 'rows' => self::cap($rows, $summary), 'summary' => $summary];
     }
 
     /** ৫) পেশাজীবীর নিবন্ধন: দিন অনুযায়ী, এখনকার অবস্থাসহ। পুরনো সাইট থেকে আনা কর্মী গোনা হয় না। */
@@ -247,6 +247,12 @@ final class ReportData
         $parts = array_map(static fn (string $x): string => trim((string) preg_replace('/\s+/u', ' ', $x)), [(string) (($row['area_name'] ?? '') !== '' ? $row['area_name'] : ($row['address'] ?? '')), $geo['upazila'], $geo['district']]);
 
         return implode(', ', array_filter($parts, static fn (string $x): bool => $x !== ''));
+    }
+
+    /** নাম ও মোবাইল এক ঘরে: নামের নিচের লাইনে মোবাইল (মোবাইল না থাকলে শুধু নাম)। */
+    private static function nameMobile(string $name, string $phone): string
+    {
+        return $name . ($phone !== '' ? "\n" . format_phone($phone) : '');
     }
 
     private static function phone(string $phone): string

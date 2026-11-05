@@ -43,7 +43,7 @@ $cards = [
     ]],
     ['আজকের হিসাব', [
         ['কর্মীর পেইজ দেখা হয়েছে', (int) $stats['visits_today'], false],
-        ['ফোন/ইমেইলে ক্লিক', (int) $stats['clicks_today'], false],
+        ['মোবাইল/ইমেইলে ক্লিক', (int) $stats['clicks_today'], false],
         ['আগ্রহী দর্শক (নাম-মোবাইল দিয়েছেন)', (int) $stats['leads_today'], false],
     ]],
     ['এক নজরে', [
@@ -57,7 +57,7 @@ $cards = [
 $dayLabel = static fn (string $date): string => bn((int) date('j', strtotime($date))) . ' ' . $months[(int) date('n', strtotime($date)) - 1];
 $twoBars = static fn (int $visits, int $clicks): array => [
     ['label' => 'সেবায় ভিজিট', 'items' => [['kind' => 'visits', 'n' => $visits]]],
-    ['label' => 'ফোন বা ইমেইলে ক্লিক', 'items' => [['kind' => 'clicks', 'n' => $clicks]]],
+    ['label' => 'মোবাইল বা ইমেইলে ক্লিক', 'items' => [['kind' => 'clicks', 'n' => $clicks]]],
 ];
 $chartList = [
     [
@@ -75,7 +75,7 @@ $chartList = [
         'empty' => null,
     ],
     [
-        'title' => 'গত ৭ দিনে কোন সেবায় খোঁজ ও ফোন',
+        'title' => 'গত ৭ দিনে কোন সেবায় খোঁজ ও মোবাইল',
         'sub' => $dayLabel($charts['week']['from']) . ' থেকে ' . $dayLabel($charts['week']['to']) . ($charts['week']['more'] > 0 ? ' · সবচেয়ে বেশিগুলো; আরও ' . bn($charts['week']['more']) . 'টি সেবা আছে' : ''),
         'wide' => true,
         'groups' => array_map(static fn (array $r): array => [
