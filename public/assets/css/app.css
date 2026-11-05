@@ -3292,6 +3292,7 @@ textarea {
    "+৮৮", তারিখের ক্যাপশন ও খালি তারিখ-ফরম্যাট। শুধু প্রথম ঘরের ডান প্রান্তের
    "(না পেলে যোগ করুন)" গাঢ়, কারণ ওটা বাটনের মতো কাজ করে। */
 .post-form .pf ::placeholder,
+.post-form .pf__ph,
 .post-form .pf select:invalid,
 .post-form .pf--date label,
 .post-form .pf__code {
