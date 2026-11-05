@@ -46,7 +46,7 @@ $cards = [
         ['আগ্রহী দর্শক (নাম-মোবাইল দিয়েছেন)', (int) $stats['leads_today'], false],
     ]],
     ['এক নজরে', [
-        ['সেবা (পেশা)', (int) $stats['services'], false],
+        ['সেবা (পেশা) নামের সংখ্যা', (int) $stats['services'], false],
         ['চালু বিজ্ঞাপন', (int) $stats['ads'], false],
         ['প্রকাশিত কাজের বিজ্ঞপ্তি', (int) $stats['jobs'], false],
         ['নিউজলেটারের গ্রাহক', (int) $stats['subscribers'], false],
