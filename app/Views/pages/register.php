@@ -113,10 +113,13 @@ $helpTel = content('today.post.helpline_tel');
                     </div>
                     <?= field_close() ?>
                     <?php if (field_on($role, 'address')): ?><?= field_open($role, 'address') ?>
-                    <div class="pf">
+                    <?php // ঠিকানার ইঙ্গিত-লেখা: ( ) এর ভেতরের অংশ ২px ছোট, তাই একলাইনে ধরে; সাধারণ placeholder-এ আলাদা সাইজ হয় না, তাই নকল ইঙ্গিত (.pf__ph) ?>
+                    <?php $hint = \App\Core\Content::get('regform.f.address'); $hasBracket = preg_match('/^(.*?)(\(.*\))\s*$/us', $hint, $hm) === 1; ?>
+                    <div class="pf pf--hint">
                         <label class="sr-only" for="rf-address"><?= t('regform.f.address') ?></label>
                         <input id="rf-address" data-bn type="text" name="address" maxlength="250" required autocomplete="street-address"
-                               placeholder="<?= $ph('address') ?>" value="<?= $val('address') ?>">
+                               placeholder=" " value="<?= $val('address') ?>">
+                        <span class="pf__ph" aria-hidden="true"><?= $hasBracket ? e($hm[1]) . '<small>' . e($hm[2]) . '</small>' : e($hint) ?> *</span>
                     </div>
                     <?= field_close() ?><?php endif; ?>
                     <?php // এলাকার তিন ড্রপডাউন: id-গুলো "কাজ সম্পর্কে জানান"-এর মতোই, app.js একই কোডে চালায় ?>

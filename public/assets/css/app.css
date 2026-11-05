@@ -5683,3 +5683,59 @@ body.page-search .svc-search__btn {
     background: var(--teal);
     color: var(--white);
 }
+
+/* ---- রেজিস্ট্রেশন ফর্ম: ঘরের ভেতরের লেখা বাঁয়ে ১০px সরানো; ঠিকানার ইঙ্গিতে ( ) এর লেখা ২px ছোট (নকল ইঙ্গিত .pf__ph) ---- */
+.page-regform .pf input,
+.page-regform .pf select,
+.page-regform .pf textarea {
+    padding-left: calc(4.5rem - 10px);
+}
+.page-regform .pf--phone input {
+    padding-left: calc(8.2rem - 10px);
+}
+.page-regform .pf__code {
+    left: calc(4.5rem - 10px);
+}
+.pf__ph {
+    position: absolute;
+    top: 0;
+    left: calc(4.5rem - 10px);
+    right: 1rem;
+    height: 4.8125rem;
+    line-height: 4.8125rem;
+    overflow: hidden;
+    white-space: nowrap;
+    color: rgba(var(--ink-rgb), 0.6);
+    font-size: calc(var(--fs-body) * var(--k-body));
+    font-weight: 300;
+    pointer-events: none;
+}
+.pf__ph small {
+    margin-left: 0.25em;
+    font-size: calc(var(--fs-body) * var(--k-body) - 2px);
+}
+.pf--hint input:not(:placeholder-shown) + .pf__ph {
+    display: none;
+}
+@media (max-width: 1199px) {
+    .page-regform .pf input,
+    .page-regform .pf select,
+    .page-regform .pf textarea {
+        padding-left: calc(1.2rem - 10px);
+    }
+    .page-regform .pf--phone input {
+        padding-left: calc(3.9rem - 10px);
+    }
+    .page-regform .pf__code {
+        left: calc(1.2rem - 10px);
+    }
+    .pf__ph {
+        left: calc(1.2rem - 10px);
+        height: 3.75rem;
+        line-height: 3.75rem;
+        font-size: calc(1rem * var(--k-body));
+    }
+    .pf__ph small {
+        font-size: calc(1rem * var(--k-body) - 2px);
+    }
+}

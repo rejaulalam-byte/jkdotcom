@@ -475,7 +475,7 @@ return [
     'regform.f.gender'       => 'জেন্ডার নির্বাচন করুন',
     'regform.f.email'        => 'আপনার ইমেইল --- অবশ্যই ইংরেজিতে',
     'regform.f.phone'        => 'মোবাইল নম্বর',
-    'regform.f.address'      => 'বর্তমান ঠিকানা (বাসা নং, রোড নং, সড়ক নাম, এলাকা)',
+    'regform.f.address'      => 'বর্তমান ঠিকানা (অফিস/দোকান/বাসার নাম ও নং)',
     'regform.f.upazila'      => 'উপজেলা / থানা নির্বাচন করুন',
     'regform.f.district'     => 'জেলা নির্বাচন করুন',
     'regform.f.division'     => 'বিভাগ নির্বাচন করুন',
