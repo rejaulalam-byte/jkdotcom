@@ -34,6 +34,7 @@ $rows = [
     ],
     'ঠিকানা' => [
         ['ঠিকানা', $val((string) $member['address'])],
+        ['এলাকার নাম', $val((string) ($member['area_name'] ?? ''))],
         ['উপজেলা / থানা', $val($geo['upazila'])],
         ['জেলা', $val($geo['district'])],
         ['বিভাগ', $val($geo['division'])],

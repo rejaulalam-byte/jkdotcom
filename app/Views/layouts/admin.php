@@ -25,6 +25,7 @@ $nav = [
     [admin_base() . '/locks', 'আটকানো লগইন', false, 'locks'],
     [admin_base() . '/jobs', 'কাজের বিজ্ঞপ্তি', false, 'inbox'],
     [admin_base() . '/services', 'সেবার তালিকা', false, 'services'],
+    [admin_base() . '/area-names', 'এলাকার নাম', false, 'registrations'],
     [admin_base() . '/leads', 'আগ্রহীর তালিকা', false, 'inbox'],
     [admin_base() . '/ads', 'বিজ্ঞাপন', false, 'ads'],
     [admin_base() . '/subscribers', 'ইমেইল গ্রাহক', false, 'inbox'],

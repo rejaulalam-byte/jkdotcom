@@ -81,7 +81,7 @@ $link = static fn (int $n): string => '/search?q=' . rawurlencode($query) . ($n 
                     <h2 class="search-group__head" id="sg-workers"><?= t('search.g.workers') ?> <span class="search-count">(<?= e(bn(count($result['workers']))) ?>)</span></h2>
                     <ul class="search-workers">
                         <?php foreach ($workers as $w):
-                            $area = implode(', ', array_filter([$w['address'], $w['upazila'], $w['district'], $w['division']], static fn (string $x): bool => $x !== ''));
+                            $area = implode(', ', array_filter([$w['area'], $w['upazila'], $w['district'], $w['division']], static fn (string $x): bool => $x !== ''));
                             ?>
                             <li>
                                 <a class="search-workers__name" href="/workers/<?= (int) $w['id'] ?>"><?= e($w['name']) ?></a>

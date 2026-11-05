@@ -51,7 +51,7 @@ final class WorkerDirectory
             if ($isDistrict && !empty($w['work_all'])) {
                 return true;
             }
-            foreach (array_merge([$w['name'], $w['address'], $w['upazila'], $w['district'], $w['division']], (array) ($w['work_districts'] ?? [])) as $field) {
+            foreach (array_merge([$w['name'], $w['area'], $w['address'], $w['upazila'], $w['district'], $w['division']], (array) ($w['work_districts'] ?? [])) as $field) {
                 if ($field !== '' && str_contains(mb_strtolower($field), $needle)) {
                     return true;
                 }

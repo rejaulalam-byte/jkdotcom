@@ -12,6 +12,7 @@ use App\Core\RateLimiter;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
+use App\Models\AreaRepository;
 use App\Models\CustomFields;
 use App\Models\FormFields;
 use App\Models\GeoRepository;
@@ -72,6 +73,7 @@ final class RegistrationController
             'phone' => normalize_phone($this->clean($_POST['phone'] ?? '', 20)),
             'email' => mb_strtolower($this->clean($_POST['email'] ?? '', 150)),
             'address' => $this->clean($_POST['address'] ?? '', 250),
+            'area_name' => AreaRepository::clean($_POST['area_name'] ?? ''),
             'upazila_id' => (int) ($_POST['upazila_id'] ?? 0),
             'district_id' => (int) ($_POST['district_id'] ?? 0),
             'division_id' => (int) ($_POST['division_id'] ?? 0),
@@ -107,6 +109,9 @@ final class RegistrationController
         }
         if ($hidden('address')) {
             $data['address'] = '';
+        }
+        if ($hidden('area')) {
+            $data['area_name'] = '';
         }
         if ($role === 'worker') {
             if ($hidden('experience')) {
@@ -157,6 +162,9 @@ final class RegistrationController
             $this->fail($back, [$messages[$result] ?? msg('msg.save_failed')], $data);
         }
 
+        // তালিকার বাইরের এলাকার নাম হলে অ্যাডমিনের যাচাইয়ের জন্য রাখা
+        AreaRepository::noteTyped((string) $data['area_name'], (int) $data['upazila_id'], (int) $data['district_id']);
+
         $member = UserRepository::findByPhone((string) $data['phone'], $role);
         CustomFields::saveValues($role, (int) ($member['id'] ?? 0), $custom);
 
@@ -204,6 +212,7 @@ final class RegistrationController
             $rows['জাতীয় পরিচয়পত্র নম্বর'] = (string) $d['nid_number'];
         }
         $rows['ঠিকানা'] = (string) $d['address'];
+        $rows['এলাকার নাম'] = (string) $d['area_name'];
         $rows['থানা/উপজেলা, জেলা, বিভাগ'] = implode(', ', array_filter([$geo['upazila'], $geo['district'], $geo['division']]));
         if ($isWorker && (string) $d['bio'] !== '') {
             $rows['সংক্ষিপ্ত বিবরণ'] = (string) $d['bio'];
@@ -286,6 +295,10 @@ final class RegistrationController
         }
         if ($d['address'] === '' && !FormFields::hidden($d['role'], 'address')) {
             $errors[] = msg('msg.address');
+        }
+        // এলাকার নাম কর্মীর জন্য আবশ্যক, প্রতিনিধির জন্য ঐচ্ছিক
+        if ($d['role'] === 'worker' && $d['area_name'] === '') {
+            $errors[] = msg('msg.area_name');
         }
         if ($d['division_id'] === 0 || $d['district_id'] === 0 || $d['upazila_id'] === 0) {
             $errors[] = msg('msg.area');

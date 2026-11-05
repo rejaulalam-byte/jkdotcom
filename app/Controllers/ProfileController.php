@@ -10,6 +10,7 @@ use App\Core\RateLimiter;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
+use App\Models\AreaRepository;
 use App\Models\GeoRepository;
 use App\Models\ServiceRepository;
 use App\Models\UserRepository;
@@ -91,6 +92,7 @@ final class ProfileController
         $data = [
             'phone' => normalize_phone(clean_input($_POST['phone'] ?? '', 20)),
             'address' => clean_input($_POST['address'] ?? '', 250),
+            'area_name' => AreaRepository::clean($_POST['area_name'] ?? ''),
             'upazila_id' => (int) ($_POST['upazila_id'] ?? 0),
             'district_id' => (int) ($_POST['district_id'] ?? 0),
             'division_id' => (int) ($_POST['division_id'] ?? 0),
@@ -133,6 +135,7 @@ final class ProfileController
                 ? msg('profile.msg.duplicate_phone')
                 : msg('msg.save_failed')], $data);
         }
+        AreaRepository::noteTyped((string) $data['area_name'], (int) $data['upazila_id'], (int) $data['district_id']);
         if ($photo !== null) {
             $this->discard((string) ($user['photo'] ?? '') !== '' ? (string) $user['photo'] : null); // পুরনো ছবি আর লাগে না
         }
@@ -167,6 +170,9 @@ final class ProfileController
         }
         if ($d['address'] === '') {
             $errors[] = msg('msg.address');
+        }
+        if ($isWorker && $d['area_name'] === '') {
+            $errors[] = msg('msg.area_name');
         }
         if ($d['division_id'] === 0 || $d['district_id'] === 0 || $d['upazila_id'] === 0) {
             $errors[] = msg('msg.area');

@@ -44,10 +44,10 @@ final class UserRepository
             $stmt = $pdo->prepare(
                 "INSERT INTO users
                     (role, status, name, gender, phone, email, password_hash, must_change_password, service_slug, service_custom, experience_years, bio, nid_number,
-                     address, upazila_id, district_id, division_id, work_all_districts, reference_1, reference_2, photo, ip_hash, consent_at, created_at)
+                     address, area_name, upazila_id, district_id, division_id, work_all_districts, reference_1, reference_2, photo, ip_hash, consent_at, created_at)
                  VALUES
                     (:role, 'pending', :name, :gender, :phone, :email, :hash, :must_change, :service, :custom, :experience, :bio, :nid,
-                     :address, :upazila, :district, :division, :work_all, :ref1, :ref2, :photo, :ip_hash, :consent_at, NOW())"
+                     :address, :area, :upazila, :district, :division, :work_all, :ref1, :ref2, :photo, :ip_hash, :consent_at, NOW())"
             );
             $stmt->execute([
                 ':role' => $data['role'],
@@ -63,6 +63,7 @@ final class UserRepository
                 ':bio' => ($data['bio'] ?? '') !== '' ? $data['bio'] : null,
                 ':nid' => $data['nid_number'] ?? null,
                 ':address' => $data['address'],
+                ':area' => ((string) ($data['area_name'] ?? '')) !== '' ? $data['area_name'] : null,
                 ':upazila' => $data['upazila_id'],
                 ':district' => $data['district_id'],
                 ':division' => $data['division_id'],
@@ -255,7 +256,7 @@ final class UserRepository
             ));
         } else {
             try {
-                $sql = "SELECT id, name, phone, address, upazila_id, district_id, division_id, work_all_districts, service_slug, service_custom FROM users
+                $sql = "SELECT id, name, phone, address, area_name, upazila_id, district_id, division_id, work_all_districts, service_slug, service_custom FROM users
                         WHERE role = 'worker' AND status = 'approved'"
                     . ($slug === null ? '' : ' AND (service_slug = :slug OR id IN (SELECT user_id FROM worker_services WHERE service_slug = :slug2))')
                     . ' ORDER BY name ASC, id ASC';
@@ -280,6 +281,7 @@ final class UserRepository
                 'name' => (string) $r['name'],
                 'phone' => (string) $r['phone'],
                 'address' => (string) $r['address'],
+                'area' => (string) ($r['area_name'] ?? ''),
                 'work_all' => !empty($r['work_all_districts']),
                 'work_districts' => GeoRepository::workDistrictNames($ids),
                 'profession' => ((string) ($r['service_slug'] ?? '')) !== '' ? ($serviceNames[(string) $r['service_slug']] ?? '') : (string) ($r['service_custom'] ?? ''),
@@ -458,7 +460,7 @@ final class UserRepository
             foreach ($rows as $i => $row) {
                 if ((int) $row['id'] === $id) {
                     $rows[$i] = array_merge($row, array_intersect_key($data, array_flip([
-                        'phone', 'address', 'upazila_id', 'district_id', 'division_id', 'photo',
+                        'phone', 'address', 'area_name', 'upazila_id', 'district_id', 'division_id', 'photo',
                         'service_slug', 'service_custom', 'experience_years', 'bio', 'work_district_ids', 'work_all_districts',
                         'reference_1', 'reference_2', 'extra_services',
                     ])));
@@ -468,9 +470,9 @@ final class UserRepository
             return self::demoWrite($rows) ? 'ok' : 'error';
         }
 
-        $sets = ['phone = :phone', 'address = :address', 'upazila_id = :upazila', 'district_id = :district', 'division_id = :division'];
+        $sets = ['phone = :phone', 'address = :address', 'area_name = :area', 'upazila_id = :upazila', 'district_id = :district', 'division_id = :division'];
         $args = [
-            ':id' => $id, ':phone' => $data['phone'], ':address' => $data['address'],
+            ':id' => $id, ':phone' => $data['phone'], ':address' => $data['address'], ':area' => ((string) ($data['area_name'] ?? '')) !== '' ? $data['area_name'] : null,
             ':upazila' => $data['upazila_id'], ':district' => $data['district_id'], ':division' => $data['division_id'],
         ];
         if (array_key_exists('service_slug', $data)) {
@@ -559,7 +561,7 @@ final class UserRepository
                 if ((int) $row['id'] === $id) {
                     $rows[$i] = array_merge($row, [
                         'password_hash' => $data['password_hash'], 'must_change_password' => 0,
-                        'email' => $data['email'], 'address' => $data['address'], 'consent_at' => date('Y-m-d H:i:s'),
+                        'email' => $data['email'], 'address' => $data['address'], 'area_name' => $data['area_name'] ?? '', 'consent_at' => date('Y-m-d H:i:s'),
                         'gender' => $data['gender'], 'upazila_id' => $data['upazila_id'], 'district_id' => $data['district_id'],
                         'division_id' => $data['division_id'], 'reference_1' => $data['reference_1'], 'reference_2' => $data['reference_2'],
                     ], $hasPhone ? ['phone' => $data['phone'], 'phone_raw' => null] : []);
@@ -570,10 +572,11 @@ final class UserRepository
         }
 
         try {
-            $sets = 'password_hash = :hash, must_change_password = 0, email = :email, address = :address, consent_at = NOW(),
+            $sets = 'password_hash = :hash, must_change_password = 0, email = :email, address = :address, area_name = :area, consent_at = NOW(),
                 gender = :gender, upazila_id = :upz, district_id = :dist, division_id = :div, reference_1 = :ref1, reference_2 = :ref2'
                 . ($hasPhone ? ', phone = :phone, phone_raw = NULL' : '');
             $args = [':id' => $id, ':hash' => $data['password_hash'], ':email' => $data['email'], ':address' => $data['address'],
+                ':area' => ((string) ($data['area_name'] ?? '')) !== '' ? $data['area_name'] : null,
                 ':gender' => $data['gender'], ':upz' => $data['upazila_id'], ':dist' => $data['district_id'], ':div' => $data['division_id'],
                 ':ref1' => $data['reference_1'] !== '' ? $data['reference_1'] : null, ':ref2' => $data['reference_2'] !== '' ? $data['reference_2'] : null]
                 + ($hasPhone ? [':phone' => $data['phone']] : []);
@@ -627,6 +630,7 @@ final class UserRepository
             'phone' => $phone !== '' ? $phone : null,
             'email' => $email !== '' ? $email : null,
             'address' => $data['address'],
+            'area_name' => (string) ($data['area_name'] ?? '') !== '' ? $data['area_name'] : null,
             'upazila_id' => $data['upazila_id'],
             'district_id' => $data['district_id'],
             'division_id' => $data['division_id'],
@@ -1096,7 +1100,7 @@ final class UserRepository
             $count = $pdo->prepare("SELECT COUNT(*) FROM users WHERE $sqlWhere");
             $count->execute($args);
             $stmt = $pdo->prepare(
-                "SELECT id, name, phone, phone_raw, email, address, upazila_id, experience_years, bio, legacy_id
+                "SELECT id, name, phone, phone_raw, email, address, area_name, upazila_id, experience_years, bio, legacy_id
                  FROM users WHERE $sqlWhere ORDER BY name, id LIMIT " . (int) $limit . ' OFFSET ' . (int) $offset
             );
             $stmt->execute($args);

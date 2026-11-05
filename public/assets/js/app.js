@@ -2287,3 +2287,94 @@
     });
     start();
 })();
+
+/* ---- "এলাকার নাম" সাজেশন ([data-area-field]: রেজিস্ট্রেশন, প্রোফাইল, প্রথমবার তথ্য-পূরণ) ----------------
+   ঘরে ফোকাস করলে /areas/list (জেলা => [[নাম, উপজেলা-আইডি]...]) একবার আসে। লেখার সঙ্গে মেলা নামগুলো ব্রাউজারের datalist-এ বসে;
+   জেলা বা উপজেলা আগেই বাছা থাকলে শুধু সেই জেলা/উপজেলার নাম আসে। তালিকায় না থাকলে নিজে লেখা যায় (অ্যাডমিন যাচাই করেন)। */
+(function () {
+    var fields = document.querySelectorAll("[data-area-field]");
+    if (!fields.length) {
+        return;
+    }
+    var byDistrict = null;
+    var flat = [];
+    var waiting = [];
+    var loading = false;
+
+    function load(done) {
+        if (byDistrict) {
+            done();
+            return;
+        }
+        waiting.push(done);
+        if (loading) {
+            return;
+        }
+        loading = true;
+        fetch("/areas/list", { credentials: "same-origin" })
+            .then(function (r) { return r.ok ? r.json() : {}; })
+            .catch(function () { return {}; })
+            .then(function (json) {
+                byDistrict = json || {};
+                Object.keys(byDistrict).forEach(function (d) {
+                    byDistrict[d].forEach(function (e) { flat.push([e[0], e[1], Number(d)]); });
+                });
+                waiting.forEach(function (cb) { cb(); });
+                waiting = [];
+            });
+    }
+
+    function selected(id) {
+        var el = document.getElementById(id);
+        var n = el ? Number(el.value) : 0;
+        return n > 0 ? n : 0;
+    }
+
+    function refresh(input, list) {
+        var district = selected("pj-district");
+        var upazila = selected("pj-upazila");
+        var q = input.value.trim().toLowerCase();
+        var pool = district ? (byDistrict[district] || []).map(function (e) { return [e[0], e[1], district]; }) : flat;
+        if (upazila) {
+            pool = pool.filter(function (e) { return e[1] === upazila || e[1] === 0; });
+        }
+        if (!q && !district) {
+            pool = [];
+        }
+        var seen = {};
+        var hits = [];
+        pool.forEach(function (e) {
+            var name = e[0];
+            var low = name.toLowerCase();
+            if (seen[low] || (q && low.indexOf(q) === -1)) {
+                return;
+            }
+            seen[low] = true;
+            hits.push([name, low.indexOf(q) === 0 ? 0 : 1]);
+        });
+        hits.sort(function (a, b) { return a[1] - b[1] || a[0].length - b[0].length; });
+        list.textContent = "";
+        hits.slice(0, 30).forEach(function (h) {
+            var option = document.createElement("option");
+            option.value = h[0];
+            list.appendChild(option);
+        });
+    }
+
+    Array.prototype.forEach.call(fields, function (field) {
+        var input = field.querySelector("input");
+        var list = field.querySelector("datalist");
+        if (!input || !list) {
+            return;
+        }
+        var run = function () { load(function () { refresh(input, list); }); };
+        input.addEventListener("focus", run);
+        input.addEventListener("input", run);
+        ["pj-district", "pj-upazila"].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.addEventListener("change", function () { if (byDistrict) { refresh(input, list); } });
+            }
+        });
+    });
+})();

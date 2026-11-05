@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\Admin\AccessController as AdminAccess;
 use App\Controllers\Admin\AdsController as AdminAds;
+use App\Controllers\Admin\AreaNamesController as AdminAreaNames;
 use App\Controllers\Admin\FeedbackInboxController as AdminFeedback;
 use App\Controllers\Admin\HeroController as AdminHero;
 use App\Controllers\Admin\HomeSectionsController as AdminHomeSections;
@@ -24,6 +25,7 @@ use App\Controllers\Admin\SubscribersController as AdminSubscribers;
 use App\Controllers\Admin\ThemeController as AdminTheme;
 use App\Controllers\AccountSetupController;
 use App\Controllers\AdImageController;
+use App\Controllers\AreaController;
 use App\Controllers\PageImageController;
 use App\Controllers\AuthController;
 use App\Controllers\FeedbackController;
@@ -74,6 +76,7 @@ return array_merge($legacyRoutes, [
     ['GET',  '/about',           [PageController::class, 'about']],
     ['GET',  '/page/{slug}',     [PageController::class, 'custom']],
     ['GET',  '/site-theme',      [ThemeController::class, 'css']],
+    ['GET',  '/areas/list',      [AreaController::class, 'suggestions']],
     ['GET',  '/robots.txt',      [SeoController::class, 'robots']],
     ['GET',  '/sitemap.xml',     [SeoController::class, 'sitemap']],
     ['GET',  '/search',          [SearchController::class, 'index']],
@@ -160,6 +163,8 @@ return array_merge($legacyRoutes, [
     ['POST', admin_route_base() . '/incomplete/mail',     [AdminIncomplete::class, 'mail']],
     ['GET',  admin_route_base() . '/feedback',            [AdminFeedback::class, 'index']],
     ['POST', admin_route_base() . '/feedback/action',     [AdminFeedback::class, 'action']],
+    ['GET',  admin_route_base() . '/area-names',          [AdminAreaNames::class, 'index']],
+    ['POST', admin_route_base() . '/area-names/action',   [AdminAreaNames::class, 'action']],
     ['GET',  admin_route_base() . '/subscribers',         [AdminSubscribers::class, 'index']],
     ['POST', admin_route_base() . '/subscribers/delete',  [AdminSubscribers::class, 'delete']],
     ['GET',  admin_route_base() . '/leads',               [AdminLeads::class, 'index']],

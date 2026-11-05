@@ -119,6 +119,15 @@ $helpTel = content('today.post.helpline_tel');
                                placeholder="<?= $ph('address') ?>" value="<?= $val('address') ?>">
                     </div>
                     <?= field_close() ?><?php endif; ?>
+                    <?php if (field_on($role, 'area')): ?><?= field_open($role, 'area') ?>
+                    <?php
+                    $areaInput = 'rf-area';
+                    $areaPh = $ph('area', $role === 'worker');
+                    $areaValue = $val('area_name');
+                    $areaRequired = $role === 'worker';
+                    require BASE_PATH . '/app/Views/partials/area-field.php';
+                    ?>
+                    <?= field_close() ?><?php endif; ?>
                     <?php // এলাকার তিন ড্রপডাউন: id-গুলো "কাজ সম্পর্কে জানান"-এর মতোই, app.js একই কোডে চালায় ?>
                     <?= field_open($role, 'upazila') ?>
                     <div class="pf pf--select">

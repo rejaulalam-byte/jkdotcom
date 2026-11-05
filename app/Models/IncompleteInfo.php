@@ -15,13 +15,14 @@ final class IncompleteInfo
         'phone' => 'মোবাইল',
         'email' => 'ইমেইল',
         'address' => 'ঠিকানা',
+        'area_name' => 'এলাকার নাম',
         'area' => 'উপজেলা/জেলা/বিভাগ',
         'experience' => 'অভিজ্ঞতা',
         'bio' => 'পরিচিতি',
     ];
 
     /** "সব" ট্যাবে যেগুলোর যেকোনোটা বাকি থাকলে কর্মী আসে (অভিজ্ঞতা ও পরিচিতি ঐচ্ছিক, তাই আলাদা ট্যাবে)। */
-    public const CORE = ['phone', 'email', 'address', 'area'];
+    public const CORE = ['phone', 'email', 'address', 'area_name', 'area'];
 
     /** যে তিনটা ঘর এই পেইজেই সরাসরি বসানো যায় (বাকিগুলো সম্পাদনা-পেইজে)। */
     public const INLINE = ['phone', 'email', 'address'];
@@ -40,6 +41,7 @@ final class IncompleteInfo
                 'phone' => (string) ($user['phone'] ?? '') === '',
                 'email' => (string) ($user['email'] ?? '') === '',
                 'address' => trim((string) ($user['address'] ?? '')) === '',
+                'area_name' => trim((string) ($user['area_name'] ?? '')) === '',
                 'area' => (int) ($user['upazila_id'] ?? 0) === 0,
                 'experience' => ($user['experience_years'] ?? null) === null || $user['experience_years'] === '',
                 'bio' => trim((string) ($user['bio'] ?? '')) === '',
@@ -59,6 +61,7 @@ final class IncompleteInfo
             'phone' => 'phone IS NULL',
             'email' => "(email IS NULL OR email = '')",
             'address' => "(address IS NULL OR address = '')",
+            'area_name' => "(area_name IS NULL OR area_name = '')",
             'area' => '(upazila_id IS NULL OR upazila_id = 0)',
             'experience' => 'experience_years IS NULL',
             'bio' => "(bio IS NULL OR bio = '')",

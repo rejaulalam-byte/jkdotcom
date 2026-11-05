@@ -68,6 +68,9 @@ $cancelUrl = $isNew ? $list : admin_base() . '/members/' . (int) $member['id'];
             <label for="ed-address">ঠিকানা (গ্রাম/এলাকা, রাস্তা)</label>
             <input id="ed-address" type="text" name="address" value="<?= $val('address') ?>" maxlength="250">
 
+            <label for="ed-area">এলাকার নাম (শুধু এলাকা, যেমন আগারগাঁও)</label>
+            <input id="ed-area" type="text" name="area_name" value="<?= $val('area_name') ?>" maxlength="100" autocomplete="off">
+
             <label for="ed-division">বিভাগ</label>
             <select id="ed-division" name="division_id" data-geo="division">
                 <option value="">— বাছুন —</option>

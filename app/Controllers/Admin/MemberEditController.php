@@ -10,6 +10,7 @@ use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
 use App\Models\AdminRepository;
+use App\Models\AreaRepository;
 use App\Models\GeoRepository;
 use App\Models\ServiceRepository;
 use App\Models\UserRepository;
@@ -121,6 +122,9 @@ final class MemberEditController
             'must_change_password' => $password !== '' ? 1 : 0,
         ];
         $result = UserRepository::create($data);
+        if ($result === 'ok') {
+            $this->rememberArea($data); // অ্যাডমিনের লেখা নতুন এলাকার নাম সরাসরি তালিকায়
+        }
         if ($result !== 'ok') {
             $this->discard($newPhoto);
             Session::flash('admin_old', $this->oldValues($data));
@@ -162,6 +166,9 @@ final class MemberEditController
         }
 
         $result = UserRepository::adminUpdate((int) $member['id'], $data);
+        if ($result === 'ok') {
+            $this->rememberArea($data);
+        }
         if ($result !== 'ok') {
             $this->discard($newPhoto);
             Session::flash('admin_old', $this->oldValues($data));
@@ -180,6 +187,15 @@ final class MemberEditController
         redirect(admin_base() . '/members/' . (int) $member['id']);
     }
 
+    /** অ্যাডমিন তালিকার বাইরের এলাকার নাম লিখলে সেটা যাচাই ছাড়াই অনুমোদিত তালিকায় যায় (অ্যাডমিন নিজেই যাচাইকারী)। @param array<string,mixed> $data */
+    private function rememberArea(array $data): void
+    {
+        $name = (string) ($data['area_name'] ?? '');
+        if ($name !== '' && !AreaRepository::isKnown($name)) {
+            AreaRepository::add($name, (int) $data['upazila_id'], (int) $data['district_id']);
+        }
+    }
+
     /**
      * ফর্মের ঘরগুলো পড়ে যাচাই করে (সম্পাদনা ও নতুন কর্মী দুটোতেই)।
      *
@@ -193,6 +209,7 @@ final class MemberEditController
             'phone' => normalize_phone(clean_input($_POST['phone'] ?? '', 20)),
             'email' => mb_strtolower(clean_input($_POST['email'] ?? '', 150)),
             'address' => clean_input($_POST['address'] ?? '', 250),
+            'area_name' => AreaRepository::clean($_POST['area_name'] ?? ''),
             'upazila_id' => (int) ($_POST['upazila_id'] ?? 0),
             'district_id' => (int) ($_POST['district_id'] ?? 0),
             'division_id' => (int) ($_POST['division_id'] ?? 0),
@@ -302,7 +319,7 @@ final class MemberEditController
     private function changedLabels(array $old, array $new): array
     {
         $labels = [
-            'name' => 'নাম', 'gender' => 'জেন্ডার', 'phone' => 'মোবাইল', 'email' => 'ইমেইল', 'address' => 'ঠিকানা',
+            'name' => 'নাম', 'gender' => 'জেন্ডার', 'phone' => 'মোবাইল', 'email' => 'ইমেইল', 'address' => 'ঠিকানা', 'area_name' => 'এলাকার নাম',
             'upazila_id' => 'উপজেলা', 'district_id' => 'জেলা', 'division_id' => 'বিভাগ', 'service_slug' => 'প্রধান পেশা',
             'service_custom' => 'নিজের লেখা পেশা', 'experience_years' => 'অভিজ্ঞতা', 'bio' => 'কাজের বিবরণ',
             'reference_1' => 'রেফারেন্স ১', 'reference_2' => 'রেফারেন্স ২', 'nid_number' => 'NID', 'photo' => 'ছবি',

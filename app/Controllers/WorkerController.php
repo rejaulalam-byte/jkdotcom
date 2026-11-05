@@ -56,7 +56,7 @@ final class WorkerController
         $professions = implode(', ', array_filter([$profession, ...$extraNames]));
         $geo = GeoRepository::names((int) $user['upazila_id'], (int) $user['district_id'], (int) $user['division_id']);
         $address = implode(', ', array_filter(
-            [(string) $user['address'], $geo['upazila'], $geo['district'], $geo['division'], 'বাংলাদেশ'],
+            [(string) $user['address'], (string) ($user['area_name'] ?? ''), $geo['upazila'], $geo['district'], $geo['division'], 'বাংলাদেশ'],
             static fn (string $part): bool => $part !== ''
         ));
         $email = (string) ($user['email'] ?? '');

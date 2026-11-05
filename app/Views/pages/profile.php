@@ -125,6 +125,15 @@ $label = static function (string $for, string $key, bool $required = false): str
                         <input id="rf-address" data-bn type="text" name="address" maxlength="250" required autocomplete="street-address"
                                placeholder="<?= $ph('address') ?>" value="<?= $val('address') ?>">
                     </div>
+                    <?= $label('rf-area', 'area', $user['role'] === 'worker') ?>
+                    <?php
+                    $areaInput = 'rf-area';
+                    $areaPh = $ph('area', $user['role'] === 'worker');
+                    $areaValue = $val('area_name');
+                    $areaRequired = $user['role'] === 'worker';
+                    $areaOwnLabel = true;
+                    require BASE_PATH . '/app/Views/partials/area-field.php';
+                    ?>
                     <?php // এলাকার তিন ড্রপডাউন: id-গুলো "কাজ সম্পর্কে জানান"-এর মতোই, app.js একই কোডে চালায় ?>
                     <?= $label('pj-upazila', 'upazila', true) ?>
                     <div class="pf pf--select">

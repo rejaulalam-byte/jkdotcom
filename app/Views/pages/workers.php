@@ -122,7 +122,7 @@ $divisionText = count($divisions) > 1
                         <tr>
                             <td class="wk-no" data-label="<?= e(content('workers.col.no')) ?>"><?= e(bn(str_pad((string) $serial, 2, '0', STR_PAD_LEFT))) ?>.</td>
                             <th class="wk-name" scope="row"><?= e($w['name']) ?></th>
-                            <td data-label="<?= e(content('workers.col.area')) ?>"><?= $w['address'] !== '' ? e($w['address']) : '—' ?></td>
+                            <td data-label="<?= e(content('workers.col.area')) ?>"><?= $w['area'] !== '' ? e($w['area']) : '—' ?></td>
                             <td data-label="<?= e(content('workers.col.upazila')) ?>"><?= $w['upazila'] !== '' ? e($w['upazila']) : '—' ?></td>
                             <td data-label="<?= e(content('workers.col.district')) ?>"><?= $w['district'] !== '' ? e($w['district']) : '—' ?></td>
                             <td class="wk-rating" data-label="<?= e(content('workers.col.rating')) ?>"><?= isset($ratings[$w['id']]) ? e(bn(rtrim(rtrim(number_format($ratings[$w['id']], 1, '.', ''), '0'), '.'))) : e(content('workers.rating_none')) ?></td>

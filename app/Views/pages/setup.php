@@ -89,6 +89,14 @@ $pwRows = [
                     <input id="st-address" data-bn type="text" name="address" maxlength="250" required autocomplete="street-address" value="<?= $val('address', (string) ($user['address'] ?? '')) ?>">
                 </div>
             </div>
+            <?php // এলাকার নাম: সাজেশন-সহ (app.js [data-area-field]); তালিকায় না থাকলে নিজে লিখলে অ্যাডমিন যাচাই করে যোগ করেন ?>
+            <div class="login-card__row" data-area-field>
+                <label for="st-area"><?= t('setup.f.area') ?><?= $star ?></label>
+                <div class="lg-field">
+                    <input id="st-area" data-bn type="text" name="area_name" list="st-area-list" maxlength="100" required autocomplete="off" value="<?= $val('area_name', (string) ($user['area_name'] ?? '')) ?>">
+                    <datalist id="st-area-list"></datalist>
+                </div>
+            </div>
             <?php // এলাকার তিন ড্রপডাউন: id-গুলো সাইটের অন্য ফর্মের মতোই (pj-*), app.js একই কোডে চালায় ?>
             <div class="login-card__row">
                 <label for="pj-upazila"><?= t('setup.f.upazila') ?><?= $star ?></label>

@@ -9,6 +9,7 @@ use App\Core\RateLimiter;
 use App\Core\Security;
 use App\Core\Session;
 use App\Core\View;
+use App\Models\AreaRepository;
 use App\Models\GeoRepository;
 use App\Models\UserRepository;
 
@@ -55,6 +56,7 @@ final class AccountSetupController
         $data = [
             'email' => mb_strtolower(clean_input($_POST['email'] ?? '', 150)),
             'address' => clean_input($_POST['address'] ?? '', 250),
+            'area_name' => AreaRepository::clean($_POST['area_name'] ?? ''),
             'phone' => $needsPhone ? normalize_phone(clean_input($_POST['phone'] ?? '', 20)) : '',
             'gender' => clean_gender($_POST['gender'] ?? null),
             'upazila_id' => (int) ($_POST['upazila_id'] ?? 0),
@@ -92,6 +94,9 @@ final class AccountSetupController
         if (mb_strlen($data['address']) < 2) {
             $errors[] = '"' . content('setup.f.address') . '" ' . $missing;
         }
+        if ($data['area_name'] === '') {
+            $errors[] = '"' . content('setup.f.area') . '" ' . $missing;
+        }
         foreach (['upazila_id' => 'setup.f.upazila', 'district_id' => 'setup.f.district', 'division_id' => 'setup.f.division'] as $field => $labelKey) {
             if ($data[$field] === 0) {
                 $errors[] = '"' . content($labelKey) . '" ' . $missing;
@@ -115,6 +120,8 @@ final class AccountSetupController
                 'duplicate_email' => msg('msg.duplicate_email'),
             ][$result] ?? msg('msg.save_failed')], $data);
         }
+
+        AreaRepository::noteTyped((string) $data['area_name'], (int) $data['upazila_id'], (int) $data['district_id']);
 
         Auth::login((int) $user['id']); // সেশন-id নতুন
         Session::flash('setup_done', true);
