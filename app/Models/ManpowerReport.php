@@ -87,7 +87,7 @@ final class ManpowerReport
         ];
     }
 
-    private const HEAD = ['ক্রমিক নং', 'বিভাগ', 'জেলা', 'উপজেলা/থানা', 'সেবা', 'পেশাজীবির নাম', 'মোবাইল নাম্বার', 'মোট সংখ্যা'];
+    private const HEAD = ['ক্রমিক নং', 'বিভাগ', 'জেলা', 'উপজেলা/থানা', 'এলাকার নাম', 'সেবা', 'পেশাজীবির নাম', 'মোবাইল নাম্বার', 'মোট সংখ্যা'];
 
     /**
      * অনুমোদিত কর্মীর সারি: প্রধান পেশায় একটা, প্রতিটি "আরও পেশা"-য় একটা করে।
@@ -97,17 +97,17 @@ final class ManpowerReport
     private static function rows(\PDO $pdo): array
     {
         $rows = $pdo->query(
-            "SELECT u.id, u.name, u.phone, u.division_id, u.district_id, u.upazila_id, COALESCE(u.service_slug, '') AS slug
+            "SELECT u.id, u.name, u.phone, u.area_name, u.division_id, u.district_id, u.upazila_id, COALESCE(u.service_slug, '') AS slug
                FROM users u WHERE u.role = 'worker' AND u.status = 'approved'
              UNION ALL
-             SELECT u.id, u.name, u.phone, u.division_id, u.district_id, u.upazila_id, ws.service_slug AS slug
+             SELECT u.id, u.name, u.phone, u.area_name, u.division_id, u.district_id, u.upazila_id, ws.service_slug AS slug
                FROM users u JOIN worker_services ws ON ws.user_id = u.id
               WHERE u.role = 'worker' AND u.status = 'approved'"
         )->fetchAll();
 
         return array_map(static fn (array $r): array => [
             'id' => (int) $r['id'], 'name' => (string) $r['name'], 'phone' => (string) ($r['phone'] ?? ''),
-            'division_id' => (int) $r['division_id'], 'district_id' => (int) $r['district_id'], 'upazila_id' => (int) $r['upazila_id'],
+            'area_name' => (string) ($r['area_name'] ?? ''), 'division_id' => (int) $r['division_id'], 'district_id' => (int) $r['district_id'], 'upazila_id' => (int) $r['upazila_id'],
             'slug' => (string) $r['slug'],
         ], $rows);
     }
@@ -163,7 +163,7 @@ final class ManpowerReport
         $rank = static fn (string $slug): int => $slug === '' ? PHP_INT_MAX : ($order[$slug] ?? PHP_INT_MAX - 1);
         $key = static fn (array $r): array => [
             $divisions[$r['division_id']] ?? $unknown, $districts[$r['district_id']] ?? $unknown, $upazilas[$r['upazila_id']] ?? $unknown,
-            $r['upazila_id'], $rank($r['slug']), $r['name'],
+            $r['upazila_id'], $r['area_name'], $rank($r['slug']), $r['name'],
         ];
         usort($scope, static fn (array $a, array $b): int => $key($a) <=> $key($b));
 
@@ -180,21 +180,23 @@ final class ManpowerReport
             $count = 0;
             if ($withNames) {
                 foreach ($list as $p) {
-                    $out[] = ['cells' => [bn(++$no), ...$area, $serviceLabel($p['slug']), $p['name'], $p['phone'] !== '' ? format_phone($p['phone']) : '—', ''], 'type' => 'row'];
+                    $out[] = ['cells' => [bn(++$no), ...$area, $p['area_name'] !== '' ? $p['area_name'] : '—', $serviceLabel($p['slug']), $p['name'], $p['phone'] !== '' ? format_phone($p['phone']) : '—', ''], 'type' => 'row'];
                     ++$count;
                 }
             } else {
-                $bySlug = [];
+                // (এলাকার নাম, সেবা) ধরে গোনা: ছোট এলাকাভিত্তিক সারি
+                $byAreaSlug = [];
                 foreach ($list as $p) {
-                    $bySlug[$p['slug']] = ($bySlug[$p['slug']] ?? 0) + 1;
+                    $k = $p['area_name'] . "\0" . $p['slug'];
+                    $byAreaSlug[$k] = [$p['area_name'], $p['slug'], ($byAreaSlug[$k][2] ?? 0) + 1];
                 }
-                uksort($bySlug, static fn ($a, $b): int => $rank((string) $a) <=> $rank((string) $b));
-                foreach ($bySlug as $slug => $n) {
-                    $out[] = ['cells' => [bn(++$no), ...$area, $serviceLabel((string) $slug), '', '', bn($n)], 'type' => 'row'];
+                uasort($byAreaSlug, static fn (array $a, array $b): int => [$a[0], $rank($a[1])] <=> [$b[0], $rank($b[1])]);
+                foreach ($byAreaSlug as [$areaName, $slug, $n]) {
+                    $out[] = ['cells' => [bn(++$no), ...$area, $areaName !== '' ? $areaName : '—', $serviceLabel((string) $slug), '', '', bn($n)], 'type' => 'row'];
                     $count += $n;
                 }
             }
-            $out[] = ['cells' => ['মোট — ' . $area[2], '', '', '', '', '', '', bn($count)], 'type' => 'sub'];
+            $out[] = ['cells' => ['মোট — ' . $area[2], '', '', '', '', '', '', '', bn($count)], 'type' => 'sub'];
         }
         if ($out === []) {
             $out[] = ['cells' => array_fill(0, count(self::HEAD), ''), 'type' => 'row'];

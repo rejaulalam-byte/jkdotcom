@@ -20,7 +20,7 @@ final class MultiPlaceReport
     /** সর্বোচ্চ কতজনের সারি দেখানো হয় (বেশি হলে কেটে জানানো হয়) */
     public const MAX_PEOPLE = 400;
 
-    private const HEAD = ['ক্রমিক নং', 'পেশাজীবির নাম', 'মোবাইল নাম্বার', 'বিভাগ (নাম)', 'জেলা (নাম)', 'উপজেলা/থানা (নাম)', 'সেবার নাম (প্রধান আগে)'];
+    private const HEAD = ['ক্রমিক নং', 'পেশাজীবির নাম', 'মোবাইল নাম্বার', 'বিভাগ (নাম)', 'জেলা (নাম)', 'উপজেলা/থানা (নাম)', 'এলাকার নাম', 'সেবার নাম (প্রধান আগে)'];
 
     /** @return array{head:list<string>,rows:list<array{cells:list<string>,type:string}>,summary:list<string>} */
     public static function build(): array
@@ -66,7 +66,7 @@ final class MultiPlaceReport
         $upazilaName = array_column($geo['upazilas'], 'short', 'id');
 
         $users = $pdo->query(
-            "SELECT id, name, phone, service_slug, service_custom, division_id, district_id, upazila_id, work_all_districts
+            "SELECT id, name, phone, area_name, service_slug, service_custom, division_id, district_id, upazila_id, work_all_districts
                FROM users WHERE role = 'worker' AND status = 'approved'"
         )->fetchAll();
         $work = [];
@@ -106,6 +106,7 @@ final class MultiPlaceReport
                 'divisionNames' => $all ? ['সব বিভাগ'] : array_map(static fn (int $d): string => $divisionName[$d] ?? '—', $divisions),
                 'districtNames' => $all ? ['সব জেলা'] : array_map(static fn (int $d): string => $districtName[$d] ?? '—', $districts),
                 'upazilaNames' => [$upazila > 0 ? ($upazilaName[$upazila] ?? '—') : '—'],
+                'areaName' => (string) ($u['area_name'] ?? '') !== '' ? (string) $u['area_name'] : '—',
                 'services' => $names,
             ];
         }
@@ -123,7 +124,7 @@ final class MultiPlaceReport
         foreach ($people as $i => $p) {
             $rows[] = ['cells' => [
                 bn($i + 1), $p['name'], $p['phone'] !== '' ? format_phone($p['phone']) : '—',
-                self::lines($p['divisionNames']), self::lines($p['districtNames']), self::lines($p['upazilaNames']), self::lines($p['services']),
+                self::lines($p['divisionNames']), self::lines($p['districtNames']), self::lines($p['upazilaNames']), $p['areaName'], self::lines($p['services']),
             ], 'type' => 'row'];
         }
         if ($rows === []) {
