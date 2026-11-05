@@ -1,8 +1,8 @@
 ---
-# cPanel Git Version Control: "Deploy HEAD Commit" এই কাজগুলো চালায়।
-# রিপো যেখানে ক্লোন হয় (যেমন ~/repositories/jkdotcom) সেখানেই সাইট চলে; সাব-ডোমেইনের
-# ডকুমেন্ট রুট = সেই ফোল্ডারের public। তাই ফাইল কপি করা লাগে না, শুধু লেখার ফোল্ডার তৈরি ও অনুমতি।
+# cPanel Git Version Control: "Deploy HEAD Commit" এই কাজ চালায়।
+# রিপো ক্লোন থাকে ~/repositories/jkdotcom-test (সাইটের ফোল্ডার নয়; নামটা পরে বদলানো যায়); ডিপ্লয়ে কোড-ফোল্ডারগুলো লাইভ সাইটের ফোল্ডার
+# ~/repositories/jkdotcom-এ কপি হয় (public_html সেই ফোল্ডারের public-এর symlink)। .env ও storage রিপোতে নেই, তাই ছোঁয়া হয় না।
+# লাইভ ফোল্ডারে কপি হয় না এমন জিনিস: রিপো থেকে মোছা ফাইল (সেগুলো হাতে মুছতে হয়)।
 deployment:
   tasks:
-    - /bin/mkdir -p storage/logs storage/ratelimit storage/sessions public/uploads
-    - /bin/chmod -R u+rwX,go-rwx storage public/uploads
+    - /bin/cp -Rf app config database public docs README.md CLAUDE.md PROGRESS.md /home2/jorurikaj/repositories/jkdotcom/
