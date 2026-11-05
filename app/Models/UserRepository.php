@@ -841,7 +841,7 @@ final class UserRepository
         $pdo = Database::connection();
         if ($pdo === null) {
             $rows = array_values(array_filter(self::demoRead(), static function (array $r) use ($role, $status, $q, $source, $noPhone): bool {
-                $hay = mb_strtolower(implode(' ', [(string) $r['name'], (string) ($r['phone'] ?? ''), (string) ($r['email'] ?? ''), (string) ($r['address'] ?? '')]));
+                $hay = mb_strtolower(implode(' ', [(string) $r['name'], (string) ($r['phone'] ?? ''), (string) ($r['email'] ?? ''), (string) ($r['address'] ?? ''), (string) ($r['area_name'] ?? '')]));
 
                 return $r['role'] === $role
                     && ($status === '' ? in_array($r['status'], self::LISTED_STATUSES, true) : $r['status'] === $status)
@@ -865,9 +865,9 @@ final class UserRepository
         }
         if ($q !== '') {
             // সাধারণ (non-emulated) প্রস্তুতিতে একই নামের প্লেসহোল্ডার বারবার চলে না, তাই চারটা আলাদা
-            $where[] = '(name LIKE :q1 OR phone LIKE :q2 OR email LIKE :q3 OR address LIKE :q4)';
+            $where[] = '(name LIKE :q1 OR phone LIKE :q2 OR email LIKE :q3 OR address LIKE :q4 OR area_name LIKE :q5)';
             $like = '%' . addcslashes($q, '%_\\') . '%';
-            $args += [':q1' => $like, ':q2' => $like, ':q3' => $like, ':q4' => $like];
+            $args += [':q1' => $like, ':q2' => $like, ':q3' => $like, ':q4' => $like, ':q5' => $like];
         }
         if ($source === 'legacy') {
             $where[] = 'legacy_id IS NOT NULL';

@@ -244,7 +244,7 @@ final class ReportData
     {
         $geo = GeoRepository::names((int) ($row['upazila_id'] ?? 0), (int) ($row['district_id'] ?? 0), (int) ($row['division_id'] ?? 0));
 
-        $parts = array_map(static fn (string $x): string => trim((string) preg_replace('/\s+/u', ' ', $x)), [(string) ($row['address'] ?? ''), $geo['upazila'], $geo['district']]);
+        $parts = array_map(static fn (string $x): string => trim((string) preg_replace('/\s+/u', ' ', $x)), [(string) (($row['area_name'] ?? '') !== '' ? $row['area_name'] : ($row['address'] ?? '')), $geo['upazila'], $geo['district']]);
 
         return implode(', ', array_filter($parts, static fn (string $x): bool => $x !== ''));
     }
