@@ -10,6 +10,10 @@ final class View
     /** @param array<string,mixed> $data ভিউয়ের ভেতরে যে ভেরিয়েবলগুলো পাওয়া যাবে */
     public static function render(string $view, array $data = [], string $layout = 'layouts/main'): void
     {
+        // সাধারণ (দর্শকের) পেইজ দেখা হলে ড্যাশবোর্ডের "আজকের দর্শক"-এর জন্য গোনা
+        if ($layout === 'layouts/main') {
+            \App\Models\PageVisits::record();
+        }
         $content = self::boldBrand(self::capture($view, $data));
         $page = self::capture($layout, $data + ['content' => $content]);
         // এডিটরের লেখায় style থাকলে শুধু সেই মানগুলো CSP-তে অনুমতি পায় (RichText)

@@ -2076,3 +2076,12 @@ input.adm-short {
     white-space: pre-line;
     vertical-align: top;
 }
+
+/* ড্যাশবোর্ডের "আজকের দর্শক" ঘর: গ্রাফের নিচে, ডানের কার্ডের ঢঙে */
+.adm-today {
+    margin-top: 16px;
+}
+.adm-today h3 .adm-muted {
+    font-size: 15px;
+    font-weight: 400;
+}

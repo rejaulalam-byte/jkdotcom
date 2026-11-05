@@ -6,6 +6,7 @@
  * @var array<string,array<string,int>> $counts  ['worker' => ['pending' => n, ...], 'agent' => [...]]
  * @var array<string,int> $stats                 AdminStats::overview()
  * @var array<string,mixed> $charts               AdminStats::charts()
+ * @var array{visitors:int,home_only:int,many:int,services_only:int,services_seen:int} $visitsToday PageVisits::today()
  */
 use App\Core\AdminAuth;
 
@@ -99,6 +100,16 @@ $chartList = [
                 <?php require __DIR__ . '/chart.php'; ?>
             <?php endforeach; ?>
         </div>
+        <section class="adm-panel adm-today" aria-label="আজকের দর্শক">
+            <h3>আজকের দর্শক <span class="adm-muted">(এ পর্যন্ত, ঢাকার সময়ে আজ রাত ১২টা থেকে; ব্রাউজার/ফোন ধরে গোনা)</span></h3>
+            <ul>
+                <li><span>আজ মোট দর্শক</span><b><?= e(bn((int) $visitsToday['visitors'])) ?></b></li>
+                <li><span>আজ শুধু হোম পেইজে এসেছেন কতজন</span><b><?= e(bn((int) $visitsToday['home_only'])) ?></b></li>
+                <li><span>আজ একাধিক পেইজে ভিজিট করেছেন কতজন</span><b><?= e(bn((int) $visitsToday['many'])) ?></b></li>
+                <li><span>আজ শুধু সেবা পেইজে ভিজিট করেছেন কতজন</span><b><?= e(bn((int) $visitsToday['services_only'])) ?></b></li>
+                <li><span>আজ সেবাসমূহ থেকে কতটা সেবার পেইজ দেখা হয়েছে</span><b><?= e(bn((int) $visitsToday['services_seen'])) ?></b></li>
+            </ul>
+        </section>
     </div>
     <aside class="adm-dash__side" aria-label="সংখ্যার সারাংশ">
         <?php // নতুন আবেদনের খবর: ডানের কার্ডগুলোর ওপরে আলাদা বাক্সে, যাতে চোখে পড়ে ?>

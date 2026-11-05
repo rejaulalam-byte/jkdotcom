@@ -24,7 +24,7 @@ final class PanelController
     {
         $admin = AdminAuth::require();
         $counts = UserRepository::countByRoleStatus();
-        $this->render('admin/dashboard', $admin, 'ড্যাশবোর্ড', ['counts' => $counts, 'stats' => AdminStats::overview(), 'charts' => AdminStats::charts(), 'hideTitle' => true]);
+        $this->render('admin/dashboard', $admin, 'ড্যাশবোর্ড', ['counts' => $counts, 'stats' => AdminStats::overview(), 'charts' => AdminStats::charts(), 'visitsToday' => \App\Models\PageVisits::today(), 'hideTitle' => true]);
     }
 
     // ---- নিজের অ্যাকাউন্ট ----------------------------------------------------------------------
