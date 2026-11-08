@@ -41,11 +41,6 @@ $cards = [
         ['নতুন আবেদন — প্রতিনিধি', $pendingAgents, true],
         ['না-পড়া মতামত', (int) $stats['feedback_unread'], true],
     ]],
-    ['আজকের হিসাব', [
-        ['কর্মীর পেইজ দেখা হয়েছে', (int) $stats['visits_today'], false],
-        ['মোবাইল/ইমেইলে ক্লিক', (int) $stats['clicks_today'], false],
-        ['আগ্রহী দর্শক (নাম-মোবাইল দিয়েছেন)', (int) $stats['leads_today'], false],
-    ]],
     ['এক নজরে', [
         ['সেবা (পেশা) নামের সংখ্যা', (int) $stats['services'], false],
         ['চালু বিজ্ঞাপন', (int) $stats['ads'], false],
@@ -103,11 +98,15 @@ $chartList = [
         <section class="adm-panel adm-today" aria-label="আজকের দর্শক">
             <h3>আজকের দর্শক <span class="adm-muted">(এ পর্যন্ত, ঢাকার সময়ে আজ রাত ১২টা থেকে; ব্রাউজার/ফোন ধরে গোনা)</span></h3>
             <ul>
-                <li><span>আজ মোট দর্শক</span><b><?= e(bn((int) $visitsToday['visitors'])) ?></b></li>
+                <li><span>আজ মোট দর্শক <small class="adm-hint">(বিভিন্ন ব্রাউজার ও মোবাইল দিয়ে)</small></span><b><?= e(bn((int) $visitsToday['visitors'])) ?></b></li>
                 <li><span>আজ শুধু হোম পেইজে এসেছেন কতজন</span><b><?= e(bn((int) $visitsToday['home_only'])) ?></b></li>
                 <li><span>আজ একাধিক পেইজে ভিজিট করেছেন কতজন</span><b><?= e(bn((int) $visitsToday['many'])) ?></b></li>
                 <li><span>আজ শুধু সেবা পেইজে ভিজিট করেছেন কতজন</span><b><?= e(bn((int) $visitsToday['services_only'])) ?></b></li>
                 <li><span>আজ সেবাসমূহ থেকে কতটা সেবার পেইজ দেখা হয়েছে</span><b><?= e(bn((int) $visitsToday['services_seen'])) ?></b></li>
+                <?php // আগের ডান পাশের "আজকের হিসাব" ঘর: এখন গ্রাফের নিচে একই তালিকায় ?>
+                <li><span>কর্মীর পেইজ দেখা হয়েছে</span><b><?= e(bn((int) $stats['visits_today'])) ?></b></li>
+                <li><span>মোবাইল/ইমেইলে ক্লিক</span><b><?= e(bn((int) $stats['clicks_today'])) ?></b></li>
+                <li><span>আগ্রহী দর্শক <small class="adm-hint">(নাম-মোবাইল দিয়েছেন)</small></span><b><?= e(bn((int) $stats['leads_today'])) ?></b></li>
             </ul>
         </section>
     </div>

@@ -2086,6 +2086,11 @@ input.adm-short {
     font-weight: 400;
 }
 
+/* ঘরের লেখার ব্রাকেটের অংশ: আশপাশের লেখার চেয়ে ২px ছোট */
+.adm-hint {
+    font-size: calc(1em - 2px);
+}
+
 /* রিপোর্টের ঘরে "নাম \n মোবাইল" দুই লাইনে দেখানো */
 .adm-reporttable td {
     white-space: pre-line;
