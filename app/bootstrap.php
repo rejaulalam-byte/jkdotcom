@@ -57,6 +57,7 @@ set_exception_handler(static function (Throwable $e) use ($isLocal): void {
 
 Security::sendHeaders();
 Session::start();
+App\Core\TrafficGuard::check(); // অল্প সময়ে অতিরিক্ত পেইজ চাওয়া বট সাময়িক আটকানো
 
 // অ্যাডমিনের "লাইভ পেইজ এডিট": শুধু "pages" অনুমতির লগইন-করা অ্যাডমিনের জন্য পেইজটা নিজের সাইটের ফ্রেমে খোলা যায়
 if (($_GET['live'] ?? '') === '1') {
