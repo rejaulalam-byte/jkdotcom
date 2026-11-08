@@ -18,7 +18,10 @@ final class PageVisits
     /** এর বেশি পুরনো সারি মাঝে মাঝে মুছে ফেলা হয় (দিন)। */
     private const KEEP_DAYS = 120;
 
-    /** এই দর্শক আজ এই পেইজ দেখলেন (একদিনে একই পেইজ একবারই)। */
+    /** এই অনুরোধের পেইজে নিশ্চিতকরণের মেটা-ট্যাগ বসবে কি না (layouts/main.php দেখে)। */
+    public static bool $armed = false;
+
+    /** এই দর্শক আজ এই পেইজ দেখলেন; নিশ্চিতকরণের অপেক্ষায় রাখা হয় (একদিনে একই পেইজ একবারই)। */
     public static function record(): void
     {
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET' || live_preview() || !empty($_SESSION['admin_id']) || (int) http_response_code() !== 200) {
@@ -41,6 +44,24 @@ final class PageVisits
         }
         if (!empty($_SESSION['pv_done'][$path])) {
             return;
+        }
+        // এখনই গোনা হয় না: পেইজ ব্রাউজারে খুলে JavaScript নিশ্চিত করলে confirm() গুনবে
+        $_SESSION['pv_pending'] = $path;
+        self::$armed = true;
+    }
+
+    /** ব্রাউজারের নিশ্চিতকরণ পেলে অপেক্ষায় থাকা পেইজটা আজকের ভিজিটে গোনা (একটি পেইজ একবারই)। */
+    public static function confirm(): void
+    {
+        $path = (string) ($_SESSION['pv_pending'] ?? '');
+        unset($_SESSION['pv_pending']);
+        if ($path === '' || !empty($_SESSION['pv_done'][$path])) {
+            return;
+        }
+        $today = date('Y-m-d');
+        if (($_SESSION['pv_date'] ?? '') !== $today) {
+            $_SESSION['pv_date'] = $today;
+            $_SESSION['pv_done'] = [];
         }
         $_SESSION['pv_done'][$path] = true;
         $_SESSION['pv_id'] ??= bin2hex(random_bytes(8));

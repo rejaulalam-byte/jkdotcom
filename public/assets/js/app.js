@@ -2383,4 +2383,12 @@
             }
         });
     });
+
+    /* ---- পেইজ-ভিজিট নিশ্চিতকরণ ---------------------------------------------
+       সার্ভার পেইজে মেটা-ট্যাগ বসালে ব্রাউজার একটু পরে নিশ্চিত করে; JavaScript না চালানো বট এখানে পৌঁছায় না, তাই গোনায় ঢোকে না */
+    if (document.querySelector('meta[name="jk-visit"]') && window.fetch) {
+        setTimeout(function () {
+            fetch("/pv", { method: "POST", credentials: "same-origin", keepalive: true }).catch(function () {});
+        }, 1500);
+    }
 })();

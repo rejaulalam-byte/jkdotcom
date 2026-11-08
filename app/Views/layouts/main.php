@@ -17,6 +17,7 @@ $pageDescription = $description ?? content('site.description');
     <title><?= e($pageTitle) ?></title>
     <meta name="description" content="<?= e($pageDescription) ?>">
     <meta name="theme-color" content="<?= e(\App\Models\SiteTheme::color('teal')) ?>">
+    <?php if (\App\Models\PageVisits::$armed): ?><meta name="jk-visit" content="1"><?php endif; ?>
     <meta property="og:type" content="website">
     <meta property="og:title" content="<?= e($pageTitle) ?>">
     <meta property="og:description" content="<?= e($pageDescription) ?>">
