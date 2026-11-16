@@ -23,7 +23,7 @@ final class Mailer
             $headers[] = 'Reply-To: ' . $replyTo;
         }
 
-        return @mail($to, self::encodeSubject($subject), $body, implode("\r\n", $headers));
+        return @mail($to, self::encodeSubject($subject), $body, implode("\r\n", $headers), self::envelopeSender($from));
     }
 
     /**
@@ -49,7 +49,7 @@ final class Mailer
             $headers[] = 'Reply-To: ' . $replyTo;
         }
 
-        return @mail($to, self::encodeSubject($subject), $body, implode("\r\n", $headers));
+        return @mail($to, self::encodeSubject($subject), $body, implode("\r\n", $headers), self::envelopeSender($from));
     }
 
     /**
@@ -84,6 +84,12 @@ final class Mailer
             . '--' . $related . "--\r\n";
 
         return ['multipart/related; boundary="' . $related . '"', $body];
+    }
+
+    /** খামের প্রেরক (Return-Path) = From ঠিকানা: না দিলে সার্ভার নিজের নাম বসায়, তখন SPF মেলে না এবং মেইল স্প্যামে যায়। ঠিকানা আগেই যাচাই করা। */
+    private static function envelopeSender(string $from): string
+    {
+        return '-f' . $from;
     }
 
     private static function from(): string
