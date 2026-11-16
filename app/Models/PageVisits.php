@@ -84,11 +84,11 @@ final class PageVisits
     /**
      * আজ এ পর্যন্তের সংখ্যা।
      *
-     * @return array{visitors:int,home_only:int,many:int,services_only:int,services_seen:int}
+     * @return array{visitors:int,home_only:int,many:int,services_page:int,services_seen:int}
      */
     public static function today(): array
     {
-        $zero = ['visitors' => 0, 'home_only' => 0, 'many' => 0, 'services_only' => 0, 'services_seen' => 0];
+        $zero = ['visitors' => 0, 'home_only' => 0, 'many' => 0, 'services_page' => 0, 'services_seen' => 0];
         $pdo = Database::connection();
         if ($pdo === null) {
             return $zero;
@@ -109,8 +109,8 @@ final class PageVisits
                 'visitors' => $count(''),
                 'home_only' => $count("HAVING COUNT(*) = 1 AND MAX(page) = '/'"),
                 'many' => $count('HAVING COUNT(*) >= 2'),
-                // "শুধু সেবা পেইজে": সেবাসমূহের মূল পেইজ (/services) ও তার ভেতরের পেশার তালিকা (/services/…) ছাড়া আর কিছু দেখেননি
-                'services_only' => $count("HAVING SUM(CASE WHEN page = '/services' OR page LIKE '/services/%' THEN 0 ELSE 1 END) = 0"),
+                // সেবা পেইজে ভিজিট: আজ যত দর্শক সেবাসমূহের মূল পেইজ (/services) খুলেছেন (অন্য পেইজও দেখে থাকতে পারেন)
+                'services_page' => $count("HAVING SUM(page = '/services') > 0"),
                 'services_seen' => (int) $seen->fetchColumn(),
             ];
         } catch (Throwable $e) {
