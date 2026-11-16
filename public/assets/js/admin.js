@@ -63,6 +63,19 @@
         document.body.appendChild(dialog);
     }
 
+    /* form.submit() চাপা বোতামের name/value পাঠায় না (যেমন name="do" value="delete"), তাই সেটা লুকানো ঘর করে জুড়ে তারপর পাঠানো হয়:
+       নইলে সার্ভার "কোন কাজ" জানতে পারে না এবং কিছুই হয় না */
+    function submitWith(form, submitter) {
+        if (submitter && submitter.name) {
+            var hidden = document.createElement("input");
+            hidden.type = "hidden";
+            hidden.name = submitter.name;
+            hidden.value = submitter.value;
+            form.appendChild(hidden);
+        }
+        form.submit();
+    }
+
     forms.forEach(function (form) {
         var confirmed = false;
         form.addEventListener("submit", function (e) {
@@ -70,11 +83,12 @@
                 return;
             }
             e.preventDefault();
+            var submitter = e.submitter || null;
             var question = form.getAttribute("data-confirm");
             if (typeof HTMLDialogElement !== "function") {
                 if (window.confirm(question)) {
                     confirmed = true;
-                    form.submit();
+                    submitWith(form, submitter);
                 }
                 return;
             }
@@ -84,7 +98,7 @@
             text.textContent = question;
             onYes = function () {
                 confirmed = true;
-                form.submit();
+                submitWith(form, submitter);
             };
             dialog.showModal();
         });
