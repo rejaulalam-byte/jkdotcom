@@ -3,7 +3,7 @@
  * ড্যাশবোর্ডের একটা বার গ্রাফ (SVG, সার্ভারেই আঁকা; স্টাইল admin.css-এ, তাই CSP আটকায় না)। মাউস রাখলে সংখ্যা দেখায় (<title>)।
  * ছোট গ্রাফে বারের নিচে আড়াআড়ি নাম ও ওপরে সংখ্যা; চওড়া গ্রাফে সেবার নাম নিচে ও সংখ্যা বারের ওপরে খাড়া (শুরু নিচে, শেষ ওপরে); সংখ্যা নিচের টেবিলেও।
  *
- * @var array{title:string,sub:string,wide:bool,groups:list<array{label:string,items:list<array{kind:string,n:int}>}>,empty:?string} $chart
+ * @var array{title:string,sub:string,note?:string,picker?:string,wide:bool,groups:list<array{label:string,items:list<array{kind:string,n:int}>}>,empty:?string} $chart
  */
 $kinds = ['visits' => 'ভিজিট', 'clicks' => 'ক্লিক'];
 $wide = $chart['wide'];
@@ -44,8 +44,8 @@ $y = static fn (int $n): float => $base - $plot * $n / $yMax;
 ?>
 <figure class="adm-chart<?= $wide ? ' adm-chart--wide' : '' ?>">
     <figcaption>
-        <h3><?= e($chart['title']) ?></h3>
-        <p><?= e($chart['sub']) ?></p>
+        <h3><?= e($chart['title']) ?><?php if (!empty($chart['note'])): // শিরোনামের ডানে ( ) এর ভিতর তারিখ/মাস ?> <span class="adm-chart__note">(<?= e($chart['note']) ?>)</span><?php endif; ?></h3>
+        <?php if ((string) $chart['sub'] !== ''): ?><p><?= e($chart['sub']) ?></p><?php endif; ?>
     </figcaption>
     <?php if (!empty($chart['picker'])): // দিন/মাস বাছার ঘর (dashboard.php নিজে তৈরি করা, আগেই escape করা) ?>
         <?= $chart['picker'] ?>
@@ -59,7 +59,7 @@ $y = static fn (int $n): float => $base - $plot * $n / $yMax;
     <?php if ($groups === []): ?>
         <p class="adm-chart__empty"><?= e((string) $chart['empty']) ?></p>
     <?php else: ?>
-        <svg viewBox="0 0 <?= $width ?> <?= $height ?>" role="img" aria-label="<?= e($chart['title'] . ' — ' . $chart['sub']) ?>">
+        <svg viewBox="0 0 <?= $width ?> <?= $height ?>" role="img" aria-label="<?= e($chart['title'] . ' — ' . ($chart['note'] ?? $chart['sub'])) ?>">
             <?php for ($i = 0; $i <= 4; $i++): $value = $step * $i; $ty = $y($value); ?>
                 <line class="adm-chart__grid<?= $i === 0 ? ' adm-chart__grid--base' : '' ?>" x1="<?= $left ?>" x2="<?= $width ?>" y1="<?= $ty ?>" y2="<?= $ty ?>"></line>
                 <text class="adm-chart__axis" x="<?= $left - 8 ?>" y="<?= $ty + 5 ?>" text-anchor="end"><?= e(bn($value)) ?></text>

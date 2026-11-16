@@ -442,29 +442,49 @@ ul.adm-notice {
     font-size: 16px;
 }
 /* গ্রাফের দিন/মাস বাছার ঘর */
+.adm-chart__note {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 16px;
+}
 .adm-chart__pick {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px 10px;
-    margin: 0 0 8px;
+    gap: 6px 8px;
+    margin: 6px 0 8px;
     font-size: 15px;
 }
 .adm-chart__pick label {
     display: inline-flex;
-    flex-wrap: wrap;
     align-items: center;
     gap: 6px;
+    margin: 0;
+    white-space: nowrap;
     color: var(--muted);
 }
 .adm-chart__pick input[type="date"],
 .adm-chart__pick select {
-    padding: 4px 8px;
+    box-sizing: border-box;
+    height: 36px;
+    margin: 0;
+    padding: 4px 6px;
     border: 1px solid var(--line);
     border-radius: 8px;
     font: inherit;
     color: inherit;
     background: #fff;
+}
+/* মাসের ঘর সরু, যাতে "দেখুন" বোতাম একই লাইনে ঘরের মাঝ বরাবর বসে */
+.adm-chart__pick select {
+    width: 9.2em;
+}
+.adm-chart__pick .adm-small {
+    min-height: 34px;
+    margin: 0;
+    padding: 2px 12px;
+    font-size: 16px;
+    align-self: center;
 }
 .adm-chart svg {
     display: block;

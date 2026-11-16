@@ -71,7 +71,7 @@ $monthName = static fn (string $ym): string => $months[(int) substr($ym, 5, 2) -
 
 ob_start(); ?>
 <form class="adm-chart__pick" action="<?= e($dashUrl) ?>" method="get" data-autosubmit>
-    <label>অন্য দিন দেখুন <input type="date" name="day" value="<?= e($shownDay) ?>" min="2020-01-01" max="<?= e($todayYmd) ?>"></label>
+    <label>অন্য দিন <input type="date" name="day" value="<?= e($shownDay) ?>" min="2020-01-01" max="<?= e($todayYmd) ?>"></label>
     <?php if ($chosenMonth !== ''): ?><input type="hidden" name="month" value="<?= e($chosenMonth) ?>"><?php endif; ?>
     <button class="adm-small" type="submit">দেখুন</button>
     <?php if ($chosenDay !== '' && $shownDay !== $yesterdayYmd): ?><a class="adm-link" href="<?= e($dashUrl . ($chosenMonth !== '' ? '?month=' . rawurlencode($chosenMonth) : '')) ?>">গতকালে ফিরুন</a><?php endif; ?>
@@ -80,7 +80,7 @@ ob_start(); ?>
 
 ob_start(); ?>
 <form class="adm-chart__pick" action="<?= e($dashUrl) ?>" method="get" data-autosubmit>
-    <label>অন্য মাস দেখুন
+    <label>অন্য মাস
         <select name="month">
             <?php for ($i = 0; $i < 24; $i++): $ym = date('Y-m', strtotime('first day of this month -' . $i . ' months')); ?>
                 <option value="<?= e($ym) ?>"<?= $ym === $shownMonth ? ' selected' : '' ?>><?= e($monthName($ym)) ?></option>
@@ -98,7 +98,8 @@ $monthTitle = $shownMonth === $lastMonth ? 'গত মাস' : ($shownMonth ===
 $chartList = [
     [
         'title' => $dayTitle,
-        'sub' => $dayLabel($shownDay) . ($shownDay === $yesterdayYmd ? '' : ' ' . bn((int) date('Y', strtotime($shownDay)))),
+        'sub' => '',
+        'note' => $dayLabel($shownDay) . ' ' . bn((int) date('Y', strtotime($shownDay))),
         'wide' => false,
         'groups' => $twoBars($charts['yesterday']['visits'], $charts['yesterday']['clicks']),
         'empty' => null,
@@ -106,7 +107,8 @@ $chartList = [
     ],
     [
         'title' => $monthTitle,
-        'sub' => $monthName($shownMonth),
+        'sub' => '',
+        'note' => $monthName($shownMonth),
         'wide' => false,
         'groups' => $twoBars($charts['month']['visits'], $charts['month']['clicks']),
         'empty' => null,
