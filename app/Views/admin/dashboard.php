@@ -6,6 +6,8 @@
  * @var array<string,array<string,int>> $counts  ['worker' => ['pending' => n, ...], 'agent' => [...]]
  * @var array<string,int> $stats                 AdminStats::overview()
  * @var array<string,mixed> $charts               AdminStats::charts()
+ * @var string|null $pickedDay    প্রথম গ্রাফের বেছে নেওয়া দিন ("Y-m-d"), না বাছলে null (= গতকাল)
+ * @var string|null $pickedMonth  দ্বিতীয় গ্রাফের বেছে নেওয়া মাস ("Y-m"), না বাছলে null (= গত মাস)
  * @var array{visitors:int,home_only:int,many:int,services_page:int,services_seen:int} $visitsToday PageVisits::today()
  */
 use App\Core\AdminAuth;
@@ -54,20 +56,61 @@ $twoBars = static fn (int $visits, int $clicks): array => [
     ['label' => 'সেবায় ভিজিট', 'items' => [['kind' => 'visits', 'n' => $visits]]],
     ['label' => 'মোবাইল বা ইমেইলে ক্লিক', 'items' => [['kind' => 'clicks', 'n' => $clicks]]],
 ];
+
+// প্রথম দুই গ্রাফে দিন ও মাস বাছার ঘর। একটা বাছলে অন্যটার বাছাই লুকানো ঘরে সঙ্গে যায়
+$dashUrl = admin_base();
+$chosenDay = (string) ($pickedDay ?? '');
+$chosenMonth = (string) ($pickedMonth ?? '');
+$todayYmd = date('Y-m-d');
+$yesterdayYmd = date('Y-m-d', strtotime('-1 day'));
+$thisMonth = date('Y-m');
+$lastMonth = date('Y-m', strtotime('first day of last month'));
+$shownDay = $charts['yesterday']['date'];
+$shownMonth = date('Y-m', strtotime($charts['month']['first']));
+$monthName = static fn (string $ym): string => $months[(int) substr($ym, 5, 2) - 1] . ' ' . bn(substr($ym, 0, 4));
+
+ob_start(); ?>
+<form class="adm-chart__pick" action="<?= e($dashUrl) ?>" method="get" data-autosubmit>
+    <label>অন্য দিন দেখুন <input type="date" name="day" value="<?= e($shownDay) ?>" min="2020-01-01" max="<?= e($todayYmd) ?>"></label>
+    <?php if ($chosenMonth !== ''): ?><input type="hidden" name="month" value="<?= e($chosenMonth) ?>"><?php endif; ?>
+    <button class="adm-small" type="submit">দেখুন</button>
+    <?php if ($chosenDay !== '' && $shownDay !== $yesterdayYmd): ?><a class="adm-link" href="<?= e($dashUrl . ($chosenMonth !== '' ? '?month=' . rawurlencode($chosenMonth) : '')) ?>">গতকালে ফিরুন</a><?php endif; ?>
+</form>
+<?php $dayPicker = (string) ob_get_clean();
+
+ob_start(); ?>
+<form class="adm-chart__pick" action="<?= e($dashUrl) ?>" method="get" data-autosubmit>
+    <label>অন্য মাস দেখুন
+        <select name="month">
+            <?php for ($i = 0; $i < 24; $i++): $ym = date('Y-m', strtotime('first day of this month -' . $i . ' months')); ?>
+                <option value="<?= e($ym) ?>"<?= $ym === $shownMonth ? ' selected' : '' ?>><?= e($monthName($ym)) ?></option>
+            <?php endfor; ?>
+        </select>
+    </label>
+    <?php if ($chosenDay !== ''): ?><input type="hidden" name="day" value="<?= e($chosenDay) ?>"><?php endif; ?>
+    <button class="adm-small" type="submit">দেখুন</button>
+    <?php if ($chosenMonth !== '' && $shownMonth !== $lastMonth): ?><a class="adm-link" href="<?= e($dashUrl . ($chosenDay !== '' ? '?day=' . rawurlencode($chosenDay) : '')) ?>">গত মাসে ফিরুন</a><?php endif; ?>
+</form>
+<?php $monthPicker = (string) ob_get_clean();
+
+$dayTitle = $shownDay === $yesterdayYmd ? 'গতকাল' : ($shownDay === $todayYmd ? 'আজ (এ পর্যন্ত)' : 'বেছে নেওয়া দিন');
+$monthTitle = $shownMonth === $lastMonth ? 'গত মাস' : ($shownMonth === $thisMonth ? 'এই মাস (এ পর্যন্ত)' : 'বেছে নেওয়া মাস');
 $chartList = [
     [
-        'title' => 'গতকাল',
-        'sub' => $dayLabel($charts['yesterday']['date']),
+        'title' => $dayTitle,
+        'sub' => $dayLabel($shownDay) . ($shownDay === $yesterdayYmd ? '' : ' ' . bn((int) date('Y', strtotime($shownDay)))),
         'wide' => false,
         'groups' => $twoBars($charts['yesterday']['visits'], $charts['yesterday']['clicks']),
         'empty' => null,
+        'picker' => $dayPicker,
     ],
     [
-        'title' => 'গত মাস',
-        'sub' => $months[(int) date('n', strtotime($charts['month']['first'])) - 1] . ' ' . bn((int) date('Y', strtotime($charts['month']['first']))),
+        'title' => $monthTitle,
+        'sub' => $monthName($shownMonth),
         'wide' => false,
         'groups' => $twoBars($charts['month']['visits'], $charts['month']['clicks']),
         'empty' => null,
+        'picker' => $monthPicker,
     ],
     [
         'title' => 'গত ৭ দিনে কোন সেবায় খোঁজ ও মোবাইল',

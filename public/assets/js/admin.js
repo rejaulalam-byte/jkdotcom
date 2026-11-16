@@ -105,6 +105,15 @@
     });
 })();
 
+/* ---- স্বয়ংক্রিয় জমা: <form data-autosubmit> এর কোনো ঘর বদলালেই ফর্ম যায় (JavaScript না থাকলে "দেখুন" বোতাম আছে) ---- */
+(function () {
+    document.querySelectorAll("form[data-autosubmit]").forEach(function (form) {
+        form.addEventListener("change", function () {
+            form.submit();
+        });
+    });
+})();
+
 /* ---- বিভাগ → জেলা → উপজেলা: একটা অন্যটাকে ছাঁকে ([data-geo] সিলেক্ট; সম্পাদনা ফর্মে) ----
    বিভাগ বাছলে শুধু সেই বিভাগের জেলা দেখায়, জেলা বাছলে শুধু সেই জেলার উপজেলা। উপজেলা বা জেলা আগে বাছলে ওপরেরগুলো নিজে বসে যায়। */
 (function () {

@@ -24,7 +24,10 @@ final class PanelController
     {
         $admin = AdminAuth::require();
         $counts = UserRepository::countByRoleStatus();
-        $this->render('admin/dashboard', $admin, 'ড্যাশবোর্ড', ['counts' => $counts, 'stats' => AdminStats::overview(), 'charts' => AdminStats::charts(), 'visitsToday' => \App\Models\PageVisits::today(), 'hideTitle' => true]);
+        // প্রথম দুই গ্রাফের জন্য বেছে নেওয়া দিন ও মাস (ঠিক না হলে null = গতকাল ও গত মাস)
+        $day = AdminStats::cleanDay($_GET['day'] ?? null);
+        $month = AdminStats::cleanMonth($_GET['month'] ?? null);
+        $this->render('admin/dashboard', $admin, 'ড্যাশবোর্ড', ['counts' => $counts, 'stats' => AdminStats::overview(), 'charts' => AdminStats::charts($day, $month), 'pickedDay' => $day, 'pickedMonth' => $month, 'visitsToday' => \App\Models\PageVisits::today(), 'hideTitle' => true]);
     }
 
     // ---- নিজের অ্যাকাউন্ট ----------------------------------------------------------------------

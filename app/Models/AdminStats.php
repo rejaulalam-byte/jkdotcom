@@ -31,17 +31,40 @@ final class AdminStats
     /** তৃতীয় গ্রাফে সর্বোচ্চ কতটি সেবা। */
     private const WEEK_SERVICES = 20;
 
+    /** ব্রাউজার থেকে আসা তারিখ ("২০২৬-১১-১৬" ছাঁদে) ঠিক হলে ও আজকের পরের না হলে সেটা, নইলে null। */
+    public static function cleanDay(mixed $value): ?string
+    {
+        if (!is_string($value) || preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $value, $m) !== 1 || !checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
+            return null;
+        }
+
+        return $value >= '2020-01-01' && $value <= date('Y-m-d') ? $value : null;
+    }
+
+    /** মাস ("২০২৬-১১" ছাঁদে) ঠিক হলে ও এই মাসের পরের না হলে সেটা, নইলে null। */
+    public static function cleanMonth(mixed $value): ?string
+    {
+        if (!is_string($value) || preg_match('/^(\d{4})-(\d{2})$/', $value, $m) !== 1 || (int) $m[2] < 1 || (int) $m[2] > 12) {
+            return null;
+        }
+
+        return $value >= '2020-01' && $value <= date('Y-m') ? $value : null;
+    }
+
     /**
-     * ড্যাশবোর্ডের তিন গ্রাফের তথ্য: গতকাল, গত মাস (ক্যালেন্ডারের আগের মাস) ও গত ৭ দিন (গতকাল পর্যন্ত) সেবা অনুযায়ী।
+     * ড্যাশবোর্ডের তিন গ্রাফের তথ্য: একটি দিন (না দিলে গতকাল), একটি মাস (না দিলে গত মাস) ও গত ৭ দিন (গতকাল পর্যন্ত) সেবা অনুযায়ী।
      *
+     * @param string|null $day   "Y-m-d" (cleanDay দিয়ে যাচাই করা)
+     * @param string|null $month "Y-m"   (cleanMonth দিয়ে যাচাই করা)
      * @return array{yesterday:array{date:string,visits:int,clicks:int},month:array{first:string,visits:int,clicks:int},
      *               week:array{from:string,to:string,rows:list<array{name:string,visits:int,clicks:int}>,more:int}}
      */
-    public static function charts(): array
+    public static function charts(?string $day = null, ?string $month = null): array
     {
         $yesterday = date('Y-m-d', strtotime('-1 day'));
-        $monthFirst = date('Y-m-01', strtotime('first day of last month'));
-        $monthLast = date('Y-m-t', strtotime('first day of last month'));
+        $day ??= $yesterday;
+        $monthFirst = $month !== null ? $month . '-01' : date('Y-m-01', strtotime('first day of last month'));
+        $monthLast = date('Y-m-t', strtotime($monthFirst));
         $weekFrom = date('Y-m-d', strtotime('-7 days'));
 
         $names = [];
@@ -60,9 +83,9 @@ final class AdminStats
 
         return [
             'yesterday' => [
-                'date' => $yesterday,
-                'visits' => array_sum(WorkerRotation::serviceVisitsBetween($yesterday, $yesterday)),
-                'clicks' => ContactTrackingRepository::clicksBetween($yesterday, $yesterday)['total'],
+                'date' => $day,
+                'visits' => array_sum(WorkerRotation::serviceVisitsBetween($day, $day)),
+                'clicks' => ContactTrackingRepository::clicksBetween($day, $day)['total'],
             ],
             'month' => [
                 'first' => $monthFirst,

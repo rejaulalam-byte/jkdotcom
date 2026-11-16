@@ -47,6 +47,9 @@ $y = static fn (int $n): float => $base - $plot * $n / $yMax;
         <h3><?= e($chart['title']) ?></h3>
         <p><?= e($chart['sub']) ?></p>
     </figcaption>
+    <?php if (!empty($chart['picker'])): // দিন/মাস বাছার ঘর (dashboard.php নিজে তৈরি করা, আগেই escape করা) ?>
+        <?= $chart['picker'] ?>
+    <?php endif; ?>
     <?php if ($wide): ?>
         <ul class="adm-chart__legend">
             <li><span class="adm-chart__key adm-chart__key--visits"></span>সেবার পেইজে ভিজিট</li>

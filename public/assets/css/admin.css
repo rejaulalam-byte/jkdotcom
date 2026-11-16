@@ -441,6 +441,31 @@ ul.adm-notice {
     color: var(--muted);
     font-size: 16px;
 }
+/* গ্রাফের দিন/মাস বাছার ঘর */
+.adm-chart__pick {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin: 0 0 8px;
+    font-size: 15px;
+}
+.adm-chart__pick label {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+}
+.adm-chart__pick input[type="date"],
+.adm-chart__pick select {
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font: inherit;
+    color: inherit;
+    background: #fff;
+}
 .adm-chart svg {
     display: block;
     width: 100%;
