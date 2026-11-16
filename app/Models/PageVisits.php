@@ -109,7 +109,8 @@ final class PageVisits
                 'visitors' => $count(''),
                 'home_only' => $count("HAVING COUNT(*) = 1 AND MAX(page) = '/'"),
                 'many' => $count('HAVING COUNT(*) >= 2'),
-                'services_only' => $count("HAVING SUM(CASE WHEN page LIKE '/services/%' THEN 0 ELSE 1 END) = 0"),
+                // "শুধু সেবা পেইজে": সেবাসমূহের মূল পেইজ (/services) ও তার ভেতরের পেশার তালিকা (/services/…) ছাড়া আর কিছু দেখেননি
+                'services_only' => $count("HAVING SUM(CASE WHEN page = '/services' OR page LIKE '/services/%' THEN 0 ELSE 1 END) = 0"),
                 'services_seen' => (int) $seen->fetchColumn(),
             ];
         } catch (Throwable $e) {
