@@ -51,28 +51,50 @@ final class AdminStats
         return $value >= '2020-01' && $value <= date('Y-m') ? $value : null;
     }
 
+    /** তৃতীয় গ্রাফে সর্বোচ্চ কত দিনের পাল্লা। */
+    public const MAX_RANGE_DAYS = 366;
+
     /**
-     * ড্যাশবোর্ডের তিন গ্রাফের তথ্য: একটি দিন (না দিলে গতকাল), একটি মাস (না দিলে গত মাস) ও গত ৭ দিন (গতকাল পর্যন্ত) সেবা অনুযায়ী।
+     * তৃতীয় গ্রাফের "থেকে–পর্যন্ত": না দিলে গত ৭ দিন (গতকাল পর্যন্ত); উল্টো দিলে ঠিক করে দেয়; পাল্লা MAX_RANGE_DAYS-এর বেশি হলে শেষ থেকে গোনা হয়।
+     *
+     * @return array{0:string,1:string} [থেকে, পর্যন্ত]
+     */
+    public static function range(?string $from, ?string $to): array
+    {
+        $to ??= date('Y-m-d', strtotime('-1 day'));
+        $from ??= date('Y-m-d', strtotime('-7 days'));
+        if ($from > $to) {
+            [$from, $to] = [$to, $from];
+        }
+        $earliest = date('Y-m-d', strtotime($to . ' -' . (self::MAX_RANGE_DAYS - 1) . ' days'));
+
+        return [max($from, $earliest), $to];
+    }
+
+    /**
+     * ড্যাশবোর্ডের তিন গ্রাফের তথ্য: একটি দিন (না দিলে গতকাল), একটি মাস (না দিলে গত মাস) ও একটি পাল্লা (না দিলে গত ৭ দিন, গতকাল পর্যন্ত) সেবা অনুযায়ী।
      *
      * @param string|null $day   "Y-m-d" (cleanDay দিয়ে যাচাই করা)
      * @param string|null $month "Y-m"   (cleanMonth দিয়ে যাচাই করা)
+     * @param string|null $from  "Y-m-d" পাল্লার শুরু (cleanDay দিয়ে যাচাই করা)
+     * @param string|null $to    "Y-m-d" পাল্লার শেষ
      * @return array{yesterday:array{date:string,visits:int,clicks:int},month:array{first:string,visits:int,clicks:int},
      *               week:array{from:string,to:string,rows:list<array{name:string,visits:int,clicks:int}>,more:int}}
      */
-    public static function charts(?string $day = null, ?string $month = null): array
+    public static function charts(?string $day = null, ?string $month = null, ?string $from = null, ?string $to = null): array
     {
         $yesterday = date('Y-m-d', strtotime('-1 day'));
         $day ??= $yesterday;
         $monthFirst = $month !== null ? $month . '-01' : date('Y-m-01', strtotime('first day of last month'));
         $monthLast = date('Y-m-t', strtotime($monthFirst));
-        $weekFrom = date('Y-m-d', strtotime('-7 days'));
+        [$weekFrom, $weekTo] = self::range($from, $to);
 
         $names = [];
         foreach (ServiceRepository::all() as $service) {
             $names[$service['slug']] = $service['name'];
         }
-        $weekVisits = WorkerRotation::serviceVisitsBetween($weekFrom, $yesterday);
-        $weekClicks = ContactTrackingRepository::clicksBetween($weekFrom, $yesterday)['by_slug'];
+        $weekVisits = WorkerRotation::serviceVisitsBetween($weekFrom, $weekTo);
+        $weekClicks = ContactTrackingRepository::clicksBetween($weekFrom, $weekTo)['by_slug'];
         $rows = [];
         foreach (array_unique(array_merge(array_keys($weekVisits), array_keys($weekClicks))) as $slug) {
             if (isset($names[$slug])) {
@@ -94,7 +116,7 @@ final class AdminStats
             ],
             'week' => [
                 'from' => $weekFrom,
-                'to' => $yesterday,
+                'to' => $weekTo,
                 'rows' => array_slice($rows, 0, self::WEEK_SERVICES),
                 'more' => max(0, count($rows) - self::WEEK_SERVICES),
             ],

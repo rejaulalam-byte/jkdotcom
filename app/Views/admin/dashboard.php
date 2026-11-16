@@ -8,6 +8,8 @@
  * @var array<string,mixed> $charts               AdminStats::charts()
  * @var string|null $pickedDay    প্রথম গ্রাফের বেছে নেওয়া দিন ("Y-m-d"), না বাছলে null (= গতকাল)
  * @var string|null $pickedMonth  দ্বিতীয় গ্রাফের বেছে নেওয়া মাস ("Y-m"), না বাছলে null (= গত মাস)
+ * @var string|null $pickedFrom   তৃতীয় গ্রাফের বেছে নেওয়া শুরুর তারিখ, না বাছলে null (= ৭ দিন আগে)
+ * @var string|null $pickedTo     তৃতীয় গ্রাফের বেছে নেওয়া শেষ তারিখ, না বাছলে null (= গতকাল)
  * @var array{visitors:int,home_only:int,many:int,services_page:int,services_seen:int} $visitsToday PageVisits::today()
  */
 use App\Core\AdminAuth;
@@ -57,24 +59,49 @@ $twoBars = static fn (int $visits, int $clicks): array => [
     ['label' => 'মোবাইল বা ইমেইলে ক্লিক', 'items' => [['kind' => 'clicks', 'n' => $clicks]]],
 ];
 
-// প্রথম দুই গ্রাফে দিন ও মাস বাছার ঘর। একটা বাছলে অন্যটার বাছাই লুকানো ঘরে সঙ্গে যায়
+// গ্রাফে দিন, মাস ও থেকে–পর্যন্ত বাছার ঘর। একটা ফর্মে বাছলে অন্যগুলোর বাছাই লুকানো ঘরে সঙ্গে যায়
 $dashUrl = admin_base();
-$chosenDay = (string) ($pickedDay ?? '');
-$chosenMonth = (string) ($pickedMonth ?? '');
+$chosen = [
+    'day' => (string) ($pickedDay ?? ''),
+    'month' => (string) ($pickedMonth ?? ''),
+    'from' => (string) ($pickedFrom ?? ''),
+    'to' => (string) ($pickedTo ?? ''),
+];
+// এই ফর্ম বাদে অন্যগুলোর বাছাই লুকানো ঘর হয়ে ফর্মের সঙ্গে যায়
+$keep = static function (array $own) use ($chosen): string {
+    $html = '';
+    foreach ($chosen as $name => $value) {
+        if ($value !== '' && !in_array($name, $own, true)) {
+            $html .= '<input type="hidden" name="' . e($name) . '" value="' . e($value) . '">';
+        }
+    }
+
+    return $html;
+};
+// "ফিরুন" লিংকের ঠিকানা: এই ফর্মের বাছাই বাদ, অন্যগুলো থাকে
+$backUrl = static function (array $own) use ($chosen, $dashUrl): string {
+    $params = array_filter(array_diff_key($chosen, array_flip($own)), static fn (string $v): bool => $v !== '');
+
+    return $dashUrl . ($params === [] ? '' : '?' . http_build_query($params));
+};
 $todayYmd = date('Y-m-d');
 $yesterdayYmd = date('Y-m-d', strtotime('-1 day'));
 $thisMonth = date('Y-m');
 $lastMonth = date('Y-m', strtotime('first day of last month'));
 $shownDay = $charts['yesterday']['date'];
 $shownMonth = date('Y-m', strtotime($charts['month']['first']));
+$shownFrom = $charts['week']['from'];
+$shownTo = $charts['week']['to'];
+$rangeIsDefault = $shownFrom === date('Y-m-d', strtotime('-7 days')) && $shownTo === $yesterdayYmd;
 $monthName = static fn (string $ym): string => $months[(int) substr($ym, 5, 2) - 1] . ' ' . bn(substr($ym, 0, 4));
+$fullDay = static fn (string $date): string => $dayLabel($date) . ' ' . bn((int) date('Y', strtotime($date)));
 
 ob_start(); ?>
 <form class="adm-chart__pick" action="<?= e($dashUrl) ?>" method="get" data-autosubmit>
     <label>অন্য দিন <input type="date" name="day" value="<?= e($shownDay) ?>" min="2020-01-01" max="<?= e($todayYmd) ?>"></label>
-    <?php if ($chosenMonth !== ''): ?><input type="hidden" name="month" value="<?= e($chosenMonth) ?>"><?php endif; ?>
+    <?= $keep(['day']) ?>
     <button class="adm-small" type="submit">দেখুন</button>
-    <?php if ($chosenDay !== '' && $shownDay !== $yesterdayYmd): ?><a class="adm-link" href="<?= e($dashUrl . ($chosenMonth !== '' ? '?month=' . rawurlencode($chosenMonth) : '')) ?>">গতকালে ফিরুন</a><?php endif; ?>
+    <?php if ($chosen['day'] !== '' && $shownDay !== $yesterdayYmd): ?><a class="adm-link" href="<?= e($backUrl(['day'])) ?>">গতকালে ফিরুন</a><?php endif; ?>
 </form>
 <?php $dayPicker = (string) ob_get_clean();
 
@@ -87,19 +114,32 @@ ob_start(); ?>
             <?php endfor; ?>
         </select>
     </label>
-    <?php if ($chosenDay !== ''): ?><input type="hidden" name="day" value="<?= e($chosenDay) ?>"><?php endif; ?>
+    <?= $keep(['month']) ?>
     <button class="adm-small" type="submit">দেখুন</button>
-    <?php if ($chosenMonth !== '' && $shownMonth !== $lastMonth): ?><a class="adm-link" href="<?= e($dashUrl . ($chosenDay !== '' ? '?day=' . rawurlencode($chosenDay) : '')) ?>">গত মাসে ফিরুন</a><?php endif; ?>
+    <?php if ($chosen['month'] !== '' && $shownMonth !== $lastMonth): ?><a class="adm-link" href="<?= e($backUrl(['month'])) ?>">গত মাসে ফিরুন</a><?php endif; ?>
 </form>
 <?php $monthPicker = (string) ob_get_clean();
 
+// তৃতীয় গ্রাফ: দুই তারিখ। দুটো বাছা শেষ হলে "দেখুন" চাপলেই যায় (আপনা-আপনি জমা দেওয়া হয় না, নইলে প্রথম তারিখ বাছতেই আধা-বাছাই চলে যেত)
+ob_start(); ?>
+<form class="adm-chart__pick adm-chart__pick--range" action="<?= e($dashUrl) ?>" method="get">
+    <label>কত তারিখ থেকে <input type="date" name="from" value="<?= e($shownFrom) ?>" min="2020-01-01" max="<?= e($todayYmd) ?>"></label>
+    <label>কত তারিখ পর্যন্ত <input type="date" name="to" value="<?= e($shownTo) ?>" min="2020-01-01" max="<?= e($todayYmd) ?>"></label>
+    <?= $keep(['from', 'to']) ?>
+    <button class="adm-small" type="submit">দেখুন</button>
+    <?php if (!$rangeIsDefault): ?><a class="adm-link" href="<?= e($backUrl(['from', 'to'])) ?>">গত ৭ দিনে ফিরুন</a><?php endif; ?>
+    <span class="adm-muted adm-hint">(সর্বোচ্চ <?= e(bn(\App\Models\AdminStats::MAX_RANGE_DAYS)) ?> দিন)</span>
+</form>
+<?php $rangePicker = (string) ob_get_clean();
+
 $dayTitle = $shownDay === $yesterdayYmd ? 'গতকাল' : ($shownDay === $todayYmd ? 'আজ (এ পর্যন্ত)' : 'বেছে নেওয়া দিন');
 $monthTitle = $shownMonth === $lastMonth ? 'গত মাস' : ($shownMonth === $thisMonth ? 'এই মাস (এ পর্যন্ত)' : 'বেছে নেওয়া মাস');
+$rangeTitle = $rangeIsDefault ? 'গত ৭ দিনে কোন কোন সেবায় খোঁজ ও মোবাইল বা ইমেইলে ক্লিক করেছে' : 'কোন কোন সেবায় খোঁজ ও মোবাইল বা ইমেইলে ক্লিক করেছে';
 $chartList = [
     [
         'title' => $dayTitle,
         'sub' => '',
-        'note' => $dayLabel($shownDay) . ' ' . bn((int) date('Y', strtotime($shownDay))),
+        'note' => $fullDay($shownDay),
         'wide' => false,
         'groups' => $twoBars($charts['yesterday']['visits'], $charts['yesterday']['clicks']),
         'empty' => null,
@@ -115,14 +155,15 @@ $chartList = [
         'picker' => $monthPicker,
     ],
     [
-        'title' => 'গত ৭ দিনে কোন সেবায় খোঁজ ও মোবাইল',
-        'sub' => $dayLabel($charts['week']['from']) . ' থেকে ' . $dayLabel($charts['week']['to']) . ($charts['week']['more'] > 0 ? ' · সবচেয়ে বেশিগুলো; আরও ' . bn($charts['week']['more']) . 'টি সেবা আছে' : ''),
+        'title' => $rangeTitle,
+        'sub' => $fullDay($shownFrom) . ' থেকে ' . $fullDay($shownTo) . ($charts['week']['more'] > 0 ? ' · সবচেয়ে বেশিগুলো; আরও ' . bn($charts['week']['more']) . 'টি সেবা আছে' : ''),
         'wide' => true,
         'groups' => array_map(static fn (array $r): array => [
             'label' => $r['name'],
             'items' => [['kind' => 'visits', 'n' => $r['visits']], ['kind' => 'clicks', 'n' => $r['clicks']]],
         ], $charts['week']['rows']),
-        'empty' => 'গত ৭ দিনে এখনও কোনো সেবায় ভিজিট বা ক্লিক নেই।',
+        'empty' => $rangeIsDefault ? 'গত ৭ দিনে এখনও কোনো সেবায় ভিজিট বা ক্লিক নেই।' : 'এই সময়ে কোনো সেবায় ভিজিট বা ক্লিক নেই।',
+        'picker' => $rangePicker,
     ],
 ];
 ?>
