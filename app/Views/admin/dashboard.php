@@ -190,9 +190,9 @@ $chartList = [
                 <li><span>আজ সেবা পেইজে ভিজিট করেছেন কতজন</span><b><?= e(bn((int) $visitsToday['services_page'])) ?></b></li>
                 <li><span>আজ সেবাসমূহ থেকে কতটা সেবার পেইজ দেখা হয়েছে</span><b><?= e(bn((int) $visitsToday['services_seen'])) ?></b></li>
                 <?php // আগের ডান পাশের "আজকের হিসাব" ঘর: এখন গ্রাফের নিচে একই তালিকায় ?>
-                <li><span>কর্মীর পেইজ দেখা হয়েছে</span><b><?= e(bn((int) $stats['visits_today'])) ?></b></li>
-                <li><span>মোবাইল/ইমেইলে ক্লিক</span><b><?= e(bn((int) $stats['clicks_today'])) ?></b></li>
-                <li><span>আগ্রহী দর্শক <small class="adm-hint">(নাম-মোবাইল দিয়েছেন)</small></span><b><?= e(bn((int) $stats['leads_today'])) ?></b></li>
+                <li><span>আজকে কর্মীর পেইজ দেখা হয়েছে</span><b><?= e(bn((int) $stats['visits_today'])) ?></b></li>
+                <li><span>আজকে মোবাইল/ইমেইলে ক্লিক করেছেন</span><b><?= e(bn((int) $stats['clicks_today'])) ?></b></li>
+                <li><span>আজকের আগ্রহী দর্শক <small class="adm-hint">(নাম-মোবাইল দিয়েছেন)</small></span><b><?= e(bn((int) $stats['leads_today'])) ?></b></li>
             </ul>
         </section>
     </div>
